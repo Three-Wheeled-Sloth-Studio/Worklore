@@ -11,6 +11,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: normalize-license-dev
+  cancel-in-progress: true
+
 jobs:
   normalize:
     if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, 'Normalize AGPL license text')
