@@ -105,11 +105,11 @@ pub fn extract_resume_candidates(
         existing_count: candidates.len().saturating_sub(created.len()),
         candidates,
         message: if created.is_empty() {
-            "No new resume bullets were found. Existing candidates were left unchanged."
+            "No new work-history bullets were found. Titles, summaries, skills, and other resume sections were ignored."
                 .to_string()
         } else {
             format!(
-                "Created {} story candidate{} from the resume.",
+                "Created {} story candidate{} from work-history bullets.",
                 created.len(),
                 if created.len() == 1 { "" } else { "s" }
             )
@@ -189,13 +189,30 @@ struct ParsedBullet {
     heading: Option<String>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum ResumeSection {
+    OutsideEmployment,
+    Employment,
+}
+
 fn parse_resume_bullets(text: &str) -> Vec<ParsedBullet> {
     let mut results = Vec::new();
+    let mut section = ResumeSection::OutsideEmployment;
     let mut heading: Option<String> = None;
 
     for (index, raw_line) in text.lines().enumerate() {
         let trimmed = raw_line.trim();
         if trimmed.is_empty() {
+            continue;
+        }
+
+        if let Some(next_section) = classify_resume_section(trimmed) {
+            section = next_section;
+            heading = None;
+            continue;
+        }
+
+        if section != ResumeSection::Employment {
             continue;
         }
 
@@ -216,6 +233,67 @@ fn parse_resume_bullets(text: &str) -> Vec<ParsedBullet> {
     }
 
     results
+}
+
+fn classify_resume_section(line: &str) -> Option<ResumeSection> {
+    let normalized = normalize_section_heading(line);
+
+    const EMPLOYMENT_SECTIONS: &[&str] = &[
+        "work history",
+        "employment history",
+        "work experience",
+        "professional experience",
+        "employment experience",
+        "career history",
+        "professional history",
+    ];
+
+    const NON_EMPLOYMENT_SECTIONS: &[&str] = &[
+        "summary",
+        "career summary",
+        "professional summary",
+        "executive summary",
+        "profile",
+        "career profile",
+        "professional profile",
+        "objective",
+        "qualifications",
+        "core qualifications",
+        "skills",
+        "technical skills",
+        "core competencies",
+        "competencies",
+        "education",
+        "certification",
+        "certifications",
+        "licenses",
+        "projects",
+        "selected projects",
+        "publications",
+        "awards",
+        "volunteer experience",
+        "community involvement",
+        "professional affiliations",
+        "affiliations",
+        "references",
+    ];
+
+    if EMPLOYMENT_SECTIONS.contains(&normalized.as_str()) {
+        Some(ResumeSection::Employment)
+    } else if NON_EMPLOYMENT_SECTIONS.contains(&normalized.as_str()) {
+        Some(ResumeSection::OutsideEmployment)
+    } else {
+        None
+    }
+}
+
+fn normalize_section_heading(line: &str) -> String {
+    line.trim()
+        .trim_matches(|character: char| matches!(character, ':' | '-' | '_' | '=' | '#'))
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+        .to_ascii_lowercase()
 }
 
 fn strip_bullet_prefix(line: &str) -> Option<&str> {
@@ -350,14 +428,31 @@ mod tests {
     use super::*;
 
     #[test]
-    fn parses_resume_bullets_with_role_context() {
-        let text = "Acme Cooperative | Product Manager | 2022 to 2026\n\n- Reduced review time by 80 percent.\n- Led an LLM intake tool for 14 teams.";
+    fn parses_only_bullets_inside_work_history() {
+        let text = "PRODUCT MANAGER\n\nPROFESSIONAL SUMMARY\n- Product leader with 15 years of experience.\n\nWORK HISTORY\n\nAcme Cooperative | Product Manager | 2022 to 2026\n\n- Reduced review time by 80 percent.\n- Led an LLM intake tool for 14 teams.\n\nSKILLS\n- Product strategy\n- SQL";
         let bullets = parse_resume_bullets(text);
         assert_eq!(bullets.len(), 2);
         assert_eq!(
             bullets[0].heading.as_deref(),
             Some("Acme Cooperative | Product Manager | 2022 to 2026")
         );
+        assert!(bullets
+            .iter()
+            .all(|bullet| !bullet.claim.contains("Product leader")));
+    }
+
+    #[test]
+    fn ignores_top_level_title_and_summary_when_no_employment_section_exists() {
+        let text = "SENIOR PRODUCT MANAGER\n\nCAREER SUMMARY\n- Reduced delivery cycle time by 80 percent.\n- Led 14 teams.";
+        assert!(parse_resume_bullets(text).is_empty());
+    }
+
+    #[test]
+    fn supports_employment_history_and_stops_at_education() {
+        let text = "EMPLOYMENT HISTORY\nNorthwind Health - Product Manager\n- Automated intake for 20 programs.\n\nEDUCATION\n- Bachelor of Science, Computer Science";
+        let bullets = parse_resume_bullets(text);
+        assert_eq!(bullets.len(), 1);
+        assert_eq!(bullets[0].claim, "Automated intake for 20 programs.");
     }
 
     #[test]
