@@ -6,10 +6,12 @@ import type {
   EntityReviewView,
   ExtractCandidatesResult,
   ImportSourceResult,
+  InterviewSummary,
   ResolveEntityReviewRequest,
   ResolveEntityReviewResult,
   SourceSummary,
   SourceType,
+  SubmitInterviewResponseRequest,
   VaultSummary,
 } from "../domain/types";
 
@@ -90,5 +92,39 @@ export async function setStoryCandidateStatus(
     vaultPath,
     candidateId,
     status,
+  });
+}
+
+export async function startGuidedInterview(
+  vaultPath: string,
+  candidateId: string,
+): Promise<InterviewSummary> {
+  return invoke<InterviewSummary>("start_guided_interview", {
+    vaultPath,
+    candidateId,
+  });
+}
+
+export async function listGuidedInterviews(vaultPath: string): Promise<InterviewSummary[]> {
+  return invoke<InterviewSummary[]>("list_guided_interviews", { vaultPath });
+}
+
+export async function submitGuidedInterviewResponse(
+  vaultPath: string,
+  request: SubmitInterviewResponseRequest,
+): Promise<InterviewSummary> {
+  return invoke<InterviewSummary>("submit_guided_interview_response", {
+    vaultPath,
+    request,
+  });
+}
+
+export async function resumeGuidedInterview(
+  vaultPath: string,
+  interviewId: string,
+): Promise<InterviewSummary> {
+  return invoke<InterviewSummary>("resume_guided_interview", {
+    vaultPath,
+    interviewId,
   });
 }
