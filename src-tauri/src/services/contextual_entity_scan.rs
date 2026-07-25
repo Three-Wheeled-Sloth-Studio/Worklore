@@ -11,10 +11,12 @@ use crate::{
     },
     error::ServiceResult,
     io_utils::{read_json, write_json_atomic},
-    services::entity_scan::{load_registry, save_registry, ScanOutcome},
+    services::entity_scan::{
+        is_generic_entity_term, is_public_domain_acronym, load_registry, save_registry, ScanOutcome,
+    },
 };
 
-const SCAN_VERSION: &str = "contextual-project-scan-v1";
+const SCAN_VERSION: &str = "contextual-project-scan-v2";
 const MIN_CANDIDATE_SCORE: f32 = 0.65;
 
 #[derive(Debug)]
@@ -82,8 +84,8 @@ pub fn scan_named_projects(
             normalized_text: detection.normalized.clone(),
             suggested_entity_type: "project".to_string(),
             scores: ReviewScores {
-                extraction: 0.84,
-                type_score: 0.72,
+                extraction: 0.92,
+                type_score: 0.84,
                 best_identity_match: candidates
                     .iter()
                     .map(|candidate| candidate.score)
@@ -110,9 +112,10 @@ pub fn scan_named_projects(
             .find(|entity| entity.entity_id == entity_id)
         {
             entity.notes = if review_item.candidate_matches.is_empty() {
-                "Detected from a project-name cue and awaiting confirmation.".to_string()
+                "Detected from an explicit project-name cue and awaiting confirmation.".to_string()
             } else {
-                "Detected from a project-name cue with possible existing matches.".to_string()
+                "Detected from an explicit project-name cue with possible existing matches."
+                    .to_string()
             };
         }
     }
@@ -136,17 +139,17 @@ pub fn scan_named_projects(
 fn detect_named_projects(text: &str) -> Vec<NamedDetection> {
     let patterns = [
         Regex::new(
-            r"(?i:(?:development|implementation|launch|creation|rollout) of)\s+(?:the\s+)?(?P<name>[A-Z][A-Za-z0-9&.'-]{2,})",
+            r"(?i:(?:development|implementation|launch|creation|rollout|deployment|redesign) of)\s+(?:the\s+)?(?P<name>[A-Z][A-Za-z0-9&.'-]{2,})",
         )
-        .expect("development cue regex"),
+        .expect("strong project cue regex"),
         Regex::new(
-            r"(?i:(?:built|created|launched|introduced|implemented|named|called))\s+(?:a\s+|an\s+|the\s+)?(?P<name>[A-Z][A-Za-z0-9&.'-]{2,})",
+            r"(?i:(?:project|product|platform|system|tool|initiative|program))\s+(?:(?:called|named|known as)\s+)(?P<name>[A-Z][A-Za-z0-9&.'-]{2,})",
         )
-        .expect("verb cue regex"),
+        .expect("explicit named project regex"),
         Regex::new(
-            r"(?i:(?:project|product|platform|system|tool))\s+(?:(?:called|named)\s+)?(?P<name>[A-Z][A-Za-z0-9&.'-]{2,})",
+            r"(?i:(?:code-named|codenamed|known as))\s+(?P<name>[A-Z][A-Za-z0-9&.'-]{2,})",
         )
-        .expect("noun cue regex"),
+        .expect("code name regex"),
     ];
 
     let mut results = Vec::new();
@@ -156,7 +159,7 @@ fn detect_named_projects(text: &str) -> Vec<NamedDetection> {
             let Some(matched) = captures.name("name") else {
                 continue;
             };
-            if is_generic_name(matched.as_str()) {
+            if !is_plausible_project_name(matched.as_str()) {
                 continue;
             }
             let key = (matched.start(), matched.end());
@@ -175,6 +178,21 @@ fn detect_named_projects(text: &str) -> Vec<NamedDetection> {
     }
     results.sort_by_key(|item| item.start);
     results
+}
+
+fn is_plausible_project_name(value: &str) -> bool {
+    let trimmed = value.trim();
+    if trimmed.len() < 4 || is_generic_entity_term(trimmed) {
+        return false;
+    }
+    if trimmed
+        .chars()
+        .all(|character| character.is_ascii_uppercase())
+        && is_public_domain_acronym(trimmed)
+    {
+        return false;
+    }
+    true
 }
 
 fn ranked_candidates(entities: &[PrivateEntity], context: &str) -> Vec<ReviewCandidateMatch> {
@@ -238,9 +256,38 @@ fn ranked_candidates(entities: &[PrivateEntity], context: &str) -> Vec<ReviewCan
 
 fn meaningful_tokens(value: &str) -> HashSet<String> {
     const STOP_WORDS: &[&str] = &[
-        "the", "and", "for", "with", "from", "into", "used", "use", "that", "this", "was", "were",
-        "are", "an", "a", "of", "to", "in", "on", "by", "before", "after", "project", "product",
+        "the",
+        "and",
+        "for",
+        "with",
+        "from",
+        "into",
+        "used",
+        "use",
+        "that",
+        "this",
+        "was",
+        "were",
+        "are",
+        "an",
+        "a",
+        "of",
+        "to",
+        "in",
+        "on",
+        "by",
+        "before",
+        "after",
+        "project",
+        "product",
         "system",
+        "tool",
+        "lead",
+        "manager",
+        "management",
+        "leadership",
+        "strategy",
+        "operations",
     ];
 
     value
@@ -276,7 +323,7 @@ fn create_provisional_project(
             value: detection.text.clone(),
             normalized_value: detection.normalized.clone(),
             status: "inferred".to_string(),
-            source: "scan".to_string(),
+            source: "contextual_project_scan_v2".to_string(),
         }],
         relationships: Vec::new(),
         occurrences: vec![EntityOccurrence {
@@ -285,8 +332,8 @@ fn create_provisional_project(
             record_id: record_id.to_string(),
             locator: locator.to_string(),
             matched_text: detection.text.clone(),
-            extraction_confidence: 0.84,
-            type_confidence: 0.72,
+            extraction_confidence: 0.92,
+            type_confidence: 0.84,
             identity_match_confidence: 0.0,
             first_seen_at: now.to_string(),
             last_seen_at: now.to_string(),
@@ -310,6 +357,15 @@ fn add_occurrence(
     now: &str,
     identity_match_confidence: f32,
 ) {
+    if let Some(existing) = entity
+        .occurrences
+        .iter_mut()
+        .find(|occurrence| occurrence.record_id == record_id && occurrence.locator == locator)
+    {
+        existing.last_seen_at = now.to_string();
+        return;
+    }
+
     entity.occurrences.push(EntityOccurrence {
         occurrence_id: format!("occurrence_{}", Uuid::now_v7()),
         record_type: record_type.to_string(),
@@ -358,18 +414,11 @@ fn existing_review_locators(vault_path: &Path, record_id: &str) -> ServiceResult
             continue;
         }
         let item: EntityReviewItem = read_json(&entry.path())?;
-        if item.record_id == record_id {
+        if item.record_id == record_id && item.status == "pending" {
             locators.insert(item.locator);
         }
     }
     Ok(locators)
-}
-
-fn is_generic_name(value: &str) -> bool {
-    matches!(
-        value.to_ascii_lowercase().as_str(),
-        "the" | "this" | "that" | "new" | "existing" | "current" | "team" | "user"
-    )
 }
 
 fn normalize(value: &str) -> String {
@@ -385,8 +434,28 @@ mod tests {
     use super::*;
 
     #[test]
-    fn finds_named_project_after_development_cue() {
+    fn finds_named_project_after_strong_development_cue() {
         let text = "Led development of Kinections, an LLM-assisted tool used to pre-screen investor complaints.";
+        let detections = detect_named_projects(text);
+        assert_eq!(detections.len(), 1);
+        assert_eq!(detections[0].text, "Kinections");
+    }
+
+    #[test]
+    fn does_not_treat_role_and_skill_words_as_project_names() {
+        let text = "Product Lead Management Leadership Strategy Operations Roadmapping Operating";
+        assert!(detect_named_projects(text).is_empty());
+    }
+
+    #[test]
+    fn loose_built_and_product_cues_do_not_create_entities() {
+        let text = "Built scalable product workflows and introduced modern operating practices.";
+        assert!(detect_named_projects(text).is_empty());
+    }
+
+    #[test]
+    fn explicit_named_tool_is_detected() {
+        let text = "The tool called Kinections helped pre-screen investor complaints.";
         let detections = detect_named_projects(text);
         assert_eq!(detections.len(), 1);
         assert_eq!(detections[0].text, "Kinections");
