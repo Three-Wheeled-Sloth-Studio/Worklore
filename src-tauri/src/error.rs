@@ -33,6 +33,12 @@ pub enum WorkLoreError {
     #[error("The requested story candidate was not found.")]
     CandidateNotFound,
 
+    #[error("The requested interview session was not found.")]
+    InterviewNotFound,
+
+    #[error("This interview action is not valid: {0}")]
+    InvalidInterviewAction(String),
+
     #[error("The requested privacy review item was not found.")]
     ReviewItemNotFound,
 
@@ -70,6 +76,8 @@ impl From<WorkLoreError> for CommandError {
             WorkLoreError::InvalidVault(_) => "invalid_vault",
             WorkLoreError::DocumentExtraction(_) => "document_extraction_failed",
             WorkLoreError::CandidateNotFound => "candidate_not_found",
+            WorkLoreError::InterviewNotFound => "interview_not_found",
+            WorkLoreError::InvalidInterviewAction(_) => "invalid_interview_action",
             WorkLoreError::ReviewItemNotFound => "review_item_not_found",
             WorkLoreError::EntityNotFound => "entity_not_found",
             WorkLoreError::InvalidReviewResolution(_) => "invalid_review_resolution",
