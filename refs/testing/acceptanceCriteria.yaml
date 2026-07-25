@@ -103,3 +103,43 @@ acceptance_criteria:
       - invalid structured output cannot update canonical records.
       - request bodies are not retained by default.
       - API keys are never written to the vault.
+  - id: ac-provider-002
+    area: manual_workspace
+    status: implemented_pending_validation
+    summary: Completed interviews can be exported to a privacy-safe manual AI workspace.
+    criteria:
+      - export runs the local privacy preflight before writing the package.
+      - private aliases are replaced with their durable vault tokens when redaction is active.
+      - replacement does not alter longer unrelated words that merely contain the alias.
+      - the package includes task instructions, selected context, structured input, privacy summary, and response schema.
+      - workspace export records operation phases and duration without retaining prompt bodies in metrics.
+  - id: ac-role-001
+    area: roles
+    status: implemented_pending_validation
+    summary: A canonical story is linked to the employment role associated with its work-history bullet.
+    criteria:
+      - role inference uses the candidate's work-history heading rather than a headline title elsewhere in the resume.
+      - common organization-title-date and title-at-organization headings are supported.
+      - an existing employer entity is reused when its canonical name or confirmed alias matches.
+      - a newly inferred employer receives a durable token and privacy review.
+      - duplicate role records are not created for the same organization, title, and date range.
+  - id: ac-story-001
+    area: story_import
+    status: implemented_pending_validation
+    summary: A synthesis response is validated before it can become a canonical story.
+    criteria:
+      - the response must match the strict structured response contract.
+      - unknown fields, empty titles, empty claims, and empty metrics are rejected.
+      - unsupported or unlinked claims are labeled and excluded by default rather than silently promoted.
+      - source fragments and interview answers become durable evidence records.
+      - the candidate and interview are linked to the resulting story.
+  - id: ac-story-002
+    area: story_storage
+    status: implemented_pending_validation
+    summary: Canonical stories remain portable, human-readable, and recoverable.
+    criteria:
+      - each story is written as paired Markdown and JSON records with the same story id and revision.
+      - paired writes use temporary files and backups so a partial failure can be rolled back.
+      - story content is scanned through the durable private-entity pipeline after import.
+      - re-importing a response for the same interview revises the existing story instead of creating a duplicate.
+      - the workspace supports review, validation, finalization, and archival status changes.
