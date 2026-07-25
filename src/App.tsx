@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { PrivacyReviewPanel } from "./components/PrivacyReviewPanel";
+import { StoryCandidatePanel } from "./components/StoryCandidatePanel";
 import type {
+  CandidateStatus,
+  CandidateSummary,
   CloudIdentifierMode,
   EntityReviewView,
   ResolveEntityReviewRequest,
@@ -12,11 +15,14 @@ import type {
 import { errorMessage } from "./domain/types";
 import {
   createVault,
+  extractResumeCandidates,
   importSource,
   listEntityReviews,
   listSources,
+  listStoryCandidates,
   openVault,
   resolveEntityReview,
+  setStoryCandidateStatus,
   updateCloudIdentifierMode,
 } from "./lib/workloreApi";
 import "./styles.css";
@@ -33,6 +39,7 @@ function App() {
   const [vault, setVault] = useState<VaultSummary | null>(null);
   const [sources, setSources] = useState<SourceSummary[]>([]);
   const [reviews, setReviews] = useState<EntityReviewView[]>([]);
+  const [candidates, setCandidates] = useState<CandidateSummary[]>([]);
   const [selectedSourceType, setSelectedSourceType] = useState<SourceType>("resume");
   const [vaultName, setVaultName] = useState("My Career Stories");
   const [busyMessage, setBusyMessage] = useState<string | null>(null);
@@ -43,6 +50,7 @@ function App() {
     if (!vault) {
       setSources([]);
       setReviews([]);
+      setCandidates([]);
       return;
     }
 
@@ -51,12 +59,14 @@ function App() {
 
   async function refreshWorkspace(vaultPath: string, refreshVault: boolean) {
     try {
-      const [sourceResult, reviewResult] = await Promise.all([
+      const [sourceResult, reviewResult, candidateResult] = await Promise.all([
         listSources(vaultPath),
         listEntityReviews(vaultPath),
+        listStoryCandidates(vaultPath),
       ]);
       setSources(sourceResult);
       setReviews(reviewResult);
+      setCandidates(candidateResult);
       if (refreshVault) {
         setVault(await openVault(vaultPath));
       }
@@ -146,6 +156,46 @@ function App() {
       await refreshWorkspace(vault.path, true);
     } catch (caught) {
       setError(errorMessage(caught));
+    } finally {
+      setBusyMessage(null);
+    }
+  }
+
+  async function handleExtractCandidates(sourceId: string) {
+    if (!vault) {
+      return;
+    }
+
+    setBusyMessage("Extracting resume story candidates");
+    setError(null);
+    try {
+      const result = await extractResumeCandidates(vault.path, sourceId);
+      setNotice(result.message);
+      await refreshWorkspace(vault.path, true);
+    } catch (caught) {
+      setError(errorMessage(caught));
+    } finally {
+      setBusyMessage(null);
+    }
+  }
+
+  async function handleCandidateStatusChange(
+    candidateId: string,
+    status: CandidateStatus,
+  ) {
+    if (!vault) {
+      return;
+    }
+
+    setBusyMessage("Saving story candidate");
+    setError(null);
+    try {
+      await setStoryCandidateStatus(vault.path, candidateId, status);
+      setCandidates(await listStoryCandidates(vault.path));
+      setNotice(candidateStatusMessage(status));
+    } catch (caught) {
+      setError(errorMessage(caught));
+      throw caught;
     } finally {
       setBusyMessage(null);
     }
@@ -248,6 +298,7 @@ function App() {
 
       <section className="status-strip" aria-label="Vault status">
         <StatusItem value={vault.sourceCount} label="Sources" />
+        <StatusItem value={candidates.length} label="Candidates" />
         <StatusItem value={vault.storyCount} label="Stories" />
         <StatusItem
           value={reviews.length}
@@ -260,6 +311,11 @@ function App() {
         {reviews.length > 0 ? (
           <PrivacyReviewPanel reviews={reviews} onResolve={handleResolveReview} />
         ) : null}
+
+        <StoryCandidatePanel
+          candidates={candidates.filter((candidate) => candidate.status !== "ignored")}
+          onStatusChange={handleCandidateStatusChange}
+        />
 
         <section className="workspace-panel source-panel" aria-labelledby="sources-heading">
           <div className="panel-heading-row">
@@ -290,7 +346,8 @@ function App() {
               <h3>Start with a resume</h3>
               <p>
                 Import a resume, job description, writing sample, or plain-text note. WorkLore
-                copies it into the vault, checks for duplicates, and starts its privacy scan.
+                copies it into the vault, checks for duplicates, extracts local text, and starts
+                its privacy scan.
               </p>
             </div>
           ) : (
@@ -309,6 +366,14 @@ function App() {
                       label={`Privacy: ${source.privacyScanStatus}`}
                       attention={source.privacyScanStatus === "needs_review"}
                     />
+                    {source.sourceType === "resume" && source.extractionStatus === "complete" ? (
+                      <button
+                        className="quiet-button compact"
+                        onClick={() => void handleExtractCandidates(source.sourceId)}
+                      >
+                        Extract stories
+                      </button>
+                    ) : null}
                   </div>
                 </article>
               ))}
@@ -340,10 +405,10 @@ function App() {
           </div>
 
           <div className="next-step-card">
-            <h3>Next useful step</h3>
+            <h3>Current working slice</h3>
             <p>
-              Import a text or Markdown resume to exercise the current vault, duplicate-check,
-              and private-entity review loop. PDF and DOCX extraction are the next parser slice.
+              Import a resume, resolve private names, then extract its bullets into story
+              candidates. Guided interviewing is the next workflow built on those records.
             </p>
           </div>
         </aside>
@@ -405,6 +470,19 @@ function BusyLayer({ message }: { message: string | null }) {
 
 function sourceTypeLabel(sourceType: SourceType): string {
   return SOURCE_TYPES.find((option) => option.value === sourceType)?.label ?? "Source";
+}
+
+function candidateStatusMessage(status: CandidateStatus): string {
+  switch (status) {
+    case "ready_to_interview":
+      return "Candidate added to the interview queue.";
+    case "saved_for_later":
+      return "Candidate saved for later.";
+    case "ignored":
+      return "Candidate ignored. The source evidence remains available.";
+    default:
+      return "Candidate updated.";
+  }
 }
 
 function formatDate(value: string): string {
