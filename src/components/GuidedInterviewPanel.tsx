@@ -30,13 +30,14 @@ export function GuidedInterviewPanel({ interview, onSubmit }: GuidedInterviewPan
     return null;
   }
 
-  const complete = interview.status === "ready_for_synthesis";
+  const activeInterview = interview;
+  const complete = activeInterview.status === "ready_for_synthesis";
 
   async function submit(action: InterviewResponseAction) {
     setSubmitting(true);
     try {
       await onSubmit(
-        interview.interviewId,
+        activeInterview.interviewId,
         action,
         action === "answer" ? answer : "",
         action === "answer" ? classification : null,
@@ -56,13 +57,13 @@ export function GuidedInterviewPanel({ interview, onSubmit }: GuidedInterviewPan
           </h2>
         </div>
         <span className="interview-progress-pill">
-          {interview.completedFieldCount}/{interview.totalFieldCount} complete
+          {activeInterview.completedFieldCount}/{activeInterview.totalFieldCount} complete
         </span>
       </div>
 
       <div className="interview-claim">
         <span>Resume claim</span>
-        <strong>{interview.candidateClaim}</strong>
+        <strong>{activeInterview.candidateClaim}</strong>
       </div>
 
       {complete ? (
@@ -80,9 +81,9 @@ export function GuidedInterviewPanel({ interview, onSubmit }: GuidedInterviewPan
         <div className="interview-question-layout">
           <div className="interview-question">
             <p className="interview-field">
-              {humanizeField(interview.currentTargetField ?? "story detail")}
+              {humanizeField(activeInterview.currentTargetField ?? "story detail")}
             </p>
-            <h3>{interview.currentQuestion}</h3>
+            <h3>{activeInterview.currentQuestion}</h3>
           </div>
 
           <div className="interview-answer">
