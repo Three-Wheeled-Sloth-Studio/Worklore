@@ -1,0 +1,60 @@
+name: Normalize License
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - "LICENSE"
+      - ".github/workflows/normalize-license.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, 'Normalize AGPL license text')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+
+      - name: Retrieve canonical AGPL-3.0 text
+        shell: python
+        run: |
+          import json
+          import pathlib
+          import urllib.request
+
+          request = urllib.request.Request(
+              "https://api.github.com/licenses/agpl-3.0",
+              headers={
+                  "Accept": "application/vnd.github+json",
+                  "User-Agent": "WorkLore-License-Normalizer",
+                  "X-GitHub-Api-Version": "2022-11-28",
+              },
+          )
+          with urllib.request.urlopen(request, timeout=30) as response:
+              payload = json.load(response)
+
+          body = payload["body"].replace("\r\n", "\n").rstrip() + "\n"
+          pathlib.Path("LICENSE").write_text(body, encoding="utf-8", newline="\n")
+
+      - name: Commit canonical license when needed
+        shell: bash
+        run: |
+          if git diff --quiet -- LICENSE; then
+            echo "LICENSE already matches GitHub's canonical AGPL-3.0 text."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add LICENSE
+          git commit -m "Normalize AGPL license text"
+          git push origin HEAD:dev
