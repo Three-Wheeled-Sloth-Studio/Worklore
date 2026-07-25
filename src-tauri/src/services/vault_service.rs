@@ -1,4 +1,7 @@
-use std::{fs, path::Path};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+};
 
 use chrono::Utc;
 use uuid::Uuid;
@@ -8,7 +11,7 @@ use crate::{
         CloudIdentifierMode, VaultDocument, VaultFeatures, VaultPrivacy, VaultSummary,
     },
     error::{ServiceResult, WorkLoreError},
-    io_utils::{read_json, write_json_atomic},
+    io_utils::{read_json, sanitize_file_name, write_json_atomic},
     services::{
         entity_scan::{count_pending_review_items, initialize_registry, save_registry},
         performance_service, privacy_scan_migration,
@@ -40,6 +43,20 @@ const VAULT_DIRECTORIES: &[&str] = &[
     ".worklore/operation-journal",
     ".worklore/operation-metrics/active",
 ];
+
+pub fn create_vault_in_parent(parent_path: &Path, name: &str) -> ServiceResult<VaultSummary> {
+    let trimmed_name = name.trim();
+    if trimmed_name.is_empty() {
+        return Err(WorkLoreError::InvalidVault(
+            "Vault name cannot be empty.".to_string(),
+        ));
+    }
+
+    fs::create_dir_all(parent_path)?;
+    let folder_name = vault_folder_name(trimmed_name);
+    let vault_path = unique_vault_directory(parent_path, &folder_name);
+    create_vault(&vault_path, trimmed_name)
+}
 
 pub fn create_vault(path: &Path, name: &str) -> ServiceResult<VaultSummary> {
     if path.join("vault.json").exists() {
@@ -159,6 +176,58 @@ fn count_json_files(directory: &Path) -> ServiceResult<usize> {
     Ok(count)
 }
 
+fn vault_folder_name(name: &str) -> String {
+    let sanitized = sanitize_file_name(name);
+    let upper = sanitized.to_ascii_uppercase();
+    let reserved = matches!(
+        upper.as_str(),
+        "CON"
+            | "PRN"
+            | "AUX"
+            | "NUL"
+            | "COM1"
+            | "COM2"
+            | "COM3"
+            | "COM4"
+            | "COM5"
+            | "COM6"
+            | "COM7"
+            | "COM8"
+            | "COM9"
+            | "LPT1"
+            | "LPT2"
+            | "LPT3"
+            | "LPT4"
+            | "LPT5"
+            | "LPT6"
+            | "LPT7"
+            | "LPT8"
+            | "LPT9"
+    );
+
+    if sanitized == "source" || reserved {
+        "WorkLore Vault".to_string()
+    } else {
+        sanitized
+    }
+}
+
+fn unique_vault_directory(parent_path: &Path, folder_name: &str) -> PathBuf {
+    let direct = parent_path.join(folder_name);
+    if !direct.exists() {
+        return direct;
+    }
+
+    for suffix in 2..10_000 {
+        let candidate = parent_path.join(format!("{folder_name}-{suffix}"));
+        if !candidate.exists() {
+            return candidate;
+        }
+    }
+
+    parent_path.join(format!("{folder_name}-{}", Uuid::now_v7()))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -168,5 +237,34 @@ mod tests {
         assert!(VAULT_DIRECTORIES
             .iter()
             .all(|directory| !directory.contains("..")));
+    }
+
+    #[test]
+    fn vault_creation_uses_a_named_child_folder() {
+        let parent = std::env::temp_dir().join(format!("worklore-vault-test-{}", Uuid::now_v7()));
+        let summary = create_vault_in_parent(&parent, "My Career Stories")
+            .expect("vault should be created");
+        let expected = parent.join("My Career Stories");
+
+        assert_eq!(summary.path, expected.to_string_lossy());
+        assert!(expected.join("vault.json").is_file());
+
+        fs::remove_dir_all(parent).expect("test vault should be removable");
+    }
+
+    #[test]
+    fn existing_named_folder_gets_a_unique_sibling() {
+        let parent = std::env::temp_dir().join(format!("worklore-vault-test-{}", Uuid::now_v7()));
+        fs::create_dir_all(parent.join("My Career Stories"))
+            .expect("existing folder should be created");
+
+        let summary = create_vault_in_parent(&parent, "My Career Stories")
+            .expect("vault should be created");
+        let expected = parent.join("My Career Stories-2");
+
+        assert_eq!(summary.path, expected.to_string_lossy());
+        assert!(expected.join("vault.json").is_file());
+
+        fs::remove_dir_all(parent).expect("test vault should be removable");
     }
 }
