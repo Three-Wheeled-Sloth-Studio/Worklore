@@ -140,8 +140,10 @@ impl OperationSession {
 
 pub fn snapshot(vault_path: &Path, limit: usize) -> ServiceResult<PerformanceSnapshot> {
     ensure_directories(vault_path)?;
+    let mut active_operations = list_active(vault_path)?;
+    refresh_elapsed_times(&mut active_operations);
     Ok(PerformanceSnapshot {
-        active_operations: list_active(vault_path)?,
+        active_operations,
         recent_metrics: list_recent_metrics(vault_path, limit.clamp(1, 200))?,
     })
 }
@@ -183,6 +185,18 @@ pub fn recover_interrupted(vault_path: &Path) -> ServiceResult<usize> {
     }
 
     Ok(recovered)
+}
+
+fn refresh_elapsed_times(operations: &mut [ActiveOperation]) {
+    let now = Utc::now();
+    for operation in operations {
+        if let Ok(started) = DateTime::parse_from_rfc3339(&operation.started_at) {
+            operation.elapsed_ms = now
+                .signed_duration_since(started.with_timezone(&Utc))
+                .num_milliseconds()
+                .max(0) as u64;
+        }
+    }
 }
 
 fn ensure_directories(vault_path: &Path) -> ServiceResult<()> {
@@ -275,5 +289,25 @@ mod tests {
     #[test]
     fn metric_limit_is_bounded_by_snapshot_caller() {
         assert_eq!(500_usize.clamp(1, 200), 200);
+    }
+
+    #[test]
+    fn snapshot_refreshes_elapsed_time_from_start_timestamp() {
+        let started_at = (Utc::now() - chrono::Duration::seconds(2)).to_rfc3339();
+        let mut operations = vec![ActiveOperation {
+            schema_version: 1,
+            run_id: "run_test".to_string(),
+            operation: "test".to_string(),
+            phase: "working".to_string(),
+            started_at,
+            updated_at: Utc::now().to_rfc3339(),
+            elapsed_ms: 0,
+            process_id: std::process::id(),
+            progress_current: None,
+            progress_total: None,
+            metadata: Map::new(),
+        }];
+        refresh_elapsed_times(&mut operations);
+        assert!(operations[0].elapsed_ms >= 1_500);
     }
 }
