@@ -4,13 +4,17 @@ updated: 2026-07-25
 open_questions:
   - id: openq-001
     status: open
+    decision_needed_from: product_owner
     summary: Which license best balances public inspection, contributions, and protection against unwanted commercial reuse?
   - id: openq-002
-    status: open
+    status: resolved
+    resolution: Use a configurable Gemini adapter with JSON Schema structured output. Start testing with gemini-3.6-flash, but do not make the model identifier part of the workflow contract.
     summary: Which Gemini model and structured-output strategy should be the default for the first test build?
   - id: openq-003
     status: open
+    decision_needed_from: product_owner
     summary: Should vault encryption at rest be part of the first public test build or a later hardening increment?
   - id: openq-004
-    status: open
-    summary: Which document parsing libraries provide the best local support for PDF, DOCX, Markdown, and text without bloating the desktop package?
+    status: resolved_pending_validation
+    resolution: Use native UTF-8 reads for text and Markdown, pdf-extract for text-bearing PDFs, and ZIP plus streaming OOXML parsing for DOCX. Report scanned or unsupported documents honestly and defer OCR.
+    summary: Which document parsing libraries provide local PDF, DOCX, Markdown, and text support without unnecessary desktop bloat?
