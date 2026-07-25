@@ -4,8 +4,11 @@ mod error;
 mod io_utils;
 mod services;
 
-use commands::vault::{
-    create_vault, import_source, list_sources, open_vault, update_cloud_identifier_mode,
+use commands::{
+    privacy::{list_entity_reviews, resolve_entity_review},
+    vault::{
+        create_vault, import_source, list_sources, open_vault, update_cloud_identifier_mode,
+    },
 };
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -17,7 +20,9 @@ pub fn run() {
             open_vault,
             import_source,
             list_sources,
-            update_cloud_identifier_mode
+            update_cloud_identifier_mode,
+            list_entity_reviews,
+            resolve_entity_review
         ])
         .run(tauri::generate_context!())
         .expect("error while running WorkLore");
