@@ -11,26 +11,46 @@ todos:
     area: repository
     summary: Add a user-facing README, defensive gitignore, security policy, and durable refs structure.
   - id: task-003
-    status: open
+    status: complete
     area: product
     summary: Write the MVP product requirements and acceptance criteria for the story bank core.
   - id: task-004
-    status: open
+    status: complete
     area: data
     summary: Define canonical schemas for vault metadata, sources, roles, stories, interviews, jobs, voice profiles, and private entities.
   - id: task-005
-    status: open
+    status: active
     area: privacy
-    summary: Specify entity extraction, durable identity matching, confidence thresholds, review workflows, stable tokens, merge, split, and rehydration behavior.
+    summary: Implement durable entity extraction, identity matching, confidence review, stable tokens, merge redirects, and source-scan reconciliation.
   - id: task-006
-    status: open
+    status: implemented_pending_validation
     area: architecture
-    summary: Scaffold the Tauri 2, React, TypeScript, and Rust application.
+    summary: Scaffold the Tauri 2, React, TypeScript, and Rust application with vault and source import commands.
   - id: task-007
-    status: open
+    status: designed
     area: providers
-    summary: Define the provider contract for Ollama, Gemini bring-your-own-key, and manual workspace packages.
+    summary: Implement the provider contract for Ollama, Gemini bring-your-own-key, and manual workspace packages.
   - id: task-008
-    status: open
+    status: complete
     area: testing
     summary: Create synthetic fixtures for resumes, job descriptions, writing samples, entity ambiguity, and Git history.
+  - id: task-009
+    status: active
+    area: validation
+    summary: Get Windows CI passing for frontend, refs, Rust formatting, tests, and clippy.
+  - id: task-010
+    status: open
+    area: parsing
+    summary: Add local PDF and DOCX text extraction and route extracted text through the entity scan pipeline.
+  - id: task-011
+    status: active
+    area: privacy
+    summary: Complete and validate the private entity review screen and resolution commands.
+  - id: task-012
+    status: open
+    area: stories
+    summary: Extract resume bullets into triageable story candidates.
+  - id: task-013
+    status: open
+    area: stories
+    summary: Implement the resumable guided interview and story synthesis state machine.
