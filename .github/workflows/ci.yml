@@ -93,12 +93,6 @@ jobs:
           npm run build:frontend 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\frontend-build.log"
           exit $LASTEXITCODE
 
-      - name: Check Rust formatting
-        shell: pwsh
-        run: |
-          cargo fmt --manifest-path src-tauri/Cargo.toml --all --check 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\rust-format.log"
-          exit $LASTEXITCODE
-
       - name: Run Rust tests externally
         shell: pwsh
         run: |
@@ -109,6 +103,12 @@ jobs:
         shell: pwsh
         run: |
           cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\rust-clippy.log"
+          exit $LASTEXITCODE
+
+      - name: Check Rust formatting
+        shell: pwsh
+        run: |
+          cargo fmt --manifest-path src-tauri/Cargo.toml --all --check 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\rust-format.log"
           exit $LASTEXITCODE
 
       - name: Verify repository remains source-only
