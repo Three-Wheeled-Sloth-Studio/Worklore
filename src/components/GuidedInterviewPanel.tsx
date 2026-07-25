@@ -3,6 +3,7 @@ import type {
   AnswerClassification,
   InterviewResponseAction,
   InterviewSummary,
+  ManualWorkspaceTarget,
 } from "../domain/types";
 
 interface GuidedInterviewPanelProps {
@@ -13,12 +14,24 @@ interface GuidedInterviewPanelProps {
     text: string,
     classification: AnswerClassification | null,
   ) => Promise<void>;
+  onExportWorkspace: (
+    interviewId: string,
+    target: ManualWorkspaceTarget,
+  ) => Promise<void>;
+  onImportResponse: (interviewId: string) => Promise<void>;
 }
 
-export function GuidedInterviewPanel({ interview, onSubmit }: GuidedInterviewPanelProps) {
+export function GuidedInterviewPanel({
+  interview,
+  onSubmit,
+  onExportWorkspace,
+  onImportResponse,
+}: GuidedInterviewPanelProps) {
   const [answer, setAnswer] = useState("");
   const [classification, setClassification] =
     useState<AnswerClassification>("confirmed_fact");
+  const [workspaceTarget, setWorkspaceTarget] =
+    useState<ManualWorkspaceTarget>("gemini");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -31,7 +44,8 @@ export function GuidedInterviewPanel({ interview, onSubmit }: GuidedInterviewPan
   }
 
   const activeInterview = interview;
-  const complete = activeInterview.status === "ready_for_synthesis";
+  const complete =
+    activeInterview.status === "ready_for_synthesis" || activeInterview.status === "completed";
 
   async function submit(action: InterviewResponseAction) {
     setSubmitting(true);
@@ -42,6 +56,24 @@ export function GuidedInterviewPanel({ interview, onSubmit }: GuidedInterviewPan
         action === "answer" ? answer : "",
         action === "answer" ? classification : null,
       );
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function exportWorkspace() {
+    setSubmitting(true);
+    try {
+      await onExportWorkspace(activeInterview.interviewId, workspaceTarget);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function importResponse() {
+    setSubmitting(true);
+    try {
+      await onImportResponse(activeInterview.interviewId);
     } finally {
       setSubmitting(false);
     }
@@ -68,14 +100,45 @@ export function GuidedInterviewPanel({ interview, onSubmit }: GuidedInterviewPan
 
       {complete ? (
         <div className="interview-complete">
-          <h3>Ready for synthesis</h3>
+          <h3>{activeInterview.status === "completed" ? "Story imported" : "Ready for synthesis"}</h3>
           <p>
-            WorkLore has completed this interview pass. Partial answers and remembered gaps
-            remain labeled rather than being polished into imaginary facts.
+            WorkLore keeps partial answers and remembered gaps labeled. Export a structured AI
+            workspace, then import the JSON response after the model completes the synthesis.
           </p>
-          <button className="primary-button compact" disabled>
-            Synthesize story - next slice
-          </button>
+          <div className="manual-workspace-controls">
+            <label>
+              <span>AI workspace</span>
+              <select
+                value={workspaceTarget}
+                onChange={(event) =>
+                  setWorkspaceTarget(event.target.value as ManualWorkspaceTarget)
+                }
+              >
+                <option value="gemini">Gemini</option>
+                <option value="chatgpt">ChatGPT</option>
+                <option value="claude">Claude</option>
+                <option value="generic">Generic package</option>
+              </select>
+            </label>
+            <button
+              className="secondary-button compact"
+              disabled={submitting}
+              onClick={() => void exportWorkspace()}
+            >
+              Export workspace
+            </button>
+            <button
+              className="primary-button compact"
+              disabled={submitting}
+              onClick={() => void importResponse()}
+            >
+              Import story JSON
+            </button>
+          </div>
+          <p className="quiet-copy">
+            Imported responses are schema-validated, linked to the employment role, scanned for
+            private entities, and saved as paired Markdown and JSON story records.
+          </p>
         </div>
       ) : (
         <div className="interview-question-layout">
