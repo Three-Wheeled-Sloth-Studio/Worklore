@@ -242,7 +242,7 @@ fn list_active(vault_path: &Path) -> ServiceResult<Vec<ActiveOperation>> {
         return Ok(Vec::new());
     }
 
-    let mut operations = Vec::new();
+    let mut operations: Vec<ActiveOperation> = Vec::new();
     for entry in fs::read_dir(directory)? {
         let entry = entry?;
         if entry.file_type()?.is_file()
