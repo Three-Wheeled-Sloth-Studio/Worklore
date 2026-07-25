@@ -43,6 +43,13 @@
   border-width: 2px;
 }
 
+.busy-detail {
+  margin: 0.22rem 0 0;
+  color: #b8aa8e;
+  font-size: 0.74rem;
+  text-transform: capitalize;
+}
+
 .performance-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
