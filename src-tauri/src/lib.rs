@@ -5,6 +5,9 @@ mod io_utils;
 mod services;
 
 use commands::{
+    candidates::{
+        extract_resume_candidates, list_story_candidates, set_story_candidate_status,
+    },
     privacy::{list_entity_reviews, resolve_entity_review},
     vault::{
         create_vault, import_source, list_sources, open_vault, update_cloud_identifier_mode,
@@ -22,7 +25,10 @@ pub fn run() {
             list_sources,
             update_cloud_identifier_mode,
             list_entity_reviews,
-            resolve_entity_review
+            resolve_entity_review,
+            extract_resume_candidates,
+            list_story_candidates,
+            set_story_candidate_status
         ])
         .run(tauri::generate_context!())
         .expect("error while running WorkLore");
