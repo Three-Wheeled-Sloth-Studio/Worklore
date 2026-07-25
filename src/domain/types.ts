@@ -39,6 +39,17 @@ export type ReviewResolutionAction =
   | "ignore_term"
   | "dismiss";
 
+export type CandidateStatus =
+  | "new"
+  | "saved_for_later"
+  | "ready_to_interview"
+  | "interviewing"
+  | "merged"
+  | "split"
+  | "ignored"
+  | "unsupported"
+  | "converted_to_story";
+
 export interface VaultSummary {
   schemaVersion: number;
   vaultId: string;
@@ -68,6 +79,25 @@ export interface ImportSourceResult {
   source: SourceSummary;
   created: boolean;
   duplicateDetected: boolean;
+  message: string;
+}
+
+export interface CandidateSummary {
+  candidateId: string;
+  sourceId: string;
+  status: CandidateStatus;
+  claim: string;
+  surroundingHeading: string | null;
+  missingFields: string[];
+  metrics: string[];
+  createdAt: string;
+}
+
+export interface ExtractCandidatesResult {
+  sourceId: string;
+  createdCount: number;
+  existingCount: number;
+  candidates: CandidateSummary[];
   message: string;
 }
 
