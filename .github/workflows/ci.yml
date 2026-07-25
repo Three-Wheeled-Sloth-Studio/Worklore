@@ -1,22 +1,24 @@
 name: Validate WorkLore
 
 on:
+  workflow_dispatch:
   push:
     branches:
-      - dev
       - qa
       - main
   pull_request:
     branches:
-      - dev
       - qa
       - main
+    types:
+      - ready_for_review
+      - reopened
 
 permissions:
   contents: read
 
 concurrency:
-  group: validate-${{ github.ref }}
+  group: validate-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -91,10 +93,10 @@ jobs:
           npm run build:frontend 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\frontend-build.log"
           exit $LASTEXITCODE
 
-      - name: Format Rust source in validation checkout
+      - name: Check Rust formatting
         shell: pwsh
         run: |
-          cargo fmt --manifest-path src-tauri/Cargo.toml --all 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\rust-format.log"
+          cargo fmt --manifest-path src-tauri/Cargo.toml --all --check 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\rust-format.log"
           exit $LASTEXITCODE
 
       - name: Run Rust tests externally
