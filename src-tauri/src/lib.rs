@@ -11,14 +11,17 @@ use commands::{
         submit_guided_interview_response,
     },
     performance::get_performance_snapshot,
-    preferences::{clear_last_vault, get_last_vault_path, remember_last_vault},
+    preferences::{
+        clear_last_vault, get_default_vault_root, get_last_import_directory,
+        get_last_vault_path, remember_last_import_file, remember_last_vault,
+    },
     privacy::{list_entity_reviews, resolve_entity_review},
     providers::create_manual_workspace,
     roles::list_roles,
     stories::{import_story_response, list_stories, set_story_status},
     vault::{
-        create_vault, create_vault_in_parent, import_source, list_sources, open_vault,
-        update_cloud_identifier_mode,
+        create_default_vault, create_vault, create_vault_in_parent, import_source, list_sources,
+        open_vault, update_cloud_identifier_mode,
     },
 };
 
@@ -29,6 +32,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             create_vault,
             create_vault_in_parent,
+            create_default_vault,
             open_vault,
             import_source,
             list_sources,
@@ -36,6 +40,9 @@ pub fn run() {
             get_last_vault_path,
             remember_last_vault,
             clear_last_vault,
+            get_last_import_directory,
+            remember_last_import_file,
+            get_default_vault_root,
             list_entity_reviews,
             resolve_entity_review,
             extract_resume_candidates,
