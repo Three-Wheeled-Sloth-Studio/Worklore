@@ -26,9 +26,11 @@ import type {
 import { errorMessage } from "./domain/types";
 import {
   clearLastVault,
+  createDefaultVault,
   createManualWorkspace,
-  createVault,
   extractResumeCandidates,
+  getDefaultVaultRoot,
+  getLastImportDirectory,
   getLastVaultPath,
   getPerformanceSnapshot,
   importSource,
@@ -39,6 +41,7 @@ import {
   listStories,
   listStoryCandidates,
   openVault,
+  rememberLastImportFile,
   rememberLastVault,
   resolveEntityReview,
   setStoryCandidateStatus,
@@ -68,6 +71,8 @@ function App() {
   const [performance, setPerformance] = useState<PerformanceSnapshot | null>(null);
   const [selectedSourceType, setSelectedSourceType] = useState<SourceType>("resume");
   const [vaultName, setVaultName] = useState("My Career Stories");
+  const [defaultVaultRoot, setDefaultVaultRoot] = useState<string | null>(null);
+  const [lastImportDirectory, setLastImportDirectory] = useState<string | null>(null);
   const [startupComplete, setStartupComplete] = useState(false);
   const [busyMessage, setBusyMessage] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -92,27 +97,39 @@ function App() {
     let cancelled = false;
 
     void (async () => {
+      setBusyMessage("Opening WorkLore");
       try {
-        const lastVaultPath = await getLastVaultPath();
-        if (!lastVaultPath || cancelled) {
-          return;
-        }
-
-        setBusyMessage("Opening last vault");
-        const reopened = await openVault(lastVaultPath);
+        const [lastVaultPath, vaultRoot, importDirectory] = await Promise.all([
+          getLastVaultPath(),
+          getDefaultVaultRoot(),
+          getLastImportDirectory(),
+        ]);
         if (cancelled) {
           return;
         }
-        setVault(reopened);
-        setNotice(`Reopened ${reopened.name}.`);
-      } catch {
-        try {
-          await clearLastVault();
-        } catch {
-          // The invalid path is already harmless. The next successful open will replace it.
+
+        setDefaultVaultRoot(vaultRoot);
+        setLastImportDirectory(importDirectory);
+
+        if (!lastVaultPath) {
+          return;
         }
+
+        try {
+          const reopened = await openVault(lastVaultPath);
+          if (!cancelled) {
+            setVault(reopened);
+            setNotice(`Reopened ${reopened.name}.`);
+          }
+        } catch {
+          await clearLastVault().catch(() => undefined);
+          if (!cancelled) {
+            setNotice("The last used vault could not be found. Create or open a vault.");
+          }
+        }
+      } catch (caught) {
         if (!cancelled) {
-          setNotice("The last used vault could not be found. Choose or create a vault.");
+          setError(errorMessage(caught));
         }
       } finally {
         if (!cancelled) {
@@ -218,18 +235,11 @@ function App() {
   async function handleCreateVault() {
     setError(null);
     setNotice(null);
-    const selected = await open({
-      directory: true,
-      multiple: false,
-      title: "Choose the parent folder for the new WorkLore vault",
-    });
-    if (!selected || Array.isArray(selected)) {
-      return;
-    }
-
     setBusyMessage("Creating vault");
     try {
-      const created = await createVault(selected, vaultName.trim() || "My Career Stories");
+      const created = await createDefaultVault(
+        vaultName.trim() || "My Career Stories",
+      );
       await activateVault(created);
       setNotice(`Vault created at ${created.path}. WorkLore will reopen it next time.`);
     } catch (caught) {
@@ -245,6 +255,7 @@ function App() {
     const selected = await open({
       directory: true,
       multiple: false,
+      defaultPath: defaultVaultRoot ?? undefined,
       title: "Open a WorkLore vault",
     });
     if (!selected || Array.isArray(selected)) {
@@ -263,6 +274,28 @@ function App() {
     }
   }
 
+  async function handleCloseVault() {
+    setBusyMessage("Closing vault");
+    setError(null);
+    try {
+      await clearLastVault();
+      setVault(null);
+      setNotice("Vault closed. WorkLore will not reopen it automatically.");
+    } catch (caught) {
+      setError(errorMessage(caught));
+    } finally {
+      setBusyMessage(null);
+    }
+  }
+
+  async function rememberFileLocation(filePath: string) {
+    try {
+      setLastImportDirectory(await rememberLastImportFile(filePath));
+    } catch {
+      // The selected file remains usable even if the convenience preference cannot be saved.
+    }
+  }
+
   async function handleImportSource() {
     if (!vault) {
       return;
@@ -272,6 +305,7 @@ function App() {
     const selected = await open({
       directory: false,
       multiple: false,
+      defaultPath: lastImportDirectory ?? undefined,
       title: `Import ${sourceTypeLabel(selectedSourceType).toLowerCase()}`,
       filters: [
         {
@@ -284,6 +318,7 @@ function App() {
       return;
     }
 
+    await rememberFileLocation(selected);
     setBusyMessage("Copying and scanning source");
     try {
       const result = await importSource(vault.path, selected, selectedSourceType);
@@ -322,7 +357,9 @@ function App() {
     try {
       const interview = await startGuidedInterview(vault.path, candidateId);
       setSelectedInterviewId(interview.interviewId);
-      setNotice("Interview started. WorkLore will preserve uncertainty instead of inventing details.");
+      setNotice(
+        "Interview started. WorkLore will preserve uncertainty instead of inventing details.",
+      );
       await refreshWorkspace(vault.path, true);
     } catch (caught) {
       setError(errorMessage(caught));
@@ -407,6 +444,7 @@ function App() {
     const responsePath = await open({
       directory: false,
       multiple: false,
+      defaultPath: lastImportDirectory ?? undefined,
       title: "Import the synthesized WorkLore story JSON",
       filters: [{ name: "JSON response", extensions: ["json"] }],
     });
@@ -414,6 +452,7 @@ function App() {
       return;
     }
 
+    await rememberFileLocation(responsePath);
     setBusyMessage("Validating and saving canonical story");
     try {
       const result = await importStoryResponse(vault.path, {
@@ -524,8 +563,9 @@ function App() {
           <h1 id="worklore-title">WorkLore</h1>
           <p className="tagline">Turn the work you did into stories you can actually use.</p>
           <p className="landing-copy">
-            Start a local career story bank or open an existing vault. A new vault is created in
-            its own named folder, and the last vault you use reopens automatically.
+            Create a local career story bank or open an existing vault. New vaults are stored in
+            WorkLore's application folder and reopen automatically until you explicitly close
+            them.
           </p>
           <label className="field-label" htmlFor="vault-name">
             Vault name
@@ -536,12 +576,17 @@ function App() {
             onChange={(event) => setVaultName(event.target.value)}
             maxLength={120}
           />
+          {defaultVaultRoot ? (
+            <p className="vault-path" title={defaultVaultRoot}>
+              New vault location: {defaultVaultRoot}
+            </p>
+          ) : null}
           <div className="primary-actions">
             <button className="primary-button" onClick={() => void handleCreateVault()}>
               Create vault
             </button>
             <button className="secondary-button" onClick={() => void handleOpenVault()}>
-              Open vault
+              Open existing vault
             </button>
           </div>
           <Feedback notice={notice} error={error} />
@@ -565,15 +610,11 @@ function App() {
             </p>
           </div>
           <div className="header-actions">
-            <button
-              className="quiet-button"
-              onClick={() => {
-                setError(null);
-                setNotice("Choose another vault. The current vault remains the launch default until you open a different one.");
-                setVault(null);
-              }}
-            >
-              Change vault
+            <button className="quiet-button" onClick={() => void handleOpenVault()}>
+              Open another vault
+            </button>
+            <button className="quiet-button" onClick={() => void handleCloseVault()}>
+              Close vault
             </button>
           </div>
         </header>
@@ -625,7 +666,9 @@ function App() {
                 <select
                   aria-label="Source type"
                   value={selectedSourceType}
-                  onChange={(event) => setSelectedSourceType(event.target.value as SourceType)}
+                  onChange={(event) =>
+                    setSelectedSourceType(event.target.value as SourceType)
+                  }
                 >
                   {SOURCE_TYPES.map((option) => (
                     <option key={option.value} value={option.value}>
