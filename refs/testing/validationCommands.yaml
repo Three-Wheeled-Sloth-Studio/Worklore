@@ -1,0 +1,20 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+updated: 2026-07-25
+commands:
+  - id: validation-git-diff
+    status: active
+    command: git diff --check
+    verifies: Whitespace errors and malformed patch output.
+  - id: validation-no-secrets
+    status: manual
+    command: Review changed files for real user data, credentials, provider logs, vault contents, and machine-local paths.
+    verifies: Public repository safety boundary.
+  - id: validation-refs
+    status: manual
+    command: Confirm required files listed in refs/templatePolicy.yaml exist and all YAML files parse successfully.
+    verifies: Durable project memory remains readable and internally consistent.
+  - id: validation-app
+    status: pending
+    command: To be defined after the Tauri application is scaffolded.
+    verifies: Application build, tests, linting, and packaging.

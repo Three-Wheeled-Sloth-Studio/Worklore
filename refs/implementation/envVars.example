@@ -1,0 +1,7 @@
+# Safe examples only. Never place real credentials in this file.
+
+# Optional path to the shared TWS design principles checkout.
+TWS_REFERENCE_HOME=
+
+# Development-only Gemini key variable name. Real values belong in local environment storage or the OS credential store.
+GEMINI_API_KEY=

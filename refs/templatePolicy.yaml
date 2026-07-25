@@ -1,0 +1,20 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+updated: 2026-07-25
+purpose: Defines required WorkLore project reference files and safety rules.
+required_files:
+  - refs/README.md
+  - refs/project.yaml
+  - refs/agents.yaml
+  - refs/fileGuide.yaml
+  - refs/planning/roadmap.yaml
+  - refs/planning/todos.yaml
+  - refs/architecture/overview.md
+  - refs/implementation/fileMap.yaml
+  - refs/handoffs/currentHandoff.md
+  - refs/testing/validationCommands.yaml
+  - refs/schemas/schemaRegistry.yaml
+rules:
+  - Paths stored in refs must be repository-relative unless a file explicitly allows machine-local values.
+  - Real secrets and user data are prohibited in refs.
+  - Unknown facts must be recorded as open questions instead of guessed.

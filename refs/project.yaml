@@ -1,0 +1,36 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+updated: 2026-07-25
+identity:
+  name: WorkLore
+  repository_url: https://github.com/Three-Wheeled-Sloth-Studio/Worklore
+  summary: Local-first application for turning career evidence into durable, reusable professional stories.
+  current_phase: planning and repository initialization
+thesis:
+  core_promise: Help users recover the useful stories buried in their work history and turn them into evidence-backed career assets without surrendering control of their data.
+audience:
+  primary_users:
+    - Professionals building a reusable career story bank.
+    - Technical early testers comfortable with local applications, Git, Ollama, or bring-your-own API keys.
+stack:
+  summary: Tauri 2 desktop application with React, TypeScript, Rust, local canonical files, rebuildable SQLite indexes, Ollama, and Gemini API support.
+repository_layout:
+  source_roots:
+    - src
+    - src-tauri
+  docs_roots:
+    - refs
+source_of_truth:
+  planning: refs/planning
+  architecture: refs/architecture
+  product: refs/product
+  implementation: refs/implementation
+  handoffs: refs/handoffs
+  testing: refs/testing
+  ui: refs/UI
+  shared_design_principles: Three-Wheeled-Sloth-Studio/TWS-Design-Principles
+  agent_reference_pattern: Three-Wheeled-Sloth-Studio/Agent-Academy
+known_open_questions:
+  - openq-001
+  - openq-002
+  - openq-003

@@ -1,0 +1,37 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+updated: 2026-07-25
+features:
+  - id: feature-vault
+    status: planned
+    summary: Create and open local user-owned vaults with copied source files and portable canonical records.
+  - id: feature-resume-ingestion
+    status: planned
+    summary: Extract roles and bullet-level story candidates from resumes.
+  - id: feature-story-interview
+    status: planned
+    summary: Ask focused questions, track completeness, and synthesize discrete evidence-backed stories.
+  - id: feature-private-entity-registry
+    status: planned
+    summary: Persist named entities, aliases, relationships, sensitivity, stable tokens, confidence scores, and review history.
+  - id: feature-job-lens
+    status: planned
+    summary: Extract job requirements and match them to existing or potential stories.
+  - id: feature-local-git
+    status: planned
+    summary: Scan local repositories and parent folders, cluster commits, and create interview candidates.
+  - id: feature-voice-profile
+    status: planned
+    summary: Combine explicit voice instructions with patterns inferred from writing samples.
+  - id: feature-ollama
+    status: planned
+    summary: Run supported agent operations through a local Ollama model.
+  - id: feature-gemini
+    status: planned
+    summary: Run supported agent operations through Gemini using a user-supplied API key.
+  - id: feature-manual-bridge
+    status: planned
+    summary: Export and re-import structured workspace packages for existing ChatGPT, Claude, or Gemini subscriptions.
+  - id: feature-linkedin-bridge
+    status: later
+    summary: Export selected stories, public anonymization rules, and voice guidance for manual LinkedIn content generation.

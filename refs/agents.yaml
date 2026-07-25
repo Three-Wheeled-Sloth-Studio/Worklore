@@ -1,0 +1,16 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+instructions:
+  - Read refs/project.yaml before starting project work.
+  - Read refs/planning/roadmap.yaml and refs/planning/todos.yaml before adding or changing implementation work.
+  - Read relevant files under refs/architecture before changing system boundaries or module ownership.
+  - Read refs/implementation/fileMap.yaml before searching broadly.
+  - Read refs/testing/validationCommands.yaml before finalizing changes.
+  - Keep durable decisions, todos, handoffs, implementation notes, and validation results in refs.
+  - Do not store secrets, real vault contents, resumes, provider logs, entity mappings, or machine-local credentials in the repository.
+  - Record unknown facts in refs/planning/openQuestions.yaml instead of guessing.
+  - Record durable product and architecture decisions in refs/planning/decisions.yaml.
+  - Update refs/handoffs/currentHandoff.md when stopping with incomplete or context-heavy work.
+  - Keep the public README user-facing. It should cover the user job, implemented major features, and installation only.
+  - Reference Three-Wheeled-Sloth-Studio/TWS-Design-Principles instead of copying shared principles into this repository.
+  - Use only standard US keyboard punctuation in generated user-facing copy.

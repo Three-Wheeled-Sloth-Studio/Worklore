@@ -1,0 +1,51 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+updated: 2026-07-25
+purpose: Minimal schema hints for WorkLore project reference files.
+defaults:
+  yaml_required_top_level_keys:
+    - version
+    - schema
+schemas:
+  refs/project.yaml:
+    required_top_level_keys:
+      - version
+      - schema
+      - updated
+      - identity
+      - thesis
+      - audience
+      - stack
+      - repository_layout
+      - source_of_truth
+      - known_open_questions
+  refs/planning/roadmap.yaml:
+    required_top_level_keys:
+      - version
+      - schema
+      - updated
+      - roadmap
+  refs/planning/todos.yaml:
+    required_top_level_keys:
+      - version
+      - schema
+      - updated
+      - todos
+  refs/planning/decisions.yaml:
+    required_top_level_keys:
+      - version
+      - schema
+      - updated
+      - decisions
+  refs/planning/risks.yaml:
+    required_top_level_keys:
+      - version
+      - schema
+      - updated
+      - risks
+  refs/testing/validationCommands.yaml:
+    required_top_level_keys:
+      - version
+      - schema
+      - updated
+      - commands

@@ -1,0 +1,67 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+updated: 2026-07-25
+decisions:
+  - id: decision-001
+    date: 2026-07-25
+    status: accepted
+    summary: WorkLore is local-first and stores canonical user data in a user-owned vault.
+    rationale: Career evidence can contain confidential and personally identifying information. Users must retain control of storage and portability.
+    consequences:
+      - Live synchronization is out of scope for the initial product.
+      - Local files remain authoritative and SQLite indexes must be rebuildable.
+  - id: decision-002
+    date: 2026-07-25
+    status: accepted
+    summary: Imported source files are copied into the vault by default.
+    rationale: Stable local copies prevent broken references and make backup behavior predictable.
+    consequences:
+      - Duplicate detection should use content hashes.
+      - Linked external files may be considered later.
+  - id: decision-003
+    date: 2026-07-25
+    status: accepted
+    summary: Career stories represent discrete accomplishments or episodes and link to roles.
+    rationale: Discrete stories are easier to reuse for interviews, resumes, job matching, and public content.
+    consequences:
+      - Role summaries should be generated from linked stories.
+  - id: decision-004
+    date: 2026-07-25
+    status: accepted
+    summary: Gemini is the first supported cloud provider, alongside Ollama and a manual workspace bridge.
+    rationale: Gemini is inexpensive for early testing while Ollama preserves a fully local path.
+    consequences:
+      - Cloud access uses user-supplied credentials initially.
+      - A hosted paid provider remains a later product option.
+  - id: decision-005
+    date: 2026-07-25
+    status: accepted
+    summary: Cloud redaction is controlled by a durable user preference with a per-request override.
+    rationale: Users need explicit control over whether named employers, projects, people, systems, and repositories are sent to hosted models.
+    consequences:
+      - Cloud requests require a visible privacy mode.
+      - Unresolved high-risk entities must block or warn before cloud submission.
+  - id: decision-006
+    date: 2026-07-25
+    status: accepted
+    summary: Each vault contains a durable Private Entity Registry with stable tokens and repeated scan-and-map behavior.
+    rationale: Entity mappings must remain consistent across sources, stories, interviews, and exports.
+    consequences:
+      - Content additions and material edits trigger entity scans.
+      - Low-confidence matches require user resolution.
+      - Entity merge, split, alias, and token redirect actions must be reversible.
+  - id: decision-007
+    date: 2026-07-25
+    status: accepted
+    summary: Local Git repository scanning precedes GitHub account integration.
+    rationale: Local scans provide most early learning value without OAuth, permission, and rate-limit complexity.
+    consequences:
+      - The first repository workflow supports one checkout and parent-folder discovery.
+  - id: decision-008
+    date: 2026-07-25
+    status: accepted
+    summary: WorkLore is a public repository, while any future hosted backend may remain private.
+    rationale: Inspectable local-first privacy behavior supports user trust and tester participation.
+    consequences:
+      - Only synthetic data may be committed.
+      - Licensing remains a separate open decision.

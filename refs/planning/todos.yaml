@@ -1,0 +1,36 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+updated: 2026-07-25
+todos:
+  - id: task-001
+    status: complete
+    area: repository
+    summary: Create the public WorkLore repository.
+  - id: task-002
+    status: complete
+    area: repository
+    summary: Add a user-facing README, defensive gitignore, security policy, and durable refs structure.
+  - id: task-003
+    status: open
+    area: product
+    summary: Write the MVP product requirements and acceptance criteria for the story bank core.
+  - id: task-004
+    status: open
+    area: data
+    summary: Define canonical schemas for vault metadata, sources, roles, stories, interviews, jobs, voice profiles, and private entities.
+  - id: task-005
+    status: open
+    area: privacy
+    summary: Specify entity extraction, durable identity matching, confidence thresholds, review workflows, stable tokens, merge, split, and rehydration behavior.
+  - id: task-006
+    status: open
+    area: architecture
+    summary: Scaffold the Tauri 2, React, TypeScript, and Rust application.
+  - id: task-007
+    status: open
+    area: providers
+    summary: Define the provider contract for Ollama, Gemini bring-your-own-key, and manual workspace packages.
+  - id: task-008
+    status: open
+    area: testing
+    summary: Create synthetic fixtures for resumes, job descriptions, writing samples, entity ambiguity, and Git history.

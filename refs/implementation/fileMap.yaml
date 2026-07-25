@@ -1,0 +1,22 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+updated: 2026-07-25
+files:
+  - path: README.md
+    purpose: User-facing product purpose, implemented major features, and installation instructions.
+    status: active
+  - path: refs
+    purpose: Durable project planning, architecture, implementation, testing, UI, and handoff context.
+    status: active
+  - path: src
+    purpose: Planned React and TypeScript application source.
+    status: not_created
+  - path: src-tauri
+    purpose: Planned Tauri and Rust desktop shell and local system integration.
+    status: not_created
+  - path: schemas
+    purpose: Planned canonical WorkLore vault and agent-operation schemas.
+    status: not_created
+  - path: fixtures
+    purpose: Planned synthetic test documents, repositories, and entity-resolution cases.
+    status: not_created

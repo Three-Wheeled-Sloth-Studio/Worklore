@@ -1,0 +1,22 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+purpose: Guide to the durable WorkLore project reference files.
+files:
+  project.yaml: Project identity, purpose, stack, source-of-truth paths, and open questions.
+  agents.yaml: Required reading order and agent operating rules.
+  planning/roadmap.yaml: Major work lanes and sequencing.
+  planning/todos.yaml: Durable implementation task list.
+  planning/decisions.yaml: Accepted product and architecture decisions.
+  planning/risks.yaml: Known risks and mitigations.
+  planning/openQuestions.yaml: Unresolved questions that affect implementation.
+  architecture/overview.md: Plain-language system shape.
+  architecture/localVsHosted.md: Local, cloud, and portability boundaries.
+  product/vision.md: Product thesis, audience, and success shape.
+  product/featureCatalog.yaml: Planned and implemented feature inventory.
+  implementation/fileMap.yaml: Important files and source roots.
+  implementation/repoConventions.md: Repository and data-safety conventions.
+  implementation/envVars.example: Safe environment variable examples.
+  handoffs/currentHandoff.md: Current state, validation, gaps, and next actions.
+  handoffs/implementationLog.yaml: Chronological implementation log.
+  testing/validationCommands.yaml: Commands to run before completing work.
+  UI/designPrinciples.md: Shared design source and WorkLore-specific application notes.

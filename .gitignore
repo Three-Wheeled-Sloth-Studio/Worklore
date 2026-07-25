@@ -1,0 +1,53 @@
+# Dependencies and build output
+node_modules/
+dist/
+build/
+coverage/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Rust and Tauri build output
+target/
+src-tauri/target/
+
+# Environment and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.pfx
+*.key
+secrets/
+
+# WorkLore vaults and user data
+vaults/
+local-vaults/
+test-vaults/
+CareerVault/
+CareerVaults/
+*.worklore/
+*.sqlite
+*.sqlite3
+*.db
+*.db-wal
+*.db-shm
+provider-logs/
+extraction-cache/
+
+# Local application state
+.cache/
+.temp/
+tmp/
+
+# Editors and operating systems
+.vscode/
+.idea/
+*.suo
+*.user
+.DS_Store
+Thumbs.db
+desktop.ini

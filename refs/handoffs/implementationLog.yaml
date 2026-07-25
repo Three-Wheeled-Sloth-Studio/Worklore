@@ -1,0 +1,16 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+updated: 2026-07-25
+entries:
+  - date: 2026-07-25
+    summary: Initialized the public WorkLore repository and durable project reference structure.
+    files:
+      - README.md
+      - .gitignore
+      - SECURITY.md
+      - AGENTS.md
+      - refs
+    validation:
+      - Confirmed README contains only user purpose, current implemented status, and installation guidance.
+      - Confirmed repository guidance prohibits real user data and credentials.
+      - Recorded current product, privacy, provider, vault, story, and Git-scanning decisions.

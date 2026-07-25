@@ -1,0 +1,28 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+updated: 2026-07-25
+roadmap:
+  - id: roadmap-001
+    horizon: now
+    status: active
+    summary: Establish the repository, durable project references, schemas, and initial Tauri application shell.
+  - id: roadmap-002
+    horizon: next
+    status: planned
+    summary: Build the local vault, source import, resume extraction, candidate triage, guided interview, and story editing loop.
+  - id: roadmap-003
+    horizon: next
+    status: planned
+    summary: Add the durable Private Entity Registry, automatic content scans, stable redaction tokens, confidence scoring, and user-assisted entity resolution.
+  - id: roadmap-004
+    horizon: later
+    status: planned
+    summary: Add job description matching, local Git repository scanning, parent-folder discovery, and commit clustering.
+  - id: roadmap-005
+    horizon: later
+    status: planned
+    summary: Add writing sample analysis, explicit voice controls, and manual LinkedIn content workspace exports.
+  - id: roadmap-006
+    horizon: future
+    status: planned
+    summary: Add private GitHub account access and an optional hosted WorkLore LLM provider with paid credits.

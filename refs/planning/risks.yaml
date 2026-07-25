@@ -1,0 +1,24 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+updated: 2026-07-25
+risks:
+  - id: risk-001
+    severity: high
+    status: open
+    summary: Real resumes, vaults, provider logs, or API credentials could be committed to the public repository.
+    mitigation: Use synthetic fixtures only, maintain defensive ignore rules, enable secret scanning, and keep local vaults outside the checkout.
+  - id: risk-002
+    severity: high
+    status: open
+    summary: The entity registry may incorrectly merge distinct projects, employers, systems, or people.
+    mitigation: Preserve confidence scores, source evidence, reversible merges, token redirects, and a clear user review workflow.
+  - id: risk-003
+    severity: medium
+    status: open
+    summary: LLM-generated stories may introduce unsupported claims or invented metrics.
+    mitigation: Preserve provenance, distinguish confirmed facts from inference, and run a claim audit before finalization.
+  - id: risk-004
+    severity: medium
+    status: open
+    summary: The initial feature set may expand into LinkedIn automation before the story-bank workflow is proven.
+    mitigation: Keep story-bank creation first and use manual content export packages before integrated publishing or analytics.
