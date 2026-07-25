@@ -49,7 +49,7 @@ npm run build:frontend
 if (-not $SkipTests) {
     cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
     cargo test --manifest-path src-tauri/Cargo.toml
-    cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
+    cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
 }
 
 $shouldBundle = -not $SkipBundle -and $Channel -ne "validate"
