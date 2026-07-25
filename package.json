@@ -2,16 +2,21 @@
   "name": "worklore",
   "private": true,
   "version": "0.1.0",
+  "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Channel qa",
+    "build:frontend": "tsc -b && vite build",
+    "validate": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Channel validate -SkipBundle",
+    "qa": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-qa.ps1 -Launch",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
     "tauri": "tauri",
-    "desktop:dev": "tauri dev",
-    "desktop:build": "tauri build"
+    "desktop:dev": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dev.ps1",
+    "desktop:dev:raw": "tauri dev",
+    "desktop:build": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Channel qa"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.11.1",
