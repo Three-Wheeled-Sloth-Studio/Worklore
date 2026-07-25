@@ -36,6 +36,8 @@ pub struct ActiveOperation {
     pub started_at: String,
     pub updated_at: String,
     pub elapsed_ms: u64,
+    #[serde(default)]
+    pub process_id: u32,
     pub progress_current: Option<u64>,
     pub progress_total: Option<u64>,
     #[serde(default)]
