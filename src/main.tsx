@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
+import "./performance.css";
 import "./privacy-review.css";
 import "./story-candidates.css";
 
