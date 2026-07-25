@@ -1,11 +1,11 @@
 use std::path::PathBuf;
 
+use serde_json::{Map, Value};
+
 use crate::{
-    domain::candidates::{
-        CandidateStatus, CandidateSummary, ExtractCandidatesResult,
-    },
+    domain::candidates::{CandidateStatus, CandidateSummary, ExtractCandidatesResult},
     error::{CommandError, CommandResult},
-    services::candidate_service,
+    services::{candidate_service, performance_service::OperationSession},
 };
 
 #[tauri::command]
@@ -13,8 +13,20 @@ pub fn extract_resume_candidates(
     vault_path: String,
     source_id: String,
 ) -> CommandResult<ExtractCandidatesResult> {
-    candidate_service::extract_resume_candidates(&PathBuf::from(vault_path), &source_id)
-        .map_err(CommandError::from)
+    let vault_path = PathBuf::from(vault_path);
+    let mut metadata = Map::new();
+    metadata.insert("sourceId".to_string(), Value::String(source_id.clone()));
+
+    let mut operation = OperationSession::start(
+        &vault_path,
+        "extract_resume_candidates",
+        metadata,
+    )
+    .map_err(CommandError::from)?;
+    let result = operation.step("parse_and_write_candidates", Map::new(), || {
+        candidate_service::extract_resume_candidates(&vault_path, &source_id)
+    });
+    operation.finish(result).map_err(CommandError::from)
 }
 
 #[tauri::command]
