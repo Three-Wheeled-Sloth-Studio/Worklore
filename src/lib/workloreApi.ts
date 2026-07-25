@@ -22,8 +22,8 @@ import type {
   VaultSummary,
 } from "../domain/types";
 
-export async function createVault(parentPath: string, name: string): Promise<VaultSummary> {
-  return invoke<VaultSummary>("create_vault_in_parent", { parentPath, name });
+export async function createDefaultVault(name: string): Promise<VaultSummary> {
+  return invoke<VaultSummary>("create_default_vault", { name });
 }
 
 export async function openVault(path: string): Promise<VaultSummary> {
@@ -40,6 +40,18 @@ export async function rememberLastVault(vaultPath: string): Promise<void> {
 
 export async function clearLastVault(): Promise<void> {
   return invoke<void>("clear_last_vault");
+}
+
+export async function getDefaultVaultRoot(): Promise<string> {
+  return invoke<string>("get_default_vault_root");
+}
+
+export async function getLastImportDirectory(): Promise<string | null> {
+  return invoke<string | null>("get_last_import_directory");
+}
+
+export async function rememberLastImportFile(filePath: string): Promise<string> {
+  return invoke<string>("remember_last_import_file", { filePath });
 }
 
 export async function importSource(
