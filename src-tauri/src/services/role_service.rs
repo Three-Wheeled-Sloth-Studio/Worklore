@@ -116,7 +116,7 @@ pub fn list_role_summaries(vault_path: &Path) -> ServiceResult<Vec<RoleSummary>>
             story_count: role.story_ids.len(),
         })
         .collect::<Vec<_>>();
-    summaries.sort_by(|left, right| right.start_date.cmp(&left.start_date));
+    summaries.sort_by_key(|role| std::cmp::Reverse(role.start_date.clone()));
     Ok(summaries)
 }
 
@@ -138,7 +138,8 @@ fn parse_role_heading(
         .collect::<Vec<_>>();
 
     if segments.len() < 2 {
-        if let Some((title, organization)) = split_title_at_organization(trimmed) {
+        let title_at_org_source = segments.first().map(String::as_str).unwrap_or(trimmed);
+        if let Some((title, organization)) = split_title_at_organization(title_at_org_source) {
             segments = vec![organization.to_string(), title.to_string()];
         }
     }
@@ -368,15 +369,21 @@ mod tests {
     #[test]
     fn parses_common_employment_heading() {
         let registry = initialize_registry("vault_test");
-        let parsed = parse_role_heading(
-            "FINRA | Lead Product Manager | 2022 - Present",
-            &registry,
-        )
-        .expect("heading should parse");
+        let parsed = parse_role_heading("FINRA | Lead Product Manager | 2022 - Present", &registry)
+            .expect("heading should parse");
         assert_eq!(parsed.organization_name, "FINRA");
         assert_eq!(parsed.title, "Lead Product Manager");
         assert_eq!(parsed.start_date.as_deref(), Some("2022"));
         assert!(parsed.is_current);
+    }
+
+    #[test]
+    fn parses_title_at_organization_without_absorbing_date_text() {
+        let registry = initialize_registry("vault_test");
+        let parsed = parse_role_heading("Lead Product Manager at FINRA | 2022 - Present", &registry)
+            .expect("heading should parse");
+        assert_eq!(parsed.organization_name, "FINRA");
+        assert_eq!(parsed.title, "Lead Product Manager");
     }
 
     #[test]
