@@ -15,10 +15,17 @@ on:
 permissions:
   contents: read
 
+env:
+  WORKLORE_EXTERNAL_ROOT: ${{ runner.temp }}\WorkLore
+  WORKLORE_BUILD_ROOT: ${{ runner.temp }}\WorkLore\build\validate
+  WORKLORE_FRONTEND_DIST: ${{ runner.temp }}\WorkLore\build\validate\frontend
+  CARGO_TARGET_DIR: ${{ runner.temp }}\WorkLore\build\validate\cargo-target
+  VALIDATION_LOG_ROOT: ${{ runner.temp }}\WorkLore\logs
+
 jobs:
   validate:
     runs-on: windows-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
 
     steps:
       - name: Check out repository
@@ -34,59 +41,69 @@ jobs:
         with:
           components: rustfmt, clippy
 
-      - name: Create validation log folder
+      - name: Initialize external validation folders
         shell: pwsh
-        run: New-Item -ItemType Directory -Force -Path validation-logs | Out-Null
+        run: |
+          New-Item -ItemType Directory -Force -Path $env:WORKLORE_BUILD_ROOT | Out-Null
+          New-Item -ItemType Directory -Force -Path $env:WORKLORE_FRONTEND_DIST | Out-Null
+          New-Item -ItemType Directory -Force -Path $env:CARGO_TARGET_DIR | Out-Null
+          New-Item -ItemType Directory -Force -Path $env:VALIDATION_LOG_ROOT | Out-Null
+          ./scripts/assert-repo-clean.ps1
 
       - name: Install frontend dependencies
         shell: pwsh
         run: |
-          npm install 2>&1 | Tee-Object -FilePath validation-logs/npm-install.log
+          npm install 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\npm-install.log"
           exit $LASTEXITCODE
 
       - name: Validate project references
         shell: pwsh
         run: |
-          python -m pip install pyyaml 2>&1 | Tee-Object -FilePath validation-logs/pip-install.log
+          python -m pip install pyyaml 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\pip-install.log"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python refs/tools/validate_refs.py --mode initialized 2>&1 | Tee-Object -FilePath validation-logs/refs-validation.log
+          python refs/tools/validate_refs.py --mode initialized 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\refs-validation.log"
           exit $LASTEXITCODE
 
       - name: Run frontend tests
         shell: pwsh
         run: |
-          npm run test 2>&1 | Tee-Object -FilePath validation-logs/frontend-tests.log
+          npm run test 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\frontend-tests.log"
           exit $LASTEXITCODE
 
-      - name: Build frontend
+      - name: Build frontend externally
         shell: pwsh
         run: |
-          npm run build 2>&1 | Tee-Object -FilePath validation-logs/frontend-build.log
+          npm run build:frontend 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\frontend-build.log"
           exit $LASTEXITCODE
 
       - name: Check Rust formatting
         shell: pwsh
         run: |
-          cargo fmt --manifest-path src-tauri/Cargo.toml --all --check 2>&1 | Tee-Object -FilePath validation-logs/rust-format.log
+          cargo fmt --manifest-path src-tauri/Cargo.toml --all --check 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\rust-format.log"
           exit $LASTEXITCODE
 
-      - name: Run Rust tests
+      - name: Run Rust tests externally
         shell: pwsh
         run: |
-          cargo test --manifest-path src-tauri/Cargo.toml 2>&1 | Tee-Object -FilePath validation-logs/rust-tests.log
+          cargo test --manifest-path src-tauri/Cargo.toml 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\rust-tests.log"
           exit $LASTEXITCODE
 
-      - name: Run Rust lints
+      - name: Run Rust lints externally
         shell: pwsh
         run: |
-          cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings 2>&1 | Tee-Object -FilePath validation-logs/rust-clippy.log
+          cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\rust-clippy.log"
           exit $LASTEXITCODE
+
+      - name: Verify repository remains source-only
+        if: always()
+        shell: pwsh
+        run: ./scripts/assert-repo-clean.ps1
 
       - name: Upload validation logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: validation-logs-${{ github.run_id }}
-          path: validation-logs
+          path: ${{ runner.temp }}\WorkLore\logs
           if-no-files-found: ignore
           retention-days: 7
