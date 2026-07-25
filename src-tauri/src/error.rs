@@ -39,6 +39,18 @@ pub enum WorkLoreError {
     #[error("This interview action is not valid: {0}")]
     InvalidInterviewAction(String),
 
+    #[error("The requested role record was not found.")]
+    RoleNotFound,
+
+    #[error("WorkLore could not infer a role from this employment-history heading: {0}")]
+    RoleInferenceFailed(String),
+
+    #[error("The requested story record was not found.")]
+    StoryNotFound,
+
+    #[error("The story synthesis response is invalid: {0}")]
+    InvalidStoryResponse(String),
+
     #[error("The requested privacy review item was not found.")]
     ReviewItemNotFound,
 
@@ -47,6 +59,12 @@ pub enum WorkLoreError {
 
     #[error("This privacy review resolution is not valid: {0}")]
     InvalidReviewResolution(String),
+
+    #[error("This provider request is blocked by privacy preflight: {0}")]
+    ProviderPreflightBlocked(String),
+
+    #[error("The manual workspace could not be created: {0}")]
+    ManualWorkspace(String),
 
     #[error("File operation failed: {0}")]
     Io(#[from] std::io::Error),
@@ -88,9 +106,15 @@ impl From<WorkLoreError> for CommandError {
             WorkLoreError::CandidateNotFound => "candidate_not_found",
             WorkLoreError::InterviewNotFound => "interview_not_found",
             WorkLoreError::InvalidInterviewAction(_) => "invalid_interview_action",
+            WorkLoreError::RoleNotFound => "role_not_found",
+            WorkLoreError::RoleInferenceFailed(_) => "role_inference_failed",
+            WorkLoreError::StoryNotFound => "story_not_found",
+            WorkLoreError::InvalidStoryResponse(_) => "invalid_story_response",
             WorkLoreError::ReviewItemNotFound => "review_item_not_found",
             WorkLoreError::EntityNotFound => "entity_not_found",
             WorkLoreError::InvalidReviewResolution(_) => "invalid_review_resolution",
+            WorkLoreError::ProviderPreflightBlocked(_) => "provider_preflight_blocked",
+            WorkLoreError::ManualWorkspace(_) => "manual_workspace_failed",
             WorkLoreError::Io(_) => "io_error",
             WorkLoreError::Json(_) => "json_error",
         };
