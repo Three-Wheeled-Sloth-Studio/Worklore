@@ -259,7 +259,6 @@ pub fn set_story_status(
     story.status = status;
     story.updated_at = Utc::now().to_rfc3339();
     story.revision += 1;
-    story.privacy_scan.content_revision = story.revision;
     write_story_pair(vault_path, &story)?;
     summarize_story(vault_path, &story)
 }
@@ -333,9 +332,15 @@ fn build_evidence(
         .filter(|turn| turn.actor == TurnActor::User)
     {
         let evidence_id = format!("evidence_{}", Uuid::now_v7());
+        let evidence_type = if turn.answer_classification == Some(AnswerClassification::ConfirmedFact)
+        {
+            EvidenceType::UserConfirmation
+        } else {
+            EvidenceType::InterviewAnswer
+        };
         evidence.push(StoryEvidence {
             evidence_id: evidence_id.clone(),
-            evidence_type: EvidenceType::InterviewAnswer,
+            evidence_type,
             source_id: None,
             locator: format!("interview:{}/turn:{}", interview.interview_id, turn.turn_id),
             captured_text: turn.text.clone(),
@@ -776,7 +781,7 @@ mod tests {
     }
 
     #[test]
-    fn story_type_prefers_process_change_for_workflow_stories() {
+    fn decision_evidence_classifies_story_as_decision() {
         assert_eq!(infer_story_type(&response()), StoryType::Decision);
     }
 
