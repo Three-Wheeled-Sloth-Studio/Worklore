@@ -50,6 +50,22 @@ export type CandidateStatus =
   | "unsupported"
   | "converted_to_story";
 
+export type InterviewStatus =
+  | "not_started"
+  | "active"
+  | "paused"
+  | "ready_for_synthesis"
+  | "completed"
+  | "abandoned";
+
+export type InterviewResponseAction = "answer" | "skip" | "do_not_remember";
+
+export type AnswerClassification =
+  | "confirmed_fact"
+  | "user_estimate"
+  | "uncertain"
+  | "not_applicable";
+
 export interface VaultSummary {
   schemaVersion: number;
   vaultId: string;
@@ -99,6 +115,25 @@ export interface ExtractCandidatesResult {
   existingCount: number;
   candidates: CandidateSummary[];
   message: string;
+}
+
+export interface InterviewSummary {
+  interviewId: string;
+  candidateId: string;
+  candidateClaim: string;
+  status: InterviewStatus;
+  currentQuestion: string | null;
+  currentTargetField: string | null;
+  completedFieldCount: number;
+  totalFieldCount: number;
+  lastUpdatedAt: string;
+}
+
+export interface SubmitInterviewResponseRequest {
+  interviewId: string;
+  action: InterviewResponseAction;
+  text: string;
+  classification?: AnswerClassification | null;
 }
 
 export interface EntityCandidateView {
