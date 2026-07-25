@@ -21,6 +21,9 @@ pub enum WorkLoreError {
     #[error("The vault record is invalid: {0}")]
     InvalidVault(String),
 
+    #[error("WorkLore could not extract text from this document: {0}")]
+    DocumentExtraction(String),
+
     #[error("The requested privacy review item was not found.")]
     ReviewItemNotFound,
 
@@ -54,6 +57,7 @@ impl From<WorkLoreError> for CommandError {
             WorkLoreError::UnsupportedSourceType => "unsupported_source_type",
             WorkLoreError::InvalidPath => "invalid_path",
             WorkLoreError::InvalidVault(_) => "invalid_vault",
+            WorkLoreError::DocumentExtraction(_) => "document_extraction_failed",
             WorkLoreError::ReviewItemNotFound => "review_item_not_found",
             WorkLoreError::EntityNotFound => "entity_not_found",
             WorkLoreError::InvalidReviewResolution(_) => "invalid_review_resolution",
