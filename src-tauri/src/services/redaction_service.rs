@@ -3,8 +3,8 @@ use std::{collections::HashMap, fs, path::Path};
 use crate::{
     domain::{
         models::{
-            CloudIdentifierMode, EntityReviewItem, EntitySensitivity, EntityStatus,
-            PrivateEntity, VaultDocument,
+            CloudIdentifierMode, EntityReviewItem, EntitySensitivity, EntityStatus, PrivateEntity,
+            VaultDocument,
         },
         providers::{PrivacyPreflightSummary, RedactionReplacement},
     },
@@ -50,10 +50,8 @@ pub fn redact_for_external_use(vault_path: &Path, input: &str) -> ServiceResult<
 
     let mut output = input.to_string();
     let mut counts: HashMap<String, usize> = HashMap::new();
-    let mut replacements = replacement_rules(
-        &registry.entities,
-        vault.privacy.cloud_identifier_mode,
-    );
+    let mut replacements =
+        replacement_rules(&registry.entities, vault.privacy.cloud_identifier_mode);
     replacements.sort_by(|left, right| right.alias.len().cmp(&left.alias.len()));
 
     for rule in replacements {
@@ -142,7 +140,11 @@ fn replacement_rules(
             alias: entity.canonical_name.clone(),
             token: entity.public_token.clone(),
         });
-        for alias in entity.aliases.iter().filter(|alias| alias.status != "rejected") {
+        for alias in entity
+            .aliases
+            .iter()
+            .filter(|alias| alias.status != "rejected")
+        {
             rules.push(ReplacementRule {
                 entity_id: entity.entity_id.clone(),
                 alias: alias.value.clone(),
@@ -277,9 +279,16 @@ mod tests {
     #[test]
     fn replacement_rules_respect_include_mode_except_never_send() {
         let private = entity("Acme", "Acme Corp", EntitySensitivity::Private);
-        let never = entity("Secret Client", "Client X", EntitySensitivity::NeverSendToCloud);
+        let never = entity(
+            "Secret Client",
+            "Client X",
+            EntitySensitivity::NeverSendToCloud,
+        );
         assert!(replacement_rules(&[private], CloudIdentifierMode::Include).is_empty());
-        assert_eq!(replacement_rules(&[never], CloudIdentifierMode::Include).len(), 2);
+        assert_eq!(
+            replacement_rules(&[never], CloudIdentifierMode::Include).len(),
+            2
+        );
     }
 
     #[test]
