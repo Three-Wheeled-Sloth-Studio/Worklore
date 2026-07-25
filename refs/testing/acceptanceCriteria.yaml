@@ -19,6 +19,7 @@ acceptance_criteria:
       - WorkLore validates vault.json and the entity registry.
       - source, story, and pending privacy-review counts are returned.
       - missing canonical directories are recreated without replacing user records.
+      - stale active-operation records are preserved as interrupted metrics.
   - id: ac-source-001
     area: source_import
     status: implemented_pending_validation
@@ -30,39 +31,69 @@ acceptance_criteria:
       - metadata stores a vault-relative path to the copied file.
   - id: ac-source-002
     area: extraction
-    status: partially_implemented
+    status: implemented_pending_validation
     summary: WorkLore reports text extraction state honestly.
     criteria:
       - TXT and Markdown are extracted locally as UTF-8.
       - invalid UTF-8 is reported as failed.
-      - PDF and DOCX remain pending until their extractors are implemented.
-      - WorkLore never marks an unparsed PDF or DOCX as understood.
+      - text-bearing PDF and DOCX files are extracted locally.
+      - unreadable or image-only documents are not marked as understood.
+  - id: ac-resume-001
+    area: resume_candidates
+    status: implemented_pending_validation
+    summary: Resume story candidates come only from explicit employment-history sections.
+    criteria:
+      - extraction starts only after a recognized work-history or employment-history heading.
+      - headline job titles above a career summary are ignored.
+      - bullets in summaries, profiles, skills, education, certifications, projects, awards, affiliations, and references are ignored.
+      - extraction stops when a recognized non-employment section begins.
+      - a resume without a recognized employment section produces no candidates and explains why.
   - id: ac-privacy-001
     area: privacy
     status: implemented_pending_validation
-    summary: Every imported source begins or completes an entity scan.
+    summary: Every readable imported source completes an entity scan.
     criteria:
-      - TXT and Markdown run the deterministic entity scan immediately.
-      - PDF and DOCX remain visibly pending until text extraction completes.
+      - readable TXT, Markdown, PDF, and DOCX sources run the deterministic entity scan.
       - detected entities receive stable vault-level tokens.
       - provisional entities create review items except for low-friction URL detections.
+      - unsupported documents remain visibly unavailable for privacy scanning.
   - id: ac-privacy-002
     area: privacy
-    status: designed
+    status: implemented_pending_validation
     summary: Ambiguous matches require user resolution.
     criteria:
       - a review item can show multiple candidate entities and confidence reasons.
       - the user can resolve same entity, related entity, new entity, or ignored term.
-      - Kinections can be reviewed against an existing complaint-screening project entity.
+      - a newly detected project name can be compared with an existing project description.
   - id: ac-ui-001
     area: desktop_shell
     status: implemented_pending_validation
-    summary: The initial desktop shell makes the next action clear.
+    summary: The desktop shell makes the next action clear.
     criteria:
       - the landing surface offers create vault and open vault without scrolling.
-      - the workspace shows sources, stories, and privacy-review counts.
+      - the workspace shows sources, stories, candidates, and privacy-review counts.
       - import and privacy preference controls are near the state they affect.
       - blocking file operations use a modal operation layer.
+  - id: ac-observability-001
+    area: observability
+    status: implemented_pending_validation
+    summary: Long local operations expose useful timing without storing private content.
+    criteria:
+      - source import records top-level and phase durations.
+      - active records show the current phase and elapsed time.
+      - completed metrics record outcomes and non-content workload sizes.
+      - metrics exclude source text, interview answers, private names, prompts, responses, and secrets.
+      - the workspace shows active operations, slow phases, and recent outcomes.
+  - id: ac-build-001
+    area: build_distribution
+    status: implemented_pending_validation
+    summary: Development, validation, QA, and release output remain outside the repository.
+    criteria:
+      - frontend output and Cargo targets use an external build root.
+      - QA is copied to a distinct external installation folder before launch.
+      - QA uses a distinct product name and application identifier.
+      - local scripts and CI fail when known build or install folders exist inside the repository.
+      - build and install manifests record external paths and the source commit.
   - id: ac-provider-001
     area: providers
     status: designed
