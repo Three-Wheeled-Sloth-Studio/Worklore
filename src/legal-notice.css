@@ -1,0 +1,22 @@
+.legal-notice {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.8rem;
+  padding: 0.65rem 1rem;
+  border-top: 1px solid #343a31;
+  color: #858d82;
+  background: #141714;
+  font-size: 0.68rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.legal-notice a {
+  color: #c7aa68;
+  text-underline-offset: 2px;
+}
+
+.legal-notice a:hover {
+  color: #e0c27c;
+}
