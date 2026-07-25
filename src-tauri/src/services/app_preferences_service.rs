@@ -75,28 +75,26 @@ fn preferences_path() -> ServiceResult<PathBuf> {
     Ok(base.join("WorkLore").join("preferences.json"))
 }
 
+#[cfg(target_os = "windows")]
 fn local_config_root() -> Option<PathBuf> {
-    #[cfg(target_os = "windows")]
-    {
-        return env::var_os("LOCALAPPDATA").map(PathBuf::from);
-    }
+    env::var_os("LOCALAPPDATA").map(PathBuf::from)
+}
 
-    #[cfg(target_os = "macos")]
-    {
-        return env::var_os("HOME")
-            .map(PathBuf::from)
-            .map(|home| home.join("Library").join("Application Support"));
-    }
+#[cfg(target_os = "macos")]
+fn local_config_root() -> Option<PathBuf> {
+    env::var_os("HOME")
+        .map(PathBuf::from)
+        .map(|home| home.join("Library").join("Application Support"))
+}
 
-    #[cfg(all(not(target_os = "windows"), not(target_os = "macos")))]
-    {
-        if let Some(path) = env::var_os("XDG_CONFIG_HOME") {
-            return Some(PathBuf::from(path));
-        }
-        env::var_os("HOME")
-            .map(PathBuf::from)
-            .map(|home| home.join(".config"))
+#[cfg(all(not(target_os = "windows"), not(target_os = "macos")))]
+fn local_config_root() -> Option<PathBuf> {
+    if let Some(path) = env::var_os("XDG_CONFIG_HOME") {
+        return Some(PathBuf::from(path));
     }
+    env::var_os("HOME")
+        .map(PathBuf::from)
+        .map(|home| home.join(".config"))
 }
 
 const fn default_schema_version() -> u32 {
