@@ -15,6 +15,30 @@ export type PrivacyScanStatus =
   | "failed"
   | "unavailable";
 
+export type EntityType =
+  | "employer"
+  | "client"
+  | "project"
+  | "product"
+  | "system"
+  | "repository"
+  | "person"
+  | "location"
+  | "email"
+  | "phone"
+  | "url"
+  | "account"
+  | "identifier"
+  | "organization"
+  | "user_defined";
+
+export type ReviewResolutionAction =
+  | "same_entity"
+  | "related_entity"
+  | "new_entity"
+  | "ignore_term"
+  | "dismiss";
+
 export interface VaultSummary {
   schemaVersion: number;
   vaultId: string;
@@ -44,6 +68,54 @@ export interface ImportSourceResult {
   source: SourceSummary;
   created: boolean;
   duplicateDetected: boolean;
+  message: string;
+}
+
+export interface EntityCandidateView {
+  entityId: string;
+  canonicalName: string;
+  publicToken: string;
+  entityType: EntityType;
+  sensitivity: string;
+  score: number;
+  reasons: string[];
+  provisional: boolean;
+}
+
+export interface EntityReviewView {
+  reviewItemId: string;
+  recordType: string;
+  recordId: string;
+  locator: string;
+  contextExcerpt: string;
+  matchedText: string;
+  suggestedEntityType: string;
+  extractionConfidence: number;
+  typeConfidence: number;
+  identityMatchConfidence: number;
+  risk: string;
+  status: string;
+  question: string;
+  provisionalEntityId: string | null;
+  candidates: EntityCandidateView[];
+  createdAt: string;
+}
+
+export interface ResolveEntityReviewRequest {
+  reviewItemId: string;
+  action: ReviewResolutionAction;
+  targetEntityId?: string | null;
+  canonicalName?: string | null;
+  entityType?: EntityType | null;
+  relationshipLabel?: string | null;
+  notes?: string | null;
+}
+
+export interface ResolveEntityReviewResult {
+  reviewItemId: string;
+  status: string;
+  affectedEntityId: string | null;
+  pendingReviewCount: number;
   message: string;
 }
 
