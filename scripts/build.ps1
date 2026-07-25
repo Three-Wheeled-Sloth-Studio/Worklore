@@ -66,7 +66,7 @@ if ($shouldBundle) {
         productName = $productName
         identifier = $identifier
         build = @{
-            beforeBuildCommand = "powershell -NoProfile -Command `"Write-Host 'Using externally staged frontend.'`""
+            beforeBuildCommand = "cmd /c echo Using externally staged frontend."
             frontendDist = $layout.FrontendDist
         }
         bundle = @{
@@ -79,6 +79,14 @@ if ($shouldBundle) {
     npm run tauri -- build --config $layout.ConfigPath
 }
 
+$gitCommit = $null
+try {
+    $gitCommit = (git rev-parse HEAD).Trim()
+}
+catch {
+    $gitCommit = $null
+}
+
 $manifest = [ordered]@{
     schemaVersion = 1
     channel = $Channel
@@ -88,7 +96,7 @@ $manifest = [ordered]@{
     frontendDist = $layout.FrontendDist
     cargoTarget = $layout.CargoTarget
     bundled = $shouldBundle
-    gitCommit = $(try { (git rev-parse HEAD).Trim() } catch { $null })
+    gitCommit = $gitCommit
 }
 $manifest | ConvertTo-Json -Depth 5 | Set-Content -Encoding UTF8 (Join-Path $layout.BuildRoot "build-manifest.json")
 
