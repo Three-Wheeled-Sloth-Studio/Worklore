@@ -66,6 +66,27 @@ export type AnswerClassification =
   | "uncertain"
   | "not_applicable";
 
+export type ManualWorkspaceTarget = "chatgpt" | "claude" | "gemini" | "generic";
+
+export type StoryStatus =
+  | "draft"
+  | "interviewing"
+  | "ready_for_review"
+  | "validated"
+  | "finalized"
+  | "archived";
+
+export type StoryType =
+  | "accomplishment"
+  | "decision"
+  | "failure"
+  | "lesson"
+  | "conflict"
+  | "leadership"
+  | "technical_delivery"
+  | "process_change"
+  | "other";
+
 export type OperationOutcome = "succeeded" | "failed" | "interrupted";
 
 export interface VaultSummary {
@@ -136,6 +157,49 @@ export interface SubmitInterviewResponseRequest {
   action: InterviewResponseAction;
   text: string;
   classification?: AnswerClassification | null;
+}
+
+export interface CreateManualWorkspaceRequest {
+  interviewId: string;
+  outputDirectory: string;
+  target: ManualWorkspaceTarget;
+}
+
+export interface ManualWorkspaceResult {
+  workspaceId: string;
+  workspacePath: string;
+  target: ManualWorkspaceTarget;
+  privacyMode: string;
+  replacementCount: number;
+  warningCount: number;
+  message: string;
+}
+
+export interface StorySummary {
+  storyId: string;
+  title: string;
+  status: StoryStatus;
+  storyType: StoryType;
+  summary: string;
+  roleId: string | null;
+  roleTitle: string | null;
+  organizationName: string | null;
+  metrics: string[];
+  outcomes: string[];
+  privacyScanStatus: PrivacyScanStatus;
+  updatedAt: string;
+  revision: number;
+}
+
+export interface ImportStoryResponseRequest {
+  interviewId: string;
+  responsePath: string;
+}
+
+export interface ImportStoryResponseResult {
+  story: StorySummary;
+  created: boolean;
+  message: string;
 }
 
 export interface EntityCandidateView {
