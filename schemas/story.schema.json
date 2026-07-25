@@ -1,0 +1,404 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://worklore.local/schemas/story.schema.json",
+  "title": "WorkLore Story",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "storyId",
+    "title",
+    "status",
+    "roleIds",
+    "content",
+    "claims",
+    "evidence",
+    "disclosure",
+    "privacyScan",
+    "createdAt",
+    "updatedAt",
+    "revision"
+  ],
+  "$defs": {
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claimId",
+        "text",
+        "classification",
+        "confidence",
+        "evidenceIds",
+        "includedByDefault"
+      ],
+      "properties": {
+        "claimId": {
+          "type": "string",
+          "pattern": "^claim_[A-Za-z0-9_-]+$"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "classification": {
+          "type": "string",
+          "enum": [
+            "confirmed_fact",
+            "user_estimate",
+            "model_inference",
+            "unsupported"
+          ]
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "evidenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^evidence_[A-Za-z0-9_-]+$"
+          },
+          "uniqueItems": true
+        },
+        "includedByDefault": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": "string",
+          "default": ""
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidenceId",
+        "evidenceType",
+        "sourceId",
+        "locator",
+        "capturedText"
+      ],
+      "properties": {
+        "evidenceId": {
+          "type": "string",
+          "pattern": "^evidence_[A-Za-z0-9_-]+$"
+        },
+        "evidenceType": {
+          "type": "string",
+          "enum": [
+            "source_fragment",
+            "interview_answer",
+            "git_commit",
+            "git_diff_summary",
+            "user_confirmation",
+            "other"
+          ]
+        },
+        "sourceId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "locator": {
+          "type": "string",
+          "description": "Stable source fragment, interview answer, commit, or other local locator."
+        },
+        "capturedText": {
+          "type": "string"
+        },
+        "capturedAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "storyId": {
+      "type": "string",
+      "pattern": "^story_[A-Za-z0-9_-]+$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "interviewing",
+        "ready_for_review",
+        "validated",
+        "finalized",
+        "archived"
+      ]
+    },
+    "storyType": {
+      "type": "string",
+      "enum": [
+        "accomplishment",
+        "decision",
+        "failure",
+        "lesson",
+        "conflict",
+        "leadership",
+        "technical_delivery",
+        "process_change",
+        "other"
+      ],
+      "default": "accomplishment"
+    },
+    "roleIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^role_[A-Za-z0-9_-]+$"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "entityIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^entity_[A-Za-z0-9_-]+$"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "relatedStoryIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^story_[A-Za-z0-9_-]+$"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "jobRequirementIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^requirement_[A-Za-z0-9_-]+$"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "content": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "summary",
+        "situation",
+        "problemOrOpportunity",
+        "responsibilities",
+        "constraints",
+        "actionsAndDecisions",
+        "toolsAndSystems",
+        "stakeholders",
+        "outcomes",
+        "metrics",
+        "lessonsLearned",
+        "operatingPhilosophy"
+      ],
+      "properties": {
+        "summary": {
+          "type": "string"
+        },
+        "situation": {
+          "type": "string"
+        },
+        "problemOrOpportunity": {
+          "type": "string"
+        },
+        "responsibilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "actionsAndDecisions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "alternativesConsidered": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "toolsAndSystems": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "stakeholders": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "outcomes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "lessonsLearned": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "operatingPhilosophy": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reusableThemes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "skillsDemonstrated": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/claim"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidence"
+      }
+    },
+    "disclosure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "defaultPublicMode",
+        "reviewRequired",
+        "notes"
+      ],
+      "properties": {
+        "defaultPublicMode": {
+          "type": "string",
+          "enum": [
+            "exact_names",
+            "stable_tokens",
+            "descriptive_anonymization"
+          ],
+          "default": "descriptive_anonymization"
+        },
+        "reviewRequired": {
+          "type": "boolean",
+          "default": true
+        },
+        "notes": {
+          "type": "string",
+          "default": ""
+        }
+      }
+    },
+    "privacyScan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "contentRevision",
+        "reviewItemIds"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "complete",
+            "needs_review",
+            "failed",
+            "unavailable"
+          ]
+        },
+        "contentRevision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "scannedAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "reviewItemIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^review_[A-Za-z0-9_-]+$"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}
