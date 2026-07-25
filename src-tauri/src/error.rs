@@ -21,9 +21,6 @@ pub enum WorkLoreError {
     #[error("The vault record is invalid: {0}")]
     InvalidVault(String),
 
-    #[error("A stored WorkLore record is invalid: {0}")]
-    InvalidRecord(String),
-
     #[error("File operation failed: {0}")]
     Io(#[from] std::io::Error),
 
@@ -48,7 +45,6 @@ impl From<WorkLoreError> for CommandError {
             WorkLoreError::UnsupportedSourceType => "unsupported_source_type",
             WorkLoreError::InvalidPath => "invalid_path",
             WorkLoreError::InvalidVault(_) => "invalid_vault",
-            WorkLoreError::InvalidRecord(_) => "invalid_record",
             WorkLoreError::Io(_) => "io_error",
             WorkLoreError::Json(_) => "json_error",
         };
