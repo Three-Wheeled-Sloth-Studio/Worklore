@@ -62,18 +62,6 @@ impl OperationSession {
         write_active(&self.vault_path, &self.active)
     }
 
-    pub fn set_progress(
-        &mut self,
-        current: u64,
-        total: Option<u64>,
-    ) -> ServiceResult<()> {
-        self.active.progress_current = Some(current);
-        self.active.progress_total = total;
-        self.active.updated_at = Utc::now().to_rfc3339();
-        self.active.elapsed_ms = duration_ms(self.started.elapsed());
-        write_active(&self.vault_path, &self.active)
-    }
-
     pub fn step<T, F>(
         &mut self,
         phase: &str,
@@ -263,7 +251,7 @@ fn list_recent_metrics(vault_path: &Path, limit: usize) -> ServiceResult<Vec<Ope
     let reader = BufReader::new(file);
     let mut metrics = reader
         .lines()
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .filter_map(|line| serde_json::from_str::<OperationMetric>(&line).ok())
         .collect::<Vec<_>>();
     metrics.reverse();
