@@ -37,7 +37,10 @@ pub fn import_synthesis_response(
 ) -> ServiceResult<ImportStoryResponseResult> {
     ensure_vault(vault_path)?;
     let mut metadata = Map::new();
-    metadata.insert("interviewId".to_string(), Value::String(interview_id.to_string()));
+    metadata.insert(
+        "interviewId".to_string(),
+        Value::String(interview_id.to_string()),
+    );
     metadata.insert(
         "responseExtension".to_string(),
         Value::String(
@@ -71,8 +74,7 @@ pub fn import_synthesis_response(
             InterviewStatus::ReadyForSynthesis | InterviewStatus::Completed
         ) {
             return Err(WorkLoreError::InvalidStoryResponse(
-                "complete the guided interview pass before importing a story response"
-                    .to_string(),
+                "complete the guided interview pass before importing a story response".to_string(),
             ));
         }
         let candidate_id = interview
@@ -216,13 +218,19 @@ pub fn import_synthesis_response(
         candidate.status = CandidateStatus::ConvertedToStory;
         candidate.updated_at = now.clone();
         candidate.revision += 1;
-        write_json_atomic(&candidate_path(vault_path, &candidate.candidate_id), &candidate)?;
+        write_json_atomic(
+            &candidate_path(vault_path, &candidate.candidate_id),
+            &candidate,
+        )?;
 
         interview.story_id = Some(story_id);
         interview.status = InterviewStatus::Completed;
         interview.updated_at = now;
         interview.revision += 1;
-        write_json_atomic(&interview_path(vault_path, &interview.interview_id), &interview)?;
+        write_json_atomic(
+            &interview_path(vault_path, &interview.interview_id),
+            &interview,
+        )?;
 
         let summary = summarize_story(vault_path, &story)?;
         Ok(ImportStoryResponseResult {
@@ -231,8 +239,7 @@ pub fn import_synthesis_response(
             message: if created {
                 "Story response validated and saved as a reviewable WorkLore story.".to_string()
             } else {
-                "Story response validated and the existing WorkLore story was revised."
-                    .to_string()
+                "Story response validated and the existing WorkLore story was revised.".to_string()
             },
         })
     })();
@@ -332,12 +339,12 @@ fn build_evidence(
         .filter(|turn| turn.actor == TurnActor::User)
     {
         let evidence_id = format!("evidence_{}", Uuid::now_v7());
-        let evidence_type = if turn.answer_classification == Some(AnswerClassification::ConfirmedFact)
-        {
-            EvidenceType::UserConfirmation
-        } else {
-            EvidenceType::InterviewAnswer
-        };
+        let evidence_type =
+            if turn.answer_classification == Some(AnswerClassification::ConfirmedFact) {
+                EvidenceType::UserConfirmation
+            } else {
+                EvidenceType::InterviewAnswer
+            };
         evidence.push(StoryEvidence {
             evidence_id: evidence_id.clone(),
             evidence_type,
@@ -405,9 +412,7 @@ fn build_claims(
         .collect()
 }
 
-fn claim_classification(
-    level: SynthesisEvidenceLevel,
-) -> (ClaimClassification, f32, String) {
+fn claim_classification(level: SynthesisEvidenceLevel) -> (ClaimClassification, f32, String) {
     match level {
         SynthesisEvidenceLevel::ConfirmedFact => {
             (ClaimClassification::ConfirmedFact, 1.0, String::new())
@@ -532,8 +537,7 @@ fn write_story_pair(vault_path: &Path, story: &StoryRecord) -> ServiceResult<()>
 
     let transaction_id = Uuid::now_v7();
     let json_temp = directory.join(format!(".{}.{}.json.tmp", story.story_id, transaction_id));
-    let markdown_temp =
-        directory.join(format!(".{}.{}.md.tmp", story.story_id, transaction_id));
+    let markdown_temp = directory.join(format!(".{}.{}.md.tmp", story.story_id, transaction_id));
     let json_backup = directory.join(format!(".{}.json.previous", story.story_id));
     let markdown_backup = directory.join(format!(".{}.md.previous", story.story_id));
 
@@ -598,12 +602,14 @@ fn render_markdown(story: &StoryRecord) -> String {
         story
             .claims
             .iter()
-            .map(|claim| format!(
-                "- [{} | {:.0}%] {}",
-                enum_label(claim.classification),
-                claim.confidence * 100.0,
-                claim.text
-            ))
+            .map(|claim| {
+                format!(
+                    "- [{} | {:.0}%] {}",
+                    enum_label(claim.classification),
+                    claim.confidence * 100.0,
+                    claim.text
+                )
+            })
             .collect::<Vec<_>>()
             .join("\n")
     )
