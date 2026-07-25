@@ -1,7 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
+import { PrivacyReviewPanel } from "./components/PrivacyReviewPanel";
 import type {
   CloudIdentifierMode,
+  EntityReviewView,
+  ResolveEntityReviewRequest,
   SourceSummary,
   SourceType,
   VaultSummary,
@@ -10,8 +13,10 @@ import { errorMessage } from "./domain/types";
 import {
   createVault,
   importSource,
+  listEntityReviews,
   listSources,
   openVault,
+  resolveEntityReview,
   updateCloudIdentifierMode,
 } from "./lib/workloreApi";
 import "./styles.css";
@@ -27,30 +32,34 @@ const SOURCE_TYPES: Array<{ value: SourceType; label: string }> = [
 function App() {
   const [vault, setVault] = useState<VaultSummary | null>(null);
   const [sources, setSources] = useState<SourceSummary[]>([]);
+  const [reviews, setReviews] = useState<EntityReviewView[]>([]);
   const [selectedSourceType, setSelectedSourceType] = useState<SourceType>("resume");
   const [vaultName, setVaultName] = useState("My Career Stories");
   const [busyMessage, setBusyMessage] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const reviewCount = useMemo(
-    () => sources.filter((source) => source.privacyScanStatus === "needs_review").length,
-    [sources],
-  );
-
   useEffect(() => {
     if (!vault) {
       setSources([]);
+      setReviews([]);
       return;
     }
 
-    void refreshSources(vault.path);
+    void refreshWorkspace(vault.path, false);
   }, [vault?.path]);
 
-  async function refreshSources(vaultPath: string) {
+  async function refreshWorkspace(vaultPath: string, refreshVault: boolean) {
     try {
-      const result = await listSources(vaultPath);
-      setSources(result);
+      const [sourceResult, reviewResult] = await Promise.all([
+        listSources(vaultPath),
+        listEntityReviews(vaultPath),
+      ]);
+      setSources(sourceResult);
+      setReviews(reviewResult);
+      if (refreshVault) {
+        setVault(await openVault(vaultPath));
+      }
     } catch (caught) {
       setError(errorMessage(caught));
     }
@@ -130,12 +139,11 @@ function App() {
       return;
     }
 
-    setBusyMessage("Copying and registering source");
+    setBusyMessage("Copying and scanning source");
     try {
       const result = await importSource(vault.path, selected, selectedSourceType);
       setNotice(result.message);
-      await refreshSources(vault.path);
-      setVault(await openVault(vault.path));
+      await refreshWorkspace(vault.path, true);
     } catch (caught) {
       setError(errorMessage(caught));
     } finally {
@@ -159,6 +167,25 @@ function App() {
       );
     } catch (caught) {
       setError(errorMessage(caught));
+    } finally {
+      setBusyMessage(null);
+    }
+  }
+
+  async function handleResolveReview(request: ResolveEntityReviewRequest) {
+    if (!vault) {
+      return;
+    }
+
+    setBusyMessage("Saving private entity decision");
+    setError(null);
+    try {
+      const result = await resolveEntityReview(vault.path, request);
+      setNotice(result.message);
+      await refreshWorkspace(vault.path, true);
+    } catch (caught) {
+      setError(errorMessage(caught));
+      throw caught;
     } finally {
       setBusyMessage(null);
     }
@@ -222,10 +249,18 @@ function App() {
       <section className="status-strip" aria-label="Vault status">
         <StatusItem value={vault.sourceCount} label="Sources" />
         <StatusItem value={vault.storyCount} label="Stories" />
-        <StatusItem value={reviewCount} label="Privacy reviews" attention={reviewCount > 0} />
+        <StatusItem
+          value={reviews.length}
+          label="Privacy reviews"
+          attention={reviews.length > 0}
+        />
       </section>
 
       <div className="workspace-grid">
+        {reviews.length > 0 ? (
+          <PrivacyReviewPanel reviews={reviews} onResolve={handleResolveReview} />
+        ) : null}
+
         <section className="workspace-panel source-panel" aria-labelledby="sources-heading">
           <div className="panel-heading-row">
             <div>
@@ -254,9 +289,8 @@ function App() {
             <div className="empty-state">
               <h3>Start with a resume</h3>
               <p>
-                Import a resume, job description, writing sample, or plain-text note. The
-                first implementation registers the source, checks for duplicates, and starts
-                its privacy scan.
+                Import a resume, job description, writing sample, or plain-text note. WorkLore
+                copies it into the vault, checks for duplicates, and starts its privacy scan.
               </p>
             </div>
           ) : (
@@ -308,8 +342,8 @@ function App() {
           <div className="next-step-card">
             <h3>Next useful step</h3>
             <p>
-              Resume extraction and entity-review screens are the next implementation slice.
-              Imported sources are already stored in the canonical vault shape they will use.
+              Import a text or Markdown resume to exercise the current vault, duplicate-check,
+              and private-entity review loop. PDF and DOCX extraction are the next parser slice.
             </p>
           </div>
         </aside>
