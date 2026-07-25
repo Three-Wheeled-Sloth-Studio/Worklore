@@ -8,7 +8,7 @@ Instrumentation must make those operations inspectable without collecting the pr
 
 ## Initial Coverage
 
-The first instrumented pipeline is source import:
+Source import is instrumented by phase:
 
 ```text
 import_source
@@ -22,6 +22,13 @@ import_source
   write_source_metadata
 ```
 
+Resume candidate extraction is also instrumented:
+
+```text
+extract_resume_candidates
+  parse_and_write_candidates
+```
+
 Future long-running operations should use the same pattern, including:
 
 - OCR
@@ -32,6 +39,17 @@ Future long-running operations should use the same pattern, including:
 - Gemini provider calls
 - Story synthesis and evidence audits
 - Vault migrations and backups
+
+## Background Execution
+
+Source import and resume candidate extraction run through Tauri's blocking-task runtime rather than on the UI command thread.
+
+This matters for two reasons:
+
+1. The desktop interface remains responsive while local parsing or scanning runs.
+2. The three-second instrumentation poll can continue reading active operation state during the task.
+
+New long-running commands should follow this pattern rather than placing a large synchronous operation directly inside a Tauri command handler.
 
 ## Storage
 
@@ -73,7 +91,7 @@ Instrumentation must not contain:
 - API keys or credential material
 - File contents
 
-Canonical record IDs may be added later when useful for diagnosis, but should be omitted unless the workflow needs them.
+Canonical record IDs may be added when useful for diagnosis, but should be omitted unless the workflow needs them.
 
 ## Interrupted Operations
 
@@ -86,7 +104,7 @@ Records owned by the current process are left alone so a routine workspace refre
 The workspace polls local instrumentation every three seconds and displays:
 
 - The current operation and phase
-- Elapsed time
+- Live elapsed time calculated from the recorded start timestamp
 - Progress when available
 - The slowest recent phases
 - Recent top-level outcomes
