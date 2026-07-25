@@ -21,6 +21,15 @@ pub enum WorkLoreError {
     #[error("The vault record is invalid: {0}")]
     InvalidVault(String),
 
+    #[error("The requested privacy review item was not found.")]
+    ReviewItemNotFound,
+
+    #[error("The selected private entity was not found.")]
+    EntityNotFound,
+
+    #[error("This privacy review resolution is not valid: {0}")]
+    InvalidReviewResolution(String),
+
     #[error("File operation failed: {0}")]
     Io(#[from] std::io::Error),
 
@@ -45,6 +54,9 @@ impl From<WorkLoreError> for CommandError {
             WorkLoreError::UnsupportedSourceType => "unsupported_source_type",
             WorkLoreError::InvalidPath => "invalid_path",
             WorkLoreError::InvalidVault(_) => "invalid_vault",
+            WorkLoreError::ReviewItemNotFound => "review_item_not_found",
+            WorkLoreError::EntityNotFound => "entity_not_found",
+            WorkLoreError::InvalidReviewResolution(_) => "invalid_review_resolution",
             WorkLoreError::Io(_) => "io_error",
             WorkLoreError::Json(_) => "json_error",
         };
