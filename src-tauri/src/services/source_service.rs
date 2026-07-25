@@ -13,7 +13,7 @@ use crate::{
         read_json, sanitize_file_name, sha256_file, to_vault_relative, unique_destination,
         write_json_atomic,
     },
-    services::entity_scan::scan_text,
+    services::{contextual_entity_scan::scan_named_projects, entity_scan::scan_text},
 };
 
 const TEXT_EXTRACTOR_VERSION: &str = "plain-text-v1";
@@ -188,7 +188,19 @@ fn extract_and_scan(
                 .join(".worklore/extraction-cache")
                 .join(format!("{source_id}.txt"));
             fs::write(&extracted_path, &text)?;
-            let scan = scan_text(vault_path, "source", source_id, &text)?;
+
+            let base_scan = scan_text(vault_path, "source", source_id, &text)?;
+            let contextual_scan = scan_named_projects(vault_path, "source", source_id, &text)?;
+            let mut review_item_ids = base_scan.review_item_ids;
+            review_item_ids.extend(contextual_scan.review_item_ids);
+            review_item_ids.sort();
+            review_item_ids.dedup();
+            let privacy_status = if review_item_ids.is_empty() {
+                PrivacyScanStatus::Complete
+            } else {
+                PrivacyScanStatus::NeedsReview
+            };
+
             Ok((
                 ExtractionState {
                     status: ExtractionStatus::Complete,
@@ -199,10 +211,13 @@ fn extract_and_scan(
                     error: None,
                 },
                 PrivacyScanState {
-                    status: scan.status,
-                    scan_version: Some(scan.scan_version),
-                    scanned_at: Some(scan.scanned_at),
-                    review_item_ids: scan.review_item_ids,
+                    status: privacy_status,
+                    scan_version: Some(format!(
+                        "{}+{}",
+                        base_scan.scan_version, contextual_scan.scan_version
+                    )),
+                    scanned_at: Some(contextual_scan.scanned_at),
+                    review_item_ids,
                 },
             ))
         }
