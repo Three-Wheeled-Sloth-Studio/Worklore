@@ -1,7 +1,5 @@
 use std::{collections::HashMap, fs, path::Path};
 
-use regex::{Regex, RegexBuilder};
-
 use crate::{
     domain::{
         models::{
@@ -42,7 +40,11 @@ pub fn redact_for_external_use(vault_path: &Path, input: &str) -> ServiceResult<
         return Err(WorkLoreError::ProviderPreflightBlocked(format!(
             "Resolve {} high-risk privacy review item{} before exporting this content.",
             blocked_review_item_ids.len(),
-            if blocked_review_item_ids.len() == 1 { "" } else { "s" }
+            if blocked_review_item_ids.len() == 1 {
+                ""
+            } else {
+                "s"
+            }
         )));
     }
 
@@ -58,12 +60,11 @@ pub fn redact_for_external_use(vault_path: &Path, input: &str) -> ServiceResult<
         if rule.alias.is_empty() || rule.alias == rule.token {
             continue;
         }
-        let regex = alias_regex(&rule.alias)?;
-        let count = regex.find_iter(&output).count();
+        let (replaced, count) = replace_alias(&output, &rule.alias, &rule.token);
         if count == 0 {
             continue;
         }
-        output = regex.replace_all(&output, rule.token.as_str()).into_owned();
+        output = replaced;
         *counts.entry(rule.entity_id.clone()).or_insert(0) += count;
     }
 
@@ -152,26 +153,72 @@ fn replacement_rules(
     rules
 }
 
-fn alias_regex(alias: &str) -> ServiceResult<Regex> {
-    let escaped = regex::escape(alias);
-    let starts_with_word = alias
-        .chars()
-        .next()
-        .is_some_and(|character| character.is_ascii_alphanumeric());
-    let ends_with_word = alias
-        .chars()
-        .last()
-        .is_some_and(|character| character.is_ascii_alphanumeric());
-    let pattern = format!(
-        "{}{}{}",
-        if starts_with_word { r"(?<![A-Za-z0-9])" } else { "" },
-        escaped,
-        if ends_with_word { r"(?![A-Za-z0-9])" } else { "" }
-    );
-    RegexBuilder::new(&pattern)
-        .case_insensitive(true)
-        .build()
-        .map_err(|error| WorkLoreError::ManualWorkspace(error.to_string()))
+fn replace_alias(input: &str, alias: &str, token: &str) -> (String, usize) {
+    if alias.is_empty() {
+        return (input.to_string(), 0);
+    }
+    if input.is_ascii() && alias.is_ascii() {
+        replace_ascii_case_insensitive(input, alias, token)
+    } else {
+        replace_case_sensitive(input, alias, token)
+    }
+}
+
+fn replace_ascii_case_insensitive(input: &str, alias: &str, token: &str) -> (String, usize) {
+    let haystack = input.to_ascii_lowercase();
+    let needle = alias.to_ascii_lowercase();
+    let mut output = String::with_capacity(input.len());
+    let mut cursor = 0;
+    let mut count = 0;
+
+    while let Some(relative_start) = haystack[cursor..].find(&needle) {
+        let start = cursor + relative_start;
+        let end = start + needle.len();
+        if is_token_boundary(input.as_bytes(), start, end) {
+            output.push_str(&input[cursor..start]);
+            output.push_str(token);
+            cursor = end;
+            count += 1;
+        } else {
+            let advance = end.max(start + 1);
+            output.push_str(&input[cursor..advance]);
+            cursor = advance;
+        }
+    }
+    output.push_str(&input[cursor..]);
+    (output, count)
+}
+
+fn replace_case_sensitive(input: &str, alias: &str, token: &str) -> (String, usize) {
+    let mut output = String::with_capacity(input.len());
+    let mut cursor = 0;
+    let mut count = 0;
+
+    while let Some(relative_start) = input[cursor..].find(alias) {
+        let start = cursor + relative_start;
+        let end = start + alias.len();
+        if is_token_boundary(input.as_bytes(), start, end) {
+            output.push_str(&input[cursor..start]);
+            output.push_str(token);
+            cursor = end;
+            count += 1;
+        } else {
+            let advance = end.max(start + 1);
+            output.push_str(&input[cursor..advance]);
+            cursor = advance;
+        }
+    }
+    output.push_str(&input[cursor..]);
+    (output, count)
+}
+
+fn is_token_boundary(bytes: &[u8], start: usize, end: usize) -> bool {
+    let before_is_word = start
+        .checked_sub(1)
+        .and_then(|index| bytes.get(index))
+        .is_some_and(u8::is_ascii_alphanumeric);
+    let after_is_word = bytes.get(end).is_some_and(u8::is_ascii_alphanumeric);
+    !before_is_word && !after_is_word
 }
 
 fn pending_reviews(vault_path: &Path) -> ServiceResult<Vec<EntityReviewItem>> {
@@ -198,9 +245,7 @@ fn pending_reviews(vault_path: &Path) -> ServiceResult<Vec<EntityReviewItem>> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::domain::models::{
-        EntityAlias, EntityType,
-    };
+    use crate::domain::models::{EntityAlias, EntityType};
 
     fn entity(name: &str, alias: &str, sensitivity: EntitySensitivity) -> PrivateEntity {
         PrivateEntity {
@@ -234,16 +279,20 @@ mod tests {
         let private = entity("Acme", "Acme Corp", EntitySensitivity::Private);
         let never = entity("Secret Client", "Client X", EntitySensitivity::NeverSendToCloud);
         assert!(replacement_rules(&[private], CloudIdentifierMode::Include).is_empty());
-        assert_eq!(
-            replacement_rules(&[never], CloudIdentifierMode::Include).len(),
-            2
-        );
+        assert_eq!(replacement_rules(&[never], CloudIdentifierMode::Include).len(), 2);
     }
 
     #[test]
-    fn alias_regex_does_not_replace_substrings_inside_words() {
-        let regex = alias_regex("FINRA").expect("regex should compile");
-        assert!(regex.is_match("At FINRA, we changed the workflow."));
-        assert!(!regex.is_match("FINRATED"));
+    fn replacement_does_not_change_substrings_inside_words() {
+        let (text, count) = replace_alias("At FINRA, not FINRATED.", "FINRA", "[EMPLOYER_1]");
+        assert_eq!(text, "At [EMPLOYER_1], not FINRATED.");
+        assert_eq!(count, 1);
+    }
+
+    #[test]
+    fn replacement_is_ascii_case_insensitive() {
+        let (text, count) = replace_alias("finra and FINRA", "FINRA", "[EMPLOYER_1]");
+        assert_eq!(text, "[EMPLOYER_1] and [EMPLOYER_1]");
+        assert_eq!(count, 2);
     }
 }
