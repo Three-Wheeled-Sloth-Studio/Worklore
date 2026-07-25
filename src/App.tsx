@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
+import { PerformancePanel } from "./components/PerformancePanel";
 import { PrivacyReviewPanel } from "./components/PrivacyReviewPanel";
 import { StoryCandidatePanel } from "./components/StoryCandidatePanel";
 import type {
+  ActiveOperation,
   CandidateStatus,
   CandidateSummary,
   CloudIdentifierMode,
   EntityReviewView,
+  PerformanceSnapshot,
   ResolveEntityReviewRequest,
   SourceSummary,
   SourceType,
@@ -16,6 +19,7 @@ import { errorMessage } from "./domain/types";
 import {
   createVault,
   extractResumeCandidates,
+  getPerformanceSnapshot,
   importSource,
   listEntityReviews,
   listSources,
@@ -40,6 +44,7 @@ function App() {
   const [sources, setSources] = useState<SourceSummary[]>([]);
   const [reviews, setReviews] = useState<EntityReviewView[]>([]);
   const [candidates, setCandidates] = useState<CandidateSummary[]>([]);
+  const [performance, setPerformance] = useState<PerformanceSnapshot | null>(null);
   const [selectedSourceType, setSelectedSourceType] = useState<SourceType>("resume");
   const [vaultName, setVaultName] = useState("My Career Stories");
   const [busyMessage, setBusyMessage] = useState<string | null>(null);
@@ -51,27 +56,51 @@ function App() {
       setSources([]);
       setReviews([]);
       setCandidates([]);
+      setPerformance(null);
       return;
     }
 
     void refreshWorkspace(vault.path, false);
   }, [vault?.path]);
 
+  useEffect(() => {
+    if (!vault) {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      void refreshPerformance(vault.path, false);
+    }, 3000);
+    return () => window.clearInterval(timer);
+  }, [vault?.path]);
+
   async function refreshWorkspace(vaultPath: string, refreshVault: boolean) {
     try {
-      const [sourceResult, reviewResult, candidateResult] = await Promise.all([
+      const [sourceResult, reviewResult, candidateResult, performanceResult] = await Promise.all([
         listSources(vaultPath),
         listEntityReviews(vaultPath),
         listStoryCandidates(vaultPath),
+        getPerformanceSnapshot(vaultPath),
       ]);
       setSources(sourceResult);
       setReviews(reviewResult);
       setCandidates(candidateResult);
+      setPerformance(performanceResult);
       if (refreshVault) {
         setVault(await openVault(vaultPath));
       }
     } catch (caught) {
       setError(errorMessage(caught));
+    }
+  }
+
+  async function refreshPerformance(vaultPath: string, reportError = true) {
+    try {
+      setPerformance(await getPerformanceSnapshot(vaultPath));
+    } catch (caught) {
+      if (reportError) {
+        setError(errorMessage(caught));
+      }
     }
   }
 
@@ -274,10 +303,12 @@ function App() {
 
           <Feedback notice={notice} error={error} />
         </section>
-        <BusyLayer message={busyMessage} />
+        <BusyLayer message={busyMessage} activeOperation={null} />
       </main>
     );
   }
+
+  const activeOperation = performance?.activeOperations[0] ?? null;
 
   return (
     <main className="app-shell">
@@ -407,15 +438,20 @@ function App() {
           <div className="next-step-card">
             <h3>Current working slice</h3>
             <p>
-              Import a resume, resolve private names, then extract its bullets into story
-              candidates. Guided interviewing is the next workflow built on those records.
+              Resume candidates are extracted only from recognized work-history sections.
+              Titles, summaries, skills, and education are deliberately ignored.
             </p>
           </div>
         </aside>
+
+        <PerformancePanel
+          snapshot={performance}
+          onRefresh={() => refreshPerformance(vault.path)}
+        />
       </div>
 
       <Feedback notice={notice} error={error} />
-      <BusyLayer message={busyMessage} />
+      <BusyLayer message={busyMessage} activeOperation={activeOperation} />
     </main>
   );
 }
@@ -453,7 +489,13 @@ function Feedback({ notice, error }: { notice: string | null; error: string | nu
   );
 }
 
-function BusyLayer({ message }: { message: string | null }) {
+function BusyLayer({
+  message,
+  activeOperation,
+}: {
+  message: string | null;
+  activeOperation: ActiveOperation | null;
+}) {
   if (!message) {
     return null;
   }
@@ -462,7 +504,14 @@ function BusyLayer({ message }: { message: string | null }) {
     <div className="busy-layer" role="status" aria-live="polite">
       <div className="busy-card">
         <span className="spinner" aria-hidden="true" />
-        <strong>{message}</strong>
+        <div>
+          <strong>{message}</strong>
+          {activeOperation ? (
+            <p className="busy-detail">
+              {humanize(activeOperation.phase)} | {formatElapsed(activeOperation.elapsedMs)}
+            </p>
+          ) : null}
+        </div>
       </div>
     </div>
   );
@@ -491,6 +540,18 @@ function formatDate(value: string): string {
     return value;
   }
   return new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(parsed);
+}
+
+function formatElapsed(durationMs: number): string {
+  const seconds = Math.max(0, Math.round(durationMs / 1000));
+  if (seconds < 60) {
+    return `${seconds} sec`;
+  }
+  return `${Math.floor(seconds / 60)} min ${seconds % 60} sec`;
+}
+
+function humanize(value: string): string {
+  return value.replaceAll("_", " ");
 }
 
 export default App;
