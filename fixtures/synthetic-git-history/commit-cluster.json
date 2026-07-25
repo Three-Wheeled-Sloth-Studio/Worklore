@@ -1,0 +1,34 @@
+{
+  "repository": "Complaint-Ferret",
+  "branch": "feature/intake-triage",
+  "commits": [
+    {
+      "sha": "1111111111111111111111111111111111111111",
+      "message": "Add complaint intake normalization",
+      "changedFiles": [
+        "src/intake/normalize.ts",
+        "src/intake/normalize.test.ts"
+      ],
+      "committedAt": "2026-07-20T14:10:00Z"
+    },
+    {
+      "sha": "2222222222222222222222222222222222222222",
+      "message": "Route low-confidence complaints to analyst review",
+      "changedFiles": [
+        "src/triage/router.ts",
+        "src/triage/router.test.ts"
+      ],
+      "committedAt": "2026-07-20T16:45:00Z"
+    },
+    {
+      "sha": "3333333333333333333333333333333333333333",
+      "message": "Add audit trail for automated triage decisions",
+      "changedFiles": [
+        "src/audit/decisionLog.ts",
+        "docs/triage-governance.md"
+      ],
+      "committedAt": "2026-07-21T11:20:00Z"
+    }
+  ],
+  "expectedClusterTheme": "Implemented a governed complaint-intake and triage workflow with human review for uncertain cases."
+}
