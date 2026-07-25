@@ -65,11 +65,13 @@ export function PrivacyReviewPanel({ reviews, onResolve }: PrivacyReviewPanelPro
     return null;
   }
 
+  const reviewItemId = activeReview.reviewItemId;
+
   async function submit(request: Omit<ResolveEntityReviewRequest, "reviewItemId">) {
     setSubmitting(true);
     try {
       await onResolve({
-        reviewItemId: activeReview.reviewItemId,
+        reviewItemId,
         ...request,
       });
     } finally {
