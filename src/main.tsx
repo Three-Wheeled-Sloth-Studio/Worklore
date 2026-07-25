@@ -5,6 +5,7 @@ import "./guided-interview.css";
 import "./legal-notice.css";
 import "./performance.css";
 import "./privacy-review.css";
+import "./story-bank.css";
 import "./story-candidates.css";
 
 const root = document.getElementById("root");
