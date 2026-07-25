@@ -14,6 +14,15 @@ pub fn create_vault(path: String, name: String) -> CommandResult<VaultSummary> {
 }
 
 #[tauri::command]
+pub fn create_vault_in_parent(
+    parent_path: String,
+    name: String,
+) -> CommandResult<VaultSummary> {
+    vault_service::create_vault_in_parent(&PathBuf::from(parent_path), &name)
+        .map_err(CommandError::from)
+}
+
+#[tauri::command]
 pub fn open_vault(path: String) -> CommandResult<VaultSummary> {
     vault_service::open_vault(&PathBuf::from(path)).map_err(CommandError::from)
 }
