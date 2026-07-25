@@ -89,12 +89,15 @@ def validate_schema_references(loaded: dict[str, Any], errors: list[str]) -> Non
             add_error(errors, item, f"schema reference `{schema}` does not exist")
 
 
-def validate_initialized(mode: str, errors: list[str]) -> None:
+def validate_initialized(
+    mode: str, policy: dict[str, Any], errors: list[str]
+) -> None:
     if mode != "initialized":
         return
     placeholder = re.compile(r"\b(?:TEMPLATE_TODO|TEMPLATE_TODO_DATE)\b")
-    for path in all_ref_files():
-        if placeholder.search(path.read_text(encoding="utf-8")):
+    for item in policy.get("bootstrap_files", []):
+        path = ROOT / item
+        if path.is_file() and placeholder.search(path.read_text(encoding="utf-8")):
             add_error(errors, path, "contains an uninitialized template placeholder")
 
 
@@ -128,6 +131,7 @@ def main() -> int:
     args = parser.parse_args()
 
     errors: list[str] = []
+    policy: dict[str, Any] = {}
     if not POLICY.is_file():
         add_error(errors, POLICY, "template policy is missing")
     else:
@@ -136,7 +140,7 @@ def main() -> int:
 
     loaded = validate_yaml(errors)
     validate_schema_references(loaded, errors)
-    validate_initialized(args.mode, errors)
+    validate_initialized(args.mode, policy, errors)
     validate_portability(errors)
     validate_secret_patterns(errors)
 
