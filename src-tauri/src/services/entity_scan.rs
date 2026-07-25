@@ -14,7 +14,7 @@ use crate::{
     io_utils::{read_json, write_json_atomic},
 };
 
-const SCAN_VERSION: &str = "deterministic-entity-scan-v1";
+const SCAN_VERSION: &str = "deterministic-entity-scan-v2";
 
 #[derive(Debug)]
 pub struct ScanOutcome {
@@ -108,7 +108,7 @@ pub fn scan_text(
                 &now,
             ),
             [] => {
-                let entity_id = create_provisional_entity(
+                create_detected_entity(
                     &mut registry,
                     record_type,
                     record_id,
@@ -116,25 +116,6 @@ pub fn scan_text(
                     &detection,
                     &now,
                 );
-
-                if detection.entity_type != EntityType::Url {
-                    let review_item = new_review_item(
-                        record_type,
-                        record_id,
-                        text,
-                        &detection,
-                        vec![ReviewCandidateMatch {
-                            entity_id,
-                            score: 1.0,
-                            reasons: vec![
-                                "WorkLore created this as a provisional new entity.".to_string()
-                            ],
-                        }],
-                        &now,
-                    );
-                    review_item_ids.push(review_item.review_item_id.clone());
-                    write_review_item(vault_path, &review_item)?;
-                }
             }
             indexes => {
                 let candidates = indexes
@@ -143,7 +124,7 @@ pub fn scan_text(
                         entity_id: registry.entities[*index].entity_id.clone(),
                         score: 0.75,
                         reasons: vec![
-                            "Multiple existing entities share this normalized alias.".to_string()
+                            "Multiple existing entities share this normalized alias.".to_string(),
                         ],
                     })
                     .collect();
@@ -213,7 +194,7 @@ fn link_confirmed_aliases(
     }
 }
 
-fn create_provisional_entity(
+fn create_detected_entity(
     registry: &mut PrivateEntityRegistry,
     record_type: &str,
     record_id: &str,
@@ -223,7 +204,7 @@ fn create_provisional_entity(
 ) -> String {
     let entity_id = format!("entity_{}", Uuid::now_v7());
     let token = allocate_token(registry, detection.entity_type);
-    let occurrence = occurrence_for(record_type, record_id, text, detection, 0.0, now);
+    let occurrence = occurrence_for(record_type, record_id, text, detection, 1.0, now);
 
     registry.entities.push(PrivateEntity {
         schema_version: 1,
@@ -233,18 +214,18 @@ fn create_provisional_entity(
         public_token: token,
         public_description: None,
         sensitivity: default_sensitivity(detection.entity_type),
-        status: EntityStatus::Provisional,
+        status: EntityStatus::Confirmed,
         aliases: vec![EntityAlias {
             value: detection.text.clone(),
             normalized_value: detection.normalized.clone(),
-            status: "inferred".to_string(),
-            source: "scan".to_string(),
+            status: "confirmed".to_string(),
+            source: "deterministic_scan_v2".to_string(),
         }],
         relationships: Vec::new(),
         occurrences: vec![occurrence],
         redirect_to_entity_id: None,
         retired_tokens: Vec::new(),
-        notes: String::new(),
+        notes: "Auto-registered by a deterministic high-confidence detector.".to_string(),
         created_at: now.to_string(),
         updated_at: now.to_string(),
         revision: 1,
@@ -254,81 +235,277 @@ fn create_provisional_entity(
 }
 
 fn collect_detections(text: &str) -> Vec<Detection> {
-    let patterns: Vec<(Regex, EntityType, f32, f32, &'static str)> = vec![
-        (
-            Regex::new(r"(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b")
-                .expect("email regex"),
-            EntityType::Email,
-            0.99,
-            0.99,
-            "high",
-        ),
-        (
-            Regex::new(r"(?i)\bhttps?://[^\s<>()\[\]{}]+")
-                .expect("url regex"),
-            EntityType::Url,
-            0.99,
-            0.99,
-            "medium",
-        ),
-        (
-            Regex::new(r"(?x)\b(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?)\d{3}[-.\s]?\d{4}\b")
-                .expect("phone regex"),
-            EntityType::Phone,
-            0.96,
-            0.98,
-            "high",
-        ),
-        (
-            Regex::new(
-                r"\b(?:[A-Z][A-Za-z0-9&.'-]+\s+){0,5}(?:Inc|LLC|Ltd|Corporation|Corp|Company|Association|Authority|Agency|Department|University|Bank|Group)\b\.?",
-            )
-            .expect("organization suffix regex"),
-            EntityType::Organization,
-            0.86,
-            0.80,
-            "medium",
-        ),
-        (
-            Regex::new(r"\b[A-Z][A-Z0-9]{2,9}\b").expect("acronym regex"),
-            EntityType::UserDefined,
-            0.68,
-            0.45,
-            "medium",
-        ),
-    ];
-
     let mut detections = Vec::new();
-    for (regex, entity_type, extraction, type_confidence, risk) in patterns {
-        for matched in regex.find_iter(text) {
-            let value = trim_terminal_punctuation(matched.as_str());
-            if value.len() < 3 || is_common_acronym(value) {
-                continue;
-            }
-            detections.push(Detection {
-                text: value.to_string(),
-                normalized: normalize(value),
-                entity_type,
-                extraction_confidence: extraction,
-                type_confidence,
-                risk,
-                start: matched.start(),
-                end: matched.start() + value.len(),
-            });
+
+    add_regex_detections(
+        &mut detections,
+        text,
+        &Regex::new(r"(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b")
+            .expect("email regex"),
+        EntityType::Email,
+        0.99,
+        0.99,
+        "high",
+    );
+    add_regex_detections(
+        &mut detections,
+        text,
+        &Regex::new(r"(?i)\bhttps?://[^\s<>()\[\]{}]+")
+            .expect("url regex"),
+        EntityType::Url,
+        0.99,
+        0.99,
+        "medium",
+    );
+    add_regex_detections(
+        &mut detections,
+        text,
+        &Regex::new(
+            r"(?x)\b(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?)\d{3}[-.\s]?\d{4}\b",
+        )
+        .expect("phone regex"),
+        EntityType::Phone,
+        0.96,
+        0.98,
+        "high",
+    );
+
+    let organization_regex = Regex::new(
+        r"\b(?:[A-Z][A-Za-z0-9&.'-]+\s+){1,5}(?:Inc|LLC|Ltd|Corporation|Corp|Company|Association|Authority|Agency|Department|University|Bank|Group|Solutions|Services|Systems|Technologies|Technology|Consulting|Industries|Partners|Enterprises|Government)\b\.?",
+    )
+    .expect("organization suffix regex");
+    for matched in organization_regex.find_iter(text) {
+        let (start, value) = trim_organization_noise(matched.start(), matched.as_str());
+        if value.split_whitespace().count() < 2 || is_generic_entity_term(value) {
+            continue;
         }
+        detections.push(Detection {
+            text: value.to_string(),
+            normalized: normalize(value),
+            entity_type: EntityType::Organization,
+            extraction_confidence: 0.90,
+            type_confidence: 0.90,
+            risk: "medium",
+            start,
+            end: start + value.len(),
+        });
+    }
+
+    let acronym_regex = Regex::new(r"\b[A-Z][A-Z0-9]{2,9}\b").expect("acronym regex");
+    for matched in acronym_regex.find_iter(text) {
+        let value = matched.as_str();
+        if is_public_domain_acronym(value)
+            || !is_acronym_in_entity_context(text, matched.start(), matched.end())
+        {
+            continue;
+        }
+        detections.push(Detection {
+            text: value.to_string(),
+            normalized: normalize(value),
+            entity_type: EntityType::UserDefined,
+            extraction_confidence: 0.82,
+            type_confidence: 0.62,
+            risk: "medium",
+            start: matched.start(),
+            end: matched.end(),
+        });
     }
 
     detections.sort_by_key(|detection| (detection.start, std::cmp::Reverse(detection.end)));
     detections.dedup_by(|left, right| {
         left.start == right.start && left.end == right.end && left.normalized == right.normalized
     });
+
+    let containing_ranges = detections
+        .iter()
+        .filter(|detection| detection.entity_type != EntityType::UserDefined)
+        .map(|detection| (detection.start, detection.end))
+        .collect::<Vec<_>>();
+    detections.retain(|detection| {
+        detection.entity_type != EntityType::UserDefined
+            || !containing_ranges
+                .iter()
+                .any(|(start, end)| *start <= detection.start && *end >= detection.end)
+    });
     detections
 }
 
-fn is_common_acronym(value: &str) -> bool {
+fn add_regex_detections(
+    detections: &mut Vec<Detection>,
+    text: &str,
+    regex: &Regex,
+    entity_type: EntityType,
+    extraction_confidence: f32,
+    type_confidence: f32,
+    risk: &'static str,
+) {
+    for matched in regex.find_iter(text) {
+        let value = trim_terminal_punctuation(matched.as_str());
+        if value.len() < 3 {
+            continue;
+        }
+        detections.push(Detection {
+            text: value.to_string(),
+            normalized: normalize(value),
+            entity_type,
+            extraction_confidence,
+            type_confidence,
+            risk,
+            start: matched.start(),
+            end: matched.start() + value.len(),
+        });
+    }
+}
+
+fn trim_organization_noise(initial_start: usize, value: &str) -> (usize, &str) {
+    const LEADING_NOISE: &[&str] = &[
+        "Professional",
+        "Experience",
+        "Employment",
+        "History",
+        "Work",
+        "Career",
+        "Summary",
+    ];
+
+    let mut start = initial_start;
+    let mut remaining = value;
+    loop {
+        let Some(first) = remaining.split_whitespace().next() else {
+            break;
+        };
+        if !LEADING_NOISE.contains(&first) {
+            break;
+        }
+        let advance = first.len();
+        start += advance;
+        remaining = &remaining[advance..];
+        let whitespace = remaining.len() - remaining.trim_start().len();
+        start += whitespace;
+        remaining = remaining.trim_start();
+    }
+
+    (start, trim_terminal_punctuation(remaining))
+}
+
+fn is_acronym_in_entity_context(text: &str, start: usize, end: usize) -> bool {
+    let line_start = text[..start]
+        .rfind(|character| character == '\n' || character == '\r')
+        .map_or(0, |index| index + 1);
+    let line_end = text[end..]
+        .find(|character| character == '\n' || character == '\r')
+        .map_or(text.len(), |index| end + index);
+    let line = &text[line_start..line_end];
+    let local_start = start - line_start;
+    let local_end = end - line_start;
+    let before = line[..local_start].to_ascii_lowercase();
+    let after = line[local_end..].to_ascii_lowercase();
+
+    before.ends_with(" at ")
+        || before.ends_with(" for ")
+        || before.ends_with(" with ")
+        || before.ends_with(" client ")
+        || before.ends_with(" employer ")
+        || before.ends_with(" agency ")
+        || after.trim_start().starts_with('(')
+        || before.trim_end().ends_with('(')
+        || line.contains('|')
+        || line.contains(" - ")
+        || line.contains(" – ")
+        || line.contains('—')
+}
+
+pub fn is_public_domain_acronym(value: &str) -> bool {
     matches!(
-        value,
-        "AND" | "THE" | "WITH" | "FOR" | "FROM" | "THIS" | "THAT" | "STAR" | "PDF" | "DOCX"
+        value.to_ascii_uppercase().as_str(),
+        "AI"
+            | "API"
+            | "ATS"
+            | "BI"
+            | "CEO"
+            | "CIO"
+            | "CRM"
+            | "CSR"
+            | "CTO"
+            | "DOCX"
+            | "HCD"
+            | "HR"
+            | "HTML"
+            | "JSON"
+            | "KPI"
+            | "LLM"
+            | "ML"
+            | "MVP"
+            | "NLP"
+            | "OCR"
+            | "OKR"
+            | "PDF"
+            | "PI"
+            | "PM"
+            | "POC"
+            | "PRD"
+            | "QA"
+            | "RDP"
+            | "ROI"
+            | "SAAS"
+            | "SQL"
+            | "STAR"
+            | "TPM"
+            | "UI"
+            | "URL"
+            | "UX"
+            | "WFM"
+            | "XML"
+            | "AND"
+            | "THE"
+            | "WITH"
+            | "FOR"
+            | "FROM"
+            | "THIS"
+            | "THAT"
+    )
+}
+
+pub fn is_generic_entity_term(value: &str) -> bool {
+    matches!(
+        value.trim().to_ascii_lowercase().as_str(),
+        "action"
+            | "analytics"
+            | "career"
+            | "current"
+            | "data"
+            | "development"
+            | "employment"
+            | "experience"
+            | "existing"
+            | "history"
+            | "implementation"
+            | "lead"
+            | "leader"
+            | "leadership"
+            | "management"
+            | "manager"
+            | "nerve"
+            | "new"
+            | "operating"
+            | "operations"
+            | "professional"
+            | "product"
+            | "program"
+            | "project"
+            | "roadmap"
+            | "roadmapping"
+            | "strategy"
+            | "summary"
+            | "system"
+            | "team"
+            | "the"
+            | "this"
+            | "that"
+            | "tool"
+            | "user"
+            | "work"
+            | "workflow"
     )
 }
 
@@ -369,8 +546,24 @@ fn find_case_insensitive_ascii(haystack: &str, needle: &str) -> Vec<(usize, usiz
     let lower_needle = needle.to_ascii_lowercase();
     lower_haystack
         .match_indices(&lower_needle)
-        .map(|(start, _)| (start, start + lower_needle.len()))
+        .filter_map(|(start, _)| {
+            let end = start + lower_needle.len();
+            if is_token_boundary(haystack.as_bytes(), start, end) {
+                Some((start, end))
+            } else {
+                None
+            }
+        })
         .collect()
+}
+
+fn is_token_boundary(bytes: &[u8], start: usize, end: usize) -> bool {
+    let before_is_word = start
+        .checked_sub(1)
+        .and_then(|index| bytes.get(index))
+        .is_some_and(u8::is_ascii_alphanumeric);
+    let after_is_word = bytes.get(end).is_some_and(u8::is_ascii_alphanumeric);
+    !before_is_word && !after_is_word
 }
 
 fn allocate_token(registry: &mut PrivateEntityRegistry, entity_type: EntityType) -> String {
@@ -515,4 +708,78 @@ pub fn count_pending_review_items(vault_path: &Path) -> ServiceResult<usize> {
         }
     }
     Ok(count)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn generic_resume_terms_are_not_entities() {
+        for value in [
+            "Lead",
+            "Manager",
+            "Management",
+            "Leadership",
+            "Strategy",
+            "Operations",
+            "Roadmapping",
+            "Operating",
+        ] {
+            assert!(is_generic_entity_term(value));
+        }
+    }
+
+    #[test]
+    fn common_technical_acronyms_are_suppressed() {
+        for value in ["LLM", "HCD", "API", "SQL", "MVP", "PRD"] {
+            assert!(is_public_domain_acronym(value));
+        }
+    }
+
+    #[test]
+    fn standalone_acronyms_without_entity_context_are_not_detected() {
+        let detections = collect_detections("Skills: FINRA LLM HCD Strategy Operations");
+        assert!(detections.is_empty());
+    }
+
+    #[test]
+    fn acronyms_in_employment_context_can_be_registered() {
+        let detections = collect_detections("Lead Product Manager at FINRA | 2022 - Present");
+        assert!(detections
+            .iter()
+            .any(|detection| detection.text == "FINRA"));
+    }
+
+    #[test]
+    fn pii_is_detected_without_creating_generic_word_detections() {
+        let detections = collect_detections(
+            "Lead Product Manager\njoseph@example.com\n301-395-2016\nStrategy Operations",
+        );
+        assert_eq!(
+            detections
+                .iter()
+                .filter(|detection| detection.entity_type == EntityType::Email)
+                .count(),
+            1
+        );
+        assert_eq!(
+            detections
+                .iter()
+                .filter(|detection| detection.entity_type == EntityType::Phone)
+                .count(),
+            1
+        );
+        assert!(!detections
+            .iter()
+            .any(|detection| detection.text == "Lead"));
+    }
+
+    #[test]
+    fn alias_matching_uses_token_boundaries() {
+        assert_eq!(
+            find_case_insensitive_ascii("Lead and Leadership", "Lead"),
+            vec![(0, 4)]
+        );
+    }
 }
