@@ -63,10 +63,14 @@ pub fn clear_last_vault() -> ServiceResult<()> {
 }
 
 fn read_preferences_or_default(path: &Path) -> ServiceResult<AppPreferences> {
-    if path.is_file() {
-        read_json(path)
-    } else {
-        Ok(AppPreferences::default())
+    if !path.is_file() {
+        return Ok(AppPreferences::default());
+    }
+
+    match read_json(path) {
+        Ok(preferences) => Ok(preferences),
+        Err(WorkLoreError::Json(_)) => Ok(AppPreferences::default()),
+        Err(error) => Err(error),
     }
 }
 
