@@ -1,7 +1,7 @@
 use std::{fs, path::Path};
 
 use chrono::Utc;
-use serde_json::json;
+use serde_json::{json, Map, Value};
 use uuid::Uuid;
 
 use crate::{
@@ -14,7 +14,9 @@ use crate::{
     },
     error::{ServiceResult, WorkLoreError},
     io_utils::{read_json, write_json_atomic},
-    services::redaction_service::redact_for_external_use,
+    services::{
+        performance_service::OperationSession, redaction_service::redact_for_external_use,
+    },
 };
 
 pub fn create_manual_workspace(
@@ -22,97 +24,117 @@ pub fn create_manual_workspace(
     request: CreateManualWorkspaceRequest,
 ) -> ServiceResult<ManualWorkspaceResult> {
     ensure_vault(vault_path)?;
-    let interview = read_interview(vault_path, &request.interview_id)?;
-    if interview.status != InterviewStatus::ReadyForSynthesis
-        && interview.status != InterviewStatus::Completed
-    {
-        return Err(WorkLoreError::ManualWorkspace(
-            "Complete the current interview pass before exporting a synthesis workspace."
-                .to_string(),
+    let mut metadata = Map::new();
+    metadata.insert(
+        "interviewId".to_string(),
+        Value::String(request.interview_id.clone()),
+    );
+    metadata.insert(
+        "target".to_string(),
+        Value::String(target_slug(request.target).to_string()),
+    );
+    let mut operation = OperationSession::start(vault_path, "create_manual_workspace", metadata)?;
+
+    let result = (|| {
+        operation.set_phase("loading_interview")?;
+        let interview = read_interview(vault_path, &request.interview_id)?;
+        if interview.status != InterviewStatus::ReadyForSynthesis
+            && interview.status != InterviewStatus::Completed
+        {
+            return Err(WorkLoreError::ManualWorkspace(
+                "Complete the current interview pass before exporting a synthesis workspace."
+                    .to_string(),
+            ));
+        }
+        let candidate_id = interview
+            .candidate_ids
+            .first()
+            .ok_or(WorkLoreError::CandidateNotFound)?;
+        let candidate = read_candidate(vault_path, candidate_id)?;
+
+        operation.set_phase("assembling_context")?;
+        let exact_context = build_context(&candidate, &interview);
+
+        operation.set_phase("privacy_preflight")?;
+        let redacted = redact_for_external_use(vault_path, &exact_context)?;
+        let privacy_mode = redacted.preflight.mode.clone();
+        let replacement_count = redacted.preflight.replacement_count;
+        let warning_count = redacted.preflight.warning_review_item_ids.len();
+
+        operation.set_phase("creating_workspace")?;
+        let output_root = Path::new(&request.output_directory);
+        fs::create_dir_all(output_root)?;
+        let workspace_id = format!("workspace_{}", Uuid::now_v7());
+        let stamp = Utc::now().format("%Y%m%d-%H%M%S");
+        let workspace_path = output_root.join(format!(
+            "worklore-{}-{stamp}-{}",
+            target_slug(request.target),
+            short_id(&workspace_id)
         ));
-    }
-    let candidate_id = interview
-        .candidate_ids
-        .first()
-        .ok_or(WorkLoreError::CandidateNotFound)?;
-    let candidate = read_candidate(vault_path, candidate_id)?;
-    let exact_context = build_context(&candidate, &interview);
-    let redacted = redact_for_external_use(vault_path, &exact_context)?;
+        if workspace_path.exists() {
+            return Err(WorkLoreError::ManualWorkspace(
+                "The generated workspace folder already exists.".to_string(),
+            ));
+        }
+        fs::create_dir_all(&workspace_path)?;
 
-    let output_root = Path::new(&request.output_directory);
-    fs::create_dir_all(output_root)?;
-    let workspace_id = format!("workspace_{}", Uuid::now_v7());
-    let stamp = Utc::now().format("%Y%m%d-%H%M%S");
-    let workspace_path = output_root.join(format!(
-        "worklore-{}-{stamp}-{}",
-        target_slug(request.target),
-        short_id(&workspace_id)
-    ));
-    if workspace_path.exists() {
-        return Err(WorkLoreError::ManualWorkspace(
-            "The generated workspace folder already exists.".to_string(),
-        ));
-    }
-    fs::create_dir_all(&workspace_path)?;
+        operation.set_phase("writing_workspace")?;
+        fs::write(
+            workspace_path.join("README.md"),
+            workspace_readme(request.target),
+        )?;
+        fs::write(
+            workspace_path.join("task.md"),
+            task_instructions(request.target),
+        )?;
+        fs::write(
+            workspace_path.join("selected-context.md"),
+            redacted.text,
+        )?;
+        write_json_atomic(
+            &workspace_path.join("structured-input.json"),
+            &json!({
+                "schemaVersion": 1,
+                "workspaceId": workspace_id.clone(),
+                "task": "synthesize_story",
+                "candidateId": candidate.candidate_id,
+                "interviewId": interview.interview_id,
+                "candidateClaim": candidate.claim,
+                "privacyMode": privacy_mode.clone(),
+                "evidenceRules": [
+                    "Do not invent missing facts, metrics, tools, employers, or outcomes.",
+                    "Preserve stable private tokens exactly.",
+                    "Label user estimates and uncertain memories.",
+                    "Return JSON matching response-schema.json."
+                ]
+            }),
+        )?;
+        write_json_atomic(
+            &workspace_path.join("response-schema.json"),
+            &story_response_schema(),
+        )?;
+        write_json_atomic(
+            &workspace_path.join("privacy-summary.json"),
+            &redacted.preflight,
+        )?;
 
-    fs::write(
-        workspace_path.join("README.md"),
-        workspace_readme(request.target),
-    )?;
-    fs::write(
-        workspace_path.join("task.md"),
-        task_instructions(request.target),
-    )?;
-    fs::write(
-        workspace_path.join("selected-context.md"),
-        redacted.text,
-    )?;
-    write_json_atomic(
-        &workspace_path.join("structured-input.json"),
-        &json!({
-            "schemaVersion": 1,
-            "workspaceId": workspace_id,
-            "task": "synthesize_story",
-            "candidateId": candidate.candidate_id,
-            "interviewId": interview.interview_id,
-            "candidateClaim": candidate.claim,
-            "privacyMode": redacted.preflight.mode,
-            "evidenceRules": [
-                "Do not invent missing facts, metrics, tools, employers, or outcomes.",
-                "Preserve stable private tokens exactly.",
-                "Label user estimates and uncertain memories.",
-                "Return JSON matching response-schema.json."
-            ]
-        }),
-    )?;
-    write_json_atomic(
-        &workspace_path.join("response-schema.json"),
-        &story_response_schema(),
-    )?;
-    write_json_atomic(
-        &workspace_path.join("privacy-summary.json"),
-        &redacted.preflight,
-    )?;
+        Ok(ManualWorkspaceResult {
+            workspace_id,
+            workspace_path: workspace_path.to_string_lossy().to_string(),
+            target: request.target,
+            privacy_mode,
+            replacement_count,
+            warning_count,
+            message: format!(
+                "Manual {} workspace created with {} private-name replacement{}.",
+                target_label(request.target),
+                replacement_count,
+                if replacement_count == 1 { "" } else { "s" }
+            ),
+        })
+    })();
 
-    let warning_count = redacted.preflight.warning_review_item_ids.len();
-    Ok(ManualWorkspaceResult {
-        workspace_id,
-        workspace_path: workspace_path.to_string_lossy().to_string(),
-        target: request.target,
-        privacy_mode: redacted.preflight.mode,
-        replacement_count: redacted.preflight.replacement_count,
-        warning_count,
-        message: format!(
-            "Manual {} workspace created with {} private-name replacement{}.",
-            target_label(request.target),
-            redacted.preflight.replacement_count,
-            if redacted.preflight.replacement_count == 1 {
-                ""
-            } else {
-                "s"
-            }
-        ),
-    })
+    operation.finish(result)
 }
 
 fn build_context(candidate: &StoryCandidate, interview: &InterviewSession) -> String {
@@ -165,7 +187,7 @@ fn build_context(candidate: &StoryCandidate, interview: &InterviewSession) -> St
 
 fn workspace_readme(target: ManualWorkspaceTarget) -> String {
     format!(
-        "# WorkLore Manual AI Workspace\n\nThis package contains one story candidate, its interview evidence, a privacy summary, and a structured response contract.\n\n## Use\n\n1. Open {}.\n2. Attach or paste `task.md`, `selected-context.md`, `structured-input.json`, and `response-schema.json`.\n3. Ask the AI to complete the task and return only the requested JSON.\n4. Save the JSON response. WorkLore import support will validate it before updating the vault.\n\nDo not add private names that are not already present in the package. Stable tokens such as `[EMPLOYER_1]` must remain unchanged.\n",
+        "# WorkLore Manual AI Workspace\n\nThis package contains one story candidate, its interview evidence, a privacy summary, and a structured response contract.\n\n## Use\n\n1. Open {}.\n2. Attach or paste `task.md`, `selected-context.md`, `structured-input.json`, and `response-schema.json`.\n3. Ask the AI to complete the task and return only the requested JSON.\n4. Save the JSON response. WorkLore validates it before updating the vault.\n\nDo not add private names that are not already present in the package. Stable tokens such as `[EMPLOYER_1]` must remain unchanged.\n",
         target_label(target)
     )
 }
