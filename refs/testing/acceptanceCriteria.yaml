@@ -1,0 +1,74 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+updated: 2026-07-25
+acceptance_criteria:
+  - id: ac-vault-001
+    area: vault
+    status: implemented_pending_validation
+    summary: A user can create a vault in a selected folder.
+    criteria:
+      - vault.json is created with schema version 1 and a stable vault id.
+      - canonical source, story, interview, privacy, export, and rebuildable cache folders are created.
+      - the default cloud identifier mode is redact.
+      - a matching empty Private Entity Registry is created.
+  - id: ac-vault-002
+    area: vault
+    status: implemented_pending_validation
+    summary: A user can reopen a valid vault without losing state.
+    criteria:
+      - WorkLore validates vault.json and the entity registry.
+      - source, story, and pending privacy-review counts are returned.
+      - missing canonical directories are recreated without replacing user records.
+  - id: ac-source-001
+    area: source_import
+    status: implemented_pending_validation
+    summary: Imported source files are copied into the vault.
+    criteria:
+      - the original source file is not modified.
+      - SHA-256 is stored in source metadata.
+      - a second import of identical bytes reuses the existing source record.
+      - metadata stores a vault-relative path to the copied file.
+  - id: ac-source-002
+    area: extraction
+    status: partially_implemented
+    summary: WorkLore reports text extraction state honestly.
+    criteria:
+      - TXT and Markdown are extracted locally as UTF-8.
+      - invalid UTF-8 is reported as failed.
+      - PDF and DOCX remain pending until their extractors are implemented.
+      - WorkLore never marks an unparsed PDF or DOCX as understood.
+  - id: ac-privacy-001
+    area: privacy
+    status: implemented_pending_validation
+    summary: Every imported source begins or completes an entity scan.
+    criteria:
+      - TXT and Markdown run the deterministic entity scan immediately.
+      - PDF and DOCX remain visibly pending until text extraction completes.
+      - detected entities receive stable vault-level tokens.
+      - provisional entities create review items except for low-friction URL detections.
+  - id: ac-privacy-002
+    area: privacy
+    status: designed
+    summary: Ambiguous matches require user resolution.
+    criteria:
+      - a review item can show multiple candidate entities and confidence reasons.
+      - the user can resolve same entity, related entity, new entity, or ignored term.
+      - Kinections can be reviewed against an existing complaint-screening project entity.
+  - id: ac-ui-001
+    area: desktop_shell
+    status: implemented_pending_validation
+    summary: The initial desktop shell makes the next action clear.
+    criteria:
+      - the landing surface offers create vault and open vault without scrolling.
+      - the workspace shows sources, stories, and privacy-review counts.
+      - import and privacy preference controls are near the state they affect.
+      - blocking file operations use a modal operation layer.
+  - id: ac-provider-001
+    area: providers
+    status: designed
+    summary: Provider work uses bounded structured contracts.
+    criteria:
+      - provider output is validated locally against an operation schema.
+      - invalid structured output cannot update canonical records.
+      - request bodies are not retained by default.
+      - API keys are never written to the vault.
