@@ -66,7 +66,7 @@ export type AnswerClassification =
   | "uncertain"
   | "not_applicable";
 
-export type OperationOutcome = "running" | "succeeded" | "failed" | "interrupted";
+export type OperationOutcome = "succeeded" | "failed" | "interrupted";
 
 export interface VaultSummary {
   schemaVersion: number;
