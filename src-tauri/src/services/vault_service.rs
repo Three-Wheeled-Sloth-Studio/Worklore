@@ -9,7 +9,10 @@ use crate::{
     },
     error::{ServiceResult, WorkLoreError},
     io_utils::{read_json, write_json_atomic},
-    services::entity_scan::{count_pending_review_items, initialize_registry, save_registry},
+    services::{
+        entity_scan::{count_pending_review_items, initialize_registry, save_registry},
+        performance_service,
+    },
 };
 
 const VAULT_DIRECTORIES: &[&str] = &[
@@ -35,6 +38,7 @@ const VAULT_DIRECTORIES: &[&str] = &[
     ".worklore/extraction-cache",
     ".worklore/provider-logs",
     ".worklore/operation-journal",
+    ".worklore/operation-metrics/active",
 ];
 
 pub fn create_vault(path: &Path, name: &str) -> ServiceResult<VaultSummary> {
@@ -106,6 +110,7 @@ pub fn open_vault(path: &Path) -> ServiceResult<VaultSummary> {
     for directory in VAULT_DIRECTORIES {
         fs::create_dir_all(path.join(directory))?;
     }
+    performance_service::recover_interrupted(path)?;
 
     summarize(path, vault)
 }
