@@ -34,11 +34,10 @@ pub fn extract_resume_candidates(
         ));
     }
 
-    let extracted_path = source
-        .extraction
-        .text_path
-        .as_deref()
-        .ok_or_else(|| WorkLoreError::SourceNotReady("Extracted text is missing.".to_string()))?;
+    let extracted_path =
+        source.extraction.text_path.as_deref().ok_or_else(|| {
+            WorkLoreError::SourceNotReady("Extracted text is missing.".to_string())
+        })?;
     let text = fs::read_to_string(vault_path.join(extracted_path))?;
     let existing = read_candidates(vault_path)?;
     let existing_fragments = existing
@@ -367,7 +366,10 @@ fn infer_skills(claim: &str) -> Vec<String> {
         ("product leadership", &["led", "guided", "owned"]),
         ("data analytics", &["analytics", "reporting", "data"]),
         ("automation", &["automation", "automated"]),
-        ("stakeholder management", &["stakeholder", "teams", "cross-functional"]),
+        (
+            "stakeholder management",
+            &["stakeholder", "teams", "cross-functional"],
+        ),
         ("AI-assisted delivery", &["llm", "ai", "coding agents"]),
     ];
 
@@ -464,6 +466,9 @@ mod tests {
 
     #[test]
     fn fragment_ids_are_stable() {
-        assert_eq!(fragment_id(7, "Built a tool"), fragment_id(7, "Built a tool"));
+        assert_eq!(
+            fragment_id(7, "Built a tool"),
+            fragment_id(7, "Built a tool")
+        );
     }
 }

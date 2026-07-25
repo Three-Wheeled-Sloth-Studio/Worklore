@@ -5,18 +5,14 @@ mod io_utils;
 mod services;
 
 use commands::{
-    candidates::{
-        extract_resume_candidates, list_story_candidates, set_story_candidate_status,
-    },
+    candidates::{extract_resume_candidates, list_story_candidates, set_story_candidate_status},
     interviews::{
         list_guided_interviews, resume_guided_interview, start_guided_interview,
         submit_guided_interview_response,
     },
     performance::get_performance_snapshot,
     privacy::{list_entity_reviews, resolve_entity_review},
-    vault::{
-        create_vault, import_source, list_sources, open_vault, update_cloud_identifier_mode,
-    },
+    vault::{create_vault, import_source, list_sources, open_vault, update_cloud_identifier_mode},
 };
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

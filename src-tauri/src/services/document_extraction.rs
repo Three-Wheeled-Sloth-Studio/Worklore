@@ -23,9 +23,7 @@ pub fn extract(path: &Path, extension: &str) -> ServiceResult<ExtractedText> {
 fn extract_utf8(path: &Path) -> ServiceResult<ExtractedText> {
     let text = fs::read_to_string(path).map_err(|error| {
         if error.kind() == std::io::ErrorKind::InvalidData {
-            WorkLoreError::DocumentExtraction(
-                "The text file is not valid UTF-8.".to_string(),
-            )
+            WorkLoreError::DocumentExtraction("The text file is not valid UTF-8.".to_string())
         } else {
             error.into()
         }

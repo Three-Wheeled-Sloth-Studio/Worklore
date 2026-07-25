@@ -26,10 +26,7 @@ const DEFAULT_FIELDS: &[&str] = &[
     "lessons_learned",
 ];
 
-pub fn start_interview(
-    vault_path: &Path,
-    candidate_id: &str,
-) -> ServiceResult<InterviewSummary> {
+pub fn start_interview(vault_path: &Path, candidate_id: &str) -> ServiceResult<InterviewSummary> {
     ensure_vault(vault_path)?;
     let mut candidate = read_candidate(vault_path, candidate_id)?;
 
@@ -108,10 +105,9 @@ pub fn submit_response(
         ));
     }
 
-    let active_question_id = interview
-        .active_question_turn_id
-        .clone()
-        .ok_or_else(|| WorkLoreError::InvalidInterviewAction("No active question exists.".to_string()))?;
+    let active_question_id = interview.active_question_turn_id.clone().ok_or_else(|| {
+        WorkLoreError::InvalidInterviewAction("No active question exists.".to_string())
+    })?;
     let target_field = interview
         .turns
         .iter()
@@ -176,10 +172,7 @@ pub fn submit_response(
     summarize(&interview, &candidate)
 }
 
-pub fn resume_interview(
-    vault_path: &Path,
-    interview_id: &str,
-) -> ServiceResult<InterviewSummary> {
+pub fn resume_interview(vault_path: &Path, interview_id: &str) -> ServiceResult<InterviewSummary> {
     ensure_vault(vault_path)?;
     let path = vault_path
         .join("interviews")
@@ -385,8 +378,7 @@ fn summarize(
         candidate_claim: candidate.claim.clone(),
         status: interview.status,
         current_question: current_question.map(|turn| turn.text.clone()),
-        current_target_field: current_question
-            .and_then(|turn| turn.target_fields.first().cloned()),
+        current_target_field: current_question.and_then(|turn| turn.target_fields.first().cloned()),
         completed_field_count,
         total_field_count: interview.completeness.len(),
         last_updated_at: interview.updated_at.clone(),

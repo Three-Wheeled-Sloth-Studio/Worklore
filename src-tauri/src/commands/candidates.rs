@@ -17,12 +17,8 @@ pub fn extract_resume_candidates(
     let mut metadata = Map::new();
     metadata.insert("sourceId".to_string(), Value::String(source_id.clone()));
 
-    let mut operation = OperationSession::start(
-        &vault_path,
-        "extract_resume_candidates",
-        metadata,
-    )
-    .map_err(CommandError::from)?;
+    let mut operation = OperationSession::start(&vault_path, "extract_resume_candidates", metadata)
+        .map_err(CommandError::from)?;
     let result = operation.step("parse_and_write_candidates", Map::new(), || {
         candidate_service::extract_resume_candidates(&vault_path, &source_id)
     });

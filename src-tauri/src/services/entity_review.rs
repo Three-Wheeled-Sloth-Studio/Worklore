@@ -7,7 +7,7 @@ use uuid::Uuid;
 use crate::{
     domain::models::{
         EntityAlias, EntityOccurrence, EntityRelationship, EntityReviewItem, EntityStatus,
-        EntityType, IgnoredTerm, PrivateEntity, PrivateEntityRegistry, PrivacyScanStatus,
+        EntityType, IgnoredTerm, PrivacyScanStatus, PrivateEntity, PrivateEntityRegistry,
         SourceDocument, TokenRedirect,
     },
     error::{ServiceResult, WorkLoreError},
@@ -232,8 +232,7 @@ pub fn resolve_review(
         ReviewResolutionAction::Dismiss => (
             "dismissed",
             provisional_index.map(|index| registry.entities[index].entity_id.clone()),
-            "This occurrence was dismissed. No alias or sensitivity rule was changed."
-                .to_string(),
+            "This occurrence was dismissed. No alias or sensitivity rule was changed.".to_string(),
         ),
     };
 
@@ -450,7 +449,8 @@ fn merge_provisional(
     request: &ResolveEntityReviewRequest,
     now: &str,
 ) -> ServiceResult<String> {
-    let (provisional, target) = two_entities_mut(&mut registry.entities, provisional_index, target_index)?;
+    let (provisional, target) =
+        two_entities_mut(&mut registry.entities, provisional_index, target_index)?;
     let retired_token = provisional.public_token.clone();
     let provisional_id = provisional.entity_id.clone();
     let target_id = target.entity_id.clone();
@@ -569,7 +569,9 @@ fn apply_type_change_if_needed(
     let new_token = allocate_token(registry, requested_type);
     registry.entities[index].entity_type = requested_type;
     registry.entities[index].public_token = new_token;
-    registry.entities[index].retired_tokens.push(retired_token.clone());
+    registry.entities[index]
+        .retired_tokens
+        .push(retired_token.clone());
     registry.entities[index].updated_at = now.to_string();
     registry.entities[index].revision += 1;
     registry.token_redirects.push(TokenRedirect {

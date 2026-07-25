@@ -136,13 +136,9 @@ pub fn import_source(
             source: SourceSummary::from(&document),
             created: true,
             duplicate_detected: false,
-            message: match (
-                document.extraction.status,
-                document.privacy_scan.status,
-            ) {
+            message: match (document.extraction.status, document.privacy_scan.status) {
                 (_, PrivacyScanStatus::NeedsReview) => {
-                    "Source imported. WorkLore found private entities that need review."
-                        .to_string()
+                    "Source imported. WorkLore found private entities that need review.".to_string()
                 }
                 (ExtractionStatus::Unsupported, _) => {
                     "Source imported, but no extractable text was found. OCR is not enabled yet."

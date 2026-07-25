@@ -21,6 +21,5 @@ pub fn resolve_entity_review(
     vault_path: String,
     request: ResolveEntityReviewRequest,
 ) -> CommandResult<ResolveEntityReviewResult> {
-    entity_review::resolve_review(&PathBuf::from(vault_path), request)
-        .map_err(CommandError::from)
+    entity_review::resolve_review(&PathBuf::from(vault_path), request).map_err(CommandError::from)
 }

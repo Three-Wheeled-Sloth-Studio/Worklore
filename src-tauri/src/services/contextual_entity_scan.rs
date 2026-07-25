@@ -7,7 +7,7 @@ use uuid::Uuid;
 use crate::{
     domain::models::{
         EntityAlias, EntityOccurrence, EntityReviewItem, EntitySensitivity, EntityStatus,
-        EntityType, PrivateEntity, PrivacyScanStatus, ReviewCandidateMatch, ReviewScores,
+        EntityType, PrivacyScanStatus, PrivateEntity, ReviewCandidateMatch, ReviewScores,
     },
     error::ServiceResult,
     io_utils::{read_json, write_json_atomic},
@@ -112,8 +112,7 @@ pub fn scan_named_projects(
             entity.notes = if review_item.candidate_matches.is_empty() {
                 "Detected from a project-name cue and awaiting confirmation.".to_string()
             } else {
-                "Detected from a project-name cue with possible existing matches."
-                    .to_string()
+                "Detected from a project-name cue with possible existing matches.".to_string()
             };
         }
     }
@@ -239,9 +238,9 @@ fn ranked_candidates(entities: &[PrivateEntity], context: &str) -> Vec<ReviewCan
 
 fn meaningful_tokens(value: &str) -> HashSet<String> {
     const STOP_WORDS: &[&str] = &[
-        "the", "and", "for", "with", "from", "into", "used", "use", "that", "this",
-        "was", "were", "are", "an", "a", "of", "to", "in", "on", "by", "before",
-        "after", "project", "product", "system",
+        "the", "and", "for", "with", "from", "into", "used", "use", "that", "this", "was", "were",
+        "are", "an", "a", "of", "to", "in", "on", "by", "before", "after", "project", "product",
+        "system",
     ];
 
     value
@@ -337,11 +336,7 @@ fn exact_entity_index(entities: &[PrivateEntity], normalized: &str) -> Option<us
     })
 }
 
-fn occurrence_already_exists(
-    entities: &[PrivateEntity],
-    record_id: &str,
-    locator: &str,
-) -> bool {
+fn occurrence_already_exists(entities: &[PrivateEntity], record_id: &str, locator: &str) -> bool {
     entities.iter().any(|entity| {
         entity
             .occurrences

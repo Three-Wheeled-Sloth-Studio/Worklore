@@ -7,8 +7,8 @@ use uuid::Uuid;
 use crate::{
     domain::models::{
         EntityAlias, EntityOccurrence, EntityReviewItem, EntitySensitivity, EntityStatus,
-        EntityType, PrivateEntity, PrivateEntityRegistry, PrivacyScanStatus,
-        ReviewCandidateMatch, ReviewScores,
+        EntityType, PrivacyScanStatus, PrivateEntity, PrivateEntityRegistry, ReviewCandidateMatch,
+        ReviewScores,
     },
     error::ServiceResult,
     io_utils::{read_json, write_json_atomic},
@@ -81,7 +81,10 @@ pub fn scan_text(
     );
 
     for detection in collect_detections(text) {
-        let detection_key = format!("{}:{}:{}", detection.normalized, detection.start, detection.end);
+        let detection_key = format!(
+            "{}:{}:{}",
+            detection.normalized, detection.start, detection.end
+        );
         if !processed.insert(detection_key) || is_ignored(&registry, &detection.normalized) {
             continue;
         }
@@ -124,7 +127,7 @@ pub fn scan_text(
                             entity_id,
                             score: 1.0,
                             reasons: vec![
-                                "WorkLore created this as a provisional new entity.".to_string(),
+                                "WorkLore created this as a provisional new entity.".to_string()
                             ],
                         }],
                         &now,
@@ -140,18 +143,12 @@ pub fn scan_text(
                         entity_id: registry.entities[*index].entity_id.clone(),
                         score: 0.75,
                         reasons: vec![
-                            "Multiple existing entities share this normalized alias.".to_string(),
+                            "Multiple existing entities share this normalized alias.".to_string()
                         ],
                     })
                     .collect();
-                let review_item = new_review_item(
-                    record_type,
-                    record_id,
-                    text,
-                    &detection,
-                    candidates,
-                    &now,
-                );
+                let review_item =
+                    new_review_item(record_type, record_id, text, &detection, candidates, &now);
                 review_item_ids.push(review_item.review_item_id.clone());
                 write_review_item(vault_path, &review_item)?;
             }
@@ -209,15 +206,7 @@ fn link_confirmed_aliases(
                         start,
                         end,
                     };
-                    add_occurrence(
-                        entity,
-                        record_type,
-                        record_id,
-                        text,
-                        &detection,
-                        1.0,
-                        now,
-                    );
+                    add_occurrence(entity, record_type, record_id, text, &detection, 1.0, now);
                 }
             }
         }
@@ -234,14 +223,7 @@ fn create_provisional_entity(
 ) -> String {
     let entity_id = format!("entity_{}", Uuid::now_v7());
     let token = allocate_token(registry, detection.entity_type);
-    let occurrence = occurrence_for(
-        record_type,
-        record_id,
-        text,
-        detection,
-        0.0,
-        now,
-    );
+    let occurrence = occurrence_for(record_type, record_id, text, detection, 0.0, now);
 
     registry.entities.push(PrivateEntity {
         schema_version: 1,
@@ -420,9 +402,11 @@ fn add_occurrence(
     now: &str,
 ) {
     let locator = format!("chars:{}-{}", detection.start, detection.end);
-    if let Some(existing) = entity.occurrences.iter_mut().find(|occurrence| {
-        occurrence.record_id == record_id && occurrence.locator == locator
-    }) {
+    if let Some(existing) = entity
+        .occurrences
+        .iter_mut()
+        .find(|occurrence| occurrence.record_id == record_id && occurrence.locator == locator)
+    {
         existing.last_seen_at = now.to_string();
         return;
     }
