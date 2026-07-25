@@ -28,6 +28,7 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "icon": [],
     "category": "Productivity",
     "shortDescription": "Turn career evidence into reusable stories.",
     "longDescription": "WorkLore is a local-first career story bank for turning resumes, documents, and project history into evidence-backed professional stories."
