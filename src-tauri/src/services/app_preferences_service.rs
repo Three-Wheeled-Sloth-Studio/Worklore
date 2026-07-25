@@ -1,4 +1,7 @@
-use std::{env, path::{Path, PathBuf}};
+use std::{
+    env,
+    path::{Path, PathBuf},
+};
 
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
