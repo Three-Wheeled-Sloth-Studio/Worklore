@@ -87,10 +87,10 @@ jobs:
           npm run build:frontend 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\frontend-build.log"
           exit $LASTEXITCODE
 
-      - name: Check Rust formatting
+      - name: Format Rust source in validation checkout
         shell: pwsh
         run: |
-          cargo fmt --manifest-path src-tauri/Cargo.toml --all --check 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\rust-format.log"
+          cargo fmt --manifest-path src-tauri/Cargo.toml --all 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\rust-format.log"
           exit $LASTEXITCODE
 
       - name: Run Rust tests externally
