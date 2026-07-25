@@ -42,6 +42,14 @@ if (Test-Path $buildManifest) {
     Copy-Item -Force $buildManifest (Join-Path $layout.InstallRoot "build-manifest.json")
 }
 
+$gitCommit = $null
+try {
+    $gitCommit = (git rev-parse HEAD).Trim()
+}
+catch {
+    $gitCommit = $null
+}
+
 $installManifest = [ordered]@{
     schemaVersion = 1
     channel = "qa"
@@ -50,7 +58,7 @@ $installManifest = [ordered]@{
     executable = $installedExecutable
     sourceBuildRoot = $layout.BuildRoot
     repository = $repoRoot
-    gitCommit = $(try { (git rev-parse HEAD).Trim() } catch { $null })
+    gitCommit = $gitCommit
 }
 $installManifest | ConvertTo-Json -Depth 5 | Set-Content -Encoding UTF8 (Join-Path $layout.InstallRoot "install-manifest.json")
 
