@@ -7,6 +7,7 @@ import type {
   ExtractCandidatesResult,
   ImportSourceResult,
   InterviewSummary,
+  PerformanceSnapshot,
   ResolveEntityReviewRequest,
   ResolveEntityReviewResult,
   SourceSummary,
@@ -126,5 +127,15 @@ export async function resumeGuidedInterview(
   return invoke<InterviewSummary>("resume_guided_interview", {
     vaultPath,
     interviewId,
+  });
+}
+
+export async function getPerformanceSnapshot(
+  vaultPath: string,
+  limit = 40,
+): Promise<PerformanceSnapshot> {
+  return invoke<PerformanceSnapshot>("get_performance_snapshot", {
+    vaultPath,
+    limit,
   });
 }
