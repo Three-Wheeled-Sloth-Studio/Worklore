@@ -101,8 +101,11 @@ enum LegacyReviewAction {
 
 fn legacy_review_action(item: &EntityReviewItem) -> Option<LegacyReviewAction> {
     let suggested = item.suggested_entity_type.as_str();
-    if suggested == "project" && is_generic_entity_term(&item.matched_text) {
-        return Some(LegacyReviewAction::DismissNoise);
+    if suggested == "project" {
+        if is_generic_entity_term(&item.matched_text) || !has_explicit_project_name_cue(item) {
+            return Some(LegacyReviewAction::DismissNoise);
+        }
+        return None;
     }
 
     if matches!(suggested, "email" | "phone" | "url" | "organization") {
@@ -119,6 +122,27 @@ fn legacy_review_action(item: &EntityReviewItem) -> Option<LegacyReviewAction> {
     }
 
     None
+}
+
+fn has_explicit_project_name_cue(item: &EntityReviewItem) -> bool {
+    let context = item.context_excerpt.to_ascii_lowercase();
+    let name = item.matched_text.to_ascii_lowercase();
+    [
+        "development of",
+        "implementation of",
+        "launch of",
+        "creation of",
+        "rollout of",
+        "deployment of",
+        "redesign of",
+        "called",
+        "named",
+        "known as",
+        "codenamed",
+        "code-named",
+    ]
+    .iter()
+    .any(|cue| context.contains(&format!("{cue} {name}")))
 }
 
 fn review_entity_index(
@@ -155,14 +179,18 @@ mod tests {
     use super::*;
     use crate::domain::models::{ReviewCandidateMatch, ReviewScores};
 
-    fn review(matched_text: &str, suggested_entity_type: &str) -> EntityReviewItem {
+    fn review(
+        matched_text: &str,
+        suggested_entity_type: &str,
+        context_excerpt: &str,
+    ) -> EntityReviewItem {
         EntityReviewItem {
             schema_version: 1,
             review_item_id: "review_test".to_string(),
             record_type: "source".to_string(),
             record_id: "source_test".to_string(),
             locator: "chars:0-4".to_string(),
-            context_excerpt: String::new(),
+            context_excerpt: context_excerpt.to_string(),
             matched_text: matched_text.to_string(),
             normalized_text: matched_text.to_ascii_lowercase(),
             suggested_entity_type: suggested_entity_type.to_string(),
@@ -187,7 +215,19 @@ mod tests {
     #[test]
     fn generic_project_words_are_dismissed() {
         assert!(matches!(
-            legacy_review_action(&review("Leadership", "project")),
+            legacy_review_action(&review("Leadership", "project", "Product Leadership")),
+            Some(LegacyReviewAction::DismissNoise)
+        ));
+    }
+
+    #[test]
+    fn loose_legacy_project_cues_are_dismissed() {
+        assert!(matches!(
+            legacy_review_action(&review(
+                "Manager",
+                "project",
+                "Product Manager translated complex requirements"
+            )),
             Some(LegacyReviewAction::DismissNoise)
         ));
     }
@@ -195,13 +235,18 @@ mod tests {
     #[test]
     fn pii_is_auto_confirmed() {
         assert!(matches!(
-            legacy_review_action(&review("person@example.com", "email")),
+            legacy_review_action(&review("person@example.com", "email", "Contact")),
             Some(LegacyReviewAction::Confirm)
         ));
     }
 
     #[test]
     fn real_named_projects_remain_for_review() {
-        assert!(legacy_review_action(&review("Kinections", "project")).is_none());
+        assert!(legacy_review_action(&review(
+            "Kinections",
+            "project",
+            "Led development of Kinections, an LLM-assisted tool"
+        ))
+        .is_none());
     }
 }
