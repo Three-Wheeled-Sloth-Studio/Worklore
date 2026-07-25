@@ -2,7 +2,7 @@ import type { CandidateStatus, CandidateSummary } from "../domain/types";
 
 interface StoryCandidatePanelProps {
   candidates: CandidateSummary[];
-  onInterview: (candidateId: string) => Promise<void>;
+  onInterview?: (candidateId: string) => Promise<void>;
   onStatusChange: (candidateId: string, status: CandidateStatus) => Promise<void>;
 }
 
@@ -13,6 +13,14 @@ export function StoryCandidatePanel({
 }: StoryCandidatePanelProps) {
   if (candidates.length === 0) {
     return null;
+  }
+
+  async function handleInterview(candidateId: string) {
+    if (onInterview) {
+      await onInterview(candidateId);
+      return;
+    }
+    await onStatusChange(candidateId, "ready_to_interview");
   }
 
   return (
@@ -57,7 +65,7 @@ export function StoryCandidatePanel({
               <button
                 className="primary-button compact"
                 disabled={candidate.status === "interviewing"}
-                onClick={() => void onInterview(candidate.candidateId)}
+                onClick={() => void handleInterview(candidate.candidateId)}
               >
                 {candidate.status === "ready_to_interview" ? "Start interview" : "Interview"}
               </button>
