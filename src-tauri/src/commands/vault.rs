@@ -5,7 +5,7 @@ use crate::{
         CloudIdentifierMode, ImportSourceResult, SourceSummary, SourceType, VaultSummary,
     },
     error::{CommandError, CommandResult},
-    services::{source_service, vault_service},
+    services::{app_preferences_service, source_service, vault_service},
 };
 
 #[tauri::command]
@@ -20,6 +20,12 @@ pub fn create_vault_in_parent(
 ) -> CommandResult<VaultSummary> {
     vault_service::create_vault_in_parent(&PathBuf::from(parent_path), &name)
         .map_err(CommandError::from)
+}
+
+#[tauri::command]
+pub fn create_default_vault(name: String) -> CommandResult<VaultSummary> {
+    let root = app_preferences_service::default_vault_root().map_err(CommandError::from)?;
+    vault_service::create_vault_in_parent(&root, &name).map_err(CommandError::from)
 }
 
 #[tauri::command]
