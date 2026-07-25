@@ -1,64 +1,31 @@
-name: Normalize License
+name: Check AGPL License
 
 on:
-  push:
-    branches:
-      - dev
-    paths:
-      - "LICENSE"
-      - ".github/workflows/normalize-license.yml"
+  workflow_dispatch:
 
 permissions:
-  contents: write
-
-concurrency:
-  group: normalize-license-dev
-  cancel-in-progress: true
+  contents: read
 
 jobs:
-  normalize:
-    if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, 'Normalize AGPL license text')
+  verify:
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
     steps:
-      - name: Check out dev
+      - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          ref: dev
-          fetch-depth: 0
 
-      - name: Retrieve canonical AGPL-3.0 text
+      - name: Verify AGPL marker
         shell: python
         run: |
-          import json
-          import pathlib
-          import urllib.request
+          from pathlib import Path
 
-          request = urllib.request.Request(
-              "https://api.github.com/licenses/agpl-3.0",
-              headers={
-                  "Accept": "application/vnd.github+json",
-                  "User-Agent": "WorkLore-License-Normalizer",
-                  "X-GitHub-Api-Version": "2022-11-28",
-              },
-          )
-          with urllib.request.urlopen(request, timeout=30) as response:
-              payload = json.load(response)
-
-          body = payload["body"].replace("\r\n", "\n").rstrip() + "\n"
-          pathlib.Path("LICENSE").write_text(body, encoding="utf-8", newline="\n")
-
-      - name: Commit canonical license when needed
-        shell: bash
-        run: |
-          if git diff --quiet -- LICENSE; then
-            echo "LICENSE already matches GitHub's canonical AGPL-3.0 text."
-            exit 0
-          fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add LICENSE
-          git commit -m "Normalize AGPL license text"
-          git push origin HEAD:dev
+          license_text = Path("LICENSE").read_text(encoding="utf-8")
+          required = [
+              "GNU AFFERO GENERAL PUBLIC LICENSE",
+              "Version 3, 19 November 2007",
+          ]
+          missing = [marker for marker in required if marker not in license_text]
+          if missing:
+              raise SystemExit(f"LICENSE is missing expected AGPL markers: {missing}")
+          print("LICENSE contains the expected AGPL-3.0 text markers.")
