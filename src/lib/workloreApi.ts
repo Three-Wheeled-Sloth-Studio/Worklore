@@ -3,15 +3,21 @@ import type {
   CandidateStatus,
   CandidateSummary,
   CloudIdentifierMode,
+  CreateManualWorkspaceRequest,
   EntityReviewView,
   ExtractCandidatesResult,
   ImportSourceResult,
+  ImportStoryResponseRequest,
+  ImportStoryResponseResult,
   InterviewSummary,
+  ManualWorkspaceResult,
   PerformanceSnapshot,
   ResolveEntityReviewRequest,
   ResolveEntityReviewResult,
   SourceSummary,
   SourceType,
+  StoryStatus,
+  StorySummary,
   SubmitInterviewResponseRequest,
   VaultSummary,
 } from "../domain/types";
@@ -127,6 +133,42 @@ export async function resumeGuidedInterview(
   return invoke<InterviewSummary>("resume_guided_interview", {
     vaultPath,
     interviewId,
+  });
+}
+
+export async function createManualWorkspace(
+  vaultPath: string,
+  request: CreateManualWorkspaceRequest,
+): Promise<ManualWorkspaceResult> {
+  return invoke<ManualWorkspaceResult>("create_manual_workspace", {
+    vaultPath,
+    request,
+  });
+}
+
+export async function importStoryResponse(
+  vaultPath: string,
+  request: ImportStoryResponseRequest,
+): Promise<ImportStoryResponseResult> {
+  return invoke<ImportStoryResponseResult>("import_story_response", {
+    vaultPath,
+    request,
+  });
+}
+
+export async function listStories(vaultPath: string): Promise<StorySummary[]> {
+  return invoke<StorySummary[]>("list_stories", { vaultPath });
+}
+
+export async function setStoryStatus(
+  vaultPath: string,
+  storyId: string,
+  status: StoryStatus,
+): Promise<StorySummary> {
+  return invoke<StorySummary>("set_story_status", {
+    vaultPath,
+    storyId,
+    status,
   });
 }
 
