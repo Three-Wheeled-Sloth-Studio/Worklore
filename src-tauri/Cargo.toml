@@ -3,6 +3,7 @@ name = "worklore"
 version = "0.1.0"
 description = "A local-first career story bank"
 authors = ["Three-Wheeled Sloth Studio"]
+license = "AGPL-3.0-only"
 edition = "2021"
 
 [lib]
