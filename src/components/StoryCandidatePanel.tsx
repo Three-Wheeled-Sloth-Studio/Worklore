@@ -2,11 +2,13 @@ import type { CandidateStatus, CandidateSummary } from "../domain/types";
 
 interface StoryCandidatePanelProps {
   candidates: CandidateSummary[];
+  onInterview: (candidateId: string) => Promise<void>;
   onStatusChange: (candidateId: string, status: CandidateStatus) => Promise<void>;
 }
 
 export function StoryCandidatePanel({
   candidates,
+  onInterview,
   onStatusChange,
 }: StoryCandidatePanelProps) {
   if (candidates.length === 0) {
@@ -54,12 +56,10 @@ export function StoryCandidatePanel({
             <div className="candidate-actions" aria-label={`Actions for ${candidate.claim}`}>
               <button
                 className="primary-button compact"
-                disabled={candidate.status === "ready_to_interview"}
-                onClick={() =>
-                  void onStatusChange(candidate.candidateId, "ready_to_interview")
-                }
+                disabled={candidate.status === "interviewing"}
+                onClick={() => void onInterview(candidate.candidateId)}
               >
-                Interview
+                {candidate.status === "ready_to_interview" ? "Start interview" : "Interview"}
               </button>
               <button
                 className="secondary-button compact"
