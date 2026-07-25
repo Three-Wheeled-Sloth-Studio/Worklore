@@ -13,7 +13,7 @@ use crate::{
     domain::performance::{
         ActiveOperation, OperationMetric, OperationOutcome, PerformanceSnapshot,
     },
-    error::{ServiceResult, WorkLoreError},
+    error::ServiceResult,
     io_utils::{read_json, write_json_atomic},
 };
 
@@ -42,6 +42,7 @@ impl OperationSession {
             started_at: now.clone(),
             updated_at: now,
             elapsed_ms: 0,
+            process_id: std::process::id(),
             progress_current: None,
             progress_total: None,
             metadata,
@@ -52,10 +53,6 @@ impl OperationSession {
             active,
             started: Instant::now(),
         })
-    }
-
-    pub fn run_id(&self) -> &str {
-        &self.active.run_id
     }
 
     pub fn set_phase(&mut self, phase: impl Into<String>) -> ServiceResult<()> {
@@ -165,9 +162,14 @@ pub fn recover_interrupted(vault_path: &Path) -> ServiceResult<usize> {
     ensure_directories(vault_path)?;
     let active = list_active(vault_path)?;
     let now = Utc::now();
+    let current_process_id = std::process::id();
     let mut recovered = 0;
 
     for operation in active {
+        if operation.process_id == current_process_id {
+            continue;
+        }
+
         let started = DateTime::parse_from_rfc3339(&operation.started_at)
             .map(|value| value.with_timezone(&Utc))
             .unwrap_or(now);
