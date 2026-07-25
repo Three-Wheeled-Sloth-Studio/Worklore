@@ -63,6 +63,16 @@ pub struct CommandError {
     pub detail: Option<String>,
 }
 
+impl CommandError {
+    pub fn background_task(error: impl ToString) -> Self {
+        Self {
+            code: "background_task_failed".to_string(),
+            message: "A background WorkLore operation stopped unexpectedly.".to_string(),
+            detail: Some(error.to_string()),
+        }
+    }
+}
+
 impl From<WorkLoreError> for CommandError {
     fn from(value: WorkLoreError) -> Self {
         let code = match &value {
