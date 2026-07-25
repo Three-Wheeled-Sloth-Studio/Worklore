@@ -37,9 +37,9 @@ todos:
   - id: task-009
     status: active
     area: validation
-    summary: Get Windows CI passing for frontend, refs, Rust formatting, tests, and clippy.
+    summary: Get Windows CI passing for frontend, refs, Rust formatting, tests, clippy, and repository/build separation.
   - id: task-010
-    status: open
+    status: implemented_pending_validation
     area: parsing
     summary: Add local PDF and DOCX text extraction and route extracted text through the entity scan pipeline.
   - id: task-011
@@ -47,10 +47,26 @@ todos:
     area: privacy
     summary: Complete and validate the private entity review screen and resolution commands.
   - id: task-012
-    status: open
+    status: implemented_pending_validation
     area: stories
-    summary: Extract resume bullets into triageable story candidates.
+    summary: Extract only recognized work-history resume bullets into triageable story candidates while ignoring headline titles and non-employment sections.
   - id: task-013
-    status: open
+    status: active
     area: stories
     summary: Implement the resumable guided interview and story synthesis state machine.
+  - id: task-014
+    status: implemented_pending_validation
+    area: observability
+    summary: Record local operation phases and durations without storing private source content in performance metrics.
+  - id: task-015
+    status: implemented_pending_validation
+    area: distribution
+    summary: Enforce external development, build, QA staging, and QA installation paths outside the repository.
+  - id: task-016
+    status: complete
+    area: licensing
+    summary: Apply AGPL-3.0-only to WorkLore and document the public-repository licensing default and exception review.
+  - id: task-017
+    status: planned
+    area: security
+    summary: Implement vault-level encryption after the first technical workflow test and before broad public distribution.
