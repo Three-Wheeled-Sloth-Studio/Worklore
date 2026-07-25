@@ -25,9 +25,11 @@ import type {
 } from "./domain/types";
 import { errorMessage } from "./domain/types";
 import {
+  clearLastVault,
   createManualWorkspace,
   createVault,
   extractResumeCandidates,
+  getLastVaultPath,
   getPerformanceSnapshot,
   importSource,
   importStoryResponse,
@@ -37,6 +39,7 @@ import {
   listStories,
   listStoryCandidates,
   openVault,
+  rememberLastVault,
   resolveEntityReview,
   setStoryCandidateStatus,
   setStoryStatus,
@@ -65,6 +68,7 @@ function App() {
   const [performance, setPerformance] = useState<PerformanceSnapshot | null>(null);
   const [selectedSourceType, setSelectedSourceType] = useState<SourceType>("resume");
   const [vaultName, setVaultName] = useState("My Career Stories");
+  const [startupComplete, setStartupComplete] = useState(false);
   const [busyMessage, setBusyMessage] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -83,6 +87,45 @@ function App() {
       null
     );
   }, [interviews, selectedInterviewId]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const lastVaultPath = await getLastVaultPath();
+        if (!lastVaultPath || cancelled) {
+          return;
+        }
+
+        setBusyMessage("Opening last vault");
+        const reopened = await openVault(lastVaultPath);
+        if (cancelled) {
+          return;
+        }
+        setVault(reopened);
+        setNotice(`Reopened ${reopened.name}.`);
+      } catch {
+        try {
+          await clearLastVault();
+        } catch {
+          // The invalid path is already harmless. The next successful open will replace it.
+        }
+        if (!cancelled) {
+          setNotice("The last used vault could not be found. Choose or create a vault.");
+        }
+      } finally {
+        if (!cancelled) {
+          setBusyMessage(null);
+          setStartupComplete(true);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!vault) {
@@ -161,13 +204,24 @@ function App() {
     }
   }
 
+  async function activateVault(nextVault: VaultSummary) {
+    setVault(nextVault);
+    try {
+      await rememberLastVault(nextVault.path);
+    } catch {
+      setNotice(
+        "Vault opened, but WorkLore could not remember it for the next launch.",
+      );
+    }
+  }
+
   async function handleCreateVault() {
     setError(null);
     setNotice(null);
     const selected = await open({
       directory: true,
       multiple: false,
-      title: "Choose a folder for the WorkLore vault",
+      title: "Choose the parent folder for the new WorkLore vault",
     });
     if (!selected || Array.isArray(selected)) {
       return;
@@ -176,8 +230,8 @@ function App() {
     setBusyMessage("Creating vault");
     try {
       const created = await createVault(selected, vaultName.trim() || "My Career Stories");
-      setVault(created);
-      setNotice("Vault created. Your sources and stories stay in this folder.");
+      await activateVault(created);
+      setNotice(`Vault created at ${created.path}. WorkLore will reopen it next time.`);
     } catch (caught) {
       setError(errorMessage(caught));
     } finally {
@@ -199,7 +253,9 @@ function App() {
 
     setBusyMessage("Opening vault");
     try {
-      setVault(await openVault(selected));
+      const opened = await openVault(selected);
+      await activateVault(opened);
+      setNotice(`${opened.name} will reopen automatically next time.`);
     } catch (caught) {
       setError(errorMessage(caught));
     } finally {
@@ -452,6 +508,14 @@ function App() {
     }
   }
 
+  if (!startupComplete) {
+    return (
+      <main className="landing-shell">
+        <BusyLayer message="Opening WorkLore" activeOperation={null} />
+      </main>
+    );
+  }
+
   if (!vault) {
     return (
       <main className="landing-shell">
@@ -460,8 +524,8 @@ function App() {
           <h1 id="worklore-title">WorkLore</h1>
           <p className="tagline">Turn the work you did into stories you can actually use.</p>
           <p className="landing-copy">
-            Start a local career story bank or open an existing vault. WorkLore copies your
-            source files into the vault you choose and keeps its durable records there.
+            Start a local career story bank or open an existing vault. A new vault is created in
+            its own named folder, and the last vault you use reopens automatically.
           </p>
           <label className="field-label" htmlFor="vault-name">
             Vault name
@@ -501,7 +565,14 @@ function App() {
             </p>
           </div>
           <div className="header-actions">
-            <button className="quiet-button" onClick={() => setVault(null)}>
+            <button
+              className="quiet-button"
+              onClick={() => {
+                setError(null);
+                setNotice("Choose another vault. The current vault remains the launch default until you open a different one.");
+                setVault(null);
+              }}
+            >
               Change vault
             </button>
           </div>
