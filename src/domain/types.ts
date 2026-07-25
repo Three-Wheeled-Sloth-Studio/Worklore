@@ -66,6 +66,8 @@ export type AnswerClassification =
   | "uncertain"
   | "not_applicable";
 
+export type OperationOutcome = "running" | "succeeded" | "failed" | "interrupted";
+
 export interface VaultSummary {
   schemaVersion: number;
   vaultId: string;
@@ -182,6 +184,39 @@ export interface ResolveEntityReviewResult {
   affectedEntityId: string | null;
   pendingReviewCount: number;
   message: string;
+}
+
+export interface ActiveOperation {
+  schemaVersion: number;
+  runId: string;
+  operation: string;
+  phase: string;
+  startedAt: string;
+  updatedAt: string;
+  elapsedMs: number;
+  processId: number;
+  progressCurrent: number | null;
+  progressTotal: number | null;
+  metadata: Record<string, unknown>;
+}
+
+export interface OperationMetric {
+  schemaVersion: number;
+  runId: string;
+  parentRunId: string | null;
+  operation: string;
+  phase: string;
+  startedAt: string;
+  completedAt: string;
+  durationMs: number;
+  outcome: OperationOutcome;
+  errorCode: string | null;
+  metadata: Record<string, unknown>;
+}
+
+export interface PerformanceSnapshot {
+  activeOperations: ActiveOperation[];
+  recentMetrics: OperationMetric[];
 }
 
 export interface AppErrorShape {
