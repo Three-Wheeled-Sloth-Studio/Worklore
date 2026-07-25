@@ -55,6 +55,12 @@ jobs:
           New-Item -ItemType Directory -Force -Path $logRoot | Out-Null
           ./scripts/assert-repo-clean.ps1
 
+      - name: Validate external build layout
+        shell: pwsh
+        run: |
+          ./scripts/validate-build-layout.ps1 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\build-layout.log"
+          exit $LASTEXITCODE
+
       - name: Install frontend dependencies
         shell: pwsh
         run: |
