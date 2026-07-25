@@ -12,6 +12,12 @@ pub enum WorkLoreError {
     #[error("The selected source file does not exist or is not a file.")]
     InvalidSourceFile,
 
+    #[error("The requested source record was not found.")]
+    SourceNotFound,
+
+    #[error("This source is not ready for that operation: {0}")]
+    SourceNotReady(String),
+
     #[error("WorkLore does not support this source file type yet.")]
     UnsupportedSourceType,
 
@@ -23,6 +29,9 @@ pub enum WorkLoreError {
 
     #[error("WorkLore could not extract text from this document: {0}")]
     DocumentExtraction(String),
+
+    #[error("The requested story candidate was not found.")]
+    CandidateNotFound,
 
     #[error("The requested privacy review item was not found.")]
     ReviewItemNotFound,
@@ -54,10 +63,13 @@ impl From<WorkLoreError> for CommandError {
             WorkLoreError::NotAVault => "not_a_vault",
             WorkLoreError::VaultAlreadyExists => "vault_already_exists",
             WorkLoreError::InvalidSourceFile => "invalid_source_file",
+            WorkLoreError::SourceNotFound => "source_not_found",
+            WorkLoreError::SourceNotReady(_) => "source_not_ready",
             WorkLoreError::UnsupportedSourceType => "unsupported_source_type",
             WorkLoreError::InvalidPath => "invalid_path",
             WorkLoreError::InvalidVault(_) => "invalid_vault",
             WorkLoreError::DocumentExtraction(_) => "document_extraction_failed",
+            WorkLoreError::CandidateNotFound => "candidate_not_found",
             WorkLoreError::ReviewItemNotFound => "review_item_not_found",
             WorkLoreError::EntityNotFound => "entity_not_found",
             WorkLoreError::InvalidReviewResolution(_) => "invalid_review_resolution",
