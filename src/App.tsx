@@ -1,14 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
+import { GuidedInterviewPanel } from "./components/GuidedInterviewPanel";
 import { PerformancePanel } from "./components/PerformancePanel";
 import { PrivacyReviewPanel } from "./components/PrivacyReviewPanel";
 import { StoryCandidatePanel } from "./components/StoryCandidatePanel";
 import type {
   ActiveOperation,
+  AnswerClassification,
   CandidateStatus,
   CandidateSummary,
   CloudIdentifierMode,
   EntityReviewView,
+  InterviewResponseAction,
+  InterviewSummary,
   PerformanceSnapshot,
   ResolveEntityReviewRequest,
   SourceSummary,
@@ -22,11 +26,14 @@ import {
   getPerformanceSnapshot,
   importSource,
   listEntityReviews,
+  listGuidedInterviews,
   listSources,
   listStoryCandidates,
   openVault,
   resolveEntityReview,
   setStoryCandidateStatus,
+  startGuidedInterview,
+  submitGuidedInterviewResponse,
   updateCloudIdentifierMode,
 } from "./lib/workloreApi";
 import "./styles.css";
@@ -44,6 +51,8 @@ function App() {
   const [sources, setSources] = useState<SourceSummary[]>([]);
   const [reviews, setReviews] = useState<EntityReviewView[]>([]);
   const [candidates, setCandidates] = useState<CandidateSummary[]>([]);
+  const [interviews, setInterviews] = useState<InterviewSummary[]>([]);
+  const [selectedInterviewId, setSelectedInterviewId] = useState<string | null>(null);
   const [performance, setPerformance] = useState<PerformanceSnapshot | null>(null);
   const [selectedSourceType, setSelectedSourceType] = useState<SourceType>("resume");
   const [vaultName, setVaultName] = useState("My Career Stories");
@@ -51,11 +60,27 @@ function App() {
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const activeInterview = useMemo(() => {
+    const selected = interviews.find(
+      (interview) => interview.interviewId === selectedInterviewId,
+    );
+    if (selected) {
+      return selected;
+    }
+    return (
+      interviews.find((interview) => interview.status === "active") ??
+      interviews.find((interview) => interview.status === "ready_for_synthesis") ??
+      null
+    );
+  }, [interviews, selectedInterviewId]);
+
   useEffect(() => {
     if (!vault) {
       setSources([]);
       setReviews([]);
       setCandidates([]);
+      setInterviews([]);
+      setSelectedInterviewId(null);
       setPerformance(null);
       return;
     }
@@ -76,16 +101,35 @@ function App() {
 
   async function refreshWorkspace(vaultPath: string, refreshVault: boolean) {
     try {
-      const [sourceResult, reviewResult, candidateResult, performanceResult] = await Promise.all([
+      const [
+        sourceResult,
+        reviewResult,
+        candidateResult,
+        interviewResult,
+        performanceResult,
+      ] = await Promise.all([
         listSources(vaultPath),
         listEntityReviews(vaultPath),
         listStoryCandidates(vaultPath),
+        listGuidedInterviews(vaultPath),
         getPerformanceSnapshot(vaultPath),
       ]);
       setSources(sourceResult);
       setReviews(reviewResult);
       setCandidates(candidateResult);
+      setInterviews(interviewResult);
       setPerformance(performanceResult);
+      setSelectedInterviewId((current) => {
+        if (current && interviewResult.some((item) => item.interviewId === current)) {
+          return current;
+        }
+        return (
+          interviewResult.find((item) => item.status === "active")?.interviewId ??
+          interviewResult.find((item) => item.status === "ready_for_synthesis")
+            ?.interviewId ??
+          null
+        );
+      });
       if (refreshVault) {
         setVault(await openVault(vaultPath));
       }
@@ -203,6 +247,60 @@ function App() {
       await refreshWorkspace(vault.path, true);
     } catch (caught) {
       setError(errorMessage(caught));
+    } finally {
+      setBusyMessage(null);
+    }
+  }
+
+  async function handleStartInterview(candidateId: string) {
+    if (!vault) {
+      return;
+    }
+
+    setBusyMessage("Opening guided interview");
+    setError(null);
+    try {
+      const interview = await startGuidedInterview(vault.path, candidateId);
+      setSelectedInterviewId(interview.interviewId);
+      setNotice("Interview started. WorkLore will preserve uncertainty instead of inventing details.");
+      await refreshWorkspace(vault.path, true);
+    } catch (caught) {
+      setError(errorMessage(caught));
+      throw caught;
+    } finally {
+      setBusyMessage(null);
+    }
+  }
+
+  async function handleInterviewResponse(
+    interviewId: string,
+    action: InterviewResponseAction,
+    text: string,
+    classification: AnswerClassification | null,
+  ) {
+    if (!vault) {
+      return;
+    }
+
+    setBusyMessage("Saving interview response");
+    setError(null);
+    try {
+      const updated = await submitGuidedInterviewResponse(vault.path, {
+        interviewId,
+        action,
+        text,
+        classification,
+      });
+      setSelectedInterviewId(updated.interviewId);
+      await refreshWorkspace(vault.path, true);
+      setNotice(
+        updated.status === "ready_for_synthesis"
+          ? "Interview pass complete. The story is ready for synthesis."
+          : "Answer saved. Here is the next useful question.",
+      );
+    } catch (caught) {
+      setError(errorMessage(caught));
+      throw caught;
     } finally {
       setBusyMessage(null);
     }
@@ -330,6 +428,7 @@ function App() {
       <section className="status-strip" aria-label="Vault status">
         <StatusItem value={vault.sourceCount} label="Sources" />
         <StatusItem value={candidates.length} label="Candidates" />
+        <StatusItem value={interviews.length} label="Interviews" />
         <StatusItem value={vault.storyCount} label="Stories" />
         <StatusItem
           value={reviews.length}
@@ -343,8 +442,16 @@ function App() {
           <PrivacyReviewPanel reviews={reviews} onResolve={handleResolveReview} />
         ) : null}
 
+        <GuidedInterviewPanel
+          interview={activeInterview}
+          onSubmit={handleInterviewResponse}
+        />
+
         <StoryCandidatePanel
-          candidates={candidates.filter((candidate) => candidate.status !== "ignored")}
+          candidates={candidates.filter(
+            (candidate) => candidate.status !== "ignored" && candidate.status !== "interviewing",
+          )}
+          onInterview={handleStartInterview}
           onStatusChange={handleCandidateStatusChange}
         />
 
@@ -438,8 +545,8 @@ function App() {
           <div className="next-step-card">
             <h3>Current working slice</h3>
             <p>
-              Resume candidates are extracted only from recognized work-history sections.
-              Titles, summaries, skills, and education are deliberately ignored.
+              Resume candidates come only from recognized employment sections. Useful claims
+              can now move directly into a resumable guided interview.
             </p>
           </div>
         </aside>
