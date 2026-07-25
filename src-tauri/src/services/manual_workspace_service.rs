@@ -8,9 +8,7 @@ use crate::{
     domain::{
         candidates::StoryCandidate,
         interviews::{InterviewSession, InterviewStatus, TurnActor},
-        providers::{
-            CreateManualWorkspaceRequest, ManualWorkspaceResult, ManualWorkspaceTarget,
-        },
+        providers::{CreateManualWorkspaceRequest, ManualWorkspaceResult, ManualWorkspaceTarget},
     },
     error::{ServiceResult, WorkLoreError},
     io_utils::{read_json, write_json_atomic},
@@ -87,10 +85,7 @@ pub fn create_manual_workspace(
             workspace_path.join("task.md"),
             task_instructions(request.target),
         )?;
-        fs::write(
-            workspace_path.join("selected-context.md"),
-            redacted.text,
-        )?;
+        fs::write(workspace_path.join("selected-context.md"), redacted.text)?;
         write_json_atomic(
             &workspace_path.join("structured-input.json"),
             &json!({
@@ -299,7 +294,12 @@ fn ensure_vault(vault_path: &Path) -> ServiceResult<()> {
 }
 
 fn short_id(value: &str) -> &str {
-    value.rsplit('_').next().unwrap_or(value).get(..8).unwrap_or(value)
+    value
+        .rsplit('_')
+        .next()
+        .unwrap_or(value)
+        .get(..8)
+        .unwrap_or(value)
 }
 
 fn target_slug(target: ManualWorkspaceTarget) -> &'static str {
