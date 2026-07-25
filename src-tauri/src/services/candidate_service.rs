@@ -34,10 +34,11 @@ pub fn extract_resume_candidates(
         ));
     }
 
-    let extracted_path =
-        source.extraction.text_path.as_deref().ok_or_else(|| {
-            WorkLoreError::SourceNotReady("Extracted text is missing.".to_string())
-        })?;
+    let extracted_path = source
+        .extraction
+        .text_path
+        .as_deref()
+        .ok_or_else(|| WorkLoreError::SourceNotReady("Extracted text is missing.".to_string()))?;
     let text = fs::read_to_string(vault_path.join(extracted_path))?;
     let existing = read_candidates(vault_path)?;
     let existing_fragments = existing
@@ -104,11 +105,11 @@ pub fn extract_resume_candidates(
         existing_count: candidates.len().saturating_sub(created.len()),
         candidates,
         message: if created.is_empty() {
-            "No new work-history bullets were found. Titles, summaries, skills, and other resume sections were ignored."
+            "No new local work-history candidates were found. Titles, summaries, skills, and other resume sections were ignored."
                 .to_string()
         } else {
             format!(
-                "Created {} story candidate{} from work-history bullets.",
+                "Created {} local story candidate{} from work-history content.",
                 created.len(),
                 if created.len() == 1 { "" } else { "s" }
             )
@@ -196,6 +197,7 @@ enum ResumeSection {
 
 fn parse_resume_bullets(text: &str) -> Vec<ParsedBullet> {
     let mut results = Vec::new();
+    let mut seen_claims = HashSet::new();
     let mut section = ResumeSection::OutsideEmployment;
     let mut heading: Option<String> = None;
 
@@ -205,108 +207,256 @@ fn parse_resume_bullets(text: &str) -> Vec<ParsedBullet> {
             continue;
         }
 
-        if let Some(next_section) = classify_resume_section(trimmed) {
+        let mut employment_line = trimmed;
+        if let Some((next_section, remainder)) = classify_resume_section_prefix(trimmed) {
             section = next_section;
             heading = None;
-            continue;
+            employment_line = remainder;
+            if section != ResumeSection::Employment || employment_line.is_empty() {
+                continue;
+            }
         }
 
         if section != ResumeSection::Employment {
             continue;
         }
 
-        if let Some(claim) = strip_bullet_prefix(trimmed) {
-            if claim.len() >= 12 {
-                results.push(ParsedBullet {
-                    line_number: index + 1,
-                    claim: claim.to_string(),
-                    heading: heading.clone(),
-                });
+        let line_number = index + 1;
+
+        if let Some(claim) = strip_bullet_prefix(employment_line) {
+            push_candidate(
+                &mut results,
+                &mut seen_claims,
+                line_number,
+                claim,
+                heading.clone(),
+            );
+            continue;
+        }
+
+        if let Some((role_heading, claim_text)) = split_role_heading_and_claim(employment_line) {
+            heading = Some(role_heading.to_string());
+            for claim in split_candidate_sentences(claim_text) {
+                push_candidate(
+                    &mut results,
+                    &mut seen_claims,
+                    line_number,
+                    claim,
+                    heading.clone(),
+                );
             }
             continue;
         }
 
-        if looks_like_heading(trimmed) {
-            heading = Some(trimmed.to_string());
+        if looks_like_role_heading(employment_line) {
+            heading = Some(employment_line.to_string());
+            continue;
         }
+
+        let candidate_sentences = split_candidate_sentences(employment_line);
+        if !candidate_sentences.is_empty() {
+            for claim in candidate_sentences {
+                push_candidate(
+                    &mut results,
+                    &mut seen_claims,
+                    line_number,
+                    claim,
+                    heading.clone(),
+                );
+            }
+            continue;
+        }
+
+        append_wrapped_continuation(&mut results, line_number, employment_line);
     }
 
     results
 }
 
-fn classify_resume_section(line: &str) -> Option<ResumeSection> {
-    let normalized = normalize_section_heading(line);
-
-    const EMPLOYMENT_SECTIONS: &[&str] = &[
-        "work history",
-        "employment history",
-        "work experience",
-        "professional experience",
-        "employment experience",
-        "career history",
-        "professional history",
-    ];
-
-    const NON_EMPLOYMENT_SECTIONS: &[&str] = &[
-        "summary",
-        "career summary",
-        "professional summary",
-        "executive summary",
-        "profile",
-        "career profile",
-        "professional profile",
-        "objective",
-        "qualifications",
-        "core qualifications",
-        "skills",
-        "technical skills",
-        "core competencies",
-        "competencies",
-        "education",
-        "certification",
-        "certifications",
-        "licenses",
-        "projects",
-        "selected projects",
-        "publications",
-        "awards",
-        "volunteer experience",
-        "community involvement",
-        "professional affiliations",
-        "affiliations",
-        "references",
-    ];
-
-    if EMPLOYMENT_SECTIONS.contains(&normalized.as_str()) {
-        Some(ResumeSection::Employment)
-    } else if NON_EMPLOYMENT_SECTIONS.contains(&normalized.as_str()) {
-        Some(ResumeSection::OutsideEmployment)
-    } else {
-        None
+fn push_candidate(
+    results: &mut Vec<ParsedBullet>,
+    seen_claims: &mut HashSet<String>,
+    line_number: usize,
+    claim: &str,
+    heading: Option<String>,
+) {
+    let cleaned = claim
+        .trim()
+        .trim_start_matches(|character: char| {
+            character.is_whitespace() || is_bullet_character(character)
+        })
+        .trim();
+    if !looks_like_candidate_text(cleaned) {
+        return;
     }
-}
 
-fn normalize_section_heading(line: &str) -> String {
-    line.trim()
-        .trim_matches(|character: char| matches!(character, ':' | '-' | '_' | '=' | '#'))
+    let normalized = cleaned
         .split_whitespace()
         .collect::<Vec<_>>()
         .join(" ")
-        .to_ascii_lowercase()
+        .to_ascii_lowercase();
+    if !seen_claims.insert(normalized) {
+        return;
+    }
+
+    results.push(ParsedBullet {
+        line_number,
+        claim: cleaned.to_string(),
+        heading,
+    });
+}
+
+fn append_wrapped_continuation(results: &mut [ParsedBullet], line_number: usize, line: &str) {
+    let Some(previous) = results.last_mut() else {
+        return;
+    };
+    if previous.line_number + 1 != line_number
+        || ends_sentence(&previous.claim)
+        || looks_like_role_heading(line)
+        || line.len() < 3
+    {
+        return;
+    }
+
+    previous.claim.push(' ');
+    previous.claim.push_str(line.trim());
+}
+
+fn classify_resume_section_prefix(line: &str) -> Option<(ResumeSection, &str)> {
+    const EMPLOYMENT_SECTIONS: &[&str] = &[
+        "professional experience",
+        "employment experience",
+        "professional history",
+        "employment history",
+        "work experience",
+        "work history",
+        "career history",
+    ];
+    const NON_EMPLOYMENT_SECTIONS: &[&str] = &[
+        "professional affiliations",
+        "professional summary",
+        "professional profile",
+        "community involvement",
+        "executive summary",
+        "volunteer experience",
+        "technical skills",
+        "selected projects",
+        "core qualifications",
+        "core competencies",
+        "career summary",
+        "career profile",
+        "certifications",
+        "qualifications",
+        "publications",
+        "affiliations",
+        "competencies",
+        "certification",
+        "references",
+        "education",
+        "objective",
+        "projects",
+        "licenses",
+        "summary",
+        "profile",
+        "skills",
+        "awards",
+    ];
+
+    if let Some(remainder) = match_section_prefix(line, EMPLOYMENT_SECTIONS) {
+        if remainder.is_empty() || looks_like_inline_employment_content(remainder) {
+            return Some((ResumeSection::Employment, remainder));
+        }
+    }
+
+    match_section_prefix(line, NON_EMPLOYMENT_SECTIONS)
+        .map(|remainder| (ResumeSection::OutsideEmployment, remainder))
+}
+
+fn match_section_prefix<'a>(line: &'a str, headings: &[&str]) -> Option<&'a str> {
+    headings.iter().find_map(|heading| {
+        if line.len() < heading.len() {
+            return None;
+        }
+        let prefix = line.get(..heading.len())?;
+        if !prefix.eq_ignore_ascii_case(heading) {
+            return None;
+        }
+        let remainder = line.get(heading.len()..)?;
+        let boundary_ok = remainder
+            .chars()
+            .next()
+            .is_none_or(|character| !character.is_ascii_alphabetic());
+        if !boundary_ok {
+            return None;
+        }
+        Some(trim_section_separator(remainder))
+    })
+}
+
+fn trim_section_separator(value: &str) -> &str {
+    value.trim_start_matches(|character: char| {
+        character.is_whitespace()
+            || matches!(character, ':' | '-' | '–' | '—' | '_' | '=' | '#')
+    })
+}
+
+fn looks_like_inline_employment_content(value: &str) -> bool {
+    contains_date_range(value)
+        || value.contains(" | ")
+        || value
+            .chars()
+            .find(|character| character.is_alphabetic())
+            .is_some_and(char::is_uppercase)
 }
 
 fn strip_bullet_prefix(line: &str) -> Option<&str> {
-    let prefixes = ["- ", "* ", "+ ", "• ", "▪ ", "– "];
-    prefixes
-        .iter()
-        .find_map(|prefix| line.strip_prefix(prefix))
-        .map(str::trim)
+    let trimmed = line.trim_start();
+    if let Some(first) = trimmed.chars().next() {
+        if is_bullet_character(first) {
+            return Some(trimmed[first.len_utf8()..].trim_start());
+        }
+    }
+
+    let numbered = Regex::new(r"^\d{1,2}[.)]\s+").expect("numbered bullet regex");
+    numbered
+        .find(trimmed)
+        .map(|matched| trimmed[matched.end()..].trim_start())
 }
 
-fn looks_like_heading(line: &str) -> bool {
-    if line.len() > 180 || line.ends_with('.') || line.ends_with(';') {
+fn is_bullet_character(character: char) -> bool {
+    matches!(
+        character,
+        '-' | '*' | '+' | '•' | '▪' | '▫' | '■' | '□' | '●' | '○' | '◦' | '‣' | '►'
+            | '–' | '—' | '·' | ''
+    )
+}
+
+fn split_role_heading_and_claim(line: &str) -> Option<(&str, &str)> {
+    let date_end = date_range_match(line)?.end();
+    let action_start = action_verb_match(line)?.start();
+    if action_start <= date_end {
+        return None;
+    }
+
+    let heading = line[..action_start]
+        .trim()
+        .trim_end_matches(|character: char| matches!(character, ':' | '-' | '–' | '—' | '|'))
+        .trim();
+    let claim = line[action_start..].trim();
+    if heading.len() < 4 || !looks_like_candidate_text(claim) {
+        return None;
+    }
+    Some((heading, claim))
+}
+
+fn looks_like_role_heading(line: &str) -> bool {
+    if line.len() > 220 || ends_sentence(line) {
         return false;
     }
+    if contains_date_range(line) {
+        return true;
+    }
+
     let separators = [" | ", " - ", " at ", " @ "];
     separators.iter().any(|separator| line.contains(separator))
         || (line.chars().any(char::is_alphabetic)
@@ -314,6 +464,165 @@ fn looks_like_heading(line: &str) -> bool {
                 .chars()
                 .filter(|character| character.is_alphabetic())
                 .all(char::is_uppercase))
+}
+
+fn split_candidate_sentences(line: &str) -> Vec<&str> {
+    let mut results = Vec::new();
+    let mut segment_start = 0;
+    let bytes = line.as_bytes();
+
+    for (index, character) in line.char_indices() {
+        if !matches!(character, '.' | '!' | '?' | ';') {
+            continue;
+        }
+        let end = index + character.len_utf8();
+        let next_is_boundary = end == bytes.len()
+            || bytes
+                .get(end)
+                .is_some_and(|byte| byte.is_ascii_whitespace());
+        if !next_is_boundary {
+            continue;
+        }
+
+        let segment = line[segment_start..end].trim();
+        if looks_like_candidate_text(segment) {
+            results.push(segment);
+        }
+        segment_start = end;
+        while bytes
+            .get(segment_start)
+            .is_some_and(|byte| byte.is_ascii_whitespace())
+        {
+            segment_start += 1;
+        }
+    }
+
+    if segment_start < line.len() {
+        let tail = line[segment_start..].trim();
+        if looks_like_candidate_text(tail) {
+            results.push(tail);
+        }
+    }
+
+    if results.is_empty() && looks_like_candidate_text(line) {
+        results.push(line.trim());
+    }
+    results
+}
+
+fn looks_like_candidate_text(line: &str) -> bool {
+    let word_count = line.split_whitespace().count();
+    if line.len() < 24 || word_count < 4 || looks_like_role_heading(line) {
+        return false;
+    }
+
+    starts_with_action_verb(line)
+        || (contains_action_verb(line) && !infer_metrics(line).is_empty())
+        || contains_outcome_signal(line)
+}
+
+fn starts_with_action_verb(line: &str) -> bool {
+    let first_word = line
+        .split_whitespace()
+        .next()
+        .unwrap_or_default()
+        .trim_matches(|character: char| !character.is_ascii_alphabetic())
+        .to_ascii_lowercase();
+    action_verbs().contains(&first_word.as_str())
+}
+
+fn contains_action_verb(line: &str) -> bool {
+    line.split_whitespace().any(|word| {
+        let normalized = word
+            .trim_matches(|character: char| !character.is_ascii_alphabetic())
+            .to_ascii_lowercase();
+        action_verbs().contains(&normalized.as_str())
+    })
+}
+
+fn action_verb_match(line: &str) -> Option<regex::Match<'_>> {
+    let pattern = format!(r"(?i)\b(?:{})\b", action_verbs().join("|"));
+    Regex::new(&pattern).expect("action verb regex").find(line)
+}
+
+fn action_verbs() -> &'static [&'static str] {
+    &[
+        "accelerated",
+        "achieved",
+        "automated",
+        "built",
+        "created",
+        "cut",
+        "defined",
+        "delivered",
+        "designed",
+        "developed",
+        "drove",
+        "enabled",
+        "established",
+        "expanded",
+        "guided",
+        "implemented",
+        "improved",
+        "increased",
+        "introduced",
+        "launched",
+        "led",
+        "managed",
+        "modernized",
+        "owned",
+        "recovered",
+        "reduced",
+        "redesigned",
+        "resolved",
+        "scaled",
+        "shortened",
+        "simplified",
+        "streamlined",
+        "supported",
+        "translated",
+        "transformed",
+    ]
+}
+
+fn contains_outcome_signal(line: &str) -> bool {
+    let lower = line.to_ascii_lowercase();
+    [
+        "resulted in",
+        "leading to",
+        "reduced ",
+        "increased ",
+        "improved ",
+        "saved ",
+        "recovered ",
+        "from months to",
+        "from weeks to",
+        "from days to",
+        "cycle time",
+        "delivery time",
+        "supporting modernization",
+    ]
+    .iter()
+    .any(|signal| lower.contains(signal))
+}
+
+fn contains_date_range(line: &str) -> bool {
+    date_range_match(line).is_some()
+}
+
+fn date_range_match(line: &str) -> Option<regex::Match<'_>> {
+    Regex::new(
+        r"(?i)\b(?:19|20)\d{2}\s*(?:-|–|—|to)\s*(?:present|current|(?:19|20)\d{2})\b",
+    )
+    .expect("date range regex")
+    .find(line)
+}
+
+fn ends_sentence(line: &str) -> bool {
+    line.trim_end()
+        .chars()
+        .next_back()
+        .is_some_and(|character| matches!(character, '.' | '!' | '?' | ';'))
 }
 
 fn fragment_id(line_number: usize, claim: &str) -> String {
@@ -455,6 +764,38 @@ mod tests {
         let bullets = parse_resume_bullets(text);
         assert_eq!(bullets.len(), 1);
         assert_eq!(bullets[0].claim, "Automated intake for 20 programs.");
+    }
+
+    #[test]
+    fn finds_bulletless_action_lines_inside_employment_only() {
+        let text = "PROFESSIONAL SUMMARY\nReduced review time by 80 percent.\nPROFESSIONAL EXPERIENCE\nAcme Cooperative | Product Manager | 2022 to 2026\nReduced review time by 80 percent.\nLed an LLM intake tool for 14 teams.\nEDUCATION\nBuilt a capstone project.";
+        let bullets = parse_resume_bullets(text);
+        assert_eq!(bullets.len(), 2);
+        assert!(bullets.iter().all(|bullet| {
+            bullet
+                .heading
+                .as_deref()
+                .is_some_and(|heading| heading.contains("Acme Cooperative"))
+        }));
+    }
+
+    #[test]
+    fn handles_section_heading_role_and_claim_flattened_on_one_line() {
+        let text = "PROFESSIONAL SUMMARY\nProduct leader.\nPROFESSIONAL EXPERIENCE ATI Government Solutions (2025–Present) Data Analytics Product Lead Translated complex requirements into scalable workflows, supporting modernization for 30,000 users. Defined a new reporting model for 22 service centers.\nEDUCATION Bachelor of Science";
+        let bullets = parse_resume_bullets(text);
+        assert_eq!(bullets.len(), 2);
+        assert!(bullets[0].claim.starts_with("Translated complex requirements"));
+        assert!(bullets[1].claim.starts_with("Defined a new reporting model"));
+        assert!(bullets
+            .iter()
+            .all(|bullet| !bullet.claim.contains("Product leader")));
+    }
+
+    #[test]
+    fn supports_pdf_bullet_glyphs() {
+        let text = "WORK EXPERIENCE\nAcme | Product Manager | 2022 to 2026\n Transformed intake for 14 teams.\n● Reduced cycle time by 80 percent.";
+        let bullets = parse_resume_bullets(text);
+        assert_eq!(bullets.len(), 2);
     }
 
     #[test]
