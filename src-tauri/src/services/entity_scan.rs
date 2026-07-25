@@ -71,51 +71,18 @@ pub fn scan_text(
     let mut review_item_ids = Vec::new();
     let mut processed = HashSet::new();
 
-    for entity in &mut registry.entities {
-        if matches!(entity.status, EntityStatus::Merged | EntityStatus::Archived) {
-            continue;
-        }
+    link_confirmed_aliases(
+        &mut registry,
+        record_type,
+        record_id,
+        text,
+        &now,
+        &mut processed,
+    );
 
-        let aliases = entity
-            .aliases
-            .iter()
-            .filter(|alias| alias.status != "rejected")
-            .map(|alias| alias.value.clone())
-            .chain(std::iter::once(entity.canonical_name.clone()))
-            .collect::<Vec<_>>();
-
-        for alias in aliases {
-            for (start, end) in find_case_insensitive(text, &alias) {
-                let key = format!("{}:{}:{}", entity.entity_id, start, end);
-                if processed.insert(key) {
-                    add_occurrence(
-                        entity,
-                        record_type,
-                        record_id,
-                        text,
-                        start,
-                        end,
-                        1.0,
-                        1.0,
-                        1.0,
-                        &now,
-                    );
-                }
-            }
-        }
-    }
-
-    for detection in collect_detections(text)? {
+    for detection in collect_detections(text) {
         let detection_key = format!("{}:{}:{}", detection.normalized, detection.start, detection.end);
-        if !processed.insert(detection_key) {
-            continue;
-        }
-
-        if registry
-            .ignored_terms
-            .iter()
-            .any(|ignored| ignored.normalized_value == detection.normalized)
-        {
+        if !processed.insert(detection_key) || is_ignored(&registry, &detection.normalized) {
             continue;
         }
 
@@ -128,60 +95,24 @@ pub fn scan_text(
             .collect::<Vec<_>>();
 
         match matching_indexes.as_slice() {
-            [index] => {
-                let entity = &mut registry.entities[*index];
-                add_occurrence(
-                    entity,
-                    record_type,
-                    record_id,
-                    text,
-                    detection.start,
-                    detection.end,
-                    detection.extraction_confidence,
-                    detection.type_confidence,
-                    1.0,
-                    &now,
-                );
-            }
+            [index] => add_occurrence(
+                &mut registry.entities[*index],
+                record_type,
+                record_id,
+                text,
+                &detection,
+                1.0,
+                &now,
+            ),
             [] => {
-                let entity_id = format!("entity_{}", Uuid::now_v7());
-                let token = allocate_token(&mut registry, detection.entity_type);
-                let occurrence = occurrence_for(
+                let entity_id = create_provisional_entity(
+                    &mut registry,
                     record_type,
                     record_id,
                     text,
-                    detection.start,
-                    detection.end,
-                    detection.extraction_confidence,
-                    detection.type_confidence,
-                    0.0,
+                    &detection,
                     &now,
                 );
-
-                registry.entities.push(PrivateEntity {
-                    schema_version: 1,
-                    entity_id: entity_id.clone(),
-                    entity_type: detection.entity_type,
-                    canonical_name: detection.text.clone(),
-                    public_token: token,
-                    public_description: None,
-                    sensitivity: default_sensitivity(detection.entity_type),
-                    status: EntityStatus::Provisional,
-                    aliases: vec![EntityAlias {
-                        value: detection.text.clone(),
-                        normalized_value: detection.normalized.clone(),
-                        status: "inferred".to_string(),
-                        source: "scan".to_string(),
-                    }],
-                    relationships: Vec::new(),
-                    occurrences: vec![occurrence],
-                    redirect_to_entity_id: None,
-                    retired_tokens: Vec::new(),
-                    notes: String::new(),
-                    created_at: now.clone(),
-                    updated_at: now.clone(),
-                    revision: 1,
-                });
 
                 if detection.entity_type != EntityType::Url {
                     let review_item = new_review_item(
@@ -192,7 +123,9 @@ pub fn scan_text(
                         vec![ReviewCandidateMatch {
                             entity_id,
                             score: 1.0,
-                            reasons: vec!["WorkLore created this as a provisional new entity.".to_string()],
+                            reasons: vec![
+                                "WorkLore created this as a provisional new entity.".to_string(),
+                            ],
                         }],
                         &now,
                     );
@@ -206,7 +139,9 @@ pub fn scan_text(
                     .map(|index| ReviewCandidateMatch {
                         entity_id: registry.entities[*index].entity_id.clone(),
                         score: 0.75,
-                        reasons: vec!["Multiple existing entities share this normalized alias.".to_string()],
+                        reasons: vec![
+                            "Multiple existing entities share this normalized alias.".to_string(),
+                        ],
                     })
                     .collect();
                 let review_item = new_review_item(
@@ -239,19 +174,116 @@ pub fn scan_text(
     })
 }
 
-fn collect_detections(text: &str) -> ServiceResult<Vec<Detection>> {
-    let mut detections = Vec::new();
+fn link_confirmed_aliases(
+    registry: &mut PrivateEntityRegistry,
+    record_type: &str,
+    record_id: &str,
+    text: &str,
+    now: &str,
+    processed: &mut HashSet<String>,
+) {
+    for entity in &mut registry.entities {
+        if matches!(entity.status, EntityStatus::Merged | EntityStatus::Archived) {
+            continue;
+        }
 
+        let aliases = entity
+            .aliases
+            .iter()
+            .filter(|alias| alias.status != "rejected")
+            .map(|alias| alias.value.clone())
+            .chain(std::iter::once(entity.canonical_name.clone()))
+            .collect::<Vec<_>>();
+
+        for alias in aliases {
+            for (start, end) in find_case_insensitive_ascii(text, &alias) {
+                let key = format!("{}:{}:{}", entity.entity_id, start, end);
+                if processed.insert(key) {
+                    let detection = Detection {
+                        text: text.get(start..end).unwrap_or_default().to_string(),
+                        normalized: normalize(&alias),
+                        entity_type: entity.entity_type,
+                        extraction_confidence: 1.0,
+                        type_confidence: 1.0,
+                        risk: "low",
+                        start,
+                        end,
+                    };
+                    add_occurrence(
+                        entity,
+                        record_type,
+                        record_id,
+                        text,
+                        &detection,
+                        1.0,
+                        now,
+                    );
+                }
+            }
+        }
+    }
+}
+
+fn create_provisional_entity(
+    registry: &mut PrivateEntityRegistry,
+    record_type: &str,
+    record_id: &str,
+    text: &str,
+    detection: &Detection,
+    now: &str,
+) -> String {
+    let entity_id = format!("entity_{}", Uuid::now_v7());
+    let token = allocate_token(registry, detection.entity_type);
+    let occurrence = occurrence_for(
+        record_type,
+        record_id,
+        text,
+        detection,
+        0.0,
+        now,
+    );
+
+    registry.entities.push(PrivateEntity {
+        schema_version: 1,
+        entity_id: entity_id.clone(),
+        entity_type: detection.entity_type,
+        canonical_name: detection.text.clone(),
+        public_token: token,
+        public_description: None,
+        sensitivity: default_sensitivity(detection.entity_type),
+        status: EntityStatus::Provisional,
+        aliases: vec![EntityAlias {
+            value: detection.text.clone(),
+            normalized_value: detection.normalized.clone(),
+            status: "inferred".to_string(),
+            source: "scan".to_string(),
+        }],
+        relationships: Vec::new(),
+        occurrences: vec![occurrence],
+        redirect_to_entity_id: None,
+        retired_tokens: Vec::new(),
+        notes: String::new(),
+        created_at: now.to_string(),
+        updated_at: now.to_string(),
+        revision: 1,
+    });
+
+    entity_id
+}
+
+fn collect_detections(text: &str) -> Vec<Detection> {
     let patterns: Vec<(Regex, EntityType, f32, f32, &'static str)> = vec![
         (
-            Regex::new(r"(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b").expect("email regex"),
+            Regex::new(r"(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b")
+                .expect("email regex"),
             EntityType::Email,
             0.99,
             0.99,
             "high",
         ),
         (
-            Regex::new(r"(?i)\bhttps?://[^\s<>()\[\]{}]+" ).expect("url regex"),
+            Regex::new(r"(?i)\bhttps?://[^\s<>()\[\]{}]+")
+                .expect("url regex"),
             EntityType::Url,
             0.99,
             0.99,
@@ -267,12 +299,12 @@ fn collect_detections(text: &str) -> ServiceResult<Vec<Detection>> {
         ),
         (
             Regex::new(
-                r"\b(?:[A-Z][A-Za-z0-9&.'-]+\s+){0,5}(?:Inc|LLC|Ltd|Corporation|Corp|Company|Association|Authority|Agency|Department|University|Bank|Group)\b\.?","
+                r"\b(?:[A-Z][A-Za-z0-9&.'-]+\s+){0,5}(?:Inc|LLC|Ltd|Corporation|Corp|Company|Association|Authority|Agency|Department|University|Bank|Group)\b\.?",
             )
             .expect("organization suffix regex"),
             EntityType::Organization,
             0.86,
-            0.8,
+            0.80,
             "medium",
         ),
         (
@@ -284,6 +316,7 @@ fn collect_detections(text: &str) -> ServiceResult<Vec<Detection>> {
         ),
     ];
 
+    let mut detections = Vec::new();
     for (regex, entity_type, extraction, type_confidence, risk) in patterns {
         for matched in regex.find_iter(text) {
             let value = trim_terminal_punctuation(matched.as_str());
@@ -307,7 +340,7 @@ fn collect_detections(text: &str) -> ServiceResult<Vec<Detection>> {
     detections.dedup_by(|left, right| {
         left.start == right.start && left.end == right.end && left.normalized == right.normalized
     });
-    Ok(detections)
+    detections
 }
 
 fn is_common_acronym(value: &str) -> bool {
@@ -329,6 +362,13 @@ fn normalize(value: &str) -> String {
         .collect()
 }
 
+fn is_ignored(registry: &PrivateEntityRegistry, normalized: &str) -> bool {
+    registry
+        .ignored_terms
+        .iter()
+        .any(|ignored| ignored.normalized_value == normalized)
+}
+
 fn entity_matches(entity: &PrivateEntity, normalized: &str) -> bool {
     normalize(&entity.canonical_name) == normalized
         || entity
@@ -338,13 +378,13 @@ fn entity_matches(entity: &PrivateEntity, normalized: &str) -> bool {
             .any(|alias| alias.normalized_value == normalized)
 }
 
-fn find_case_insensitive(haystack: &str, needle: &str) -> Vec<(usize, usize)> {
-    if needle.trim().is_empty() {
+fn find_case_insensitive_ascii(haystack: &str, needle: &str) -> Vec<(usize, usize)> {
+    if needle.trim().is_empty() || !haystack.is_ascii() || !needle.is_ascii() {
         return Vec::new();
     }
 
-    let lower_haystack = haystack.to_lowercase();
-    let lower_needle = needle.to_lowercase();
+    let lower_haystack = haystack.to_ascii_lowercase();
+    let lower_needle = needle.to_ascii_lowercase();
     lower_haystack
         .match_indices(&lower_needle)
         .map(|(start, _)| (start, start + lower_needle.len()))
@@ -370,20 +410,16 @@ fn default_sensitivity(entity_type: EntityType) -> EntitySensitivity {
     }
 }
 
-#[allow(clippy::too_many_arguments)]
 fn add_occurrence(
     entity: &mut PrivateEntity,
     record_type: &str,
     record_id: &str,
     text: &str,
-    start: usize,
-    end: usize,
-    extraction_confidence: f32,
-    type_confidence: f32,
+    detection: &Detection,
     identity_match_confidence: f32,
     now: &str,
 ) {
-    let locator = format!("chars:{start}-{end}");
+    let locator = format!("chars:{}-{}", detection.start, detection.end);
     if let Some(existing) = entity.occurrences.iter_mut().find(|occurrence| {
         occurrence.record_id == record_id && occurrence.locator == locator
     }) {
@@ -395,10 +431,7 @@ fn add_occurrence(
         record_type,
         record_id,
         text,
-        start,
-        end,
-        extraction_confidence,
-        type_confidence,
+        detection,
         identity_match_confidence,
         now,
     ));
@@ -406,15 +439,11 @@ fn add_occurrence(
     entity.revision += 1;
 }
 
-#[allow(clippy::too_many_arguments)]
 fn occurrence_for(
     record_type: &str,
     record_id: &str,
     text: &str,
-    start: usize,
-    end: usize,
-    extraction_confidence: f32,
-    type_confidence: f32,
+    detection: &Detection,
     identity_match_confidence: f32,
     now: &str,
 ) -> EntityOccurrence {
@@ -422,10 +451,13 @@ fn occurrence_for(
         occurrence_id: format!("occurrence_{}", Uuid::now_v7()),
         record_type: record_type.to_string(),
         record_id: record_id.to_string(),
-        locator: format!("chars:{start}-{end}"),
-        matched_text: text.get(start..end).unwrap_or_default().to_string(),
-        extraction_confidence,
-        type_confidence,
+        locator: format!("chars:{}-{}", detection.start, detection.end),
+        matched_text: text
+            .get(detection.start..detection.end)
+            .unwrap_or_default()
+            .to_string(),
+        extraction_confidence: detection.extraction_confidence,
+        type_confidence: detection.type_confidence,
         identity_match_confidence,
         first_seen_at: now.to_string(),
         last_seen_at: now.to_string(),
@@ -473,10 +505,12 @@ fn new_review_item(
 }
 
 fn write_review_item(vault_path: &Path, item: &EntityReviewItem) -> ServiceResult<()> {
-    let path = vault_path
-        .join("privacy/review-items")
-        .join(format!("{}.json", item.review_item_id));
-    write_json_atomic(&path, item)
+    write_json_atomic(
+        &vault_path
+            .join("privacy/review-items")
+            .join(format!("{}.json", item.review_item_id)),
+        item,
+    )
 }
 
 pub fn count_pending_review_items(vault_path: &Path) -> ServiceResult<usize> {
