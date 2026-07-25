@@ -34,26 +34,59 @@ jobs:
         with:
           components: rustfmt, clippy
 
+      - name: Create validation log folder
+        shell: pwsh
+        run: New-Item -ItemType Directory -Force -Path validation-logs | Out-Null
+
       - name: Install frontend dependencies
-        run: npm install
+        shell: pwsh
+        run: |
+          npm install 2>&1 | Tee-Object -FilePath validation-logs/npm-install.log
+          exit $LASTEXITCODE
 
       - name: Validate project references
         shell: pwsh
         run: |
-          python -m pip install pyyaml
-          python refs/tools/validate_refs.py --mode initialized
+          python -m pip install pyyaml 2>&1 | Tee-Object -FilePath validation-logs/pip-install.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python refs/tools/validate_refs.py --mode initialized 2>&1 | Tee-Object -FilePath validation-logs/refs-validation.log
+          exit $LASTEXITCODE
 
       - name: Run frontend tests
-        run: npm run test
+        shell: pwsh
+        run: |
+          npm run test 2>&1 | Tee-Object -FilePath validation-logs/frontend-tests.log
+          exit $LASTEXITCODE
 
       - name: Build frontend
-        run: npm run build
+        shell: pwsh
+        run: |
+          npm run build 2>&1 | Tee-Object -FilePath validation-logs/frontend-build.log
+          exit $LASTEXITCODE
 
       - name: Check Rust formatting
-        run: cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
+        shell: pwsh
+        run: |
+          cargo fmt --manifest-path src-tauri/Cargo.toml --all --check 2>&1 | Tee-Object -FilePath validation-logs/rust-format.log
+          exit $LASTEXITCODE
 
       - name: Run Rust tests
-        run: cargo test --manifest-path src-tauri/Cargo.toml
+        shell: pwsh
+        run: |
+          cargo test --manifest-path src-tauri/Cargo.toml 2>&1 | Tee-Object -FilePath validation-logs/rust-tests.log
+          exit $LASTEXITCODE
 
       - name: Run Rust lints
-        run: cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
+        shell: pwsh
+        run: |
+          cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings 2>&1 | Tee-Object -FilePath validation-logs/rust-clippy.log
+          exit $LASTEXITCODE
+
+      - name: Upload validation logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-logs-${{ github.run_id }}
+          path: validation-logs
+          if-no-files-found: ignore
+          retention-days: 7
