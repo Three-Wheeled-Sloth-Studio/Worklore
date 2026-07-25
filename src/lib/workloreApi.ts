@@ -1,7 +1,10 @@
 import { invoke } from "@tauri-apps/api/core";
 import type {
+  CandidateStatus,
+  CandidateSummary,
   CloudIdentifierMode,
   EntityReviewView,
+  ExtractCandidatesResult,
   ImportSourceResult,
   ResolveEntityReviewRequest,
   ResolveEntityReviewResult,
@@ -61,5 +64,31 @@ export async function resolveEntityReview(
   return invoke<ResolveEntityReviewResult>("resolve_entity_review", {
     vaultPath,
     request,
+  });
+}
+
+export async function extractResumeCandidates(
+  vaultPath: string,
+  sourceId: string,
+): Promise<ExtractCandidatesResult> {
+  return invoke<ExtractCandidatesResult>("extract_resume_candidates", {
+    vaultPath,
+    sourceId,
+  });
+}
+
+export async function listStoryCandidates(vaultPath: string): Promise<CandidateSummary[]> {
+  return invoke<CandidateSummary[]>("list_story_candidates", { vaultPath });
+}
+
+export async function setStoryCandidateStatus(
+  vaultPath: string,
+  candidateId: string,
+  status: CandidateStatus,
+): Promise<CandidateSummary> {
+  return invoke<CandidateSummary>("set_story_candidate_status", {
+    vaultPath,
+    candidateId,
+    status,
   });
 }
