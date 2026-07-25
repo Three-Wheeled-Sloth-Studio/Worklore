@@ -1,6 +1,7 @@
 pub mod candidates;
 pub mod interviews;
 pub mod performance;
+pub mod preferences;
 pub mod privacy;
 pub mod providers;
 pub mod roles;
