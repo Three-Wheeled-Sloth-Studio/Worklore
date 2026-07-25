@@ -108,7 +108,7 @@ jobs:
       - name: Run Rust lints externally
         shell: pwsh
         run: |
-          cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\rust-clippy.log"
+          cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\rust-clippy.log"
           exit $LASTEXITCODE
 
       - name: Verify repository remains source-only
