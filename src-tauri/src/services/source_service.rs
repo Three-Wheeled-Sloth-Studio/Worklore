@@ -255,11 +255,13 @@ fn extract_and_scan(
     let contextual_scan = operation.step("scan_named_projects", empty_metadata(), || {
         scan_named_projects(vault_path, "source", source_id, &extracted.text)
     })?;
+    let scans_complete = base_scan.status == PrivacyScanStatus::Complete
+        && contextual_scan.status == PrivacyScanStatus::Complete;
     let mut review_item_ids = base_scan.review_item_ids;
     review_item_ids.extend(contextual_scan.review_item_ids);
     review_item_ids.sort();
     review_item_ids.dedup();
-    let privacy_status = if review_item_ids.is_empty() {
+    let privacy_status = if review_item_ids.is_empty() && scans_complete {
         PrivacyScanStatus::Complete
     } else {
         PrivacyScanStatus::NeedsReview
