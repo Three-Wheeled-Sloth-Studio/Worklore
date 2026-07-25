@@ -4,22 +4,22 @@ updated: 2026-07-25
 roadmap:
   - id: roadmap-001
     horizon: now
-    status: active
+    status: implemented_pending_validation
     summary: Establish the repository, durable project references, schemas, and initial Tauri application shell.
   - id: roadmap-002
-    horizon: next
-    status: planned
-    summary: Build the local vault, source import, resume extraction, candidate triage, guided interview, and story editing loop.
+    horizon: now
+    status: active
+    summary: Build the local vault, source import, document extraction, resume candidate triage, guided interview, and story editing loop.
   - id: roadmap-003
-    horizon: next
-    status: planned
-    summary: Add the durable Private Entity Registry, automatic content scans, stable redaction tokens, confidence scoring, and user-assisted entity resolution.
+    horizon: now
+    status: active
+    summary: Complete the durable Private Entity Registry, automatic content scans, stable redaction tokens, confidence scoring, and user-assisted entity resolution.
   - id: roadmap-004
-    horizon: later
+    horizon: next
     status: planned
     summary: Add job description matching, local Git repository scanning, parent-folder discovery, and commit clustering.
   - id: roadmap-005
-    horizon: later
+    horizon: next
     status: planned
     summary: Add writing sample analysis, explicit voice controls, and manual LinkedIn content workspace exports.
   - id: roadmap-006
