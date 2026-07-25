@@ -36,7 +36,10 @@ impl Default for AppPreferences {
 
 pub fn get_last_vault_path() -> ServiceResult<Option<String>> {
     let preferences = read_preferences_or_default(&preferences_path()?)?;
-    Ok(existing_directory_value(preferences.last_vault_path, true))
+    Ok(existing_directory_value(
+        preferences.last_vault_path,
+        true,
+    ))
 }
 
 pub fn remember_last_vault(path: &Path) -> ServiceResult<()> {
@@ -164,7 +167,12 @@ mod tests {
 
     #[test]
     fn missing_paths_are_not_returned_as_defaults() {
-        let missing = std::env::temp_dir().join(format!("missing-{}", Utc::now().timestamp_nanos_opt().unwrap_or_default()));
-        assert!(existing_directory_value(Some(missing.to_string_lossy().to_string()), false).is_none());
+        let stamp = Utc::now().timestamp_nanos_opt().unwrap_or_default();
+        let missing = std::env::temp_dir().join(format!("missing-{stamp}"));
+        assert!(existing_directory_value(
+            Some(missing.to_string_lossy().to_string()),
+            false
+        )
+        .is_none());
     }
 }
