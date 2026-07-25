@@ -380,8 +380,9 @@ mod tests {
     #[test]
     fn parses_title_at_organization_without_absorbing_date_text() {
         let registry = initialize_registry("vault_test");
-        let parsed = parse_role_heading("Lead Product Manager at FINRA | 2022 - Present", &registry)
-            .expect("heading should parse");
+        let parsed =
+            parse_role_heading("Lead Product Manager at FINRA | 2022 - Present", &registry)
+                .expect("heading should parse");
         assert_eq!(parsed.organization_name, "FINRA");
         assert_eq!(parsed.title, "Lead Product Manager");
     }
