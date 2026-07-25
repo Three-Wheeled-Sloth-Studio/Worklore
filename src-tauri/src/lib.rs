@@ -12,6 +12,8 @@ use commands::{
     },
     performance::get_performance_snapshot,
     privacy::{list_entity_reviews, resolve_entity_review},
+    providers::create_manual_workspace,
+    stories::{import_story_response, list_stories, set_story_status},
     vault::{create_vault, import_source, list_sources, open_vault, update_cloud_identifier_mode},
 };
 
@@ -34,7 +36,11 @@ pub fn run() {
             list_guided_interviews,
             submit_guided_interview_response,
             resume_guided_interview,
-            get_performance_snapshot
+            get_performance_snapshot,
+            create_manual_workspace,
+            import_story_response,
+            list_stories,
+            set_story_status
         ])
         .run(tauri::generate_context!())
         .expect("error while running WorkLore");
