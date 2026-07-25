@@ -28,17 +28,21 @@ pub fn update_cloud_identifier_mode(
 }
 
 #[tauri::command]
-pub fn import_source(
+pub async fn import_source(
     vault_path: String,
     source_path: String,
     source_type: SourceType,
 ) -> CommandResult<ImportSourceResult> {
-    source_service::import_source(
-        &PathBuf::from(vault_path),
-        &PathBuf::from(source_path),
-        source_type,
-    )
-    .map_err(CommandError::from)
+    tauri::async_runtime::spawn_blocking(move || {
+        source_service::import_source(
+            &PathBuf::from(vault_path),
+            &PathBuf::from(source_path),
+            source_type,
+        )
+        .map_err(CommandError::from)
+    })
+    .await
+    .map_err(CommandError::background_task)?
 }
 
 #[tauri::command]
