@@ -5,24 +5,28 @@ roadmap:
   - id: roadmap-001
     horizon: now
     status: implemented_pending_validation
-    summary: Establish the repository, durable project references, schemas, and initial Tauri application shell.
+    summary: Establish the repository, durable project references, schemas, initial Tauri application shell, and external build boundary.
   - id: roadmap-002
     horizon: now
-    status: active
-    summary: Build the local vault, source import, document extraction, resume candidate triage, guided interview, and story editing loop.
+    status: implemented_pending_validation
+    summary: Complete the first manual story-bank vertical slice from local resume import through work-history candidate extraction, guided interview, privacy-safe synthesis export, strict response import, role linking, and canonical Markdown plus JSON story storage.
   - id: roadmap-003
     horizon: now
     status: active
-    summary: Complete the durable Private Entity Registry, automatic content scans, stable redaction tokens, confidence scoring, and user-assisted entity resolution.
+    summary: Complete the durable Private Entity Registry, automatic content scans, stable redaction tokens, confidence scoring, user-assisted entity resolution, and scan-status reconciliation across sources and stories.
   - id: roadmap-004
     horizon: next
     status: planned
-    summary: Add job description matching, local Git repository scanning, parent-folder discovery, and commit clustering.
+    summary: Add direct Ollama and Gemini providers, story editing, claim and evidence review, undo, and version history.
   - id: roadmap-005
     horizon: next
     status: planned
-    summary: Add writing sample analysis, explicit voice controls, and manual LinkedIn content workspace exports.
+    summary: Add job description matching, local Git repository scanning, parent-folder discovery, and commit clustering.
   - id: roadmap-006
+    horizon: next
+    status: planned
+    summary: Add writing sample analysis, explicit voice controls, and LinkedIn content workspace exports grounded in canonical stories.
+  - id: roadmap-007
     horizon: future
     status: planned
     summary: Add private GitHub account access and an optional hosted WorkLore LLM provider with paid credits.
