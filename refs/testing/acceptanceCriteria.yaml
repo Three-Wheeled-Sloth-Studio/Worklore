@@ -5,8 +5,11 @@ acceptance_criteria:
   - id: ac-vault-001
     area: vault
     status: implemented_pending_validation
-    summary: A user can create a vault in a selected folder.
+    summary: A user can create a vault in its own named folder beneath a selected parent folder.
     criteria:
+      - the selected parent folder is not converted directly into a vault.
+      - a filesystem-safe folder name is derived from the user-facing vault name.
+      - an existing sibling folder is never overwritten; a unique suffix is used instead.
       - vault.json is created with schema version 1 and a stable vault id.
       - canonical source, story, interview, privacy, export, and rebuildable cache folders are created.
       - the default cloud identifier mode is redact.
@@ -20,6 +23,16 @@ acceptance_criteria:
       - source, story, and pending privacy-review counts are returned.
       - missing canonical directories are recreated without replacing user records.
       - stale active-operation records are preserved as interrupted metrics.
+  - id: ac-vault-003
+    area: vault
+    status: implemented_pending_validation
+    summary: A local one-user installation resumes the last valid vault automatically.
+    criteria:
+      - the most recently created or manually opened vault path is stored in local application preferences outside the repository and vault.
+      - the last valid vault opens automatically on the next launch.
+      - a missing or invalid remembered vault falls back to the vault chooser without blocking startup.
+      - opening a different vault replaces the remembered launch default.
+      - choosing Change vault does not delete or modify the current vault.
   - id: ac-source-001
     area: source_import
     status: implemented_pending_validation
