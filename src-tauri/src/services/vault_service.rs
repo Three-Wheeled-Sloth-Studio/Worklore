@@ -11,7 +11,7 @@ use crate::{
     io_utils::{read_json, write_json_atomic},
     services::{
         entity_scan::{count_pending_review_items, initialize_registry, save_registry},
-        performance_service,
+        performance_service, privacy_scan_migration,
     },
 };
 
@@ -111,6 +111,7 @@ pub fn open_vault(path: &Path) -> ServiceResult<VaultSummary> {
         fs::create_dir_all(path.join(directory))?;
     }
     performance_service::recover_interrupted(path)?;
+    privacy_scan_migration::migrate_legacy_review_noise(path)?;
 
     summarize(path, vault)
 }
