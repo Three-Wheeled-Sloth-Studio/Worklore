@@ -1,6 +1,6 @@
 use std::{fs, fs::File, io::Read, path::Path};
 
-use quick_xml::{escape::unescape, events::Event, reader::Reader};
+use quick_xml::{events::Event, reader::Reader};
 
 use crate::error::{ServiceResult, WorkLoreError};
 
@@ -107,9 +107,10 @@ fn extract_wordprocessing_xml(xml: &str) -> ServiceResult<String> {
                 let decoded = event
                     .decode()
                     .map_err(|error| WorkLoreError::DocumentExtraction(error.to_string()))?;
-                let value = unescape(&decoded)
-                    .map_err(|error| WorkLoreError::DocumentExtraction(error.to_string()))?;
-                output.push_str(&value);
+                output.push_str(&decoded);
+            }
+            Ok(Event::GeneralRef(event)) if inside_text => {
+                append_general_reference(&mut output, event.as_ref())?;
             }
             Ok(Event::End(event)) => {
                 let name = event.name();
@@ -132,6 +133,42 @@ fn extract_wordprocessing_xml(xml: &str) -> ServiceResult<String> {
     }
 
     Ok(output)
+}
+
+fn append_general_reference(output: &mut String, reference: &[u8]) -> ServiceResult<()> {
+    match reference {
+        b"amp" => output.push('&'),
+        b"lt" => output.push('<'),
+        b"gt" => output.push('>'),
+        b"apos" => output.push('\''),
+        b"quot" => output.push('"'),
+        value if value.starts_with(b"#x") => {
+            append_numeric_reference(output, &value[2..], 16)?;
+        }
+        value if value.starts_with(b"#") => {
+            append_numeric_reference(output, &value[1..], 10)?;
+        }
+        value => {
+            let name = std::str::from_utf8(value)
+                .map_err(|error| WorkLoreError::DocumentExtraction(error.to_string()))?;
+            output.push('&');
+            output.push_str(name);
+            output.push(';');
+        }
+    }
+    Ok(())
+}
+
+fn append_numeric_reference(output: &mut String, digits: &[u8], radix: u32) -> ServiceResult<()> {
+    let digits = std::str::from_utf8(digits)
+        .map_err(|error| WorkLoreError::DocumentExtraction(error.to_string()))?;
+    let code_point = u32::from_str_radix(digits, radix)
+        .map_err(|error| WorkLoreError::DocumentExtraction(error.to_string()))?;
+    let character = char::from_u32(code_point).ok_or_else(|| {
+        WorkLoreError::DocumentExtraction(format!("Invalid XML code point: {code_point}"))
+    })?;
+    output.push(character);
+    Ok(())
 }
 
 fn has_local_name(qualified_name: &[u8], local_name: &[u8]) -> bool {
@@ -188,6 +225,13 @@ mod tests {
             </w:document>"#;
         let text = extract_wordprocessing_xml(xml).expect("docx XML should parse");
         assert_eq!(clean_extracted_text(&text), "First & second\nNext\tColumn");
+    }
+
+    #[test]
+    fn extracts_numeric_character_references() {
+        let xml = r#"<w:document xmlns:w="urn:test"><w:body><w:p><w:r><w:t>A&#38;B &#x2014; C</w:t></w:r></w:p></w:body></w:document>"#;
+        let text = extract_wordprocessing_xml(xml).expect("numeric references should parse");
+        assert_eq!(clean_extracted_text(&text), "A&B — C");
     }
 
     #[test]
