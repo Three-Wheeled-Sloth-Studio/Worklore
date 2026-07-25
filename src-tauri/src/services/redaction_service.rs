@@ -52,7 +52,7 @@ pub fn redact_for_external_use(vault_path: &Path, input: &str) -> ServiceResult<
     let mut counts: HashMap<String, usize> = HashMap::new();
     let mut replacements =
         replacement_rules(&registry.entities, vault.privacy.cloud_identifier_mode);
-    replacements.sort_by(|left, right| right.alias.len().cmp(&left.alias.len()));
+    replacements.sort_by_key(|rule| std::cmp::Reverse(rule.alias.len()));
 
     for rule in replacements {
         if rule.alias.is_empty() || rule.alias == rule.token {
