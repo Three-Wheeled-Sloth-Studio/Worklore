@@ -22,12 +22,24 @@ import type {
   VaultSummary,
 } from "../domain/types";
 
-export async function createVault(path: string, name: string): Promise<VaultSummary> {
-  return invoke<VaultSummary>("create_vault", { path, name });
+export async function createVault(parentPath: string, name: string): Promise<VaultSummary> {
+  return invoke<VaultSummary>("create_vault_in_parent", { parentPath, name });
 }
 
 export async function openVault(path: string): Promise<VaultSummary> {
   return invoke<VaultSummary>("open_vault", { path });
+}
+
+export async function getLastVaultPath(): Promise<string | null> {
+  return invoke<string | null>("get_last_vault_path");
+}
+
+export async function rememberLastVault(vaultPath: string): Promise<void> {
+  return invoke<void>("remember_last_vault", { vaultPath });
+}
+
+export async function clearLastVault(): Promise<void> {
+  return invoke<void>("clear_last_vault");
 }
 
 export async function importSource(
