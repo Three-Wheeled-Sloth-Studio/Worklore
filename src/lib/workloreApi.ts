@@ -1,7 +1,10 @@
 import { invoke } from "@tauri-apps/api/core";
 import type {
   CloudIdentifierMode,
+  EntityReviewView,
   ImportSourceResult,
+  ResolveEntityReviewRequest,
+  ResolveEntityReviewResult,
   SourceSummary,
   SourceType,
   VaultSummary,
@@ -38,5 +41,25 @@ export async function updateCloudIdentifierMode(
   return invoke<VaultSummary>("update_cloud_identifier_mode", {
     vaultPath,
     mode,
+  });
+}
+
+export async function listEntityReviews(
+  vaultPath: string,
+  pendingOnly = true,
+): Promise<EntityReviewView[]> {
+  return invoke<EntityReviewView[]>("list_entity_reviews", {
+    vaultPath,
+    pendingOnly,
+  });
+}
+
+export async function resolveEntityReview(
+  vaultPath: string,
+  request: ResolveEntityReviewRequest,
+): Promise<ResolveEntityReviewResult> {
+  return invoke<ResolveEntityReviewResult>("resolve_entity_review", {
+    vaultPath,
+    request,
   });
 }
