@@ -13,10 +13,10 @@ use crate::{
         read_json, sanitize_file_name, sha256_file, to_vault_relative, unique_destination,
         write_json_atomic,
     },
-    services::{contextual_entity_scan::scan_named_projects, entity_scan::scan_text},
+    services::{
+        contextual_entity_scan::scan_named_projects, document_extraction, entity_scan::scan_text,
+    },
 };
-
-const TEXT_EXTRACTOR_VERSION: &str = "plain-text-v1";
 
 pub fn import_source(
     vault_path: &Path,
@@ -113,12 +113,21 @@ pub fn import_source(
         source: SourceSummary::from(&document),
         created: true,
         duplicate_detected: false,
-        message: if document.privacy_scan.status == PrivacyScanStatus::NeedsReview {
-            "Source imported. WorkLore found private entities that need review.".to_string()
-        } else if document.extraction.status == ExtractionStatus::Pending {
-            "Source imported. Text extraction and privacy review are queued.".to_string()
-        } else {
-            "Source imported and scanned.".to_string()
+        message: match (
+            document.extraction.status,
+            document.privacy_scan.status,
+        ) {
+            (_, PrivacyScanStatus::NeedsReview) => {
+                "Source imported. WorkLore found private entities that need review.".to_string()
+            }
+            (ExtractionStatus::Unsupported, _) => {
+                "Source imported, but no extractable text was found. OCR is not enabled yet."
+                    .to_string()
+            }
+            (ExtractionStatus::Failed, _) => {
+                "Source copied into the vault, but text extraction failed.".to_string()
+            }
+            _ => "Source imported and scanned.".to_string(),
         },
     })
 }
@@ -160,75 +169,37 @@ fn extract_and_scan(
     extension: &str,
     now: &str,
 ) -> ServiceResult<(ExtractionState, PrivacyScanState)> {
-    if !matches!(extension, "txt" | "md") {
-        return Ok((
-            ExtractionState {
-                status: ExtractionStatus::Pending,
-                extractor_version: None,
-                text_path: None,
-                character_count: 0,
-                warnings: vec![
-                    "PDF and DOCX extraction will be added in the document parsing slice."
-                        .to_string(),
-                ],
-                error: None,
-            },
-            PrivacyScanState {
-                status: PrivacyScanStatus::Pending,
-                scan_version: None,
-                scanned_at: None,
-                review_item_ids: Vec::new(),
-            },
-        ));
-    }
-
-    match fs::read_to_string(destination) {
-        Ok(text) => {
-            let extracted_path = vault_path
-                .join(".worklore/extraction-cache")
-                .join(format!("{source_id}.txt"));
-            fs::write(&extracted_path, &text)?;
-
-            let base_scan = scan_text(vault_path, "source", source_id, &text)?;
-            let contextual_scan = scan_named_projects(vault_path, "source", source_id, &text)?;
-            let mut review_item_ids = base_scan.review_item_ids;
-            review_item_ids.extend(contextual_scan.review_item_ids);
-            review_item_ids.sort();
-            review_item_ids.dedup();
-            let privacy_status = if review_item_ids.is_empty() {
-                PrivacyScanStatus::Complete
-            } else {
-                PrivacyScanStatus::NeedsReview
-            };
-
-            Ok((
+    let extracted = match document_extraction::extract(destination, extension) {
+        Ok(extracted) => extracted,
+        Err(error) => {
+            return Ok((
                 ExtractionState {
-                    status: ExtractionStatus::Complete,
-                    extractor_version: Some(TEXT_EXTRACTOR_VERSION.to_string()),
-                    text_path: Some(to_vault_relative(vault_path, &extracted_path)?),
-                    character_count: text.chars().count(),
+                    status: ExtractionStatus::Failed,
+                    extractor_version: None,
+                    text_path: None,
+                    character_count: 0,
                     warnings: Vec::new(),
-                    error: None,
+                    error: Some(error.to_string()),
                 },
                 PrivacyScanState {
-                    status: privacy_status,
-                    scan_version: Some(format!(
-                        "{}+{}",
-                        base_scan.scan_version, contextual_scan.scan_version
-                    )),
-                    scanned_at: Some(contextual_scan.scanned_at),
-                    review_item_ids,
+                    status: PrivacyScanStatus::Unavailable,
+                    scan_version: None,
+                    scanned_at: Some(now.to_string()),
+                    review_item_ids: Vec::new(),
                 },
-            ))
+            ));
         }
-        Err(error) if error.kind() == std::io::ErrorKind::InvalidData => Ok((
+    };
+
+    if extracted.text.trim().is_empty() {
+        return Ok((
             ExtractionState {
-                status: ExtractionStatus::Failed,
-                extractor_version: Some(TEXT_EXTRACTOR_VERSION.to_string()),
+                status: ExtractionStatus::Unsupported,
+                extractor_version: Some(extracted.extractor_version),
                 text_path: None,
                 character_count: 0,
-                warnings: Vec::new(),
-                error: Some("The text file is not valid UTF-8.".to_string()),
+                warnings: extracted.warnings,
+                error: None,
             },
             PrivacyScanState {
                 status: PrivacyScanStatus::Unavailable,
@@ -236,9 +207,45 @@ fn extract_and_scan(
                 scanned_at: Some(now.to_string()),
                 review_item_ids: Vec::new(),
             },
-        )),
-        Err(error) => Err(error.into()),
+        ));
     }
+
+    let extracted_path = vault_path
+        .join(".worklore/extraction-cache")
+        .join(format!("{source_id}.txt"));
+    fs::write(&extracted_path, &extracted.text)?;
+
+    let base_scan = scan_text(vault_path, "source", source_id, &extracted.text)?;
+    let contextual_scan = scan_named_projects(vault_path, "source", source_id, &extracted.text)?;
+    let mut review_item_ids = base_scan.review_item_ids;
+    review_item_ids.extend(contextual_scan.review_item_ids);
+    review_item_ids.sort();
+    review_item_ids.dedup();
+    let privacy_status = if review_item_ids.is_empty() {
+        PrivacyScanStatus::Complete
+    } else {
+        PrivacyScanStatus::NeedsReview
+    };
+
+    Ok((
+        ExtractionState {
+            status: ExtractionStatus::Complete,
+            extractor_version: Some(extracted.extractor_version),
+            text_path: Some(to_vault_relative(vault_path, &extracted_path)?),
+            character_count: extracted.text.chars().count(),
+            warnings: extracted.warnings,
+            error: None,
+        },
+        PrivacyScanState {
+            status: privacy_status,
+            scan_version: Some(format!(
+                "{}+{}",
+                base_scan.scan_version, contextual_scan.scan_version
+            )),
+            scanned_at: Some(contextual_scan.scanned_at),
+            review_item_ids,
+        },
+    ))
 }
 
 fn normalized_extension(path: &Path) -> ServiceResult<String> {
