@@ -12,9 +12,7 @@ use crate::{
     },
     error::{ServiceResult, WorkLoreError},
     io_utils::{read_json, write_json_atomic},
-    services::{
-        performance_service::OperationSession, redaction_service::redact_for_external_use,
-    },
+    services::{performance_service::OperationSession, redaction_service::redact_for_external_use},
 };
 
 pub fn create_manual_workspace(
