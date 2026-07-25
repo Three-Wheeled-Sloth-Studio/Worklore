@@ -13,6 +13,7 @@ use commands::{
     performance::get_performance_snapshot,
     privacy::{list_entity_reviews, resolve_entity_review},
     providers::create_manual_workspace,
+    roles::list_roles,
     stories::{import_story_response, list_stories, set_story_status},
     vault::{create_vault, import_source, list_sources, open_vault, update_cloud_identifier_mode},
 };
@@ -38,6 +39,7 @@ pub fn run() {
             resume_guided_interview,
             get_performance_snapshot,
             create_manual_workspace,
+            list_roles,
             import_story_response,
             list_stories,
             set_story_status
