@@ -14,6 +14,7 @@ if (-not (Get-Command cargo -ErrorAction SilentlyContinue)) {
     throw "cargo was not found. Install the Rust toolchain and reopen the terminal."
 }
 
+Show-WorkLoreLegacyBuildWarning
 $layout = Get-WorkLoreBuildLayout -Channel "dev"
 Initialize-WorkLoreBuildLayout -Layout $layout
 $env:WORKLORE_BUILD_CHANNEL = "dev"
@@ -26,5 +27,7 @@ if (-not (Test-Path "node_modules")) {
     npm install
 }
 
-Write-Host "Development compilation: $($layout.CargoTarget)"
+Write-Host "Repository: $repoRoot"
+Write-Host "External build root: $($layout.BuildRoot)"
+Write-Host "Cargo compilation cache: $($layout.CargoTarget)"
 npm run desktop:dev:raw
