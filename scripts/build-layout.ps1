@@ -46,16 +46,30 @@ function Assert-OutsideWorkLoreRepo {
     }
 }
 
+function Get-WorkLoreDefaultExternalRoot {
+    $repoRoot = Get-WorkLoreRepoRoot
+    $repoParent = Split-Path -Parent $repoRoot
+    $repoFolderName = Split-Path -Leaf $repoRoot
+
+    # Keep large Cargo and bundler output on the same drive as the checkout while
+    # preserving a hard boundary between source files and generated artifacts.
+    return Get-NormalizedPath (Join-Path $repoParent "WorkLoreExternal\$repoFolderName")
+}
+
+function Get-WorkLoreLegacyExternalRoot {
+    if (-not $env:LOCALAPPDATA) {
+        return $null
+    }
+
+    return Get-NormalizedPath (Join-Path $env:LOCALAPPDATA "WorkLore")
+}
+
 function Get-WorkLoreExternalRoot {
     if ($env:WORKLORE_EXTERNAL_ROOT) {
         $root = Get-NormalizedPath $env:WORKLORE_EXTERNAL_ROOT
     }
-    elseif ($env:LOCALAPPDATA) {
-        $root = Get-NormalizedPath (Join-Path $env:LOCALAPPDATA "WorkLore")
-    }
     else {
-        $repoParent = Split-Path -Parent (Get-WorkLoreRepoRoot)
-        $root = Get-NormalizedPath (Join-Path $repoParent "WorkLoreExternal")
+        $root = Get-WorkLoreDefaultExternalRoot
     }
 
     Assert-OutsideWorkLoreRepo -Path $root -Purpose "WorkLore external root"
@@ -116,4 +130,18 @@ function Initialize-WorkLoreBuildLayout {
     New-Item -ItemType Directory -Force -Path $Layout.FrontendDist | Out-Null
     New-Item -ItemType Directory -Force -Path $Layout.CargoTarget | Out-Null
     New-Item -ItemType Directory -Force -Path $Layout.LogsRoot | Out-Null
+}
+
+function Show-WorkLoreLegacyBuildWarning {
+    $legacyRoot = Get-WorkLoreLegacyExternalRoot
+    if (-not $legacyRoot) {
+        return
+    }
+
+    $legacyBuildRoot = Join-Path $legacyRoot "build"
+    $currentExternalRoot = Get-WorkLoreExternalRoot
+    if ((Test-Path $legacyBuildRoot) -and -not (Test-PathInside -Candidate $legacyBuildRoot -Parent $currentExternalRoot)) {
+        Write-Warning "Legacy WorkLore build files remain on the system drive at: $legacyBuildRoot"
+        Write-Warning "After closing WorkLore, run cleanup-legacy-build.bat to reclaim that space. Vaults and preferences are not removed."
+    }
 }
