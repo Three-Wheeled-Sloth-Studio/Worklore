@@ -1,0 +1,126 @@
+name: Validate WorkLore
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - qa
+      - main
+  pull_request:
+    branches:
+      - qa
+      - main
+    types:
+      - ready_for_review
+      - reopened
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: windows-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Initialize external validation folders
+        shell: pwsh
+        run: |
+          $externalRoot = Join-Path $env:RUNNER_TEMP "WorkLore"
+          $buildRoot = Join-Path $externalRoot "build\validate"
+          $frontendDist = Join-Path $buildRoot "frontend"
+          $cargoTarget = Join-Path $buildRoot "cargo-target"
+          $logRoot = Join-Path $externalRoot "logs"
+
+          "WORKLORE_EXTERNAL_ROOT=$externalRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "WORKLORE_BUILD_ROOT=$buildRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "WORKLORE_FRONTEND_DIST=$frontendDist" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "CARGO_TARGET_DIR=$cargoTarget" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "VALIDATION_LOG_ROOT=$logRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+          New-Item -ItemType Directory -Force -Path $buildRoot | Out-Null
+          New-Item -ItemType Directory -Force -Path $frontendDist | Out-Null
+          New-Item -ItemType Directory -Force -Path $cargoTarget | Out-Null
+          New-Item -ItemType Directory -Force -Path $logRoot | Out-Null
+          ./scripts/assert-repo-clean.ps1
+
+      - name: Validate external build layout
+        shell: pwsh
+        run: |
+          ./scripts/validate-build-layout.ps1 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\build-layout.log"
+          exit $LASTEXITCODE
+
+      - name: Install frontend dependencies
+        shell: pwsh
+        run: |
+          npm install 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\npm-install.log"
+          exit $LASTEXITCODE
+
+      - name: Validate project references
+        shell: pwsh
+        run: |
+          python -m pip install pyyaml 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\pip-install.log"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python refs/tools/validate_refs.py --mode initialized 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\refs-validation.log"
+          exit $LASTEXITCODE
+
+      - name: Run frontend tests
+        shell: pwsh
+        run: |
+          npm run test 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\frontend-tests.log"
+          exit $LASTEXITCODE
+
+      - name: Build frontend externally
+        shell: pwsh
+        run: |
+          npm run build:frontend 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\frontend-build.log"
+          exit $LASTEXITCODE
+
+      - name: Run Rust tests externally
+        shell: pwsh
+        run: |
+          cargo test --manifest-path src-tauri/Cargo.toml 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\rust-tests.log"
+          exit $LASTEXITCODE
+
+      - name: Run Rust lints externally
+        shell: pwsh
+        run: |
+          cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\rust-clippy.log"
+          exit $LASTEXITCODE
+
+      - name: Check Rust formatting
+        shell: pwsh
+        run: |
+          cargo fmt --manifest-path src-tauri/Cargo.toml --all --check 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\rust-format.log"
+          exit $LASTEXITCODE
+
+      - name: Verify repository remains source-only
+        if: always()
+        shell: pwsh
+        run: ./scripts/assert-repo-clean.ps1
+
+      - name: Upload validation logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-logs-${{ github.run_id }}
+          path: ${{ runner.temp }}\WorkLore\logs
+          if-no-files-found: ignore
+          retention-days: 7

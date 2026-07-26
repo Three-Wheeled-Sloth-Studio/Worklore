@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://worklore.local/schemas/provider-settings.schema.json",
+  "title": "WorkLore Provider Settings",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "defaultProvider",
+    "cloudIdentifierMode",
+    "ollama",
+    "gemini",
+    "manualWorkspace",
+    "updatedAt"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "defaultProvider": {
+      "type": "string",
+      "enum": [
+        "ollama",
+        "gemini",
+        "manual"
+      ]
+    },
+    "cloudIdentifierMode": {
+      "type": "string",
+      "enum": [
+        "redact",
+        "include"
+      ],
+      "default": "redact"
+    },
+    "ollama": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baseUrl",
+        "model",
+        "enabled"
+      ],
+      "properties": {
+        "baseUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:11434"
+        },
+        "model": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "gemini": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model",
+        "credentialKeyId",
+        "enabled"
+      ],
+      "properties": {
+        "model": {
+          "type": "string",
+          "default": "gemini-3.6-flash"
+        },
+        "credentialKeyId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Opaque operating system credential store lookup key. Never contains the secret itself."
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "manualWorkspace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "preferredTarget",
+        "enabled"
+      ],
+      "properties": {
+        "preferredTarget": {
+          "type": "string",
+          "enum": [
+            "chatgpt",
+            "claude",
+            "gemini",
+            "generic"
+          ],
+          "default": "generic"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

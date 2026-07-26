@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "WorkLore",
+  "version": "0.1.0",
+  "identifier": "org.threewheeledsloth.worklore",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1427",
+    "beforeBuildCommand": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/tauri-before-build.ps1",
+    "frontendDist": "../../WorkLoreBuild/frontend"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "WorkLore",
+        "width": 1280,
+        "height": 820,
+        "minWidth": 900,
+        "minHeight": 620,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [],
+    "category": "Productivity",
+    "shortDescription": "Turn career evidence into reusable stories.",
+    "longDescription": "WorkLore is a local-first career story bank for turning resumes, documents, and project history into evidence-backed professional stories."
+  }
+}

@@ -1,0 +1,210 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://worklore.local/schemas/entity-review-item.schema.json",
+  "title": "WorkLore Entity Review Item",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "reviewItemId",
+    "recordType",
+    "recordId",
+    "locator",
+    "matchedText",
+    "suggestedEntityType",
+    "scores",
+    "candidateMatches",
+    "risk",
+    "status",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "reviewItemId": {
+      "type": "string",
+      "pattern": "^review_[A-Za-z0-9_-]+$"
+    },
+    "recordType": {
+      "type": "string",
+      "enum": [
+        "source",
+        "story",
+        "interview",
+        "candidate",
+        "voice_profile",
+        "job",
+        "git_snapshot",
+        "other"
+      ]
+    },
+    "recordId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "locator": {
+      "type": "string",
+      "minLength": 1
+    },
+    "contextExcerpt": {
+      "type": "string",
+      "default": ""
+    },
+    "matchedText": {
+      "type": "string",
+      "minLength": 1
+    },
+    "normalizedText": {
+      "type": "string",
+      "minLength": 1
+    },
+    "suggestedEntityType": {
+      "type": "string"
+    },
+    "scores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "extraction",
+        "type",
+        "bestIdentityMatch"
+      ],
+      "properties": {
+        "extraction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "type": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "bestIdentityMatch": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "candidateMatches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "entityId",
+          "score",
+          "reasons"
+        ],
+        "properties": {
+          "entityId": {
+            "type": "string",
+            "pattern": "^entity_[A-Za-z0-9_-]+$"
+          },
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "risk": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "auto_linked",
+        "resolved_same_entity",
+        "resolved_related_entity",
+        "resolved_new_entity",
+        "ignored",
+        "dismissed"
+      ]
+    },
+    "resolution": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "resolvedAt",
+        "resolvedBy"
+      ],
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "same_entity",
+            "related_entity",
+            "new_entity",
+            "ignore_term",
+            "dismiss"
+          ]
+        },
+        "entityId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "relatedEntityId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "canonicalName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "resolvedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "resolvedBy": {
+          "type": "string",
+          "enum": [
+            "user",
+            "rule",
+            "migration"
+          ]
+        },
+        "notes": {
+          "type": "string",
+          "default": ""
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

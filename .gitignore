@@ -2,6 +2,10 @@
 node_modules/
 dist/
 build/
+artifacts/
+release/
+qa-install/
+validation-logs/
 coverage/
 *.log
 npm-debug.log*

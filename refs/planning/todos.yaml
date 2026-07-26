@@ -11,26 +11,78 @@ todos:
     area: repository
     summary: Add a user-facing README, defensive gitignore, security policy, and durable refs structure.
   - id: task-003
-    status: open
+    status: complete
     area: product
     summary: Write the MVP product requirements and acceptance criteria for the story bank core.
   - id: task-004
-    status: open
+    status: complete
     area: data
     summary: Define canonical schemas for vault metadata, sources, roles, stories, interviews, jobs, voice profiles, and private entities.
   - id: task-005
-    status: open
+    status: active
     area: privacy
-    summary: Specify entity extraction, durable identity matching, confidence thresholds, review workflows, stable tokens, merge, split, and rehydration behavior.
+    summary: Implement durable entity extraction, identity matching, confidence review, stable tokens, merge redirects, and record-scan reconciliation.
   - id: task-006
-    status: open
+    status: implemented_pending_validation
     area: architecture
-    summary: Scaffold the Tauri 2, React, TypeScript, and Rust application.
+    summary: Scaffold the Tauri 2, React, TypeScript, and Rust application with vault and source import commands.
   - id: task-007
-    status: open
+    status: active
     area: providers
-    summary: Define the provider contract for Ollama, Gemini bring-your-own-key, and manual workspace packages.
+    summary: Implement the provider contract for Ollama, Gemini bring-your-own-key, and manual workspace packages. The manual workspace path is implemented; direct providers remain open.
   - id: task-008
-    status: open
+    status: complete
     area: testing
     summary: Create synthetic fixtures for resumes, job descriptions, writing samples, entity ambiguity, and Git history.
+  - id: task-009
+    status: active
+    area: validation
+    summary: Keep Windows CI green for frontend, refs, Rust formatting, tests, clippy, and repository/build separation.
+  - id: task-010
+    status: implemented_pending_validation
+    area: parsing
+    summary: Add local PDF and DOCX text extraction and route extracted text through the entity scan pipeline.
+  - id: task-011
+    status: active
+    area: privacy
+    summary: Complete and validate private entity review and reconcile resolved reviews back into source and story scan status.
+  - id: task-012
+    status: implemented_pending_validation
+    area: stories
+    summary: Extract only recognized work-history resume bullets into triageable story candidates while ignoring headline titles and non-employment sections.
+  - id: task-013
+    status: implemented_pending_validation
+    area: stories
+    summary: Implement the resumable guided interview and evidence-labeling state machine.
+  - id: task-014
+    status: implemented_pending_validation
+    area: observability
+    summary: Record local operation phases and durations without storing private source content in performance metrics.
+  - id: task-015
+    status: implemented_pending_validation
+    area: distribution
+    summary: Enforce external development, build, QA staging, and QA installation paths outside the repository.
+  - id: task-016
+    status: complete
+    area: licensing
+    summary: Apply AGPL-3.0-only to WorkLore and document the public-repository licensing default and exception review.
+  - id: task-017
+    status: planned
+    area: security
+    summary: Implement vault-level encryption after the first technical workflow test and before broad public distribution.
+  - id: task-018
+    status: implemented_pending_validation
+    area: stories
+    summary: Export privacy-safe manual AI synthesis workspaces and import strict structured responses into paired Markdown and JSON story records.
+  - id: task-019
+    status: implemented_pending_validation
+    area: roles
+    summary: Infer canonical employment roles from work-history headings and link discrete stories to those roles without using headline resume titles.
+  - id: task-020
+    status: open
+    area: stories
+    summary: Add full story editing, claim review, evidence inspection, undo, and version-history controls.
+  - id: task-021
+    status: open
+    area: providers
+    summary: Implement direct Ollama and Gemini adapters behind the provider-neutral structured operation contract.
