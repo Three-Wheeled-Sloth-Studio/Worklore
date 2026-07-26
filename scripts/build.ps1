@@ -22,6 +22,7 @@ if (-not (Get-Command cargo -ErrorAction SilentlyContinue)) {
     throw "cargo was not found. Install the Rust toolchain and reopen the terminal."
 }
 
+Show-WorkLoreLegacyBuildWarning
 $layout = Get-WorkLoreBuildLayout -Channel $Channel
 Initialize-WorkLoreBuildLayout -Layout $layout -Clean:$Clean
 
@@ -31,6 +32,7 @@ $env:WORKLORE_FRONTEND_DIST = $layout.FrontendDist
 $env:CARGO_TARGET_DIR = $layout.CargoTarget
 
 Write-Host "Repository: $repoRoot"
+Write-Host "External root: $($layout.ExternalRoot)"
 Write-Host "Build root: $($layout.BuildRoot)"
 Write-Host "Cargo target: $($layout.CargoTarget)"
 Write-Host "Frontend output: $($layout.FrontendDist)"
@@ -92,6 +94,7 @@ $manifest = [ordered]@{
     channel = $Channel
     builtAt = (Get-Date).ToUniversalTime().ToString("o")
     repository = $repoRoot
+    externalRoot = $layout.ExternalRoot
     buildRoot = $layout.BuildRoot
     frontendDist = $layout.FrontendDist
     cargoTarget = $layout.CargoTarget
