@@ -226,7 +226,7 @@ export interface InspirationRelationshipMutationResult {
 }
 
 
-export type TargetContextLifecycle = "active" | "archived";
+export type TargetContextLifecycle = "active" | "stale" | "archived";
 export type TargetContextRelationKind = "topic" | "theme" | "story";
 
 export interface TargetContextSource {

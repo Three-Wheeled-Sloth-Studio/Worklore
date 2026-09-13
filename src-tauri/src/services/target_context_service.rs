@@ -20,6 +20,7 @@ use crate::{
 #[serde(rename_all = "snake_case")]
 pub enum TargetContextLifecycle {
     Active,
+    Stale,
     Archived,
 }
 
@@ -27,6 +28,7 @@ impl TargetContextLifecycle {
     fn as_str(self) -> &'static str {
         match self {
             Self::Active => "active",
+            Self::Stale => "stale",
             Self::Archived => "archived",
         }
     }
@@ -34,6 +36,7 @@ impl TargetContextLifecycle {
     fn parse(value: &str) -> ServiceResult<Self> {
         match value {
             "active" => Ok(Self::Active),
+            "stale" => Ok(Self::Stale),
             "archived" => Ok(Self::Archived),
             _ => Err(WorkLoreError::InvalidVault(format!(
                 "Unknown Target Context lifecycle {value}."
@@ -1317,7 +1320,7 @@ mod tests {
             UpdateTargetContextRequest {
                 target_id: before.target_id.clone(),
                 title: "Director of Product — synthetic".into(),
-                lifecycle: TargetContextLifecycle::Active,
+                lifecycle: TargetContextLifecycle::Stale,
                 source_url: Some("https://example.com/jobs/product".into()),
                 organization_name: Some("Synthetic Health Co".into()),
                 role_title: Some("Director of Product".into()),
@@ -1333,8 +1336,10 @@ mod tests {
         )
         .expect("update");
         assert_eq!(updated.target_id, before.target_id);
+        assert_eq!(updated.lifecycle, TargetContextLifecycle::Stale);
         assert_eq!(updated.revision, before.revision + 1);
         let reopened = load_target_context(&path, &before.target_id).expect("reopen");
+        assert_eq!(reopened.lifecycle, TargetContextLifecycle::Stale);
         assert_eq!(
             reopened.organization_name.as_deref(),
             Some("Synthetic Health Co")

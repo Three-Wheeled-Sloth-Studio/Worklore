@@ -18,6 +18,7 @@ import "../target-context.css";
 
 const LIFECYCLES: Array<{ value: TargetContextLifecycle; label: string }> = [
   { value: "active", label: "Active" },
+  { value: "stale", label: "Stale" },
   { value: "archived", label: "Archived" },
 ];
 
