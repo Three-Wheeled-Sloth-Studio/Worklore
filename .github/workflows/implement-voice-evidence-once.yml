@@ -53,6 +53,10 @@ jobs:
         shell: pwsh
         run: python .github/scripts/apply_voice_evidence_slice.py
 
+      - name: Correct generated Voice Evidence matchers
+        shell: pwsh
+        run: python .github/scripts/fix_voice_evidence_slice.py
+
       - name: Format Rust changes
         shell: pwsh
         run: cargo fmt --manifest-path src-tauri/Cargo.toml --all
