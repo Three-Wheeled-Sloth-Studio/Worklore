@@ -126,7 +126,7 @@ todos:
   - id: task-030
     status: planned
     area: targeting
-    summary: Next bounded Phase 1 slice: make Target Context a durable working object beginning with job descriptions, extracting/storing contextual responsibilities, skills, concepts, and language without keyword stuffing, fabricated standing, or single-JD overfitting.
+    summary: "Next bounded Phase 1 slice: make Target Context a durable working object beginning with job descriptions, extracting/storing contextual responsibilities, skills, concepts, and language without keyword stuffing, fabricated standing, or single-JD overfitting."
   - id: task-031
     status: planned
     area: voice
