@@ -7,6 +7,7 @@ pub mod performance;
 pub mod preferences;
 pub mod privacy;
 pub mod providers;
+pub mod quality;
 pub mod roles;
 pub mod stories;
 pub mod target_contexts;

@@ -25,3 +25,4 @@ pub mod vault_service;
 pub mod voice_analysis_service;
 pub mod voice_evidence_service;
 pub mod voice_profile_service;
+pub mod writing_lint_service;

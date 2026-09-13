@@ -33,6 +33,7 @@ use commands::{
         analyze_voice_evidence, create_manual_workspace, get_provider_settings,
         list_provider_models, test_provider_connection, update_provider_settings,
     },
+    quality::lint_draft,
     roles::list_roles,
     stories::{import_story_response, list_stories, set_story_status},
     target_contexts::{
@@ -145,6 +146,7 @@ pub fn run() {
             list_provider_models,
             test_provider_connection,
             analyze_voice_evidence,
+            lint_draft,
             list_roles,
             import_story_response,
             list_stories,

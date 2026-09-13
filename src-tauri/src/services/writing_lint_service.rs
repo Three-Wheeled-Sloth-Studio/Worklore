@@ -1,16 +1,4 @@
-from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[2]
-
-
-def replace_once(path: Path, old: str, new: str) -> None:
-    text = path.read_text(encoding="utf-8")
-    if old not in text:
-        raise RuntimeError(f"Expected anchor not found in {path}: {old[:120]!r}")
-    path.write_text(text.replace(old, new, 1), encoding="utf-8")
-
-
-writing_lint_service = r'''use std::path::Path;
+use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
@@ -383,16 +371,28 @@ fn lint_writing_rule(
             let start = find_case_insensitive(text, &phrase)?;
             (
                 (start, start + phrase.len()),
-                format!("Active Writing Rule '{}' bans the phrase '{}'.", rule.name, phrase),
-                Some(format!("Remove or rewrite the banned phrase required by '{}'.", rule.name)),
+                format!(
+                    "Active Writing Rule '{}' bans the phrase '{}'.",
+                    rule.name, phrase
+                ),
+                Some(format!(
+                    "Remove or rewrite the banned phrase required by '{}'.",
+                    rule.name
+                )),
             )
         }
         DeterministicWritingRule::BanWord(word) => {
             let start = find_word_case_insensitive(text, &word)?;
             (
                 (start, start + word.len()),
-                format!("Active Writing Rule '{}' bans the word '{}'.", rule.name, word),
-                Some(format!("Replace the banned word required by '{}'.", rule.name)),
+                format!(
+                    "Active Writing Rule '{}' bans the word '{}'.",
+                    rule.name, word
+                ),
+                Some(format!(
+                    "Replace the banned word required by '{}'.",
+                    rule.name
+                )),
             )
         }
         DeterministicWritingRule::ForbidPunctuation(kind) => {
@@ -404,7 +404,11 @@ fn lint_writing_rule(
                     rule.name,
                     kind.label()
                 ),
-                Some(format!("Remove or replace the {} required by '{}'.", kind.label(), rule.name)),
+                Some(format!(
+                    "Remove or replace the {} required by '{}'.",
+                    kind.label(),
+                    rule.name
+                )),
             )
         }
     };
@@ -612,7 +616,10 @@ mod tests {
 
     #[test]
     fn rhetorical_question_opening_is_deterministic_and_located() {
-        let result = lint_text_with_rules("What happens when the handoff is unclear? The queue grows.", &[]);
+        let result = lint_text_with_rules(
+            "What happens when the handoff is unclear? The queue grows.",
+            &[],
+        );
         let finding = result
             .findings
             .iter()
@@ -676,10 +683,22 @@ mod tests {
     #[test]
     fn only_active_explicit_writing_rules_are_enforced() {
         let rules = vec![
-            rule("active", "ban phrase: game changer", WritingRuleStatus::Active),
+            rule(
+                "active",
+                "ban phrase: game changer",
+                WritingRuleStatus::Active,
+            ),
             rule("proposed", "ban word: synergy", WritingRuleStatus::Proposed),
-            rule("disabled", "ban word: leverage", WritingRuleStatus::Disabled),
-            rule("retired", "forbid punctuation: em dash", WritingRuleStatus::Retired),
+            rule(
+                "disabled",
+                "ban word: leverage",
+                WritingRuleStatus::Disabled,
+            ),
+            rule(
+                "retired",
+                "forbid punctuation: em dash",
+                WritingRuleStatus::Retired,
+            ),
         ];
         let result = lint_text_with_rules(
             "This game changer gives us synergy and leverage — but only one active rule should fire.",
@@ -694,7 +713,10 @@ mod tests {
         assert_eq!(result.enforceable_writing_rule_count, 1);
         assert_eq!(writing_findings.len(), 1);
         assert_eq!(writing_findings[0].rule_id, "writing_rule:active");
-        assert_eq!(writing_findings[0].matched_text.as_deref(), Some("game changer"));
+        assert_eq!(
+            writing_findings[0].matched_text.as_deref(),
+            Some("game changer")
+        );
     }
 
     #[test]
@@ -769,9 +791,18 @@ mod tests {
             .iter()
             .any(|item| item.rule_id == format!("writing_rule:{}", created.rule_id)));
 
-        assert_eq!(before_rules, voice_profile_service::list_writing_rules(&path).unwrap());
-        assert_eq!(before_voices, voice_profile_service::list_core_voices(&path).unwrap());
-        assert_eq!(before_tones, voice_profile_service::list_tone_modes(&path).unwrap());
+        assert_eq!(
+            before_rules,
+            voice_profile_service::list_writing_rules(&path).unwrap()
+        );
+        assert_eq!(
+            before_voices,
+            voice_profile_service::list_core_voices(&path).unwrap()
+        );
+        assert_eq!(
+            before_tones,
+            voice_profile_service::list_tone_modes(&path).unwrap()
+        );
         assert_eq!(
             before_directions,
             voice_profile_service::list_voice_directions(&path).unwrap()
@@ -780,86 +811,3 @@ mod tests {
         std::fs::remove_dir_all(path).unwrap();
     }
 }
-'''
-
-quality_command = r'''use std::path::PathBuf;
-
-use crate::{
-    error::{CommandError, CommandResult},
-    services::writing_lint_service::{self, LintDraftRequest, LintDraftResult},
-};
-
-#[tauri::command]
-pub fn lint_draft(vault_path: String, request: LintDraftRequest) -> CommandResult<LintDraftResult> {
-    writing_lint_service::lint_draft(&PathBuf::from(vault_path), request).map_err(CommandError::from)
-}
-'''
-
-(ROOT / "src-tauri/src/services/writing_lint_service.rs").write_text(
-    writing_lint_service, encoding="utf-8"
-)
-(ROOT / "src-tauri/src/commands/quality.rs").write_text(quality_command, encoding="utf-8")
-
-replace_once(
-    ROOT / "src-tauri/src/services/mod.rs",
-    "pub mod voice_profile_service;\n",
-    "pub mod voice_profile_service;\npub mod writing_lint_service;\n",
-)
-replace_once(
-    ROOT / "src-tauri/src/commands/mod.rs",
-    "pub mod providers;\n",
-    "pub mod providers;\npub mod quality;\n",
-)
-replace_once(
-    ROOT / "src-tauri/src/lib.rs",
-    "    providers::{\n        analyze_voice_evidence, create_manual_workspace, get_provider_settings,\n        list_provider_models, test_provider_connection, update_provider_settings,\n    },\n    roles::list_roles,\n",
-    "    providers::{\n        analyze_voice_evidence, create_manual_workspace, get_provider_settings,\n        list_provider_models, test_provider_connection, update_provider_settings,\n    },\n    quality::lint_draft,\n    roles::list_roles,\n",
-)
-replace_once(
-    ROOT / "src-tauri/src/lib.rs",
-    "            analyze_voice_evidence,\n            list_roles,\n",
-    "            analyze_voice_evidence,\n            lint_draft,\n            list_roles,\n",
-)
-
-replace_once(
-    ROOT / "src/domain/types.ts",
-    "export interface UpdateWritingRuleRequest extends CreateWritingRuleRequest {\n  ruleId: string;\n  status: WritingRuleStatus;\n}\n\nexport interface ProviderSettings {",
-    '''export interface UpdateWritingRuleRequest extends CreateWritingRuleRequest {\n  ruleId: string;\n  status: WritingRuleStatus;\n}\n\nexport type LintSeverity = "advisory" | "warning";\nexport type LintCategory =\n  | "opening_pattern"\n  | "engagement_bait"\n  | "hashtags"\n  | "structure"\n  | "writing_rule";\nexport type LintSourceKind = "built_in" | "writing_rule";\n\nexport interface LintDraftRequest {\n  text: string;\n}\n\nexport interface LintFinding {\n  ruleId: string;\n  category: LintCategory;\n  severity: LintSeverity;\n  reason: string;\n  remediation: string | null;\n  matchedText: string | null;\n  startOffset: number | null;\n  endOffset: number | null;\n  sourceKind: LintSourceKind;\n  sourceId: string | null;\n}\n\nexport interface UnsupportedWritingRule {\n  ruleId: string;\n  name: string;\n  instruction: string;\n  reason: string;\n}\n\nexport interface LintDraftResult {\n  findings: LintFinding[];\n  activeWritingRuleCount: number;\n  enforceableWritingRuleCount: number;\n  unsupportedWritingRules: UnsupportedWritingRule[];\n}\n\nexport interface ProviderSettings {''',
-)
-
-replace_once(
-    ROOT / "src/lib/workloreApi.ts",
-    "  UpdateWritingRuleRequest,\n  ProviderSettings,\n",
-    "  UpdateWritingRuleRequest,\n  LintDraftRequest,\n  LintDraftResult,\n  ProviderSettings,\n",
-)
-replace_once(
-    ROOT / "src/lib/workloreApi.ts",
-    "export async function getProviderSettings(): Promise<ProviderSettings> {\n",
-    '''export async function lintDraft(\n  vaultPath: string,\n  request: LintDraftRequest,\n): Promise<LintDraftResult> {\n  return invoke<LintDraftResult>("lint_draft", { vaultPath, request });\n}\n\nexport async function getProviderSettings(): Promise<ProviderSettings> {\n''',
-)
-
-replace_once(
-    ROOT / "src/components/VoiceWorkspace.tsx",
-    "  WritingRuleRecord,\n  WritingRuleStatus,\n} from \"../domain/types\";",
-    "  WritingRuleRecord,\n  WritingRuleStatus,\n  LintDraftResult,\n} from \"../domain/types\";",
-)
-replace_once(
-    ROOT / "src/components/VoiceWorkspace.tsx",
-    "  listWritingRules,\n  reviewVoiceEvidence,\n",
-    "  listWritingRules,\n  lintDraft,\n  reviewVoiceEvidence,\n",
-)
-replace_once(
-    ROOT / "src/components/VoiceWorkspace.tsx",
-    "  const [ruleInstruction, setRuleInstruction] = useState(\"\");\n  const [providerSettings, setProviderSettings] = useState<ProviderSettings | null>(null);",
-    "  const [ruleInstruction, setRuleInstruction] = useState(\"\");\n  const [lintText, setLintText] = useState(\"\");\n  const [lintResult, setLintResult] = useState<LintDraftResult | null>(null);\n  const [providerSettings, setProviderSettings] = useState<ProviderSettings | null>(null);",
-)
-replace_once(
-    ROOT / "src/components/VoiceWorkspace.tsx",
-    "  async function addRule() {\n",
-    '''  async function runDraftLint() {\n    if (!lintText.trim()) return;\n    setBusy("Checking draft patterns deterministically");\n    setNotice(null);\n    setError(null);\n    try {\n      const result = await lintDraft(vaultPath, { text: lintText });\n      setLintResult(result);\n      setNotice(\n        result.findings.length > 0\n          ? `${result.findings.length} explainable pattern finding${result.findings.length === 1 ? "" : "s"} returned. No score was calculated and nothing was changed.`\n          : "No deterministic pattern findings for this draft. No score was calculated and nothing was changed.",\n      );\n    } catch (caught) {\n      setError(errorMessage(caught));\n    } finally {\n      setBusy(null);\n    }\n  }\n\n  async function addRule() {\n''',
-)
-replace_once(
-    ROOT / "src/components/VoiceWorkspace.tsx",
-    '''      <section className="workspace-panel" aria-labelledby="rules-heading">\n        <div className="panel-heading-row"><div><p className="eyebrow">Behavioral constraints</p><h2 id="rules-heading">Writing Rules</h2></div><span className="status-pill">{rules.length}</span></div>\n        <div className="voice-form-grid"><input value={ruleName} onChange={(event) => setRuleName(event.target.value)} placeholder="Rule name" /><textarea value={ruleInstruction} onChange={(event) => setRuleInstruction(event.target.value)} placeholder="Explicit instruction" rows={2} /><button className="secondary-button compact" disabled={busy !== null || !ruleName.trim() || !ruleInstruction.trim()} onClick={() => void addRule()}>Add proposed rule</button></div>\n        <div className="voice-card-list">{rules.map((item) => <article className="voice-model-card" key={item.ruleId}><div className="voice-card-heading"><div><h3>{item.name}</h3><p className="voice-preview">{item.instruction}</p></div><span className="status-pill">{item.status}</span></div><div className="support-actions">{item.status === "proposed" ? <button className="primary-button compact" onClick={() => void setRuleStatus(item, "active")}>Activate</button> : null}{item.status === "active" ? <button className="quiet-button compact" onClick={() => void setRuleStatus(item, "disabled")}>Disable</button> : null}{item.status === "disabled" ? <button className="secondary-button compact" onClick={() => void setRuleStatus(item, "active")}>Enable</button> : null}{item.status !== "retired" ? <button className="quiet-button compact" onClick={() => void setRuleStatus(item, "retired")}>Retire</button> : null}</div></article>)}</div>\n      </section>\n\n      {busy ?''',
-    '''      <section className="workspace-panel" aria-labelledby="rules-heading">\n        <div className="panel-heading-row"><div><p className="eyebrow">Behavioral constraints</p><h2 id="rules-heading">Writing Rules</h2></div><span className="status-pill">{rules.length}</span></div>\n        <div className="voice-form-grid"><input value={ruleName} onChange={(event) => setRuleName(event.target.value)} placeholder="Rule name" /><textarea value={ruleInstruction} onChange={(event) => setRuleInstruction(event.target.value)} placeholder="Explicit instruction" rows={2} /><button className="secondary-button compact" disabled={busy !== null || !ruleName.trim() || !ruleInstruction.trim()} onClick={() => void addRule()}>Add proposed rule</button></div>\n        <p className="voice-rule">Deterministic enforcement currently understands active rules written as <code>ban phrase: ...</code>, <code>ban word: ...</code>, or <code>forbid punctuation: em dash|en dash|semicolon|exclamation mark|ellipsis</code>. Other active rules remain advisory rather than becoming hidden regexes.</p>\n        <div className="voice-card-list">{rules.map((item) => <article className="voice-model-card" key={item.ruleId}><div className="voice-card-heading"><div><h3>{item.name}</h3><p className="voice-preview">{item.instruction}</p></div><span className="status-pill">{item.status}</span></div><div className="support-actions">{item.status === "proposed" ? <button className="primary-button compact" onClick={() => void setRuleStatus(item, "active")}>Activate</button> : null}{item.status === "active" ? <button className="quiet-button compact" onClick={() => void setRuleStatus(item, "disabled")}>Disable</button> : null}{item.status === "disabled" ? <button className="secondary-button compact" onClick={() => void setRuleStatus(item, "active")}>Enable</button> : null}{item.status !== "retired" ? <button className="quiet-button compact" onClick={() => void setRuleStatus(item, "retired")}>Retire</button> : null}</div></article>)}</div>\n      </section>\n\n      <section className="workspace-panel" aria-labelledby="draft-lint-heading">\n        <div className="panel-heading-row">\n          <div><p className="eyebrow">Provider-free challenge</p><h2 id="draft-lint-heading">Draft Pattern Check</h2></div>\n          <span className="status-pill">deterministic</span>\n        </div>\n        <p>Paste a draft for a transient check against explainable single-draft patterns and active machine-enforceable Writing Rules. This does not call a provider, calculate an AI probability, create a quality score, or save the draft.</p>\n        <textarea value={lintText} onChange={(event) => setLintText(event.target.value)} rows={8} placeholder="Paste a draft to challenge. The text stays transient in this view." />\n        <div className="support-actions"><button className="secondary-button compact" disabled={busy !== null || !lintText.trim()} onClick={() => void runDraftLint()}>Check draft patterns</button></div>\n        {lintResult ? (\n          <div className="voice-analysis-results">\n            <p className="voice-meta">Active Writing Rules: {lintResult.activeWritingRuleCount} | machine-enforceable: {lintResult.enforceableWritingRuleCount} | findings: {lintResult.findings.length}</p>\n            {lintResult.findings.length === 0 ? <p className="voice-rule">No deterministic findings. This is not a claim that the draft is perfect or human-written.</p> : (\n              <div className="voice-card-list">\n                {lintResult.findings.map((finding, index) => (\n                  <article className="voice-model-card" key={`${finding.ruleId}-${finding.startOffset ?? "global"}-${index}`}>\n                    <div className="voice-card-heading"><div><h3>{finding.category.replaceAll("_", " ")}</h3><p className="voice-meta">{finding.ruleId} | {finding.sourceKind}</p></div><span className={`status-pill ${finding.severity === "warning" ? "attention" : ""}`}>{finding.severity}</span></div>\n                    <p>{finding.reason}</p>\n                    {finding.matchedText ? <p className="voice-preview">Matched: {finding.matchedText}</p> : null}\n                    {finding.startOffset !== null && finding.endOffset !== null ? <p className="voice-meta">UTF-16 offsets {finding.startOffset}-{finding.endOffset}</p> : null}\n                    {finding.remediation ? <p className="voice-rule">Challenge: {finding.remediation}</p> : null}\n                  </article>\n                ))}\n              </div>\n            )}\n            {lintResult.unsupportedWritingRules.length > 0 ? (\n              <div className="voice-card-list">\n                {lintResult.unsupportedWritingRules.map((rule) => (\n                  <article className="voice-model-card" key={rule.ruleId}>\n                    <div className="voice-card-heading"><div><h3>{rule.name}</h3><p className="voice-meta">Active rule is advisory only</p></div><span className="status-pill attention">not auto-enforced</span></div>\n                    <p className="voice-preview">{rule.instruction}</p><p className="voice-rule">{rule.reason}</p>\n                  </article>\n                ))}\n              </div>\n            ) : null}\n          </div>\n        ) : null}\n      </section>\n\n      {busy ?''',
-)

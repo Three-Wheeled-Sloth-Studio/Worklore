@@ -14,6 +14,7 @@ import type {
   VoiceSourceCandidate,
   WritingRuleRecord,
   WritingRuleStatus,
+  LintDraftResult,
 } from "../domain/types";
 import { errorMessage } from "../domain/types";
 import {
@@ -32,6 +33,7 @@ import {
   listVoiceEvidence,
   listVoiceSourceCandidates,
   listWritingRules,
+  lintDraft,
   reviewVoiceEvidence,
   saveCoreVoiceTrait,
   setVoiceDirectionStatus,
@@ -76,6 +78,8 @@ export function VoiceWorkspace({ vaultPath }: { vaultPath: string }) {
   const [directionRationale, setDirectionRationale] = useState("");
   const [ruleName, setRuleName] = useState("");
   const [ruleInstruction, setRuleInstruction] = useState("");
+  const [lintText, setLintText] = useState("");
+  const [lintResult, setLintResult] = useState<LintDraftResult | null>(null);
   const [providerSettings, setProviderSettings] = useState<ProviderSettings | null>(null);
   const [analysisEvidenceIds, setAnalysisEvidenceIds] = useState<string[]>([]);
   const [analysisGuidance, setAnalysisGuidance] = useState("");
@@ -366,6 +370,26 @@ export function VoiceWorkspace({ vaultPath }: { vaultPath: string }) {
     );
   }
 
+  async function runDraftLint() {
+    if (!lintText.trim()) return;
+    setBusy("Checking draft patterns deterministically");
+    setNotice(null);
+    setError(null);
+    try {
+      const result = await lintDraft(vaultPath, { text: lintText });
+      setLintResult(result);
+      setNotice(
+        result.findings.length > 0
+          ? `${result.findings.length} explainable pattern finding${result.findings.length === 1 ? "" : "s"} returned. No score was calculated and nothing was changed.`
+          : "No deterministic pattern findings for this draft. No score was calculated and nothing was changed.",
+      );
+    } catch (caught) {
+      setError(errorMessage(caught));
+    } finally {
+      setBusy(null);
+    }
+  }
+
   async function addRule() {
     if (!ruleName.trim() || !ruleInstruction.trim()) return;
     await run(
@@ -605,7 +629,46 @@ export function VoiceWorkspace({ vaultPath }: { vaultPath: string }) {
       <section className="workspace-panel" aria-labelledby="rules-heading">
         <div className="panel-heading-row"><div><p className="eyebrow">Behavioral constraints</p><h2 id="rules-heading">Writing Rules</h2></div><span className="status-pill">{rules.length}</span></div>
         <div className="voice-form-grid"><input value={ruleName} onChange={(event) => setRuleName(event.target.value)} placeholder="Rule name" /><textarea value={ruleInstruction} onChange={(event) => setRuleInstruction(event.target.value)} placeholder="Explicit instruction" rows={2} /><button className="secondary-button compact" disabled={busy !== null || !ruleName.trim() || !ruleInstruction.trim()} onClick={() => void addRule()}>Add proposed rule</button></div>
+        <p className="voice-rule">Deterministic enforcement currently understands active rules written as <code>ban phrase: ...</code>, <code>ban word: ...</code>, or <code>forbid punctuation: em dash|en dash|semicolon|exclamation mark|ellipsis</code>. Other active rules remain advisory rather than becoming hidden regexes.</p>
         <div className="voice-card-list">{rules.map((item) => <article className="voice-model-card" key={item.ruleId}><div className="voice-card-heading"><div><h3>{item.name}</h3><p className="voice-preview">{item.instruction}</p></div><span className="status-pill">{item.status}</span></div><div className="support-actions">{item.status === "proposed" ? <button className="primary-button compact" onClick={() => void setRuleStatus(item, "active")}>Activate</button> : null}{item.status === "active" ? <button className="quiet-button compact" onClick={() => void setRuleStatus(item, "disabled")}>Disable</button> : null}{item.status === "disabled" ? <button className="secondary-button compact" onClick={() => void setRuleStatus(item, "active")}>Enable</button> : null}{item.status !== "retired" ? <button className="quiet-button compact" onClick={() => void setRuleStatus(item, "retired")}>Retire</button> : null}</div></article>)}</div>
+      </section>
+
+      <section className="workspace-panel" aria-labelledby="draft-lint-heading">
+        <div className="panel-heading-row">
+          <div><p className="eyebrow">Provider-free challenge</p><h2 id="draft-lint-heading">Draft Pattern Check</h2></div>
+          <span className="status-pill">deterministic</span>
+        </div>
+        <p>Paste a draft for a transient check against explainable single-draft patterns and active machine-enforceable Writing Rules. This does not call a provider, calculate an AI probability, create a quality score, or save the draft.</p>
+        <textarea value={lintText} onChange={(event) => setLintText(event.target.value)} rows={8} placeholder="Paste a draft to challenge. The text stays transient in this view." />
+        <div className="support-actions"><button className="secondary-button compact" disabled={busy !== null || !lintText.trim()} onClick={() => void runDraftLint()}>Check draft patterns</button></div>
+        {lintResult ? (
+          <div className="voice-analysis-results">
+            <p className="voice-meta">Active Writing Rules: {lintResult.activeWritingRuleCount} | machine-enforceable: {lintResult.enforceableWritingRuleCount} | findings: {lintResult.findings.length}</p>
+            {lintResult.findings.length === 0 ? <p className="voice-rule">No deterministic findings. This is not a claim that the draft is perfect or human-written.</p> : (
+              <div className="voice-card-list">
+                {lintResult.findings.map((finding, index) => (
+                  <article className="voice-model-card" key={`${finding.ruleId}-${finding.startOffset ?? "global"}-${index}`}>
+                    <div className="voice-card-heading"><div><h3>{finding.category.replaceAll("_", " ")}</h3><p className="voice-meta">{finding.ruleId} | {finding.sourceKind}</p></div><span className={`status-pill ${finding.severity === "warning" ? "attention" : ""}`}>{finding.severity}</span></div>
+                    <p>{finding.reason}</p>
+                    {finding.matchedText ? <p className="voice-preview">Matched: {finding.matchedText}</p> : null}
+                    {finding.startOffset !== null && finding.endOffset !== null ? <p className="voice-meta">UTF-16 offsets {finding.startOffset}-{finding.endOffset}</p> : null}
+                    {finding.remediation ? <p className="voice-rule">Challenge: {finding.remediation}</p> : null}
+                  </article>
+                ))}
+              </div>
+            )}
+            {lintResult.unsupportedWritingRules.length > 0 ? (
+              <div className="voice-card-list">
+                {lintResult.unsupportedWritingRules.map((rule) => (
+                  <article className="voice-model-card" key={rule.ruleId}>
+                    <div className="voice-card-heading"><div><h3>{rule.name}</h3><p className="voice-meta">Active rule is advisory only</p></div><span className="status-pill attention">not auto-enforced</span></div>
+                    <p className="voice-preview">{rule.instruction}</p><p className="voice-rule">{rule.reason}</p>
+                  </article>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </section>
 
       {busy ? <p className="voice-rule">{busy}</p> : null}

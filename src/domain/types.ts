@@ -476,6 +476,46 @@ export interface UpdateWritingRuleRequest extends CreateWritingRuleRequest {
   status: WritingRuleStatus;
 }
 
+export type LintSeverity = "advisory" | "warning";
+export type LintCategory =
+  | "opening_pattern"
+  | "engagement_bait"
+  | "hashtags"
+  | "structure"
+  | "writing_rule";
+export type LintSourceKind = "built_in" | "writing_rule";
+
+export interface LintDraftRequest {
+  text: string;
+}
+
+export interface LintFinding {
+  ruleId: string;
+  category: LintCategory;
+  severity: LintSeverity;
+  reason: string;
+  remediation: string | null;
+  matchedText: string | null;
+  startOffset: number | null;
+  endOffset: number | null;
+  sourceKind: LintSourceKind;
+  sourceId: string | null;
+}
+
+export interface UnsupportedWritingRule {
+  ruleId: string;
+  name: string;
+  instruction: string;
+  reason: string;
+}
+
+export interface LintDraftResult {
+  findings: LintFinding[];
+  activeWritingRuleCount: number;
+  enforceableWritingRuleCount: number;
+  unsupportedWritingRules: UnsupportedWritingRule[];
+}
+
 export interface ProviderSettings {
   selectedProviderId: string | null;
   ollamaBaseUrl: string;

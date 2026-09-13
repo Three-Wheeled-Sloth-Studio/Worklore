@@ -63,6 +63,8 @@ import type {
   WritingRuleRecord,
   CreateWritingRuleRequest,
   UpdateWritingRuleRequest,
+  LintDraftRequest,
+  LintDraftResult,
   ProviderSettings,
   UpdateProviderSettingsRequest,
   ProviderModel,
@@ -101,6 +103,13 @@ export async function getLastImportDirectory(): Promise<string | null> {
 
 export async function rememberLastImportFile(filePath: string): Promise<string> {
   return invoke<string>("remember_last_import_file", { filePath });
+}
+
+export async function lintDraft(
+  vaultPath: string,
+  request: LintDraftRequest,
+): Promise<LintDraftResult> {
+  return invoke<LintDraftResult>("lint_draft", { vaultPath, request });
 }
 
 export async function getProviderSettings(): Promise<ProviderSettings> {
