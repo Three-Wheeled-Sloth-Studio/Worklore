@@ -1,7 +1,7 @@
 ---
 type: Handoff Prompt
 title: Next WorkLore Development Slice
-description: Bounded prompt for direct Story Seed guided development on the validated save-first Capture foundation.
+description: Bounded prompt for durable Topics and Themes on the validated Capture and direct Story Seed development foundation.
 status: draft
 tags: [handoff, next-slice]
 ---
@@ -15,19 +15,19 @@ Work directly on `dev`. Do not promote `qa` or `main` unless explicitly requeste
 
 ## Accepted Starting Point
 
-Canonical SQLite persistence and save-first Capture are complete.
+Canonical SQLite persistence, save-first Capture, and direct Story Seed guided development are complete.
 
-Validated Capture code checkpoint:
+Validated Story Seed development code checkpoint:
 
-`c1dc3e4cbd164d88166ae1008fc32f09ca1ff0a4`
+`f3c4824b9dce08814e50fb7bb9916aa9a768d09a`
 
 Validation evidence:
 
-- Actions run `34755608799`
-- Job `103719339322`
+- Actions run `34757490749`
+- Job `103724285496`
 - case-collision, refs, agent-context, diff, frontend build, rustfmt, and Clippy checks green
 - frontend tests: 3 passed, 0 failed
-- Rust tests: 56 passed, 0 failed
+- Rust tests: 62 passed, 0 failed
 
 Read `refs/handoffs/currentHandoff.md` for the complete delta and current branch state before making changes.
 
@@ -36,7 +36,7 @@ Read `refs/handoffs/currentHandoff.md` for the complete delta and current branch
 From the repository root, first run:
 
 ```powershell
-python refs/tools/generate_agent_context.py --focus "WorkLore direct Story Seed guided development and interview target generalization"
+python refs/tools/generate_agent_context.py --focus "WorkLore durable Topics Themes proof relationships and evergreen timely lifecycle"
 ```
 
 Treat the generated packet as derived orientation, not project truth. Load only the authoritative refs and source files needed for this slice.
@@ -47,115 +47,152 @@ Read at minimum:
 - `refs/architecture/vaultFormat.md`
 - `refs/UI/designPrinciples.md`
 - `refs/handoffs/currentHandoff.md`
-- `src-tauri/src/services/capture_service.rs`
 - `src-tauri/src/services/canonical_store.rs`
-- `src-tauri/src/services/interview_service.rs`
-- `src-tauri/src/domain/interviews.rs`
-- `src-tauri/src/domain/candidates.rs`
-- `src-tauri/src/services/story_service.rs`
-- `src-tauri/src/commands/interviews.rs`
-- the current thin Capture/Interview frontend surfaces after understanding the service contracts
+- `src-tauri/src/services/capture_service.rs`
+- `src-tauri/src/services/seed_development_service.rs`
+- the existing canonical Story/Proof/Theme/Topic table and relationship definitions
+- `src-tauri/src/lib.rs`
+- `src/domain/types.ts`
+- `src/lib/workloreApi.ts`
+- the current thin Capture/Story frontend surfaces after understanding the service contracts
 
 ## Immediate Objective
 
-Implement `task-027`: generalize guided Story development so a directly captured Story Seed can be developed without a resume candidate or Role.
+Implement `task-028`: make Topic Candidates and Themes durable working objects with explicit relationships and evergreen-versus-timely metadata.
 
-The target flow is:
+Target flow:
 
-`captured Story Seed -> guided gap questions -> classified answers/evidence -> developing Story`
+`captured topic -> classify evergreen/timely -> connect themes/stories/proof -> inspect standing/context -> manage lifecycle`
 
-The hard architectural rule is that a canonical `seed_` or `story_` record becomes the interview target. Do not manufacture a fake `candidate_` record merely to reuse the prototype service.
+The hard semantic rule is that a Topic is an idea/work object, not Evidence. Stories and Proof Points can establish the user's standing; Inspiration and Target Context may inform the Topic but cannot silently become evidence about the user.
 
-Do not begin the broad workspace/navigation rewrite in this slice.
+Do not begin discovery, Voice, Posts, analytics, or the broad workspace/navigation rewrite in this slice.
 
-### 1. Generalize the interview target
+### 1. Topic as a first-class canonical object
 
-The current guided interview service is candidate-centric. It starts from `StoryCandidate`, reads candidate missing fields, asks questions against the candidate claim, updates candidate state, and reloads that candidate for response/resume operations.
+Capture already creates `topic_` records. Add a reusable canonical repository/service boundary so Topics can be created, loaded, listed, and updated independently of the Capture screen.
 
-Introduce a reusable target abstraction that can represent at least:
+Preserve stable Topic IDs.
 
-- a canonical Story Seed;
-- a canonical Story;
-- the legacy resume-candidate path through a compatibility adapter where still needed.
+Support the accepted lifecycle:
 
-New direct-seed sessions should persist canonically using the existing `interview_sessions.target_seed_id` / `target_story_id` boundary or a compatible schema migration if evidence shows one is needed.
+- captured;
+- exploring;
+- ready;
+- drafted;
+- parked;
+- retired.
 
-Candidate IDs may remain migration/prototype provenance, but must not be the required new-domain interview identity.
+Do not delete or recreate the Topic merely because lifecycle or metadata changes.
 
-### 2. Preserve useful interview behavior
+### 2. Evergreen versus timely metadata
 
-Retain and generalize the current mechanics rather than rewriting them gratuitously:
+Add explicit topic timing metadata with a narrow deterministic contract.
 
-- deterministic completeness fields;
-- bounded question rounds;
-- one active question at a time;
-- Answer, Skip, and Do Not Remember actions;
-- Confirmed Fact, User Estimate, Uncertain, and Not Applicable answer classifications;
-- confidence/completeness behavior;
-- deterministic question selection;
-- restart/resume semantics;
-- prevention of duplicate active interviews for the same target.
+At minimum support:
 
-Use the Story Seed title/summary, or Story narrative where appropriate, as the initial context passed into question generation.
+- evergreen;
+- timely.
 
-### 3. Canonical persistence and evidence
+For a timely Topic, support local user-entered relevance/freshness information such as a relevant-until date/time and/or note when useful. The exact schema may be refined based on current persistence conventions, but it must be auditable and portable.
 
-For directly captured Story Seeds:
+Hard rules:
 
-- start and resume interview state from canonical SQLite;
-- retain the stable `seed_` target ID through reopen;
-- persist classified user answers with provenance suitable for later promotion to Evidence Records;
-- do not require Role context;
-- preserve existing Private Entity Registry and privacy/provider preflight boundaries when content leaves local-only workflows.
+- no provider/network call is required;
+- WorkLore does not claim a Topic is currently timely unless the user or a future qualified discovery workflow supplies that context;
+- changing evergreen/timely classification does not change Topic identity;
+- clearing stale timely metadata is reversible and must not discard provenance.
 
-Prefer extending the canonical interview repository boundary over adding new JSON-only concepts. Prototype interview JSON may remain supported for legacy candidate compatibility during migration.
+A schema migration is acceptable if required. Keep it transactional and versioned.
 
-### 4. Story development outcome
+### 3. Durable Themes
 
-When enough information exists, allow the user to create or update a developing Story from the Story Seed.
+Make Theme a usable first-class canonical object rather than only an existing table.
 
-At minimum:
+Support:
 
-- Story ID is canonical and stable;
-- Story -> Story Seed lineage is explicit through the relationship model;
-- useful confirmed/estimated answers remain attributable to the interview/seed rather than being flattened into unattributed prose;
-- Story creation does not require Role;
-- source/capture provenance remains reachable from the Story Seed lineage.
+- create/load/list/update;
+- emerging, active, and retired lifecycle;
+- stable Theme identity;
+- optional descriptive text.
 
-Do not implement final voice/content drafting behavior here.
+Theme lifecycle must remain independent of Topic lifecycle.
 
-### 5. Preserve the resume bootstrap path
+### 4. Explicit Topic relationships
 
-`Seed from resume` remains an optional bootstrap path, not a deprecated broken path.
+Use the existing typed many-to-many relationship model. Support deterministic add/remove/list operations for Topic relationships to at least:
 
-Existing candidate-driven interviews must continue to work while the new canonical target model becomes primary. Prefer an adapter that maps candidate claim/missing-field behavior into the generalized interview engine rather than maintaining two independent question engines.
+- Story;
+- Proof Point;
+- Theme;
+- Inspiration;
+- Target Context.
 
-Do not force migrated or current candidates to become fake direct captures merely to satisfy the new path.
+Use explicit relationship types and stable semantic IDs.
 
-### 6. Thin UI only
+Required behavior:
 
-Add only the UI needed to exercise the real direct-seed development path, for example:
+- repeated identical add is idempotent;
+- removal removes only the relationship, not either semantic record;
+- load/detail APIs can return enough relationship identity/type information for later workspace surfaces;
+- provenance/audit remains attributable;
+- no relationship automatically changes the semantic class of either side.
 
-- a Develop action on a captured item classified as Story Seed;
-- the current interview panel accepting a direct Story Seed target;
-- clear indication of which seed/story is being developed;
-- resume/reopen behavior for that target.
+### 5. Standing versus context
 
-Do not migrate all current panels into Home/Stories routes yet. The broad navigation shell remains a separate controlled slice.
+Expose enough deterministic information for a future Topics workspace to distinguish:
 
-### 7. Proof cases
+- user standing: explicit linked Story/Proof Point material;
+- organizing context: Theme;
+- creative/contextual input: Inspiration;
+- audience/opportunity context: Target Context.
+
+Do not create a fake standing score in this slice. Counts or explicit connection lists are sufficient.
+
+Do not auto-promote Inspiration or Target Context into Evidence, Proof Point, Story, or Voice Evidence.
+
+### 6. Bounded API and thin UI
+
+Expose stable Tauri/application APIs for Topic/Theme CRUD and relationship management. Keep SQLite details out of React.
+
+Add only enough UI to exercise the real canonical path, for example:
+
+- open a captured Topic Candidate;
+- edit title/summary/lifecycle/timing class;
+- create/select a Theme;
+- inspect/add/remove explicit relationships using existing records where practical.
+
+A compact Topic detail/editor embedded in the current shell is acceptable.
+
+Do not migrate all existing screens into the future primary navigation in this slice.
+
+### 7. Preserve current flows
+
+Keep green:
+
+- save-first Capture and Topic classification from Capture;
+- direct Story Seed guided development;
+- legacy candidate/resume interview path;
+- Source/Inspiration/Target Context separation;
+- privacy infrastructure;
+- optional resume bootstrap.
+
+Do not change direct Story Seed development back into a provider-dependent workflow.
+
+### 8. Proof cases
 
 Add synthetic tests proving at least:
 
-- a directly captured Story Seed can start an interview without a resume candidate;
-- the same interview survives reopen and remains attached to the same `seed_` ID;
-- starting the same target again resumes/reuses the active interview instead of forking duplicates;
-- Answer, Skip, Do Not Remember, and answer-classification semantics remain correct for direct seeds;
-- guided questions are grounded in the Story Seed context rather than a resume bullet;
-- a sufficiently developed Story Seed can create or update a developing Story with explicit seed lineage;
-- no Role is required;
-- legacy candidate-driven interview behavior remains green;
-- privacy/provider preparation does not bypass existing local redaction/preflight behavior.
+- a Capture-created Topic Candidate survives reopen and can be loaded/edited through the Topic API;
+- Topic lifecycle changes preserve identity;
+- evergreen/timely metadata is explicit and provider-free;
+- timely metadata can be set, changed, and cleared without changing Topic identity;
+- Theme lifecycle is independent from Topic lifecycle;
+- a Topic can connect to multiple Themes, Stories, and Proof Points;
+- repeated identical relationship creation is idempotent;
+- removing a relationship does not delete its Topic or target record;
+- Inspiration and Target Context relationships remain contextual and create no Evidence/Proof records;
+- existing Capture and Story Seed development tests remain green.
 
 ## Constraints
 
@@ -164,10 +201,11 @@ Add synthetic tests proving at least:
 - No WorkLore-hosted backend, account, or proprietary sync.
 - No automatic publishing or scheduling.
 - No Voice implementation yet.
-- No Topics, Posts, analytics, discovery, or provider expansion beyond what existing interview/provider seams require.
+- No Posts or analytics.
+- No news/current-event discovery or trend ranking.
+- No provider requirement for Topic persistence, timing metadata, or relationships.
 - No broad navigation rewrite.
-- No fake candidate records for direct Story Seed development.
-- Preserve Private Entity Registry behavior and privacy preflight.
+- Preserve Private Entity Registry behavior and privacy preflight where applicable.
 - Preserve the public repository boundary and use synthetic fixtures only.
 - Keep build/dev/QA output outside the repository and default it to the checkout drive.
 - Run the Git-index case-collision guard before finalizing path changes.
@@ -193,6 +231,6 @@ Batch meaningful changes before pushing. Avoid repeated CI churn on draft PR #1.
 
 ## Stop Point
 
-Stop after a directly captured Story Seed can be developed through the generalized guided interview path, reopen safely, and produce/update a developing Story with canonical seed lineage while the legacy candidate path remains green.
+Stop after Topics and Themes are durable first-class local objects, evergreen/timely metadata is explicit, typed Topic relationships are manageable and idempotent, the thin UI exercises the canonical path, and the delta handoff is updated.
 
-Do not continue into the full navigation rewrite, Topics, Voice, Posts, or Insights in the same slice.
+Do not continue into Inspiration extraction, Target Context ideation, discovery, Voice, Posts, Insights, or the full navigation rewrite in the same slice.
