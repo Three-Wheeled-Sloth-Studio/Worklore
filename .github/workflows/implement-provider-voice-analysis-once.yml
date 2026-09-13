@@ -1,4 +1,4 @@
-# retry after Clippy audit-parameter correction
+# retry after provider audit test-call correction
 name: One-shot provider voice analysis implementation
 
 on:
