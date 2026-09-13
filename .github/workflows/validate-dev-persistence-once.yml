@@ -39,15 +39,15 @@ jobs:
           names = [
               "pub struct StorySeedRecord",
               "pub struct CanonicalStoryRecord",
-              "pub fn schema_version",
-              "pub fn create_story_seed",
-              "pub fn load_story_seed",
-              "pub fn create_story",
-              "pub fn load_story",
-              "pub fn create_evidence",
-              "pub fn create_inspiration",
-              "pub fn create_target_context",
-              "fn normalized_title",
+              "pub fn schema_version(",
+              "pub fn create_story_seed(",
+              "pub fn load_story_seed(",
+              "pub fn create_story(\n",
+              "pub fn load_story(",
+              "pub fn create_evidence(",
+              "pub fn create_inspiration(",
+              "pub fn create_target_context(\n",
+              "fn normalized_title(",
           ]
           for name in names:
               replacement = "#[allow(dead_code)]\n" + name
