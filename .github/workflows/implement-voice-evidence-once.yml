@@ -1,4 +1,4 @@
-name: One-shot Voice Evidence provenance implementation
+name: One-shot Voice Evidence closeout
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  implement-voice-evidence:
+  closeout-voice-evidence:
     runs-on: windows-2025
     steps:
       - name: Check out repository
@@ -18,50 +18,46 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Set up Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, clippy
-
-      - name: Keep build output outside checkout
+      - name: Install refs validation dependency
         shell: pwsh
-        run: |
-          $frontendDist = Join-Path $env:RUNNER_TEMP "worklore-voice-frontend"
-          $cargoTarget = Join-Path $env:RUNNER_TEMP "worklore-voice-cargo"
-          "WORKLORE_FRONTEND_DIST=$frontendDist" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "CARGO_TARGET_DIR=$cargoTarget" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          New-Item -ItemType Directory -Force -Path $frontendDist | Out-Null
-          New-Item -ItemType Directory -Force -Path $cargoTarget | Out-Null
+        run: python -m pip install pyyaml
 
-      - name: Install validation dependencies
-        shell: pwsh
-        run: |
-          npm install --legacy-peer-deps --no-audit --no-fund --package-lock=false
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python -m pip install pyyaml
-
-      - name: Bounded re-entry packet
-        shell: pwsh
-        run: python refs/tools/generate_agent_context.py --focus "WorkLore Phase 2 Voice Evidence provenance authorship eligibility raw AI exclusion writing samples"
-
-      - name: Apply bounded Voice Evidence slice
-        shell: pwsh
-        run: python .github/scripts/apply_voice_evidence_slice.py
-
-      - name: Correct generated Voice Evidence validation details
+      - name: Reconcile task-031 documentation
         shell: pwsh
         run: python .github/scripts/fix_voice_evidence_slice.py
 
-      - name: Format Rust changes
+      - name: Remove one-shot implementation infrastructure
         shell: pwsh
-        run: cargo fmt --manifest-path src-tauri/Cargo.toml --all
+        run: |
+          Remove-Item .github/scripts/apply_voice_evidence_slice.py -Force
+          Remove-Item .github/scripts/fix_voice_evidence_slice.py -Force
+          Remove-Item .github/workflows/implement-voice-evidence-once.yml -Force
 
-      - name: Validate references and path safety
+      - name: Guard bounded closeout diff
+        shell: pwsh
+        run: |
+          $allowed = @(
+            '.github/scripts/apply_voice_evidence_slice.py',
+            '.github/scripts/fix_voice_evidence_slice.py',
+            '.github/workflows/implement-voice-evidence-once.yml',
+            'refs/architecture/vaultFormat.md',
+            'refs/handoffs/currentHandoff.md',
+            'refs/handoffs/next-dev-prompt.md',
+            'refs/planning/roadmap.yaml',
+            'refs/planning/todos.yaml'
+          )
+          $changed = @(git diff --name-only)
+          foreach ($path in $changed) {
+            if ($allowed -notcontains $path) {
+              throw "Unexpected closeout change: $path"
+            }
+          }
+          if ($changed.Count -ne $allowed.Count) {
+            Write-Host "Changed paths:" ($changed -join ', ')
+            throw "Closeout diff did not contain the expected bounded path set."
+          }
+
+      - name: Validate closeout references and path safety
         shell: pwsh
         run: |
           python scripts/check-case-collisions.py
@@ -72,32 +68,12 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           git diff --check
 
-      - name: Run frontend tests
-        shell: pwsh
-        run: npm run test
-
-      - name: Build frontend
-        shell: pwsh
-        run: npm run build:frontend
-
-      - name: Run Rust tests
-        shell: pwsh
-        run: cargo test --manifest-path src-tauri/Cargo.toml
-
-      - name: Run Rust lints
-        shell: pwsh
-        run: cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
-
-      - name: Confirm Rust formatting
-        shell: pwsh
-        run: cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
-
-      - name: Commit validated Voice Evidence slice
+      - name: Commit bounded task-031 closeout
         shell: pwsh
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- src-tauri/src/services/canonical_store.rs src-tauri/src/services/voice_evidence_service.rs src-tauri/src/services/target_context_service.rs src-tauri/src/services/topic_service.rs src-tauri/src/services/mod.rs src-tauri/src/commands/voice.rs src-tauri/src/commands/mod.rs src-tauri/src/lib.rs src/domain/types.ts src/lib/workloreApi.ts src/voiceEvidencePolicy.ts src/voiceEvidencePolicy.test.ts src/components/VoiceWorkspace.tsx src/components/FutureWorkspace.tsx src/App.tsx src/navigation.ts src/navigation.test.ts src/voice.css
-          if (git diff --cached --quiet) { throw "Voice Evidence slice produced no staged changes." }
-          git commit -m "feat: add governed Voice Evidence provenance"
+          git add --all -- .github/scripts/apply_voice_evidence_slice.py .github/scripts/fix_voice_evidence_slice.py .github/workflows/implement-voice-evidence-once.yml refs/architecture/vaultFormat.md refs/handoffs/currentHandoff.md refs/handoffs/next-dev-prompt.md refs/planning/roadmap.yaml refs/planning/todos.yaml
+          if (git diff --cached --quiet) { throw "Task-031 closeout produced no staged changes." }
+          git commit -m "docs: close task-031 and hand off Core Voice foundation"
           git push origin HEAD:dev
