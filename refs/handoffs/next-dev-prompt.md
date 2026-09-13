@@ -1,7 +1,7 @@
 ---
 type: Handoff Prompt
 title: Next WorkLore Development Slice
-description: Bounded prompt for Inspiration ingestion and working-object behavior on the validated Capture, Story, and Topic/Theme foundation.
+description: Bounded prompt for Phase 1 task-oriented application-shell and navigation integration on the validated professional-memory domain foundation.
 status: draft
 tags: [handoff, next-slice]
 ---
@@ -15,238 +15,204 @@ Work directly on `dev`. Do not promote `qa` or `main` unless explicitly requeste
 
 ## Accepted Starting Point
 
-Canonical SQLite persistence, save-first Capture, direct Story Seed guided development, and durable Topics/Themes are complete.
+Phase 1 professional-memory domain work is substantially complete through Target Context.
 
-Validated Topic/Theme code checkpoint:
+Validated Target Context product checkpoint:
 
-`6105fc6e89d152ee1679604c992691b25a695ea1`
+`078fad9547bd3f6728670e17b3884494e7d56af5`
 
-Validation evidence:
+Implementation validation:
 
-- Actions run `34761411830`
-- Job `103734793189`
-- case-collision, refs/OKF, bounded context, diff, frontend build, Clippy, and rustfmt checks green
+- Actions run `34771917326`
+- Job `103762940903`
 - frontend tests: 3 passed, 0 failed
-- Rust tests: 64 passed, 0 failed
+- Rust tests: 72 passed, 0 failed
+- production frontend build: green
+- case-collision, refs/OKF, bounded agent context, `git diff --check`, warnings-denied Clippy, and rustfmt: green
 
-Provider architecture is also clarified for future work: Ollama remains first-class local, remote providers are BYOK through a provider registry beginning with Gemini, credentials stay in the OS credential store, privacy preflight is mandatory, and there is no silent local-to-cloud fallback or WorkLore-hosted key proxy. Do not implement provider work in this slice.
+Completed Phase 1 foundation includes canonical persistence, save-first Capture, direct Story Seed development, durable Topics/Themes, Source-backed Inspiration, and Source-backed Target Context with explicit semantic boundaries.
 
-Read `refs/handoffs/currentHandoff.md` for the complete delta and current branch state before making changes.
+Provider architecture is locked but not implemented in this slice: Ollama remains first-class local; remote adapters are explicit BYOK through a provider-neutral registry beginning with Gemini; credentials stay in the OS credential store; remote calls require privacy preflight; there is no silent local-to-cloud fallback or WorkLore-hosted inference/key proxy.
+
+Read `refs/handoffs/currentHandoff.md` for the complete accepted state before making changes.
 
 ## Start With Bounded Re-entry
 
 From the repository root, first run:
 
 ```powershell
-python refs/tools/generate_agent_context.py --focus "WorkLore Inspiration ingestion provenance takeaways reactions Topic Theme relationships"
+python refs/tools/generate_agent_context.py --focus "WorkLore Phase 1 application shell navigation Home Capture Stories Topics supporting Sources Privacy Import Export Providers Settings"
 ```
 
-Treat the generated packet as derived orientation, not project truth. Load only the authoritative refs and source files needed for this slice.
+Treat generated context as derived orientation, not project truth. Read only the authoritative refs and source needed for this integration slice.
 
 Read at minimum:
 
 - `refs/product/prd.md`
-- `refs/architecture/vaultFormat.md`
-- `refs/architecture/providerArchitecture.md`
 - `refs/UI/designPrinciples.md`
+- `refs/planning/roadmap.yaml`
+- `refs/planning/todos.yaml`
 - `refs/handoffs/currentHandoff.md`
-- `src-tauri/src/services/canonical_store.rs`
-- `src-tauri/src/services/capture_service.rs`
-- `src-tauri/src/services/source_service.rs`
-- `src-tauri/src/services/topic_service.rs`
-- the existing Inspiration table/relationship definitions
-- `src-tauri/src/lib.rs`
+- `src/App.tsx`
+- current Capture/Story/Topic/Inspiration/Target Context components
+- current Sources, Privacy, Import/Export/provider/settings supporting surfaces
 - `src/domain/types.ts`
 - `src/lib/workloreApi.ts`
-- current thin Capture/Topic frontend surfaces after understanding service contracts
 
 ## Immediate Objective
 
-Implement `task-029`: make Inspiration ingestion and Inspiration records useful, provenance-preserving Phase 1 working objects.
+Implement `task-041`: close Phase 1 by replacing the prototype resume/storage-centric top-level experience with the accepted task-oriented application shell.
 
-Target flow:
+This is an integration/navigation slice, not a domain rewrite.
 
-`source/URL/text/file -> save neutral Source first -> create/link Inspiration -> capture summary/takeaways/reaction -> connect Topic/Theme -> reopen`
+The accepted primary product model is:
 
-The hard semantic rule is that Inspiration is intentionally external material. It can influence what the user thinks or writes, but it is not Evidence about the user and it is never Voice Evidence merely because it was saved or quoted.
+1. Home
+2. Capture
+3. Stories
+4. Topics
+5. Voice
+6. Posts
+7. Insights
 
-Do not begin discovery, Voice, Posts, analytics, providers, or the broad navigation rewrite in this slice.
+Supporting access includes:
 
-### 1. Preserve save-first Source semantics
+- Sources
+- Privacy
+- Import/Export
+- Providers
+- Settings
+- optional `Seed from resume`
 
-Reuse the accepted Capture contract:
+### 1. Make implemented professional-memory work primary
 
-`enter/import -> save Source -> optionally classify/process/connect`
+Home, Capture, Stories, and Topics should become coherent first-class destinations built on the validated local services and components already in the repository.
 
-Inspiration processing must never be required before preserving user-entered/pasted external material.
+Do not duplicate or replace the canonical service layer merely to fit the new shell.
 
-Do not create fake files, fake paths, or fake evidence records to represent pasted or URL-associated content.
+Where Inspiration and Target Context do not warrant permanent top-level destinations under the accepted design, make them discoverable/reopenable through appropriate Home/Capture/Topic/contextual flows or a bounded supporting workspace. Do not hide durable records behind a path that only works immediately after classification.
 
-### 2. Supported Inspiration entry paths
+### 2. Demote prototype/storage concepts
 
-Support the bounded entry paths already accepted by the PRD:
+The current application shell still presents a numbered resume-oriented prototype sequence such as import source, Capture, Seed from resume, Sources, Roles, candidates, and Stories.
 
-- pasted/copied external text;
-- user-provided URL plus optional pasted excerpt/body/context;
-- existing local-file Source ingestion.
+That sequence must stop being the primary information architecture.
 
-Direct URL fetching is not required for this slice. If reliable fetching would materially widen networking/privacy/provider scope, preserve the URL as provenance and let the user paste the relevant content.
+Preserve useful legacy functionality, but move it into supporting or optional access:
 
-A Source may remain Source-only. Creating Inspiration is an explicit semantic step.
+- source/import tooling remains available;
+- privacy/entity review remains available;
+- `Seed from resume` remains available as optional bootstrap;
+- legacy role/candidate utilities may remain reachable where useful;
+- do not delete validated paths simply because they are no longer primary navigation.
 
-### 3. Inspiration as a first-class canonical object
+### 3. Future destinations must be honest
 
-Expose a stable service/repository boundary for create/load/list/update/reopen behavior.
+Voice, Posts, and Insights belong in the accepted product architecture but their substantive phases are not implemented yet.
 
-Preserve stable `inspiration_` identity.
+If these destinations appear in the shell, they must clearly communicate future/unavailable status and must not simulate functionality that does not exist.
 
-Support the accepted lifecycle:
+Do not implement:
 
-- `saved`;
-- `processed`;
-- `archived`.
+- Voice Evidence/Core Voice/Tone Modes;
+- provider execution or BYOK settings behavior beyond any existing supporting placeholder;
+- post generation/editorial workflow;
+- analytics;
+- discovery/news;
+- social publishing or scheduling.
 
-Support structured fields sufficient for the PRD, refining the exact schema to current persistence conventions:
+### 4. Home should orient, not become a dashboard project
 
-- source URL/title/author/date when known;
-- capture timestamp through Source/provenance;
-- structured summary;
-- main takeaways;
-- useful excerpts/quote references;
-- why this is interesting;
-- explicit user reaction;
-- possible concepts/angles;
-- notes/questions/counterpoints as appropriate.
+Build the thinnest useful Home experience needed to orient the user around the professional-memory loop.
 
-A versioned SQLite migration is acceptable if required. Keep it transactional and portable.
+Prefer existing deterministic/local information, for example:
 
-### 4. Provenance and excerpt handling
+- quick capture entry;
+- recent/in-progress professional-memory objects;
+- obvious paths to Stories and Topics;
+- prompts to continue incomplete work if already available cheaply.
 
-Keep Source as neutral provenance and Inspiration as the external semantic object.
+Do not invent fake KPI scores, content health scores, AI recommendations, or analytics before those systems exist.
 
-For excerpts/quotes:
+### 5. Preserve semantic boundaries
 
-- retain attribution to the Source;
-- distinguish verbatim excerpt from user reaction/notes;
-- do not silently rewrite external language as the user's own wording;
-- do not let imported external prose become Voice Evidence.
+Navigation changes must not weaken the accepted domain rules:
 
-Avoid duplicating full source bodies into multiple semantic records unless the current canonical design clearly requires it.
+- Source is neutral provenance.
+- Evidence/Proof supports factual standing.
+- Inspiration is external creative/contextual input.
+- Target Context describes an audience/opportunity and never proves the user has a listed skill.
+- Voice Evidence is future and must remain distinct.
+- raw AI drafts never train canonical voice.
+- resume-derived and direct-capture Stories coexist.
 
-### 5. Topic and Theme connections
+### 6. Preserve local-first behavior
 
-Reuse the durable Topic/Theme relationship foundation rather than inventing a second relationship system.
+The shell must remain fully useful with no provider configured.
 
-Support explicit idempotent Inspiration connections to at least:
+Do not require Ollama, a BYOK provider, an account, network access, or a WorkLore backend to navigate, Capture, develop Stories, manage Topics, or work with Inspiration/Target Context.
 
-- Topic Candidate;
-- Theme.
+### 7. Prefer stateful navigation over a visual rewrite
 
-The direction used internally may follow the existing canonical relationship conventions, but UI/API callers need stable semantic IDs and relationship types.
+This slice should establish the information architecture and coherent routing/state model with minimal disruption.
 
-Removing a link must not delete either record.
+Avoid an unnecessary full CSS/design-system rewrite. Reuse the existing visual language and `refs/UI/designPrinciples.md`.
 
-### 6. Semantic boundaries
+A lightweight internal navigation state/router is acceptable if it materially simplifies the shell. Do not introduce a large dependency without a clear need.
 
-Hard rules:
+### 8. Proof cases
 
-- Inspiration != Evidence about the user.
-- Inspiration != Proof Point.
-- Inspiration != Story.
-- Inspiration != Voice Evidence.
-- A user's reaction to Inspiration is user-authored material but does not automatically qualify as canonical Voice Evidence; that decision belongs to the future Voice provenance workflow.
-- Linking Inspiration to a Topic does not establish standing. Standing comes from explicit Story/Proof Point material.
+Add or update coverage proving at least:
 
-Add tests around these boundaries rather than relying only on documentation.
-
-### 7. Provider-free first implementation
-
-Save, edit, lifecycle, provenance, takeaways/reaction capture, and Topic/Theme relationships must work with no model/provider/network call.
-
-Manual/deterministic processing is acceptable for this slice.
-
-Future model assistance may use Ollama or a configured BYOK adapter through the provider registry, but do not build that provider integration here.
-
-### 8. Bounded API and thin UI
-
-Expose stable Tauri/application APIs. Keep SQLite details out of React.
-
-Add only enough UI to exercise the canonical path, for example:
-
-- create/open Inspiration from a saved Source;
-- show provenance/URL/source metadata;
-- edit summary, takeaways, reaction, notes/counterpoints, lifecycle;
-- connect/disconnect Topic and Theme records;
-- reopen the same Inspiration after restart.
-
-Do not migrate the full application into the future primary navigation in this slice.
-
-### 9. Preserve current flows
-
-Keep green:
-
-- save-first Capture;
-- direct Story Seed guided development;
-- durable Topic/Theme behavior and timing metadata;
-- legacy candidate/resume interview path;
-- Source/Evidence/Inspiration/Target Context separation;
-- privacy infrastructure;
-- optional resume bootstrap.
-
-### 10. Proof cases
-
-Add synthetic coverage proving at least:
-
-- pasted external material persists as Source before Inspiration creation/processing;
-- URL-associated material can remain Source-only or become Inspiration without fake local paths;
-- local-file Sources can be linked to Inspiration without breaking existing import behavior;
-- Inspiration survives reopen with stable identity and Source provenance;
-- lifecycle and structured summary/takeaway/reaction edits preserve identity;
-- excerpt/quote data remains attributable to Source and distinct from user reaction;
-- Topic and Theme links are idempotent and survive reopen;
-- removing a relationship preserves both records;
-- Inspiration creates no Evidence, Proof Point, Story, or Voice Evidence implicitly;
-- no provider/network call is required;
-- existing Capture, Story Seed, and Topic/Theme tests remain green.
+- the primary shell presents Home, Capture, Stories, Topics, Voice, Posts, and Insights in the accepted order;
+- Capture, Stories, and Topics open functional existing workflows rather than placeholders;
+- optional resume bootstrap is no longer a primary workflow requirement;
+- Sources/Privacy/supporting utilities remain reachable;
+- future Voice/Posts/Insights surfaces do not claim implemented capabilities;
+- existing Inspiration and Target Context records remain reachable/reopenable through a coherent path;
+- changing navigation does not create/delete canonical records;
+- existing 72 Rust tests remain green;
+- frontend tests cover the new shell/navigation behavior;
+- the application remains provider-free for Phase 1 workflows.
 
 ## Constraints
 
 - Standalone Windows-first application.
 - Local canonical storage only.
-- No WorkLore-hosted backend, account, proprietary sync, inference proxy, or credential gateway.
-- No automatic publishing or scheduling.
-- No Voice implementation yet.
-- No Posts or analytics.
-- No news/current-event discovery, feeds, polling, or trend ranking.
-- No provider requirement for Inspiration persistence or processing.
-- Do not implement BYOK/provider adapters in this slice; only preserve the architecture contract.
-- No broad navigation rewrite.
-- Preserve Private Entity Registry behavior and privacy preflight where applicable.
-- Preserve the public repository boundary and use synthetic fixtures only.
-- Keep build/dev/QA output outside the repository and default it to the checkout drive.
+- No WorkLore-hosted backend/account/proprietary sync.
+- No automatic publishing/scheduling/autonomous engagement.
+- No Phase 2 Voice implementation in this slice.
+- No provider execution/BYOK implementation in this slice.
+- No Posts/editorial workflow implementation.
+- No analytics or discovery/news work.
+- No ATS/fit scoring or Target Context keyword stuffing.
+- Preserve Private Entity Registry and privacy infrastructure.
+- Preserve legacy optional resume paths without letting them drive top-level UX.
+- Preserve public-repository synthetic-data boundary.
+- Keep build/dev/QA output outside the repository and on the checkout drive by default.
 - Run the Git-index case-collision guard before finalizing path changes.
 - Do not hand-edit generated OKF indexes.
 
 ## Validation
 
-Run the repository validation path appropriate to the files changed. At minimum:
+Run at minimum:
 
 ```powershell
 python scripts/check-case-collisions.py
 git diff --check
 python refs/tools/validate_refs.py --mode initialized
 python refs/tools/generate_agent_context.py --check
+npm run test
+npm run build:frontend
 cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
 cargo test --manifest-path src-tauri/Cargo.toml
 cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
 ```
 
-If frontend TypeScript/UI changes, also run the normal frontend tests and production build.
-
-Batch meaningful changes before pushing. Avoid repeated CI churn on draft PR #1.
+Keep build outputs outside the checkout. Batch meaningful changes before pushing; avoid unnecessary CI churn on draft PR #1.
 
 ## Stop Point
 
-Stop after Inspiration is a durable first-class external-context object with Source provenance, useful structured notes/takeaways/reaction, explicit Topic/Theme links, semantic-boundary tests, and a thin canonical UI/API path.
+Stop when the application shell reflects the accepted product information architecture, existing Phase 1 professional-memory workflows are coherently reachable, supporting prototype/storage functions remain available but demoted, and future Voice/Posts/Insights destinations are honest about their status.
 
-Do not continue into Target Context ideation, discovery, Voice, Posts, Insights, provider implementation, or the full navigation rewrite in the same slice.
+At that point, reassess Phase 1 exit criteria. If they are satisfied, mark Phase 1 complete and hand off to `task-031` / Phase 2 Voice provenance rather than beginning Voice work implicitly inside this slice.
