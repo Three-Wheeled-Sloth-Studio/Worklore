@@ -69,6 +69,7 @@ for label, query, mapper in [
         "map_writing_rule",
     ),
 ]:
+    query = query.replace("\\n", "\n")
     old = f'''    let mut statement = connection.prepare(\n        "{query}",\n    )?;\n    statement\n        .query_map([], {mapper})?\n        .collect::<Result<Vec<_>, _>>()\n        .map_err(Into::into)'''
     new = f'''    let mut statement = connection.prepare(\n        "{query}",\n    )?;\n    let rows = statement\n        .query_map([], {mapper})?\n        .collect::<Result<Vec<_>, _>>()?;\n    Ok(rows)'''
     text = replace_once(text, old, new, label)
