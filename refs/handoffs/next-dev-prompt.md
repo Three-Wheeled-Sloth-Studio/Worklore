@@ -1,7 +1,7 @@
 ---
 type: Handoff Prompt
 title: Next WorkLore Development Slice
-description: Bounded prompt for Phase 1 task-oriented application-shell and navigation integration on the validated professional-memory domain foundation.
+description: Bounded prompt for Phase 2 task-031 Voice Evidence provenance and eligibility on the completed Phase 1 professional-memory foundation.
 status: draft
 tags: [handoff, next-slice]
 ---
@@ -15,182 +15,155 @@ Work directly on `dev`. Do not promote `qa` or `main` unless explicitly requeste
 
 ## Accepted Starting Point
 
-Phase 1 professional-memory domain work is substantially complete through Target Context.
+Phase 1 Professional Memory is complete.
 
-Validated Target Context product checkpoint:
+Validated Phase 1 product checkpoint:
 
-`9c757550a86cfc0ce263e362fe8d3512eec5834d`
+`e3393d7f95d5e060a23719b72b0ac9f051df5e92`
 
 Implementation validation:
 
-- Actions run `34772820995`
-- Job `103765412308`
-- frontend tests: 3 passed, 0 failed
-- Rust tests: 72 passed, 0 failed
-- production frontend build: green
+- Actions `34775461730`
+- Job `103772650411`
+- frontend: 6 passed / 0 failed across 2 files
+- Rust: 72 passed / 0 failed
+- production frontend build: green, 48 modules transformed
 - case-collision, refs/OKF, bounded agent context, `git diff --check`, warnings-denied Clippy, and rustfmt: green
 
-Completed Phase 1 foundation includes canonical persistence, save-first Capture, direct Story Seed development, durable Topics/Themes, Source-backed Inspiration, and Source-backed Target Context with explicit semantic boundaries. Target Context lifecycle is aligned to the accepted canonical contract as `active`, `stale`, or `archived`.
+The task-oriented shell now exposes Home, Capture, Stories, Topics, Voice, Posts, and Insights in the accepted order. Home/Capture/Stories/Topics are real Phase 1 workspaces. Sources/Privacy/Import-Export/Settings are supporting access. Inspiration and Target Context are reopenable from the Library. Voice/Posts/Insights are intentionally honest future surfaces.
 
-Provider architecture is locked but not implemented in this slice: Ollama remains first-class local; remote adapters are explicit BYOK through a provider-neutral registry beginning with Gemini; credentials stay in the OS credential store; remote calls require privacy preflight; there is no silent local-to-cloud fallback or WorkLore-hosted inference/key proxy.
-
-Read `refs/handoffs/currentHandoff.md` for the complete accepted state before making changes.
+Read `refs/handoffs/currentHandoff.md` before making changes.
 
 ## Start With Bounded Re-entry
 
-From the repository root, first run:
-
 ```powershell
-python refs/tools/generate_agent_context.py --focus "WorkLore Phase 1 application shell navigation Home Capture Stories Topics supporting Sources Privacy Import Export Providers Settings"
+python refs/tools/generate_agent_context.py --focus "WorkLore Phase 2 Voice Evidence provenance authorship eligibility raw AI exclusion writing samples"
 ```
 
-Treat generated context as derived orientation, not project truth. Read only the authoritative refs and source needed for this integration slice.
+Treat generated context as derived orientation. Read only the authoritative refs/source needed for this slice.
 
 Read at minimum:
 
 - `refs/product/prd.md`
-- `refs/UI/designPrinciples.md`
+- `refs/product/domainModel.md`
+- `refs/architecture/vaultFormat.md`
+- `refs/architecture/providerArchitecture.md`
 - `refs/planning/roadmap.yaml`
 - `refs/planning/todos.yaml`
 - `refs/handoffs/currentHandoff.md`
-- `src/App.tsx`
-- current Capture/Story/Topic/Inspiration/Target Context components
-- current Sources, Privacy, Import/Export/provider/settings supporting surfaces
+- canonical store / migration code relevant to Voice Evidence and Sources
+- Capture writing-sample classification behavior
 - `src/domain/types.ts`
 - `src/lib/workloreApi.ts`
+- current Voice future workspace entry point
 
 ## Immediate Objective
 
-Implement `task-041`: close Phase 1 by replacing the prototype resume/storage-centric top-level experience with the accepted task-oriented application shell.
+Implement `task-031`: establish durable, auditable Voice Evidence provenance and eligibility before Core Voice inference or provider execution.
 
-This is an integration/navigation slice, not a domain rewrite.
+This slice answers one question reliably:
 
-The accepted primary product model is:
+`What text is allowed to teach WorkLore how this user writes?`
 
-1. Home
-2. Capture
-3. Stories
-4. Topics
-5. Voice
-6. Posts
-7. Insights
+### 1. Voice Evidence is a governed semantic object
 
-Supporting access includes:
+Add or complete first-class Voice Evidence persistence/API behavior with stable identity and reopen semantics.
 
-- Sources
-- Privacy
-- Import/Export
-- Providers
-- Settings
-- optional `Seed from resume`
+At minimum retain:
 
-### 1. Make implemented professional-memory work primary
+- source/provenance lineage;
+- evidence text or a stable reference to attributable source text without unnecessary duplication;
+- authorship assertion/state;
+- eligibility state;
+- eligibility/ineligibility reason;
+- explicit user approval state and timestamp where approval is required;
+- created/updated/revision metadata;
+- audit events for eligibility/approval changes.
 
-Home, Capture, Stories, and Topics should become coherent first-class destinations built on the validated local services and components already in the repository.
+Prefer an extensible eligibility model over a boolean if the accepted domain contracts already distinguish pending/eligible/ineligible/revoked states.
 
-Do not duplicate or replace the canonical service layer merely to fit the new shell.
+### 2. Enforce provenance before inference
 
-Where Inspiration and Target Context do not warrant permanent top-level destinations under the accepted design, make them discoverable/reopenable through appropriate Home/Capture/Topic/contextual flows or a bounded supporting workspace. Do not hide durable records behind a path that only works immediately after classification.
+Eligible Voice Evidence must be demonstrably user-authored or explicitly approved as eligible user writing.
 
-### 2. Demote prototype/storage concepts
+Examples:
 
-The current application shell still presents a numbered resume-oriented prototype sequence such as import source, Capture, Seed from resume, Sources, Roles, candidates, and Stories.
+- imported writing sample: candidate/pending until authorship and approval are established;
+- explicitly user-authored pasted writing: may become eligible only through an explicit eligibility/approval action consistent with the domain contract;
+- future final user-approved Posts: eventual eligible source class, but Posts are not implemented in this slice.
 
-That sequence must stop being the primary information architecture.
+Do not infer authorship merely from file location, Capture ownership, or the fact that text is stored in the user's vault.
 
-Preserve useful legacy functionality, but move it into supporting or optional access:
+### 3. Make contamination structurally difficult
 
-- source/import tooling remains available;
-- privacy/entity review remains available;
-- `Seed from resume` remains available as optional bootstrap;
-- legacy role/candidate utilities may remain reachable where useful;
-- do not delete validated paths simply because they are no longer primary navigation.
+Normal application/API paths must refuse or permanently mark ineligible:
 
-### 3. Future destinations must be honest
+- raw AI/model drafts;
+- rejected drafts;
+- unedited provider output;
+- external Inspiration excerpts/prose;
+- Target Context text;
+- job descriptions or public-profile material.
 
-Voice, Posts, and Insights belong in the accepted product architecture but their substantive phases are not implemented yet.
+A user-authored reaction or note attached to Inspiration/Target Context remains user-authored text, but it must not silently become Voice Evidence. Require an explicit governed action if such text is ever eligible under the contract.
 
-If these destinations appear in the shell, they must clearly communicate future/unavailable status and must not simulate functionality that does not exist.
+### 4. Keep semantic classes separate
 
-Do not implement:
+Voice Evidence is not factual Evidence/Proof about accomplishments.
 
-- Voice Evidence/Core Voice/Tone Modes;
-- provider execution or BYOK settings behavior beyond any existing supporting placeholder;
-- post generation/editorial workflow;
-- analytics;
-- discovery/news;
-- social publishing or scheduling.
+Factual Evidence supports `Did this happen?` / standing.
+Voice Evidence supports `How does this user write?`.
+Inspiration supports external creative/contextual influence.
+Target Context supports audience/opportunity context.
 
-### 4. Home should orient, not become a dashboard project
+Do not collapse these into one generic source-role flag.
 
-Build the thinnest useful Home experience needed to orient the user around the professional-memory loop.
+### 5. Keep this slice provider-free
 
-Prefer existing deterministic/local information, for example:
+Do not implement Ollama/Gemini/BYOK execution merely to analyze voice yet.
 
-- quick capture entry;
-- recent/in-progress professional-memory objects;
-- obvious paths to Stories and Topics;
-- prompts to continue incomplete work if already available cheaply.
+The first Phase 2 invariant is trustworthy provenance. Core Voice trait inference, Tone Modes, Voice Direction, edit-delta learning, and provider-assisted analysis belong to later bounded work after eligibility is proven.
 
-Do not invent fake KPI scores, content health scores, AI recommendations, or analytics before those systems exist.
+### 6. Thin Voice UI
 
-### 5. Preserve semantic boundaries
+Replace the current honest Voice future surface only as far as necessary to let the user:
 
-Navigation changes must not weaken the accepted domain rules:
+- see Voice Evidence candidates/evidence;
+- understand provenance/authorship;
+- approve or reject eligibility where appropriate;
+- reopen evidence after restart;
+- see why an item is ineligible.
 
-- Source is neutral provenance.
-- Evidence/Proof supports factual standing.
-- Inspiration is external creative/contextual input.
-- Target Context describes an audience/opportunity and never proves the user has a listed skill.
-- Voice Evidence is future and must remain distinct.
-- raw AI drafts never train canonical voice.
-- resume-derived and direct-capture Stories coexist.
+Do not fabricate Core Voice traits or a voice score before `task-032`.
 
-### 6. Preserve local-first behavior
+### 7. Proof cases
 
-The shell must remain fully useful with no provider configured.
+Cover at least:
 
-Do not require Ollama, a BYOK provider, an account, network access, or a WorkLore backend to navigate, Capture, develop Stories, manage Topics, or work with Inspiration/Target Context.
-
-### 7. Prefer stateful navigation over a visual rewrite
-
-This slice should establish the information architecture and coherent routing/state model with minimal disruption.
-
-Avoid an unnecessary full CSS/design-system rewrite. Reuse the existing visual language and `refs/UI/designPrinciples.md`.
-
-A lightweight internal navigation state/router is acceptable if it materially simplifies the shell. Do not introduce a large dependency without a clear need.
-
-### 8. Proof cases
-
-Add or update coverage proving at least:
-
-- the primary shell presents Home, Capture, Stories, Topics, Voice, Posts, and Insights in the accepted order;
-- Capture, Stories, and Topics open functional existing workflows rather than placeholders;
-- optional resume bootstrap is no longer a primary workflow requirement;
-- Sources/Privacy/supporting utilities remain reachable;
-- future Voice/Posts/Insights surfaces do not claim implemented capabilities;
-- existing Inspiration and Target Context records remain reachable/reopenable through a coherent path;
-- changing navigation does not create/delete canonical records;
-- existing 72 Rust tests remain green;
-- frontend tests cover the new shell/navigation behavior;
-- the application remains provider-free for Phase 1 workflows.
+- writing-sample Source starts pending rather than silently eligible;
+- explicit authorship/approval can make valid user writing eligible;
+- eligibility and approval survive reopen with stable identity;
+- raw AI/model-origin material cannot become eligible through normal service/API calls;
+- Inspiration source prose cannot become eligible merely by linking/copying it;
+- Target Context cannot become Voice Evidence;
+- eligibility changes are audited and revisioned;
+- removing/revoking eligibility does not delete the underlying Source;
+- no provider/network availability is required;
+- all Phase 1 frontend and 72 Rust regression tests remain green.
 
 ## Constraints
 
-- Standalone Windows-first application.
-- Local canonical storage only.
-- No WorkLore-hosted backend/account/proprietary sync.
-- No automatic publishing/scheduling/autonomous engagement.
-- No Phase 2 Voice implementation in this slice.
+- Standalone Windows-first, local canonical storage.
+- No WorkLore account/backend/proprietary sync.
+- No automatic publication or scheduling.
+- No Core Voice inference or Tone Modes in this slice.
 - No provider execution/BYOK implementation in this slice.
-- No Posts/editorial workflow implementation.
-- No analytics or discovery/news work.
-- No ATS/fit scoring or Target Context keyword stuffing.
+- No Posts/editorial workflow, analytics, or discovery.
+- Preserve Evidence/Inspiration/Target Context/Voice Evidence distinctions.
 - Preserve Private Entity Registry and privacy infrastructure.
-- Preserve legacy optional resume paths without letting them drive top-level UX.
-- Preserve public-repository synthetic-data boundary.
-- Keep build/dev/QA output outside the repository and on the checkout drive by default.
-- Run the Git-index case-collision guard before finalizing path changes.
+- Public-repository fixtures must remain synthetic.
+- Keep build/dev/QA output outside the repository.
+- Run case-collision and refs/OKF validation.
 - Do not hand-edit generated OKF indexes.
 
 ## Validation
@@ -209,10 +182,8 @@ cargo test --manifest-path src-tauri/Cargo.toml
 cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
 ```
 
-Keep build outputs outside the checkout. Batch meaningful changes before pushing; avoid unnecessary CI churn on draft PR #1.
-
 ## Stop Point
 
-Stop when the application shell reflects the accepted product information architecture, existing Phase 1 professional-memory workflows are coherently reachable, supporting prototype/storage functions remain available but demoted, and future Voice/Posts/Insights destinations are honest about their status.
+Stop when Voice Evidence provenance/eligibility is durable, reopenable, explicit to the user, and structurally prevents raw model/external contextual material from contaminating canonical voice.
 
-At that point, reassess Phase 1 exit criteria. If they are satisfied, mark Phase 1 complete and hand off to `task-031` / Phase 2 Voice provenance rather than beginning Voice work implicitly inside this slice.
+At that point reassess the next Phase 2 slice. Do not begin Core Voice inference or provider execution implicitly.

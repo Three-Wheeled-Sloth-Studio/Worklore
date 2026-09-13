@@ -47,7 +47,7 @@ phases:
   - id: phase-1
     name: Professional Memory
     horizon: now
-    status: in_progress
+    status: complete
     objective: Recenter WorkLore around durable capture, stories, topics, themes, proof points, inspiration, and target context.
     scope:
       - Replace the resume-centric primary navigation with Capture, Stories, Topics, Voice, Posts, and Insights-oriented navigation.
@@ -79,6 +79,7 @@ phases:
       - Deterministic provider-free Target Context signal extraction from captured text or safe vault-relative local extraction cache, with idempotent merge behavior and no fit score, ATS score, or automatic standing claim.
       - Explicit idempotent Target Context connections to Topics, Themes, and Stories while preserving the rule that opportunity context is not Evidence or Proof about the user.
       - Thin Target Context editor/API path that makes the semantic boundary visible and keeps Capture, Story, Topic, and Inspiration flows green.
+      - Task-oriented application shell with first-class Home, Capture, Stories, and Topics; supporting Library/Privacy/Import-Export/Settings access; reopenable Inspiration and Target Context; and honest future Voice, Posts, and Insights destinations.
     architecture_notes:
       - Durable local persistence uses SQLite for canonical structured state while source bytes remain in the vault filesystem.
       - Human-readable export remains desirable.
@@ -87,7 +88,7 @@ phases:
       - Topic timing, lifecycle, and relationships are deterministic local state and do not require provider or network availability.
       - Inspiration is external context, not factual evidence about the user; excerpts retain Source attribution and user reaction remains separately attributable even though neither becomes Voice Evidence automatically.
       - Target Context records what an opportunity or audience asks for. Extracted responsibilities, skills, concepts, language, and tensions are contextual signals only; they do not establish that the user possesses a skill, create standing, or authorize keyword stuffing.
-      - Phase 1 domain work is substantially complete. The remaining bounded Phase 1 slice is the task-oriented application-shell/navigation integration described by task-041 before Phase 2 begins.
+      - Phase 1 is complete. The task-oriented shell now exposes the professional-memory model directly while retaining resume bootstrap and infrastructure as supporting paths. Phase 2 begins explicitly with Voice Evidence provenance rather than provider execution or trait inference.
     exit_criteria:
       - A new user can build useful stories and topic candidates without importing a resume.
       - Capture survives restart and supports incomplete material.
