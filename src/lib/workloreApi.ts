@@ -51,6 +51,18 @@ import type {
   ReviewVoiceEvidenceRequest,
   VoiceEvidenceRecord,
   VoiceSourceCandidate,
+  CoreVoiceRecord,
+  CreateCoreVoiceRequest,
+  SaveCoreVoiceTraitRequest,
+  ToneModeRecord,
+  CreateToneModeRequest,
+  UpdateToneModeRequest,
+  VoiceDirectionRecord,
+  CreateVoiceDirectionRequest,
+  SetVoiceDirectionStatusRequest,
+  WritingRuleRecord,
+  CreateWritingRuleRequest,
+  UpdateWritingRuleRequest,
 } from "../domain/types";
 
 export async function createDefaultVault(name: string): Promise<VaultSummary> {
@@ -393,6 +405,93 @@ export async function reviewVoiceEvidence(
   request: ReviewVoiceEvidenceRequest,
 ): Promise<VoiceEvidenceRecord> {
   return invoke<VoiceEvidenceRecord>("review_voice_evidence", { vaultPath, request });
+}
+
+export async function listCoreVoices(vaultPath: string): Promise<CoreVoiceRecord[]> {
+  return invoke<CoreVoiceRecord[]>("list_core_voices", { vaultPath });
+}
+
+export async function createCoreVoice(
+  vaultPath: string,
+  request: CreateCoreVoiceRequest,
+): Promise<CoreVoiceRecord> {
+  return invoke<CoreVoiceRecord>("create_core_voice", { vaultPath, request });
+}
+
+export async function saveCoreVoiceTrait(
+  vaultPath: string,
+  request: SaveCoreVoiceTraitRequest,
+): Promise<CoreVoiceRecord> {
+  return invoke<CoreVoiceRecord>("save_core_voice_trait", { vaultPath, request });
+}
+
+export async function deleteCoreVoiceTrait(
+  vaultPath: string,
+  voiceId: string,
+  traitId: string,
+): Promise<CoreVoiceRecord> {
+  return invoke<CoreVoiceRecord>("delete_core_voice_trait", { vaultPath, voiceId, traitId });
+}
+
+export async function activateCoreVoice(
+  vaultPath: string,
+  voiceId: string,
+): Promise<CoreVoiceRecord> {
+  return invoke<CoreVoiceRecord>("activate_core_voice", { vaultPath, voiceId });
+}
+
+export async function listToneModes(vaultPath: string): Promise<ToneModeRecord[]> {
+  return invoke<ToneModeRecord[]>("list_tone_modes", { vaultPath });
+}
+
+export async function createToneMode(
+  vaultPath: string,
+  request: CreateToneModeRequest,
+): Promise<ToneModeRecord> {
+  return invoke<ToneModeRecord>("create_tone_mode", { vaultPath, request });
+}
+
+export async function updateToneMode(
+  vaultPath: string,
+  request: UpdateToneModeRequest,
+): Promise<ToneModeRecord> {
+  return invoke<ToneModeRecord>("update_tone_mode", { vaultPath, request });
+}
+
+export async function listVoiceDirections(vaultPath: string): Promise<VoiceDirectionRecord[]> {
+  return invoke<VoiceDirectionRecord[]>("list_voice_directions", { vaultPath });
+}
+
+export async function createVoiceDirection(
+  vaultPath: string,
+  request: CreateVoiceDirectionRequest,
+): Promise<VoiceDirectionRecord> {
+  return invoke<VoiceDirectionRecord>("create_voice_direction", { vaultPath, request });
+}
+
+export async function setVoiceDirectionStatus(
+  vaultPath: string,
+  request: SetVoiceDirectionStatusRequest,
+): Promise<VoiceDirectionRecord> {
+  return invoke<VoiceDirectionRecord>("set_voice_direction_status", { vaultPath, request });
+}
+
+export async function listWritingRules(vaultPath: string): Promise<WritingRuleRecord[]> {
+  return invoke<WritingRuleRecord[]>("list_writing_rules", { vaultPath });
+}
+
+export async function createWritingRule(
+  vaultPath: string,
+  request: CreateWritingRuleRequest,
+): Promise<WritingRuleRecord> {
+  return invoke<WritingRuleRecord>("create_writing_rule", { vaultPath, request });
+}
+
+export async function updateWritingRule(
+  vaultPath: string,
+  request: UpdateWritingRuleRequest,
+): Promise<WritingRuleRecord> {
+  return invoke<WritingRuleRecord>("update_writing_rule", { vaultPath, request });
 }
 
 export async function startStorySeedDevelopment(

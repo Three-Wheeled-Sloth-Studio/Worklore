@@ -22,7 +22,7 @@ use crate::{
 };
 
 pub const DATABASE_RELATIVE_PATH: &str = "data/worklore.sqlite";
-const CURRENT_SCHEMA_VERSION: i64 = 6;
+const CURRENT_SCHEMA_VERSION: i64 = 7;
 const MIGRATION_NAME: &str = "prototype_to_professional_memory_v1";
 
 const SCHEMA_V1: &str = r#"
@@ -177,6 +177,88 @@ CREATE TABLE voice_evidence (
 );
 CREATE INDEX idx_voice_evidence_status_updated ON voice_evidence(status, updated_at DESC);
 CREATE INDEX idx_voice_evidence_source ON voice_evidence(source_id);
+"#;
+
+const SCHEMA_V7: &str = r#"
+CREATE TABLE core_voices (
+  voice_id TEXT PRIMARY KEY,
+  version_number INTEGER NOT NULL UNIQUE CHECK (version_number >= 1),
+  label TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('proposed','active','superseded')),
+  provenance_json TEXT NOT NULL,
+  activated_at TEXT,
+  superseded_at TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  revision INTEGER NOT NULL CHECK (revision >= 1)
+);
+CREATE UNIQUE INDEX idx_core_voice_single_active ON core_voices(status) WHERE status='active';
+CREATE INDEX idx_core_voices_version ON core_voices(version_number DESC);
+
+CREATE TABLE core_voice_traits (
+  trait_id TEXT PRIMARY KEY,
+  voice_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  value TEXT NOT NULL,
+  user_guidance TEXT,
+  provenance_json TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  revision INTEGER NOT NULL CHECK (revision >= 1),
+  UNIQUE(voice_id, name),
+  FOREIGN KEY(voice_id) REFERENCES core_voices(voice_id) ON DELETE CASCADE
+);
+CREATE INDEX idx_core_voice_traits_voice ON core_voice_traits(voice_id, name);
+
+CREATE TABLE core_voice_trait_evidence (
+  trait_id TEXT NOT NULL,
+  voice_evidence_id TEXT NOT NULL,
+  linked_at TEXT NOT NULL,
+  PRIMARY KEY(trait_id, voice_evidence_id),
+  FOREIGN KEY(trait_id) REFERENCES core_voice_traits(trait_id) ON DELETE CASCADE,
+  FOREIGN KEY(voice_evidence_id) REFERENCES voice_evidence(voice_evidence_id)
+);
+CREATE INDEX idx_core_voice_trait_evidence_evidence ON core_voice_trait_evidence(voice_evidence_id);
+
+CREATE TABLE tone_modes (
+  tone_id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL,
+  instructions TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('active','disabled','retired')),
+  provenance_json TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  revision INTEGER NOT NULL CHECK (revision >= 1)
+);
+CREATE INDEX idx_tone_modes_status_updated ON tone_modes(status, updated_at DESC);
+
+CREATE TABLE voice_directions (
+  voice_direction_id TEXT PRIMARY KEY,
+  statement TEXT NOT NULL,
+  rationale TEXT NOT NULL,
+  proposed_by TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('proposed','accepted','completed','retired')),
+  provenance_json TEXT NOT NULL,
+  accepted_at TEXT,
+  completed_at TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  revision INTEGER NOT NULL CHECK (revision >= 1)
+);
+CREATE INDEX idx_voice_directions_status_updated ON voice_directions(status, updated_at DESC);
+
+CREATE TABLE writing_rules (
+  rule_id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  instruction TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('proposed','active','disabled','retired')),
+  provenance_json TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  revision INTEGER NOT NULL CHECK (revision >= 1)
+);
+CREATE INDEX idx_writing_rules_status_updated ON writing_rules(status, updated_at DESC);
 "#;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -486,6 +568,16 @@ fn migrate_schema(connection: &mut Connection) -> ServiceResult<()> {
         tx.execute_batch(SCHEMA_V6)?;
         tx.execute(
             "INSERT INTO schema_migrations(version,name,applied_at) VALUES (6,'voice_evidence_provenance_v6',?1)",
+            [Utc::now().to_rfc3339()],
+        )?;
+        tx.commit()?;
+        version = 6;
+    }
+    if version == 6 {
+        let tx = connection.transaction()?;
+        tx.execute_batch(SCHEMA_V7)?;
+        tx.execute(
+            "INSERT INTO schema_migrations(version,name,applied_at) VALUES (7,'core_voice_foundation_v7',?1)",
             [Utc::now().to_rfc3339()],
         )?;
         tx.commit()?;
@@ -836,7 +928,7 @@ mod tests {
     fn initializes_database() {
         let p = vault();
         assert!(database_path(&p).is_file());
-        assert_eq!(schema_version(&p).unwrap(), 6);
+        assert_eq!(schema_version(&p).unwrap(), 7);
         fs::remove_dir_all(p).unwrap();
     }
     #[test]

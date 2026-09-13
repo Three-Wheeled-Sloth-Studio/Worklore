@@ -21,3 +21,4 @@ pub mod target_context_service;
 pub mod topic_service;
 pub mod vault_service;
 pub mod voice_evidence_service;
+pub mod voice_profile_service;

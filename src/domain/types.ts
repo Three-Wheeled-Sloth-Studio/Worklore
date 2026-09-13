@@ -361,6 +361,121 @@ export interface ReviewVoiceEvidenceRequest {
   decision: VoiceEvidenceDecision;
 }
 
+export type CoreVoiceStatus = "proposed" | "active" | "superseded";
+export type ToneModeStatus = "active" | "disabled" | "retired";
+export type VoiceDirectionStatus = "proposed" | "accepted" | "completed" | "retired";
+export type WritingRuleStatus = "proposed" | "active" | "disabled" | "retired";
+
+export interface CoreVoiceTraitEvidence {
+  voiceEvidenceId: string;
+  currentStatus: string;
+}
+
+export interface CoreVoiceTrait {
+  traitId: string;
+  name: string;
+  value: string;
+  userGuidance: string | null;
+  evidence: CoreVoiceTraitEvidence[];
+  provenanceKind: "voice_evidence" | "user_guidance" | "mixed" | "missing" | string;
+  provenanceValid: boolean;
+  invalidatedEvidenceIds: string[];
+  createdAt: string;
+  updatedAt: string;
+  revision: number;
+}
+
+export interface CoreVoiceRecord {
+  voiceId: string;
+  versionNumber: number;
+  label: string;
+  status: CoreVoiceStatus;
+  traits: CoreVoiceTrait[];
+  activatedAt: string | null;
+  supersededAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  revision: number;
+}
+
+export interface CreateCoreVoiceRequest {
+  label: string;
+}
+
+export interface SaveCoreVoiceTraitRequest {
+  voiceId: string;
+  traitId?: string | null;
+  name: string;
+  value: string;
+  userGuidance?: string | null;
+  voiceEvidenceIds: string[];
+}
+
+export interface ToneModeRecord {
+  toneId: string;
+  name: string;
+  description: string;
+  instructions: string;
+  status: ToneModeStatus;
+  createdAt: string;
+  updatedAt: string;
+  revision: number;
+}
+
+export interface CreateToneModeRequest {
+  name: string;
+  description: string;
+  instructions: string;
+}
+
+export interface UpdateToneModeRequest extends CreateToneModeRequest {
+  toneId: string;
+  status: ToneModeStatus;
+}
+
+export interface VoiceDirectionRecord {
+  voiceDirectionId: string;
+  statement: string;
+  rationale: string;
+  proposedBy: string;
+  status: VoiceDirectionStatus;
+  acceptedAt: string | null;
+  completedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  revision: number;
+}
+
+export interface CreateVoiceDirectionRequest {
+  statement: string;
+  rationale: string;
+}
+
+export interface SetVoiceDirectionStatusRequest {
+  voiceDirectionId: string;
+  status: VoiceDirectionStatus;
+}
+
+export interface WritingRuleRecord {
+  ruleId: string;
+  name: string;
+  instruction: string;
+  status: WritingRuleStatus;
+  createdAt: string;
+  updatedAt: string;
+  revision: number;
+}
+
+export interface CreateWritingRuleRequest {
+  name: string;
+  instruction: string;
+}
+
+export interface UpdateWritingRuleRequest extends CreateWritingRuleRequest {
+  ruleId: string;
+  status: WritingRuleStatus;
+}
+
 export type PrivacyScanStatus =
   | "pending"
   | "complete"

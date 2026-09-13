@@ -53,3 +53,67 @@
 .voice-actions {
   margin-top: 0.85rem;
 }
+
+
+.voice-concept-grid {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-top: 1rem;
+}
+
+.voice-model-card {
+  border: 1px solid var(--border-color, #d8d8d8);
+  border-radius: 0.8rem;
+  padding: 1rem;
+  background: var(--panel-background, #fff);
+}
+
+.voice-inline-form,
+.voice-form-grid,
+.voice-trait-editor {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1rem;
+}
+
+.voice-inline-form {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.voice-trait-list {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 0.8rem;
+}
+
+.voice-trait {
+  border-top: 1px solid var(--border-color, #d8d8d8);
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding-top: 0.75rem;
+}
+
+.voice-evidence-picker {
+  border: 1px solid var(--border-color, #d8d8d8);
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.75rem;
+}
+
+.voice-evidence-picker label {
+  align-items: center;
+  display: flex;
+  gap: 0.45rem;
+}
+
+@media (max-width: 720px) {
+  .voice-inline-form {
+    grid-template-columns: 1fr;
+  }
+
+  .voice-trait {
+    display: grid;
+  }
+}
