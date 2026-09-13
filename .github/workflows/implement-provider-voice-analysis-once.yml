@@ -1,3 +1,4 @@
+# retry after Windows audit cleanup and provider configuration corrections
 name: One-shot provider voice analysis implementation
 
 on:
@@ -52,6 +53,10 @@ jobs:
       - name: Apply bounded provider voice analysis slice
         shell: pwsh
         run: python .github/scripts/apply_provider_voice_analysis_slice.py
+
+      - name: Apply provider voice analysis corrections
+        shell: pwsh
+        run: python .github/scripts/fix_provider_voice_analysis_slice.py
 
       - name: Format Rust changes
         shell: pwsh
