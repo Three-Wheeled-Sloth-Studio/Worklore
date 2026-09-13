@@ -1,4 +1,4 @@
-# retry after Windows audit cleanup and provider configuration corrections
+# retry after Clippy audit-parameter correction
 name: One-shot provider voice analysis implementation
 
 on:
@@ -57,6 +57,10 @@ jobs:
       - name: Apply provider voice analysis corrections
         shell: pwsh
         run: python .github/scripts/fix_provider_voice_analysis_slice.py
+
+      - name: Apply provider voice analysis Clippy correction
+        shell: pwsh
+        run: python .github/scripts/fix_provider_voice_analysis_clippy.py
 
       - name: Format Rust changes
         shell: pwsh
