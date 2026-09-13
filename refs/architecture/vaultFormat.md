@@ -1,206 +1,312 @@
-# Vault Format
+# Vault Format and Canonical Domain Contract
+
+Status: accepted Phase 1 contract
+Updated: 2026-09-12
 
 ## Purpose
 
-A WorkLore vault is a user-owned folder containing original source files and portable canonical records. The application may build indexes and caches around those records, but it must never make the database the only usable copy of a user's work.
+A WorkLore vault is a user-owned, portable folder containing canonical structured professional memory, original source material, privacy mappings, and exportable history.
 
-## Initial Layout
+This contract replaces the prototype assumption that every durable structured record must remain canonical as paired JSON or Markdown files. The prototype files remain valid migration inputs. They do not constrain the refocused domain model.
+
+## Storage decision
+
+For the refocused product, SQLite is the recommended canonical store for structured records, relationships, lineage, audit events, revisions, experiments, and analytics.
+
+Canonical source bytes and attachments remain ordinary files in the vault filesystem.
+
+Human-readable export is a required portability and recovery capability, but exported JSON, JSONL, and Markdown are snapshots of canonical state rather than a second live database that must be kept transactionally synchronized on every edit.
+
+This split provides:
+
+- reliable transactions across related records;
+- queryable many-to-many relationships without duplicated ID arrays;
+- exact revision and analytics joins;
+- durable migration support;
+- simpler audit/version behavior;
+- a portable vault that still works without WorkLore-hosted storage or sync.
+
+## Target vault layout
 
 ```text
 WorkLoreVault/
   vault.json
 
+  data/
+    worklore.sqlite
+
   sources/
-    resumes/
-    job-descriptions/
-    writing-samples/
-    interview-transcripts/
-    git-snapshots/
-    other/
-    metadata/
-
-  roles/
-  candidates/
-  stories/
-  interviews/
-  jobs/
-  voice/
-
-  privacy/
-    entity-registry.json
-    review-items/
-    scan-log/
+    originals/
+    attachments/
 
   exports/
-    manual-workspaces/
+    snapshots/
     markdown/
     json/
 
   backups/
 
   .worklore/
-    index.sqlite
     extraction-cache/
+    search-cache/
+    embeddings/
     provider-logs/
     operation-journal/
 ```
 
-## Canonical And Rebuildable Data
+`vault.json`, `data/worklore.sqlite`, original imported source bytes, user-created attachments, and the Private Entity Registry state represented in the database are canonical.
 
-### Canonical
+Everything under `.worklore` is rebuildable or diagnostic unless a later contract explicitly says otherwise.
 
-- `vault.json`
-- Imported source files
-- Source metadata JSON
-- Role JSON
-- Candidate JSON
-- Story Markdown and JSON
-- Interview JSON
-- Job analysis JSON
-- Voice profile records
-- Private Entity Registry records
-- Entity review decisions
-- User-created exports
+Provider credentials remain outside the vault in the operating-system credential store.
 
-### Rebuildable
+## Canonical identity and lifecycle rules
 
-- SQLite indexes
-- Extracted text caches
-- Embeddings
-- Search indexes
-- Provider request estimates
-- Temporary workspace packages
-- Derived summaries that retain canonical inputs
+Canonical IDs are opaque, stable, prefixed identifiers. New records should use a UUIDv7 or equivalent sortable random payload after the prefix.
 
-Deleting `.worklore/index.sqlite` must not remove durable user content.
+Existing durable IDs are preserved when the migrated concept retains the same meaning. When a prototype concept changes meaning, WorkLore creates the new canonical ID and records the legacy ID in migration lineage rather than preserving an accidental prefix or shape.
 
-## Story Storage
+All mutable canonical records carry at least:
 
-Each story has:
+- stable ID;
+- record type;
+- lifecycle status;
+- created timestamp;
+- updated timestamp;
+- integer row revision for optimistic concurrency;
+- origin/provenance metadata.
 
-```text
-stories/
-  story_<id>.md
-  story_<id>.json
-```
+Archiving is preferred to destructive deletion for records that may participate in provenance, publication history, voice evidence, or analytics. Explicit user-requested purge remains possible but must be auditable and must preserve referential integrity.
 
-The JSON record is the canonical structured contract. The Markdown record is the canonical human-readable rendering.
+Lifecycle state and domain maturity are separate where both matter. For example, a Story may be `active` while its maturity is `developing`.
 
-Both files carry the same story ID and revision. A save operation writes them as one logical transaction. When a write is interrupted, WorkLore should preserve the previous valid pair and recover from the operation journal.
+## Canonical domain model
 
-## Imported Sources
+| Concept | ID prefix | Lifecycle or maturity | Canonical purpose |
+| --- | --- | --- | --- |
+| Story | `story_` | lifecycle: `active`, `archived`; maturity: `developing`, `evidence_rich`, `ready_to_use` | Durable account of something the user experienced or did. A Story does not require a Role. |
+| Story Seed | `seed_` | `captured`, `developing`, `converted`, `dismissed`, `archived` | Incomplete memory or fragment worth preserving and potentially developing. |
+| Proof Point | `proof_` | `candidate`, `confirmed`, `retired` | Reusable factual result, decision, artifact, number, qualitative outcome, tool use, or lesson. |
+| Topic Candidate | `topic_` | `captured`, `exploring`, `ready`, `drafted`, `parked`, `retired` | Durable idea the user may have credible reason to discuss. It exists independently of any Post. |
+| Theme | `theme_` | `emerging`, `active`, `retired` | Recurring area of demonstrated expertise or professional interest. |
+| Inspiration | `inspiration_` | `saved`, `processed`, `archived` | External material used to stimulate concepts, questions, counterpoints, or connections. It is not Evidence about the user. |
+| Target Context | `target_` | `active`, `stale`, `archived` | Opportunity or audience context such as a job description, public profile, or audience example. It informs ideation, not keyword stuffing. |
+| Voice Evidence | `voice_evidence_` | `pending`, `eligible`, `rejected`, `retired` | A specifically approved sample that may inform canonical voice. Eligibility is explicit and provenance-gated. |
+| Core Voice | `voice_` | `proposed`, `active`, `superseded` | Versioned stable author-identity traits derived only from eligible Voice Evidence and explicit user guidance. |
+| Tone Mode | `tone_` | `active`, `disabled`, `retired` | Intentional register that changes expression without becoming a separate identity. |
+| Voice Direction | `voice_direction_` | `proposed`, `accepted`, `completed`, `retired` | User-approved direction for deliberate voice evolution. |
+| Writing Rule | `rule_` | `proposed`, `active`, `disabled`, `retired` | Generation or review constraint kept separate from author identity. |
+| Audience Model | `audience_` | `draft`, `active`, `retired` | Structured reader archetype used for Audience Lens interpretation. |
+| Post | `post_` | `idea`, `drafting`, `challenge`, `review`, `approved`, `published`, `archived` | Professional content artifact and workflow container. Exact text lives in immutable Revision records. |
+| Revision | `revision_` | immutable snapshot; approval state recorded separately | Exact content version with parent lineage, content hash, origin actor, provider run where relevant, and change metadata. |
+| Experiment | `experiment_` | `planned`, `active`, `completed`, `cancelled` | Explicit content hypothesis linked to one or more Posts or Publications. |
+| Performance Record | `performance_` | immutable import snapshot; may be superseded by a later snapshot | Imported analytics for a specific Publication and exact published Revision. |
+| Source | `source_` | `active`, `archived` | Neutral provenance record for imported or captured material and its original bytes or captured text. |
+| Evidence Record | `evidence_` | `candidate`, `confirmed`, `rejected`, `retired` | Specific support for a factual claim, Story, or Proof Point, with locator and provenance. |
 
-Source files are copied into the appropriate source-type folder by default.
+## Supporting records that remain useful
 
-A source metadata file is stored separately:
+The refocused model also retains supporting concepts where they add real value:
 
-```text
-sources/metadata/source_<id>.json
-```
+- Role remains an optional career-context record with `role_` IDs. It can link to Stories, Sources, and entities but does not own them and is never mandatory for Story creation.
+- Interview remains a durable guided-development session with `interview_` IDs. New sessions target a Story Seed or Story directly instead of requiring a resume candidate.
+- Private Entity records preserve current `entity_` IDs and stable public tokens.
+- Provider Run records capture model/provider execution metadata without retaining private request bodies by default.
+- Publication records use `publication_` IDs to represent the manual act of publishing an exact approved Revision.
+- Audit Events use `audit_` IDs and record material state transitions and provenance-affecting changes.
+- Migration Map records preserve legacy IDs and source paths when concepts are transformed.
 
-Metadata includes:
+## Relationship model
 
-- Original filename
-- Optional original path hint
-- Copied vault-relative path
-- Content hash
-- Byte size
-- Media type
-- Import time
-- Extraction state
-- Privacy scan state
-- Provenance
+High-value relationships are many-to-many and should be represented by typed associative tables rather than duplicated arrays stored on both records.
 
-The original source file is never modified by WorkLore.
+At minimum the persistence layer must support:
 
-## Duplicate Handling
+- Story <-> Story Seed lineage;
+- Story <-> Proof Point;
+- Story <-> Theme;
+- Story <-> Role;
+- Proof Point <-> Evidence Record;
+- Evidence Record <-> Source;
+- Topic Candidate <-> Story;
+- Topic Candidate <-> Proof Point;
+- Topic Candidate <-> Theme;
+- Topic Candidate <-> Inspiration;
+- Topic Candidate <-> Target Context;
+- Voice Evidence <-> Source or Revision;
+- Core Voice version <-> Voice Evidence;
+- Post <-> Topic Candidate;
+- Post <-> Story;
+- Post <-> Proof Point;
+- Post <-> Theme;
+- Post <-> Inspiration;
+- Post <-> Target Context;
+- Post <-> Audience Model;
+- Post <-> Experiment;
+- Publication -> Post + exact published Revision;
+- Performance Record -> Publication + exact published Revision.
 
-Before copying a source, WorkLore computes SHA-256.
+Low-value generic associations such as tags may use reusable link tables. Relationships that enforce product invariants should use typed tables and foreign keys.
 
-When the hash already exists, the user should be offered:
+## Provenance contract
 
-- Use the existing source record
-- Import another labeled reference to the same stored content
-- Cancel
+`Source` is neutral origin metadata. Evidence, Inspiration, Target Context, and Voice Evidence are separate semantic records or usage decisions and must never collapse into one source-type enum.
 
-WorkLore must not create duplicate stored bytes silently.
+A single imported file may participate in more than one workflow only through explicit role records. For example, a user-authored article may be a Source, Inspiration for a new Topic Candidate, and separately approved Voice Evidence. Those uses remain independently auditable.
 
-## Paths
+Derived records capture:
 
-Canonical records store vault-relative paths using forward slashes.
+- creation actor: `user`, `import`, `system`, `model`, or `migration`;
+- source record IDs or parent revision IDs;
+- provider/model run ID when model assistance was involved;
+- creation timestamp;
+- content hash for immutable text snapshots;
+- explicit user confirmation or approval when required.
 
-Machine-local recent-vault settings may store absolute paths outside the vault. Canonical records must not depend on those paths for portability.
+Provider output is provenance, not evidence about the user.
 
-## IDs
+## Voice-training eligibility invariant
 
-Canonical IDs use stable prefixed values:
+Raw model output can never become canonical Voice Evidence merely because it exists in the vault.
 
-- `vault_`
-- `source_`
-- `role_`
-- `candidate_`
-- `story_`
-- `interview_`
-- `job_`
-- `requirement_`
-- `voice_`
-- `entity_`
-- `review_`
-- `evidence_`
-- `claim_`
+Every Revision records its origin and parentage. Revisions whose content is raw provider/model output are permanently marked `voice_training_prohibited`.
 
-The first implementation may use UUIDv7 or ULID payloads after the prefix. IDs are opaque to users.
+Voice Evidence may be created only when at least one of these conditions is true:
 
-## Schema Versions
+1. The material is genuinely user-authored or user-dictated and the user accepts it as representative.
+2. The material is a user-edited descendant of generated text and the user explicitly accepts that edited text as representative.
+3. The material is the exact human-approved final version of a Post and the user allows final approved work to contribute to voice.
+4. The material is explicit user guidance about desired or undesired voice behavior.
 
-Every canonical JSON record includes `schemaVersion`.
+Approval of a later Revision never changes the eligibility of an earlier raw model Revision. The raw draft remains excluded forever.
 
-Migrations must:
+Inspiration and Target Context are never automatically eligible for voice learning, even when their source text happens to resemble the user.
 
-1. Detect the existing schema version.
-2. Write a recoverable backup or operation journal entry.
-3. Produce the new record without changing the durable ID.
-4. Validate the new record.
-5. Replace the old record atomically.
-6. Record the migration result.
+## Draft, edit, approval, and publication lineage
 
-## Atomic Writes
+A Post is a workflow container. A Revision is an immutable text snapshot.
 
-For canonical text and JSON files:
+The normal lineage is:
 
-1. Write to a temporary file in the destination directory.
-2. Flush and close the temporary file.
-3. Validate it where applicable.
-4. Rename it over the target using the safest atomic operation available on the platform.
-5. Retain the prior version until the logical multi-file save completes.
+`angle/idea -> model or user draft Revision -> user-edited Revision(s) -> approved Revision -> manual Publication -> Performance Record(s)`
 
-Long-running imports and migrations must show a blocking operation state in the UI.
+Each Revision stores a `parent_revision_id`, content hash, origin actor, and creation metadata.
 
-## Backups
+Approval identifies one exact Revision. Manual publication records one exact Revision and the user-entered publication metadata.
 
-Automatic live synchronization is out of scope.
+If the user changes the text while publishing outside WorkLore, WorkLore should capture or paste back the exact published text as a new user/import Revision and attach the Publication to that Revision instead of pretending the previously approved text was published unchanged.
 
-The first version should support:
+Performance Records must link to the Publication and its exact Revision. Analytics must never join to "the current Post text" because the current draft may have changed after publication.
 
-- Manual vault export or copy
-- A backup command that produces a timestamped archive or folder copy
-- Excluding rebuildable `.worklore` data by default
-- Optional inclusion of caches for diagnostic support
+## Evidence and standing
 
-Backup and restore must never include provider credentials because credentials live in the operating system credential store.
+Proof Points and substantive claims link to Evidence Records, not directly to generic Source metadata.
 
-## Machine-Local Application State
+Evidence Records may represent:
 
-Recent vault paths, window state, and credential lookup keys belong in the application's machine-local settings, not inside the vault unless a setting is explicitly portable.
+- a source fragment;
+- a user-confirmed memory;
+- an interview answer;
+- a project artifact;
+- a Git commit or diff summary;
+- another explicit factual record.
 
-## Vault Validation
+Model inference may be retained in provenance or review notes, but it is not Evidence until the user confirms it or another supported source establishes it.
 
-Opening a vault should validate:
+A Post can reference Inspiration and Target Context without those records becoming proof of the user's experience.
 
-- `vault.json` exists and matches a supported schema
-- Required canonical directories exist or can be created
-- The vault is writable for editing operations
-- Entity registry identity matches the vault
-- No incomplete operation journal entry requires recovery
+## Privacy and confidentiality
 
-A vault with newer unsupported schema versions should open read-only when practical rather than being modified blindly.
+Private canonical records may retain real employer, client, person, project, product, system, repository, location, and metric details.
+
+Private Entity Registry IDs and stable tokens remain durable. Entity occurrences may link to any canonical record or Revision.
+
+Public-use checks are tied to the exact Revision content hash and the Private Entity Registry revision used for review.
+
+A Post cannot move to `approved` for public use, and a Publication cannot be recorded, unless the exact candidate Revision has a passing confidentiality review or an explicit user override permitted by policy.
+
+When WorkLore produces public-safe wording, the transformed Revision derives from the private Revision and keeps the same factual Evidence lineage. Confidentiality transformation changes disclosure, not truth.
+
+## Audit and version expectations
+
+SQLite transactions protect multi-record changes.
+
+Mutable domain records use optimistic row revisions. Material text artifacts use immutable Revision records.
+
+Append-only Audit Events are required for:
+
+- migration;
+- merge or split operations;
+- evidence confirmation or rejection;
+- voice-evidence eligibility changes;
+- Core Voice activation or supersession;
+- privacy-rule changes affecting public output;
+- Post approval;
+- Publication recording or correction;
+- analytics import;
+- destructive purge.
+
+The audit log need not capture every keystroke. It must capture changes that affect provenance, identity, privacy, publication state, or later interpretation.
+
+## Migration and reuse from the prototype
+
+| Prototype concept | Refocused mapping |
+| --- | --- |
+| Vault document | Preserve vault ID and user-facing metadata in `vault.json`; migrate structured state to `data/worklore.sqlite`. |
+| SourceDocument | Preserve `source_` IDs, copied bytes, hashes, extraction state, provenance, and privacy state. Add semantic role records instead of expanding `SourceType` indefinitely. |
+| Resume source | Preserve as Source. Resume processing becomes optional `Seed from resume` and may create Story Seeds, Roles, Evidence Records, and Stories. |
+| Job description | Preserve source bytes and provenance. Create Target Context. Existing job/requirement analysis becomes target-context concepts, not Evidence about the user. |
+| Writing sample | Preserve as Source. Create Voice Evidence only after provenance establishes user authorship and the user approves eligibility. |
+| StoryCandidate | Migrate to Story Seed where still useful. Use a new `seed_` ID and retain the legacy `candidate_` ID in migration lineage. Converted candidates may become archived/converted seeds linked to their Story. |
+| Story | Preserve `story_` IDs and factual content. Map prototype status to lifecycle plus maturity. Remove mandatory Role coupling. |
+| Nested Story evidence | Promote to global Evidence Records and preserve existing `evidence_` IDs where semantics remain valid. |
+| Story claims | Confirmed or user-estimated reusable claims may become candidate Proof Points. Unsupported or model-inferred claims remain provenance/review material until established. |
+| Role | Preserve `role_` IDs as optional career context. Existing reverse `storyIds` arrays are replaced by relationship rows. |
+| Interview | Preserve `interview_` IDs and turn history. Remap candidate targets to Story Seeds; future interviews may target Story Seeds or Stories directly. |
+| Voice profile explicit instructions | Migrate to Writing Rules, preserving text and enabled/priority semantics. |
+| Voice profile observations | Import as proposed Core Voice traits requiring review rather than silently accepting historical inference as identity. |
+| Voice profile sample refs | Import as pending Voice Evidence candidates. Do not mark eligible until user authorship and approval are established. |
+| Private Entity Registry | Preserve entity IDs, stable tokens, aliases, redirects, review decisions, and occurrence history. |
+| Provider/manual workspace artifacts | Preserve as provider-run or audit provenance where useful. Model text remains in Revision lineage and is not automatically Voice Evidence. |
+
+Migration must be recoverable and non-destructive. No prototype JSON or Markdown record should be deleted until the new database has been validated and a backup or export exists.
+
+## Portability and export
+
+Portability does not require WorkLore-hosted sync.
+
+Canonical database paths and Source records use vault-relative paths. Machine-local recent-vault settings may keep absolute paths outside the vault.
+
+A portable export snapshot should be deterministic and schema-versioned and may include:
+
+- a manifest with vault ID, export time, schema version, and content hashes;
+- JSON or JSONL domain records;
+- Markdown renderings for Stories, Topics, Voice summaries, and Posts where useful;
+- copied original Source files when requested;
+- publication and analytics metadata;
+- privacy/entity data only when the user explicitly includes private records.
+
+Export does not expose provider credentials.
+
+For backup or vault copy, WorkLore should checkpoint SQLite WAL state before copying and should treat concurrent multi-machine editing through a synced filesystem as unsupported unless a future sync contract explicitly adds it.
+
+## Prototype compatibility during migration
+
+Until the SQLite migration is implemented, the current JSON/Markdown vault remains supported by the existing prototype services.
+
+New feature work should not extend the old per-record layout with additional domain concepts. The next persistence slice should introduce the SQLite boundary and migration seam first, then move Phase 1 concepts behind that boundary.
+
+## Validation expectations
+
+Persistence implementation that follows this contract must eventually demonstrate:
+
+1. stable IDs survive migration;
+2. Story creation does not require a Role or resume;
+3. Source semantic roles remain distinct;
+4. raw model text cannot become Voice Evidence through any normal code path;
+5. exact approved and published Revision lineage is preserved;
+6. Performance Records join to the exact published Revision;
+7. privacy review is tied to exact public-use content;
+8. a copied vault opens without machine-local absolute-path dependencies;
+9. human-readable export can be regenerated from canonical state;
+10. no WorkLore-hosted service is required.

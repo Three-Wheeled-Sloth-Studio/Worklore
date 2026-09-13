@@ -98,13 +98,17 @@ active_refocus_tasks:
     area: architecture
     summary: Lock the standalone local deployment contract with no hosted backend, proprietary sync, or automatic social publishing in the accepted roadmap.
   - id: task-024
-    status: next
+    status: complete
     area: data
     summary: Define the refocused domain model and migration mapping for Story, Story Seed, Proof Point, Topic Candidate, Theme, Inspiration, Target Context, Voice Evidence, Core Voice, Tone Mode, Voice Direction, Writing Rule, Audience Model, Post, Revision, Experiment, Performance Record, and Source/Evidence.
   - id: task-025
-    status: next
+    status: complete
     area: ux
     summary: Design the task-oriented navigation and home flow around Capture, Stories, Topics, Voice, Posts, and Insights while demoting Sources and Privacy to supporting infrastructure.
+  - id: task-040
+    status: next
+    area: data
+    summary: Introduce the canonical SQLite persistence boundary, schema/migration framework, Phase 1 relational tables, and non-destructive migration seam from prototype vault records without beginning a broad UI rewrite.
   - id: task-026
     status: planned
     area: capture

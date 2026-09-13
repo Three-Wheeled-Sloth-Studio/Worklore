@@ -1,7 +1,7 @@
 ---
 type: Handoff Prompt
 title: Next WorkLore Development Slice
-description: Bounded prompt for the refocused domain-model and navigation contract work.
+description: Bounded prompt for the canonical SQLite persistence and prototype-migration seam.
 status: draft
 tags: [handoff, next-slice]
 ---
@@ -18,85 +18,122 @@ Work directly on `dev`. Do not promote `qa` or `main` unless explicitly requeste
 From the repository root, first run:
 
 ```powershell
-python refs/tools/generate_agent_context.py --focus "refocused domain model and navigation architecture"
+python refs/tools/generate_agent_context.py --focus "WorkLore Phase 1 canonical SQLite persistence and prototype migration seam"
 ```
 
-Treat the packet as derived orientation, not project truth. Use its file-map hints to load only the relevant authoritative refs and source files. Do not reread the full repository history.
+Treat the packet as derived orientation, not project truth. Follow its file hints and load only the authoritative refs and source files needed for the slice.
 
-At minimum, confirm the current product contract in `refs/product/prd.md` and the standalone boundary in `refs/architecture/standalone-deployment-contract.md` before proposing architecture.
+Read at minimum:
+
+- `refs/product/prd.md`
+- `refs/architecture/standalone-deployment-contract.md`
+- `refs/architecture/vaultFormat.md`
+- `refs/UI/designPrinciples.md`
+- `refs/handoffs/currentHandoff.md`
+- relevant existing schemas and Rust persistence services only after the contracts are understood
 
 ## Immediate Objective
 
-Before implementing new user-facing features, complete the Phase 1 contract work for the refocused product.
+Implement the bounded persistence foundation required by the accepted Professional Memory domain contract.
 
-Produce two reviewable artifacts.
+Do not begin the broad navigation rewrite in this slice.
 
-### A. Refocused Domain Model
+### 1. Canonical SQLite boundary
 
-Define canonical schemas and relationships for:
+Introduce a durable local database at the contract location `data/worklore.sqlite` for new/refocused canonical structured state.
 
-- Story
+Add a migration/version framework that can:
+
+- initialize a new database deterministically;
+- detect schema version;
+- migrate transactionally;
+- recover or fail safely;
+- keep database paths vault-relative;
+- avoid placing credentials or private provider logs into the database.
+
+### 2. Phase 1 relational model
+
+Implement only the Phase 1 records and relationship substrate needed for Professional Memory:
+
+- Source
 - Story Seed
+- Story
+- Evidence Record
 - Proof Point
 - Topic Candidate
 - Theme
 - Inspiration
 - Target Context
-- Voice Evidence
-- Core Voice
-- Tone Mode
-- Voice Direction
-- Writing Rule
-- Audience Model
-- Post
-- Revision
-- Experiment
-- Performance Record
-- Source/Evidence record
+- optional Role context
+- typed many-to-many relationships
+- migration lineage
+- material audit events
 
-The design must include IDs and lifecycle semantics, provenance, privacy relationships, many-to-many relationships where appropriate, audit/version expectations, explicit Evidence/Inspiration/Target Context separation, raw-AI voice-training exclusion, draft/edit/published lineage, analytics linkage, migration/reuse mapping from prototype records, and a recommendation for SQLite versus portable/human-readable representations.
+Do not implement Voice, Post, Experiment, Performance Record, or publication workflows yet. Their contracts should shape extensibility but not expand this slice.
 
-Do not contort the new model merely to preserve accidental prototype shapes.
+### 3. Non-destructive prototype migration seam
 
-### B. Navigation And Workspace Architecture
+Build a migration/import path from the existing prototype data that preserves behavior and user data without preserving accidental shapes.
 
-Propose the product-level information architecture centered on:
+At minimum:
 
-- Capture
-- Stories
-- Topics
-- Voice
-- Posts
-- Insights
+- preserve `source_`, `story_`, `role_`, `interview_`, and `entity_` IDs when semantics remain the same;
+- map useful Story Candidates to new Story Seeds with migration lineage;
+- promote nested Story Evidence into canonical Evidence Records;
+- make Story -> Role optional;
+- classify existing job descriptions as Target Context;
+- keep writing samples as Sources and do not silently make them Voice Evidence;
+- preserve Private Entity Registry behavior and stable tokens;
+- leave legacy JSON/Markdown records intact until migration has been validated and backed up.
 
-Define where Sources, Privacy/private entities, provider settings, audit history, import/export, and settings belong.
+### 4. Proof cases
 
-The home surface should make the next likely task obvious and support capturing something, developing a story, exploring post ideas, drafting/refining a post, and reviewing what is working.
+Add synthetic tests proving at least:
 
-Do not implement navigation before reviewing the proposed structure.
+- a new vault can initialize the canonical database;
+- a Story Seed can persist without a resume;
+- a Story can persist without a Role;
+- Evidence, Inspiration, and Target Context remain distinct;
+- prototype Source and Story IDs survive migration where appropriate;
+- Story Candidate migration records the old `candidate_` ID without reusing it as the new Story Seed ID;
+- reopening the vault preserves the same canonical records;
+- no machine-local absolute path becomes required canonical data.
 
-## Locked Constraints
+## Constraints
 
 - Standalone Windows-first application.
-- Local canonical storage; SQLite is allowed.
-- No WorkLore-hosted backend or account required.
-- No proprietary WorkLore cloud sync in the accepted roadmap.
-- No automatic LinkedIn/social publishing or scheduling in the accepted roadmap.
-- Human review and manual publication are intentional boundaries.
-- Raw AI drafts never train canonical voice.
-- Voice supports controlled tone diversity and deliberate user-directed evolution.
-- Confidentiality transformation is a hard requirement.
-- WorkLore should resist slop and generic fluff rather than optimize for content volume.
-- Resume ingestion is optional `Seed from resume` support.
-- Job descriptions are Target Context for ideation, not keyword-stuffing targets.
-- External posts, articles, papers, and URLs are Inspiration unless separately established as evidence.
+- Local canonical storage only.
+- No WorkLore-hosted backend, account, or proprietary sync.
+- No automatic publishing or scheduling.
+- No broad UI rewrite.
+- No direct provider expansion unless strictly required for a test seam.
+- Preserve the public repository boundary and use synthetic fixtures only.
+- Keep build/dev/QA output outside the repository and default it to the checkout drive.
+- Run the Git-index case-collision guard before finalizing path changes.
+- Do not hand-edit generated OKF indexes.
 
-## Existing Foundation To Preserve Selectively
+## Validation
 
-Preserve useful vault lifecycle, source import/extraction, resume seeding, guided interview mechanics, evidence classifications, Private Entity Registry and stable tokens, manual AI workspace exchange, story persistence, operation instrumentation, and external build/QA storage separation.
+Use the repository validation guidance.
+
+Because this slice changes Rust persistence code, run at minimum:
+
+```powershell
+python scripts/check-case-collisions.py
+git diff --check
+python refs/tools/validate_refs.py --mode initialized
+python refs/tools/generate_agent_context.py --check
+cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
+cargo test --manifest-path src-tauri/Cargo.toml
+cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
+```
+
+Run frontend tests/build only if frontend or shared TypeScript contracts change.
+
+Batch meaningful changes before pushing. Avoid repeated CI churn on the draft PR.
 
 ## Stop Point
 
-Stop after the domain-model and navigation/workspace proposals are documented and internally checked for consistency with the PRD.
+Stop after the canonical persistence foundation and non-destructive migration seam are implemented, tested, documented, and the delta handoff is updated.
 
-Do not begin broad UI or persistence refactoring until those contracts are reviewed.
+Do not begin the large navigation/workspace rewrite in the same slice.
