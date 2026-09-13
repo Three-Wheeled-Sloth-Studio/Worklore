@@ -6,6 +6,7 @@ import { HomeWorkspace } from "./components/HomeWorkspace";
 import { LibraryWorkspace } from "./components/LibraryWorkspace";
 import { GuidedInterviewPanel } from "./components/GuidedInterviewPanel";
 import { PerformancePanel } from "./components/PerformancePanel";
+import { ProviderSettingsPanel } from "./components/ProviderSettingsPanel";
 import { PrivacyReviewPanel } from "./components/PrivacyReviewPanel";
 import { StoryBankPanel } from "./components/StoryBankPanel";
 import { StoryCandidatePanel } from "./components/StoryCandidatePanel";
@@ -662,10 +663,7 @@ function App() {
             <section className="workspace-panel" aria-labelledby="settings-heading">
               <p className="eyebrow">Application</p>
               <h2 id="settings-heading">Settings</h2>
-              <div className="next-step-card">
-                <h3>AI Providers</h3>
-                <p>Ollama and provider-neutral BYOK configuration begin in Phase 2. No provider is required for current professional-memory workflows, and WorkLore will not silently fall back to cloud execution.</p>
-              </div>
+              <ProviderSettingsPanel />
               <div className="next-step-card">
                 <h3>Storage</h3>
                 <p title={vault!.path}>This vault is local at {vault!.path}. Backup and portable export remain explicit user-controlled operations.</p>

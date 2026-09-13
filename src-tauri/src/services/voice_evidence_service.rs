@@ -185,6 +185,13 @@ struct SourceRecord {
     extraction_json: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EligibleVoiceEvidenceMaterial {
+    pub voice_evidence_id: String,
+    pub source_id: String,
+    pub text_snapshot: String,
+}
+
 pub fn list_voice_source_candidates(
     vault_path: &Path,
 ) -> ServiceResult<Vec<VoiceSourceCandidateView>> {
@@ -235,6 +242,64 @@ pub fn list_voice_source_candidates(
         });
     }
     Ok(out)
+}
+
+pub fn load_eligible_voice_evidence_material(
+    vault_path: &Path,
+    requested_ids: &[String],
+) -> ServiceResult<Vec<EligibleVoiceEvidenceMaterial>> {
+    canonical_store::initialize(vault_path)?;
+    let requested = requested_ids
+        .iter()
+        .map(|value| value.trim())
+        .filter(|value| !value.is_empty())
+        .collect::<std::collections::BTreeSet<_>>();
+    if requested.is_empty() {
+        return Err(WorkLoreError::SourceNotReady(
+            "Select at least one eligible Voice Evidence record for analysis.".to_string(),
+        ));
+    }
+    if requested.len() > 24 {
+        return Err(WorkLoreError::ProviderOperation {
+            code: "request_too_large",
+            message: "Voice analysis is limited to 24 evidence records per run.".to_string(),
+        });
+    }
+
+    let connection = open_connection(vault_path)?;
+    let mut material = Vec::with_capacity(requested.len());
+    for voice_evidence_id in requested {
+        let row = connection
+            .query_row(
+                "SELECT source_id,text_snapshot,status FROM voice_evidence WHERE voice_evidence_id=?1",
+                [voice_evidence_id],
+                |row| {
+                    Ok((
+                        row.get::<_, String>(0)?,
+                        row.get::<_, String>(1)?,
+                        row.get::<_, String>(2)?,
+                    ))
+                },
+            )
+            .optional()?
+            .ok_or_else(|| {
+                WorkLoreError::InvalidVault(format!(
+                    "Voice Evidence {voice_evidence_id} was not found."
+                ))
+            })?;
+        if row.2 != "eligible" {
+            return Err(WorkLoreError::SourceNotReady(format!(
+                "Voice Evidence {voice_evidence_id} is {} and cannot be sent as canonical voice evidence.",
+                row.2
+            )));
+        }
+        material.push(EligibleVoiceEvidenceMaterial {
+            voice_evidence_id: voice_evidence_id.to_string(),
+            source_id: row.0,
+            text_snapshot: row.1,
+        });
+    }
+    Ok(material)
 }
 
 pub fn create_voice_evidence_from_source(

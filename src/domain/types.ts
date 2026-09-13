@@ -476,6 +476,52 @@ export interface UpdateWritingRuleRequest extends CreateWritingRuleRequest {
   status: WritingRuleStatus;
 }
 
+export interface ProviderSettings {
+  selectedProviderId: string | null;
+  ollamaBaseUrl: string;
+  ollamaModelId: string | null;
+}
+
+export interface UpdateProviderSettingsRequest extends ProviderSettings {}
+
+export interface ProviderModel {
+  modelId: string;
+  displayName: string;
+  parameterSize: string | null;
+  quantizationLevel: string | null;
+}
+
+export interface ProviderConnection {
+  providerId: string;
+  available: boolean;
+  modelCount: number;
+  message: string;
+}
+
+export interface AnalyzeVoiceEvidenceRequest {
+  providerId: string;
+  modelId: string;
+  voiceEvidenceIds: string[];
+  userGuidance?: string | null;
+}
+
+export interface VoiceTraitProposal {
+  proposalId: string;
+  name: string;
+  value: string;
+  evidenceIds: string[];
+  rationale: string;
+}
+
+export interface VoiceAnalysisProposalSet {
+  runId: string;
+  operationId: string;
+  operationVersion: number;
+  providerId: string;
+  modelId: string;
+  proposals: VoiceTraitProposal[];
+}
+
 export type PrivacyScanStatus =
   | "pending"
   | "complete"

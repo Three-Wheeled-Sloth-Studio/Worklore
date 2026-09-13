@@ -63,6 +63,12 @@ import type {
   WritingRuleRecord,
   CreateWritingRuleRequest,
   UpdateWritingRuleRequest,
+  ProviderSettings,
+  UpdateProviderSettingsRequest,
+  ProviderModel,
+  ProviderConnection,
+  AnalyzeVoiceEvidenceRequest,
+  VoiceAnalysisProposalSet,
 } from "../domain/types";
 
 export async function createDefaultVault(name: string): Promise<VaultSummary> {
@@ -95,6 +101,33 @@ export async function getLastImportDirectory(): Promise<string | null> {
 
 export async function rememberLastImportFile(filePath: string): Promise<string> {
   return invoke<string>("remember_last_import_file", { filePath });
+}
+
+export async function getProviderSettings(): Promise<ProviderSettings> {
+  return invoke<ProviderSettings>("get_provider_settings");
+}
+
+export async function updateProviderSettings(
+  request: UpdateProviderSettingsRequest,
+): Promise<ProviderSettings> {
+  return invoke<ProviderSettings>("update_provider_settings", { request });
+}
+
+export async function listProviderModels(providerId: string): Promise<ProviderModel[]> {
+  return invoke<ProviderModel[]>("list_provider_models", { providerId });
+}
+
+export async function testProviderConnection(
+  providerId: string,
+): Promise<ProviderConnection> {
+  return invoke<ProviderConnection>("test_provider_connection", { providerId });
+}
+
+export async function analyzeVoiceEvidence(
+  vaultPath: string,
+  request: AnalyzeVoiceEvidenceRequest,
+): Promise<VoiceAnalysisProposalSet> {
+  return invoke<VoiceAnalysisProposalSet>("analyze_voice_evidence", { vaultPath, request });
 }
 
 export async function importSource(

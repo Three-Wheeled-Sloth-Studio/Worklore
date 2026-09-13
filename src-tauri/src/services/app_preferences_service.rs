@@ -7,6 +7,7 @@ use chrono::Utc;
 use serde::{Deserialize, Serialize};
 
 use crate::{
+    domain::providers::ProviderSettingsView,
     error::{ServiceResult, WorkLoreError},
     io_utils::{read_json, write_json_atomic},
 };
@@ -20,6 +21,12 @@ struct AppPreferences {
     last_vault_path: Option<String>,
     #[serde(default)]
     last_import_directory: Option<String>,
+    #[serde(default)]
+    selected_provider_id: Option<String>,
+    #[serde(default = "default_ollama_base_url")]
+    ollama_base_url: String,
+    #[serde(default)]
+    ollama_model_id: Option<String>,
     updated_at: String,
 }
 
@@ -29,6 +36,9 @@ impl Default for AppPreferences {
             schema_version: default_schema_version(),
             last_vault_path: None,
             last_import_directory: None,
+            selected_provider_id: None,
+            ollama_base_url: default_ollama_base_url(),
+            ollama_model_id: None,
             updated_at: Utc::now().to_rfc3339(),
         }
     }
@@ -84,6 +94,27 @@ pub fn default_vault_root() -> ServiceResult<PathBuf> {
 
 pub fn get_default_vault_root() -> ServiceResult<String> {
     Ok(default_vault_root()?.to_string_lossy().to_string())
+}
+
+pub fn get_provider_settings() -> ServiceResult<ProviderSettingsView> {
+    let preferences = read_preferences_or_default(&preferences_path()?)?;
+    Ok(ProviderSettingsView {
+        selected_provider_id: preferences.selected_provider_id,
+        ollama_base_url: preferences.ollama_base_url,
+        ollama_model_id: preferences.ollama_model_id,
+    })
+}
+
+pub fn save_provider_settings(
+    settings: ProviderSettingsView,
+) -> ServiceResult<ProviderSettingsView> {
+    update_preferences(|preferences| {
+        preferences.schema_version = 2;
+        preferences.selected_provider_id = settings.selected_provider_id.clone();
+        preferences.ollama_base_url = settings.ollama_base_url.clone();
+        preferences.ollama_model_id = settings.ollama_model_id.clone();
+    })?;
+    Ok(settings)
 }
 
 fn update_preferences(mut update: impl FnMut(&mut AppPreferences)) -> ServiceResult<()> {
@@ -147,7 +178,11 @@ fn local_config_root() -> Option<PathBuf> {
 }
 
 const fn default_schema_version() -> u32 {
-    1
+    2
+}
+
+fn default_ollama_base_url() -> String {
+    "http://127.0.0.1:11434".to_string()
 }
 
 #[cfg(test)]
@@ -157,9 +192,12 @@ mod tests {
     #[test]
     fn default_preferences_keep_vault_and_import_memory_separate() {
         let preferences = AppPreferences::default();
-        assert_eq!(preferences.schema_version, 1);
+        assert_eq!(preferences.schema_version, 2);
         assert!(preferences.last_vault_path.is_none());
         assert!(preferences.last_import_directory.is_none());
+        assert!(preferences.selected_provider_id.is_none());
+        assert_eq!(preferences.ollama_base_url, "http://127.0.0.1:11434");
+        assert!(preferences.ollama_model_id.is_none());
     }
 
     #[test]

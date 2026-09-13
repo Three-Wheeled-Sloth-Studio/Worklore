@@ -66,6 +66,9 @@ pub enum WorkLoreError {
     #[error("The manual workspace could not be created: {0}")]
     ManualWorkspace(String),
 
+    #[error("Provider operation failed: {message}")]
+    ProviderOperation { code: &'static str, message: String },
+
     #[error("SQLite operation failed: {0}")]
     Sqlite(#[from] rusqlite::Error),
 
@@ -96,6 +99,13 @@ impl CommandError {
 
 impl From<WorkLoreError> for CommandError {
     fn from(value: WorkLoreError) -> Self {
+        if let WorkLoreError::ProviderOperation { code, message } = &value {
+            return Self {
+                code: (*code).to_string(),
+                message: message.clone(),
+                detail: None,
+            };
+        }
         let code = match &value {
             WorkLoreError::NotAVault => "not_a_vault",
             WorkLoreError::VaultAlreadyExists => "vault_already_exists",
@@ -118,6 +128,7 @@ impl From<WorkLoreError> for CommandError {
             WorkLoreError::InvalidReviewResolution(_) => "invalid_review_resolution",
             WorkLoreError::ProviderPreflightBlocked(_) => "provider_preflight_blocked",
             WorkLoreError::ManualWorkspace(_) => "manual_workspace_failed",
+            WorkLoreError::ProviderOperation { .. } => unreachable!("provider errors return above"),
             WorkLoreError::Sqlite(_) => "sqlite_error",
             WorkLoreError::Io(_) => "io_error",
             WorkLoreError::Json(_) => "json_error",

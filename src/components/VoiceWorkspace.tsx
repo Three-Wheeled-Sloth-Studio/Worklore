@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import type {
   CoreVoiceRecord,
   CoreVoiceTrait,
+  ProviderSettings,
+  VoiceAnalysisProposalSet,
+  VoiceTraitProposal,
   ToneModeRecord,
   VoiceAuthorshipState,
   VoiceDirectionRecord,
@@ -15,12 +18,14 @@ import type {
 import { errorMessage } from "../domain/types";
 import {
   activateCoreVoice,
+  analyzeVoiceEvidence,
   createCoreVoice,
   createToneMode,
   createVoiceDirection,
   createVoiceEvidenceFromSource,
   createWritingRule,
   deleteCoreVoiceTrait,
+  getProviderSettings,
   listCoreVoices,
   listToneModes,
   listVoiceDirections,
@@ -71,6 +76,11 @@ export function VoiceWorkspace({ vaultPath }: { vaultPath: string }) {
   const [directionRationale, setDirectionRationale] = useState("");
   const [ruleName, setRuleName] = useState("");
   const [ruleInstruction, setRuleInstruction] = useState("");
+  const [providerSettings, setProviderSettings] = useState<ProviderSettings | null>(null);
+  const [analysisEvidenceIds, setAnalysisEvidenceIds] = useState<string[]>([]);
+  const [analysisGuidance, setAnalysisGuidance] = useState("");
+  const [analysisResult, setAnalysisResult] = useState<VoiceAnalysisProposalSet | null>(null);
+  const [proposalVoiceId, setProposalVoiceId] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -80,11 +90,32 @@ export function VoiceWorkspace({ vaultPath }: { vaultPath: string }) {
     [evidence],
   );
 
+  const proposedVoices = useMemo(
+    () => voices.filter((voice) => voice.status === "proposed"),
+    [voices],
+  );
+
   useEffect(() => {
     setNotice(null);
     setError(null);
     void refresh();
   }, [vaultPath]);
+
+  useEffect(() => {
+    void getProviderSettings()
+      .then(setProviderSettings)
+      .catch(() => setProviderSettings(null));
+  }, [vaultPath]);
+
+  useEffect(() => {
+    const eligibleIds = new Set(eligibleEvidence.map((item) => item.voiceEvidenceId));
+    setAnalysisEvidenceIds((current) => current.filter((id) => eligibleIds.has(id)));
+  }, [eligibleEvidence]);
+
+  useEffect(() => {
+    if (proposalVoiceId && proposedVoices.some((voice) => voice.voiceId === proposalVoiceId)) return;
+    setProposalVoiceId(proposedVoices[0]?.voiceId ?? "");
+  }, [proposalVoiceId, proposedVoices]);
 
   async function refresh() {
     try {
@@ -223,6 +254,70 @@ export function VoiceWorkspace({ vaultPath }: { vaultPath: string }) {
     );
   }
 
+  async function runVoiceAnalysis() {
+    if (
+      !providerSettings?.selectedProviderId ||
+      !providerSettings.ollamaModelId ||
+      analysisEvidenceIds.length === 0
+    ) return;
+    setBusy("Analyzing eligible Voice Evidence locally");
+    setNotice(null);
+    setError(null);
+    try {
+      const result = await analyzeVoiceEvidence(vaultPath, {
+        providerId: providerSettings.selectedProviderId,
+        modelId: providerSettings.ollamaModelId,
+        voiceEvidenceIds: analysisEvidenceIds,
+        userGuidance: analysisGuidance || null,
+      });
+      setAnalysisResult(result);
+      setNotice(
+        result.proposals.length > 0
+          ? `${result.proposals.length} review-only voice proposal${result.proposals.length === 1 ? "" : "s"} returned. Nothing has changed in Core Voice.`
+          : "The selected samples did not support a stable voice proposal. Core Voice remains unchanged.",
+      );
+    } catch (caught) {
+      setError(errorMessage(caught));
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function acceptVoiceProposal(proposal: VoiceTraitProposal) {
+    if (!proposalVoiceId) return;
+    setBusy("Accepting reviewed voice proposal");
+    setNotice(null);
+    setError(null);
+    try {
+      await saveCoreVoiceTrait(vaultPath, {
+        voiceId: proposalVoiceId,
+        name: proposal.name,
+        value: proposal.value,
+        userGuidance: null,
+        voiceEvidenceIds: proposal.evidenceIds,
+      });
+      setAnalysisResult((current) =>
+        current
+          ? { ...current, proposals: current.proposals.filter((item) => item.proposalId !== proposal.proposalId) }
+          : null,
+      );
+      setNotice("Proposal accepted into the selected proposed Core Voice version with its eligible evidence links preserved.");
+      await refresh();
+    } catch (caught) {
+      setError(errorMessage(caught));
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  function discardVoiceProposal(proposalId: string) {
+    setAnalysisResult((current) =>
+      current
+        ? { ...current, proposals: current.proposals.filter((item) => item.proposalId !== proposalId) }
+        : null,
+    );
+  }
+
   async function addTone() {
     if (!toneName.trim() || !toneInstructions.trim()) return;
     await run(
@@ -353,6 +448,116 @@ export function VoiceWorkspace({ vaultPath }: { vaultPath: string }) {
             })}
           </div>
         )}
+      </section>
+
+      <section className="workspace-panel" aria-labelledby="voice-analysis-heading">
+        <div className="panel-heading-row">
+          <div><p className="eyebrow">Provider-assisted, review-only</p><h2 id="voice-analysis-heading">Analyze Voice Evidence</h2></div>
+          <span className="status-pill">v1</span>
+        </div>
+        <p>
+          Ask the explicitly configured local provider for attributable observations. Provider output is temporary review material and cannot change Core Voice until you accept a proposal.
+        </p>
+        {!providerSettings?.selectedProviderId || !providerSettings.ollamaModelId ? (
+          <div className="empty-state compact-empty">
+            <h3>No executable provider configured</h3>
+            <p>Configure local Ollama and an explicit model in Settings. Manual Voice management remains fully available without a provider.</p>
+          </div>
+        ) : eligibleEvidence.length === 0 ? (
+          <div className="empty-state compact-empty">
+            <h3>No eligible evidence to analyze</h3>
+            <p>Only explicitly approved Voice Evidence can enter this operation.</p>
+          </div>
+        ) : (
+          <div className="voice-analysis-panel">
+            <p className="voice-meta">Provider: {providerSettings.selectedProviderId} | model: {providerSettings.ollamaModelId}</p>
+            <fieldset className="voice-evidence-picker">
+              <legend>Select eligible Voice Evidence</legend>
+              {eligibleEvidence.map((item) => (
+                <label key={item.voiceEvidenceId}>
+                  <input
+                    type="checkbox"
+                    checked={analysisEvidenceIds.includes(item.voiceEvidenceId)}
+                    disabled={busy !== null}
+                    onChange={(event) =>
+                      setAnalysisEvidenceIds((current) =>
+                        event.target.checked
+                          ? [...current, item.voiceEvidenceId]
+                          : current.filter((id) => id !== item.voiceEvidenceId),
+                      )
+                    }
+                  />
+                  {item.sourceDisplayName}
+                </label>
+              ))}
+            </fieldset>
+            <textarea
+              value={analysisGuidance}
+              onChange={(event) => setAnalysisGuidance(event.target.value)}
+              rows={3}
+              placeholder="Optional guidance for this analysis, such as traits you want checked. Guidance is context, not evidence."
+            />
+            <div className="support-actions">
+              <button
+                className="primary-button compact"
+                disabled={busy !== null || analysisEvidenceIds.length === 0}
+                onClick={() => void runVoiceAnalysis()}
+              >
+                Analyze selected evidence
+              </button>
+            </div>
+          </div>
+        )}
+
+        {analysisResult ? (
+          <div className="voice-analysis-results">
+            <div className="voice-card-heading">
+              <div>
+                <h3>Review proposals</h3>
+                <p className="voice-meta">{analysisResult.operationId} v{analysisResult.operationVersion} | {analysisResult.runId}</p>
+              </div>
+              <span className="status-pill attention">Not canonical</span>
+            </div>
+            {analysisResult.proposals.length === 0 ? (
+              <p className="voice-rule">No pending proposals. Core Voice was not changed.</p>
+            ) : (
+              <>
+                <label className="field-label" htmlFor="proposal-voice-version">Accept into proposed Core Voice version</label>
+                <select
+                  id="proposal-voice-version"
+                  value={proposalVoiceId}
+                  disabled={busy !== null || proposedVoices.length === 0}
+                  onChange={(event) => setProposalVoiceId(event.target.value)}
+                >
+                  {proposedVoices.length === 0 ? <option value="">Create a proposed Core Voice version first</option> : null}
+                  {proposedVoices.map((voice) => <option key={voice.voiceId} value={voice.voiceId}>v{voice.versionNumber}: {voice.label}</option>)}
+                </select>
+                <div className="voice-card-list">
+                  {analysisResult.proposals.map((proposal) => (
+                    <article className="voice-model-card" key={proposal.proposalId}>
+                      <h4>{proposal.name}</h4>
+                      <p>{proposal.value}</p>
+                      <p className="voice-meta">Evidence: {proposal.evidenceIds.join(", ")}</p>
+                      <p className="voice-rule">Provider rationale: {proposal.rationale}</p>
+                      <div className="support-actions">
+                        <button
+                          className="primary-button compact"
+                          disabled={busy !== null || !proposalVoiceId}
+                          onClick={() => void acceptVoiceProposal(proposal)}
+                        >
+                          Accept trait
+                        </button>
+                        <button className="quiet-button compact" disabled={busy !== null} onClick={() => discardVoiceProposal(proposal.proposalId)}>
+                          Discard
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        ) : null}
       </section>
 
       <section className="workspace-panel" aria-labelledby="core-voice-heading">

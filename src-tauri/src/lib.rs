@@ -29,7 +29,10 @@ use commands::{
         remember_last_import_file, remember_last_vault,
     },
     privacy::{list_entity_reviews, resolve_entity_review},
-    providers::create_manual_workspace,
+    providers::{
+        analyze_voice_evidence, create_manual_workspace, get_provider_settings,
+        list_provider_models, test_provider_connection, update_provider_settings,
+    },
     roles::list_roles,
     stories::{import_story_response, list_stories, set_story_status},
     target_contexts::{
@@ -137,6 +140,11 @@ pub fn run() {
             resume_guided_interview,
             get_performance_snapshot,
             create_manual_workspace,
+            get_provider_settings,
+            update_provider_settings,
+            list_provider_models,
+            test_provider_connection,
+            analyze_voice_evidence,
             list_roles,
             import_story_response,
             list_stories,
