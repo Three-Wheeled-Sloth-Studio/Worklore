@@ -1,7 +1,7 @@
 ---
 type: Handoff Prompt
 title: Next WorkLore Development Slice
-description: Bounded prompt for provider-neutral voice proposals on the validated schema-v7 Core Voice foundation.
+description: Bounded prompt for the deterministic anti-slop Writing Pattern Linter foundation on the validated provider-neutral Voice stack.
 status: draft
 tags: [handoff, next-slice]
 ---
@@ -17,173 +17,147 @@ Work directly on `dev`. Do not promote `qa` or `main` unless explicitly requeste
 
 Phase 1 Professional Memory is complete. Phase 2 Voice Intelligence is in progress.
 
-Validated Voice Evidence checkpoint:
+Validated provider-neutral voice analysis checkpoint:
 
-`faf702206eac854700b7d634ef40901afe898916`
+`34def4aca4e52eaa32d59546cbf174964c9eae66`
 
-Validated provider-free Core Voice foundation checkpoint:
+Implementation validation:
 
-`8344be9b3e25900d8eb59c1e6c35f97f25896bd5`
-
-Implementation validation for the Core Voice foundation:
-
-- Actions `34784149143`
-- Job `103796446983`
+- Actions `34786970170`
+- Job `103804095335`
 - frontend: 8 passed / 0 failed across 3 files
-- Rust: 81 passed / 0 failed
-- production frontend build: green, 51 modules transformed
+- Rust: 90 passed / 0 failed
+- production frontend build: green, 53 modules transformed
 - case-collision, refs/OKF, bounded agent context, `git diff --check`, warnings-denied Clippy, and rustfmt: green
 
-Schema v7 now persists semantically separate Core Voice versions/traits, eligible-evidence provenance links, Tone Modes, Voice Directions, and Writing Rules. Core Voice activation is transactional; invalidated evidence is surfaced rather than rewriting history; the UI supports manual management without provider inference.
+This checkpoint includes governed Voice Evidence, schema-v7 Core Voice/Tone/Direction/Writing Rules, and an executable provider-neutral registry with Ollama plus review-only `analyze_voice_evidence` v1 proposals. Provider output remains non-authoritative until explicit user acceptance through the existing provenance-safe Core Voice path.
 
 Read `refs/handoffs/currentHandoff.md` before making changes.
 
 ## Start With Bounded Re-entry
 
 ```powershell
-python refs/tools/generate_agent_context.py --focus "WorkLore Phase 2 provider registry Ollama structured voice analysis proposals Core Voice eligible Voice Evidence"
+python refs/tools/generate_agent_context.py --focus "WorkLore task-033 deterministic anti-slop writing pattern linter Writing Rules draft quality"
 ```
 
 Treat generated context as derived orientation. Read only the authoritative refs/source needed for this slice.
 
 Read at minimum:
 
-- `refs/product/prd.md`, especially voice/provider/privacy sections
-- `refs/architecture/vaultFormat.md`
-- `refs/architecture/providerArchitecture.md`
+- `refs/product/prd.md`, especially the anti-slop and voice-quality sections
 - `refs/planning/roadmap.yaml`
 - `refs/planning/todos.yaml`
 - `refs/handoffs/currentHandoff.md`
-- `src-tauri/src/services/voice_evidence_service.rs`
+- `refs/architecture/providerArchitecture.md`
 - `src-tauri/src/services/voice_profile_service.rs`
-- `src-tauri/src/services/canonical_store.rs`
-- `src-tauri/src/commands/voice.rs`
 - `src/domain/types.ts`
 - `src/lib/workloreApi.ts`
-- `src/components/VoiceWorkspace.tsx`
 
 ## Immediate Objective
 
-Continue `task-032` by adding the smallest provider-neutral execution path that can propose voice observations without making provider output authoritative.
+Begin `task-033` with the smallest deterministic Writing Pattern Linter foundation that can challenge a supplied draft without requiring provider execution or inventing durable Post/Revision state.
 
 This slice should answer:
 
-`Can WorkLore ask an explicitly selected provider to analyze only eligible voice material, return structured attributable proposals, and let the user accept or discard those proposals without weakening canonical provenance?`
+`Can WorkLore identify specific, explainable AI-default/repetitive writing patterns and explicit Writing Rule violations in one supplied draft without claiming a fake AI probability or opaque quality score?`
 
-### 1. Implement the provider-neutral registry seam
+### 1. Define a provider-free lint contract first
 
-Follow `refs/architecture/providerArchitecture.md` rather than placing Ollama-specific networking in the Voice workflow.
+Create a stable structured contract for deterministic findings.
 
-Requirements:
+Each finding should carry enough information for a UI or later workflow to explain itself, such as:
 
-- stable provider IDs rather than workflow-specific provider branches;
-- explicit configured provider/model selection;
-- normalized provider status and error categories;
-- structured request/response contracts with local validation;
-- no credentials in frontend, vault, SQLite canonical records, exports, or logs;
-- no silent provider fallback;
-- provider-free workflows must continue to function when no provider is configured.
+- stable rule ID;
+- category;
+- severity/level with documented semantics;
+- concise human-readable reason;
+- matched text and/or start/end location when practical;
+- deterministic remediation guidance when the rule has an obvious correction;
+- whether the finding came from a built-in pattern or an explicit user Writing Rule.
 
-Do not invent a hosted WorkLore provider.
+Do not collapse findings into a fake overall "slop score", AI probability, or quality percentage.
 
-### 2. Prefer Ollama for the first executable adapter
+### 2. Implement only single-draft checks with stable semantics
 
-Ollama is the first-class local provider and the cheapest safe path for early voice-analysis testing.
+Start with deterministic rules that are useful without a portfolio/history corpus. Candidate checks include:
 
-At minimum, the adapter should:
+- rhetorical-question opening;
+- forced closing question;
+- repeated engagement-bait phrasing;
+- excessive hashtag count;
+- strongly list-dominated/numbered structure when it crosses a transparent threshold;
+- explicit banned phrase/word rules from active Writing Rules;
+- explicit punctuation/style constraints that can be represented deterministically from Writing Rules;
+- certainty-language warnings for patterns that make unsupported absolute claims, only where the heuristic can be clearly explained.
 
-- use an explicitly configured local base URL;
-- test connectivity cleanly;
-- enumerate/select installed models if practical under the current architecture;
-- execute structured JSON output for a versioned operation contract;
-- map transport/model/schema failures into normalized provider errors;
-- fail cleanly when Ollama is absent or stopped.
+Prefer a smaller reliable rule set over a broad fuzzy detector.
 
-Do not make Ollama installation a prerequisite for opening or using WorkLore.
+### 3. Writing Rules are explicit constraints, not inferred identity
 
-### 3. Add one review-only voice analysis operation
-
-Add a versioned operation such as `analyze_voice_evidence`.
-
-Input may include only:
-
-- eligible Voice Evidence selected by the user/system under the task-031 rules;
-- explicit user guidance intended for voice analysis;
-- stable source/evidence identifiers needed for attribution.
-
-The structured result should contain proposed observations/traits with enough attribution to review, for example:
-
-- proposed trait name;
-- concise trait description/value;
-- supporting Voice Evidence IDs;
-- rationale tied to observed material;
-- optional conflicts/weak-support notes.
-
-Do not request or return fake confidence percentages or AI/human probability scores.
-
-### 4. Keep proposals non-authoritative
-
-Provider output must not directly mutate active Core Voice.
+Active Writing Rules should participate in linting where their instruction can be represented by a deterministic matcher.
 
 Requirements:
 
-- proposals remain transient or explicitly review-state data until accepted;
-- user acceptance creates/updates a trait only through the existing proposed Core Voice path;
-- all accepted traits still satisfy the schema-v7 provenance rules;
-- discarded proposals leave canonical identity unchanged;
-- provider-generated wording itself never becomes Voice Evidence;
-- provider run metadata may record provider/model/operation/result status but not credentials or private request/response bodies by default.
+- do not silently convert arbitrary prose instructions into unreliable hidden regexes;
+- if only a subset of Writing Rule forms is machine-enforceable in this slice, model that distinction explicitly;
+- disabled/retired/proposed rules must not behave as active enforcement;
+- linting must not mutate Core Voice, Tone Modes, Voice Direction, or Writing Rules.
 
-### 5. Preserve manual and BYOK seams without scope explosion
+### 4. Preserve the provider boundary
 
-The provider registry should leave clean adapter seams for:
+Deterministic linting must run with no configured provider and no network availability.
 
-- `manual` workspace export/import;
-- Gemini BYOK as the first remote adapter.
+Leave a clean seam for later model-assisted quality review through the existing provider registry, but:
 
-Do not force Gemini credential storage into this slice if implementing the OS credential boundary would make the slice substantially broader than the Ollama + registry + review-only proposal proof. If Gemini is deferred, document the exact seam and next dependency rather than creating a placeholder that leaks credentials into ordinary settings.
+- do not automatically call Ollama;
+- do not silently fall back to a provider;
+- do not make provider output authoritative;
+- do not add Gemini/BYOK work merely to implement the linter.
 
-### 6. Privacy and source boundaries remain hard
+### 5. Explicitly defer corpus-dependent checks
 
-- Rejected/retired/pending Voice Evidence cannot be sent as canonical voice evidence for analysis.
-- Inspiration and Target Context cannot enter the voice-analysis evidence set merely because they contain useful prose.
-- Raw provider output cannot become Evidence or Voice Evidence.
-- Stable redaction/private-entity behavior must remain intact.
-- Cloud/manual paths require privacy preflight before any later remote transmission; local Ollama does not authorize bypassing canonical source eligibility rules.
+`task-033` also names cross-draft repetition and proof-point rotation. Those need durable draft/published-content lineage that does not yet exist.
 
-### 7. Do not implement edit-delta learning yet
+Do not invent transient pseudo-history or begin broad Content Studio/Post persistence in this slice merely to claim those boxes are checked.
 
-Edit-delta learning depends on durable Post/Revision lineage that preserves model draft -> human edit -> final approved text.
+Instead, define the lint API/data seam so later portfolio checks can add findings under the same contract once durable Post/Revision lineage exists.
 
-That lineage belongs to the Content Studio/audit work. Leave the seam explicit, but do not infer recurring writing preferences from arbitrary current UI edits or Voice Evidence review actions.
+Likewise, do not pretend a single draft can prove "batch mode collapse" across multiple outputs.
 
-### 8. Proof cases
+### 6. Evidence and standing challenges stay grounded
+
+Do not infer standing from Target Context or Inspiration.
+
+If this slice includes a simple unsupported-certainty warning, make clear it is a writing-pattern challenge, not proof that the factual claim is false. Full evidence/standing review can follow once the content workflow supplies explicit claim/evidence context.
+
+### 7. Proof cases
 
 Cover at least:
 
-- no configured provider leaves all existing provider-free Voice workflows functional;
-- provider selection is explicit and no automatic fallback occurs;
-- only eligible Voice Evidence can enter `analyze_voice_evidence` input;
-- provider output with missing/unknown evidence IDs is rejected locally;
-- malformed structured output is rejected without canonical mutation;
-- a valid proposal does not change active Core Voice until explicit user acceptance;
-- accepted proposal traits still pass existing provenance enforcement;
-- discarded proposals leave Core Voice unchanged;
-- Ollama unavailable/model unavailable errors normalize cleanly;
-- provider logs/records do not contain credentials;
-- existing 81 Rust tests and frontend regressions remain green.
+- linter runs with no provider configured;
+- clean ordinary prose can return zero findings;
+- rhetorical-question opening is detected deterministically;
+- forced closing question/engagement-bait example is detected without treating every legitimate question as bait;
+- hashtag threshold is deterministic and boundary-tested;
+- active enforceable Writing Rule can generate a finding;
+- disabled/retired/proposed Writing Rule does not enforce;
+- findings contain stable IDs and useful locations/matched text where applicable;
+- no linter operation mutates Voice or canonical content state;
+- no AI/human probability or overall fake quality score is produced;
+- existing 90 Rust tests and 8 frontend tests remain green.
 
 ## Constraints
 
 - Standalone Windows-first, local canonical storage.
 - No WorkLore account/backend/proprietary sync.
 - No automatic publication or scheduling.
-- No silent local-to-cloud fallback.
-- No provider secret in frontend/canonical/log/export state.
-- Do not implement Content Studio, analytics, discovery, or edit-delta learning in this slice.
-- Do not implement anti-slop `task-033` or confidentiality `task-034` implicitly.
+- No silent provider fallback.
+- Deterministic linter must remain provider-free.
 - Preserve Evidence/Inspiration/Target Context/Voice Evidence distinctions.
-- Preserve immutable Voice Evidence authorship provenance and raw-model exclusion.
+- Preserve Core Voice/Tone/Direction/Writing Rule semantic separation.
+- Do not implement edit-delta learning before durable Post/Revision lineage exists.
+- Do not implement cross-draft repetition/proof-point rotation by inventing temporary history.
+- Do not begin Content Studio broadly in this slice.
 - Public-repository fixtures must remain synthetic.
 - Keep build/dev/QA output outside the repository.
 - Run case-collision and refs/OKF validation.
@@ -207,6 +181,6 @@ cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -
 
 ## Stop Point
 
-Stop when WorkLore has a provider-neutral registry boundary, a clean first local provider path, and one structured review-only voice-analysis operation whose proposals can be accepted through the existing provenance-safe Core Voice workflow.
+Stop when WorkLore has a deterministic provider-free single-draft lint contract plus a small, well-tested set of explainable anti-slop/Writing Rule checks that can be extended later to provider-assisted and portfolio-aware review.
 
-Do not begin edit-delta learning or Content Studio implicitly.
+Do not begin cross-draft history, edit-delta learning, or broad Content Studio work implicitly.

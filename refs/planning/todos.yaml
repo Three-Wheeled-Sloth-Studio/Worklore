@@ -134,7 +134,7 @@ todos:
   - id: task-032
     status: in_progress
     area: voice
-    summary: Core Voice, Tone Modes, Voice Direction, and Writing Rule foundation is complete in schema v7; remaining work is provider-assisted review-only voice proposals and later edit-delta learning after durable Post/Revision lineage exists.
+    summary: Core Voice foundation and Ollama-backed provider-neutral review-only voice proposals are complete; edit-delta learning remains intentionally deferred until durable Post/Revision lineage exists.
   - id: task-033
     status: planned
     area: quality

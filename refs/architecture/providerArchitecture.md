@@ -14,13 +14,37 @@ WorkLore uses a provider registry rather than embedding provider-specific networ
 
 The registry resolves a configured provider implementation from a stable provider ID. Workflow code supplies provider-neutral task input and receives provider-neutral structured output or normalized errors.
 
-Provider IDs are durable strings rather than a closed TypeScript union so new adapters can be added without rewriting every workflow. The initial registry is expected to contain:
+Provider IDs are durable strings rather than a closed TypeScript union so new adapters can be added without rewriting every workflow. The accepted registry direction contains:
 
 - `ollama` — local generation using a separately installed Ollama service;
 - `gemini` — the first remote bring-your-own-key (BYOK) adapter;
 - `manual` — export/import packages for an external AI workspace.
 
 Additional remote providers may be added later under the same BYOK contract. Adding a provider does not authorize WorkLore to send data to it automatically.
+
+## Current Implementation Status
+
+The first executable provider-registry slice is implemented as of the validated `34def4aca4e52eaa32d59546cbf174964c9eae66` checkpoint.
+
+Current behavior:
+
+- `ollama` is the first executable registry adapter. Provider-specific networking remains behind the Rust provider boundary rather than inside Voice workflow code.
+- Non-secret provider configuration is machine-local application preference state (preference schema v2), not vault or canonical SQLite state.
+- The initial Ollama adapter accepts loopback/local base URLs only. This prevents the local-provider path from becoming an undeclared remote-transmission path.
+- Model discovery is available before model selection. Structured execution requires an explicitly configured provider and model; no provider or model is silently substituted.
+- `analyze_voice_evidence` v1 consumes only selected eligible Voice Evidence plus explicit user guidance and returns attributable Core Voice trait proposals.
+- Provider text is treated as untrusted/inert analysis input where applicable. Returned evidence IDs are validated locally against the selected eligible evidence set, and malformed or unattributable structured output is rejected.
+- Analysis results remain transient review material. They become canonical only when a user explicitly accepts a proposal through the existing proposed Core Voice trait path, which re-applies schema-v7 provenance enforcement.
+- Provider-run audit records retain operation/provider/model/result metadata but do not retain prompt, response, or guidance bodies by default.
+- Provider-free WorkLore workflows remain usable with no provider configured and when Ollama is absent or stopped.
+
+Not yet implemented behind the executable registry:
+
+- Gemini BYOK or another cloud adapter;
+- operating-system credential storage for remote-provider secrets;
+- cloud privacy preflight/disclosure tied to executable BYOK calls.
+
+Those remain required before any remote adapter may transmit user material. The existing manual workspace export/import path remains separate and explicit; it is not a hidden fallback from Ollama.
 
 ## Bring Your Own Key Contract
 
@@ -170,18 +194,20 @@ Each BYOK adapter must:
 - preserve the provider and model used in run metadata while excluding credentials;
 - avoid automatic fallback to another provider.
 
-The Gemini adapter is the first implementation of this contract. Future adapters should reuse it rather than creating new workflow-specific credential paths.
+Gemini remains the first planned remote implementation of this contract. It is not yet executable; when implemented, later remote adapters should reuse that credential/privacy boundary rather than creating workflow-specific secret paths.
 
 ## Ollama Adapter
 
-The Ollama adapter should:
+The implemented Ollama adapter currently:
 
-- Use the configured local base URL
-- List installed models
-- Test JSON or schema-constrained output behavior
-- Record model capability status per machine
-- Allow the user to select a model
-- Fail cleanly when Ollama is not running
+- Uses an explicitly configured loopback/local base URL.
+- Lists installed models before a model must be selected.
+- Executes schema-constrained structured output for versioned operations.
+- Allows explicit model selection in machine-local preferences.
+- Maps connectivity, model, timeout, and structured-output failures to provider-neutral errors.
+- Fails cleanly when Ollama is not running and never falls back to a remote provider.
+
+Per-machine model capability profiling remains future work beyond the current connection/model-discovery seam.
 
 Ollama content does not require cloud redaction, but the user may still choose tokenized context for testing parity.
 

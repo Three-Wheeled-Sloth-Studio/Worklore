@@ -106,6 +106,8 @@ phases:
       - Thin provider-free Voice Evidence review UI for candidate creation, provenance review, approve/reject/retire decisions, reopen, and visible ineligibility reasons.
       - Schema-v7 provider-free Core Voice foundation with versioned proposed/active/superseded identity, queryable attributable traits, eligible Voice Evidence/user-guidance provenance, transactional activation/supersession, and invalidated-provenance surfacing without historical rewrite.
       - Durable Tone Modes, Voice Directions, and Writing Rules with independent lifecycles plus thin Voice workspace management that keeps observed identity, intentional tone, desired evolution, and behavioral rules semantically separate.
+      - Provider-neutral executable registry seam with Ollama as the first local adapter, machine-local non-secret provider preferences, explicit provider/model selection, normalized failures, loopback-only local configuration, and no silent fallback.
+      - Versioned `analyze_voice_evidence` v1 workflow that uses only eligible Voice Evidence plus explicit guidance, validates attributable structured proposals locally, keeps results transient until human acceptance, and reuses schema-v7 provenance enforcement when a proposal is saved into a proposed Core Voice.
     scope:
       - Introduce canonical Voice Evidence, Core Voice, Tone Modes, Voice Direction, and Writing Rules.
       - Ingest representative user-authored writing and approved final posts as voice evidence.
