@@ -116,7 +116,7 @@ todos:
     area: stories
     summary: Generalize guided story development so a directly captured canonical Story Seed can be interviewed, reopened, and converted into a developing Story without a resume candidate or Role.
   - id: task-028
-    status: next
+    status: in_progress
     area: topics
     summary: Implement durable topic candidates, themes, proof-point/story relationships, and evergreen versus timely lifecycle metadata as the next bounded Phase 1 slice.
   - id: task-029

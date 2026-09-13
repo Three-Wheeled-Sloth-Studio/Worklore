@@ -22,7 +22,7 @@ use crate::{
 };
 
 pub const DATABASE_RELATIVE_PATH: &str = "data/worklore.sqlite";
-const CURRENT_SCHEMA_VERSION: i64 = 2;
+const CURRENT_SCHEMA_VERSION: i64 = 3;
 const MIGRATION_NAME: &str = "prototype_to_professional_memory_v1";
 
 const SCHEMA_V1: &str = r#"
@@ -116,6 +116,13 @@ const SCHEMA_V2: &str = r#"
 ALTER TABLE sources ADD COLUMN source_origin TEXT NOT NULL DEFAULT 'imported_file';
 ALTER TABLE sources ADD COLUMN captured_text TEXT;
 CREATE INDEX idx_sources_origin_imported_at ON sources(source_origin, imported_at DESC);
+"#;
+
+const SCHEMA_V3: &str = r#"
+ALTER TABLE topic_candidates ADD COLUMN timing_class TEXT NOT NULL DEFAULT 'evergreen';
+ALTER TABLE topic_candidates ADD COLUMN relevant_until TEXT;
+ALTER TABLE topic_candidates ADD COLUMN timely_note TEXT;
+CREATE INDEX idx_topics_status_timing ON topic_candidates(status, timing_class, updated_at DESC);
 "#;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -385,6 +392,16 @@ fn migrate_schema(connection: &mut Connection) -> ServiceResult<()> {
         tx.execute_batch(SCHEMA_V2)?;
         tx.execute(
             "INSERT INTO schema_migrations(version,name,applied_at) VALUES (2,'capture_text_sources_v2',?1)",
+            [Utc::now().to_rfc3339()],
+        )?;
+        tx.commit()?;
+        version = 2;
+    }
+    if version == 2 {
+        let tx = connection.transaction()?;
+        tx.execute_batch(SCHEMA_V3)?;
+        tx.execute(
+            "INSERT INTO schema_migrations(version,name,applied_at) VALUES (3,'topic_timing_v3',?1)",
             [Utc::now().to_rfc3339()],
         )?;
         tx.commit()?;
@@ -735,7 +752,7 @@ mod tests {
     fn initializes_database() {
         let p = vault();
         assert!(database_path(&p).is_file());
-        assert_eq!(schema_version(&p).unwrap(), 2);
+        assert_eq!(schema_version(&p).unwrap(), 3);
         fs::remove_dir_all(p).unwrap();
     }
     #[test]

@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { SeedDevelopmentPanel } from "./SeedDevelopmentPanel";
+import { TopicPanel } from "./TopicPanel";
 import type { CaptureRole, CaptureSource, SourceType } from "../domain/types";
 import { errorMessage } from "../domain/types";
 import {
@@ -34,12 +35,14 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [developmentSeedId, setDevelopmentSeedId] = useState<string | null>(null);
+  const [developmentTopicId, setDevelopmentTopicId] = useState<string | null>(null);
 
   useEffect(() => {
     setSaved(null);
     setNotice(null);
     setError(null);
     setDevelopmentSeedId(null);
+    setDevelopmentTopicId(null);
     void refreshRecent();
   }, [vaultPath]);
 
@@ -108,6 +111,9 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
 
   const storySeedClassification = saved?.classifications.find(
     (classification) => classification.role === "story_seed",
+  );
+  const topicClassification = saved?.classifications.find(
+    (classification) => classification.role === "topic_candidate",
   );
 
   return (
@@ -197,6 +203,15 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
                 Develop this story seed
               </button>
             ) : null}
+            {topicClassification ? (
+              <button
+                className="primary-button compact"
+                disabled={busy !== null}
+                onClick={() => setDevelopmentTopicId(topicClassification.targetId)}
+              >
+                Open this topic
+              </button>
+            ) : null}
           </div>
         </div>
       ) : null}
@@ -206,6 +221,14 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
           vaultPath={vaultPath}
           seedId={developmentSeedId}
           onClose={() => setDevelopmentSeedId(null)}
+        />
+      ) : null}
+
+      {developmentTopicId ? (
+        <TopicPanel
+          vaultPath={vaultPath}
+          topicId={developmentTopicId}
+          onClose={() => setDevelopmentTopicId(null)}
         />
       ) : null}
 

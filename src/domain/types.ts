@@ -38,6 +38,95 @@ export interface CaptureClassificationResult {
   created: boolean;
 }
 
+export type TopicLifecycle =
+  | "captured"
+  | "exploring"
+  | "ready"
+  | "drafted"
+  | "parked"
+  | "retired";
+
+export type TopicTimingClass = "evergreen" | "timely";
+export type ThemeLifecycle = "emerging" | "active" | "retired";
+export type TopicRelationKind =
+  | "story"
+  | "proof_point"
+  | "theme"
+  | "inspiration"
+  | "target_context";
+
+export interface CreateTopicRequest {
+  title: string;
+  summary: string;
+  timingClass: TopicTimingClass;
+  relevantUntil?: string | null;
+  timelyNote?: string | null;
+}
+
+export interface UpdateTopicRequest extends CreateTopicRequest {
+  topicId: string;
+  lifecycle: TopicLifecycle;
+}
+
+export interface TopicRelationship {
+  relationshipId: string;
+  relationKind: TopicRelationKind;
+  targetId: string;
+  targetLabel: string;
+  targetDetail: string;
+  targetStatus: string;
+  category: "standing" | "organizing_context" | "creative_context" | "target_context" | string;
+}
+
+export interface TopicRecord {
+  topicId: string;
+  title: string;
+  summary: string;
+  lifecycle: TopicLifecycle;
+  timingClass: TopicTimingClass;
+  relevantUntil: string | null;
+  timelyNote: string | null;
+  createdAt: string;
+  updatedAt: string;
+  revision: number;
+  relationships: TopicRelationship[];
+}
+
+export interface CreateThemeRequest {
+  name: string;
+  description: string;
+}
+
+export interface UpdateThemeRequest extends CreateThemeRequest {
+  themeId: string;
+  lifecycle: ThemeLifecycle;
+}
+
+export interface ThemeRecord {
+  themeId: string;
+  name: string;
+  description: string;
+  lifecycle: ThemeLifecycle;
+  createdAt: string;
+  updatedAt: string;
+  revision: number;
+}
+
+export interface TopicLinkTarget {
+  relationKind: TopicRelationKind;
+  targetId: string;
+  label: string;
+  detail: string;
+  status: string;
+}
+
+export interface TopicRelationshipMutationResult {
+  topicId: string;
+  relationKind: TopicRelationKind;
+  targetId: string;
+  changed: boolean;
+}
+
 export type PrivacyScanStatus =
   | "pending"
   | "complete"

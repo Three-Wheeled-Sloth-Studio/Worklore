@@ -16,4 +16,5 @@ pub mod role_service;
 pub mod seed_development_service;
 pub mod source_service;
 pub mod story_service;
+pub mod topic_service;
 pub mod vault_service;

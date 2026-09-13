@@ -8,4 +8,5 @@ pub mod privacy;
 pub mod providers;
 pub mod roles;
 pub mod stories;
+pub mod topics;
 pub mod vault;

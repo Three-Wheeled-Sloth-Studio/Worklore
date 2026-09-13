@@ -6,6 +6,8 @@ import type {
   CaptureRole,
   CaptureSource,
   CloudIdentifierMode,
+  CreateThemeRequest,
+  CreateTopicRequest,
   CreateManualWorkspaceRequest,
   EntityReviewView,
   ExtractCandidatesResult,
@@ -24,6 +26,13 @@ import type {
   StoryStatus,
   StorySummary,
   SubmitInterviewResponseRequest,
+  ThemeRecord,
+  TopicLinkTarget,
+  TopicRecord,
+  TopicRelationKind,
+  TopicRelationshipMutationResult,
+  UpdateThemeRequest,
+  UpdateTopicRequest,
   VaultSummary,
 } from "../domain/types";
 
@@ -108,6 +117,85 @@ export async function classifyCaptureSource(
     sourceId,
     role,
   });
+}
+
+export async function createTopic(
+  vaultPath: string,
+  request: CreateTopicRequest,
+): Promise<TopicRecord> {
+  return invoke<TopicRecord>("create_topic", { vaultPath, request });
+}
+
+export async function getTopic(vaultPath: string, topicId: string): Promise<TopicRecord> {
+  return invoke<TopicRecord>("get_topic", { vaultPath, topicId });
+}
+
+export async function listTopics(vaultPath: string): Promise<TopicRecord[]> {
+  return invoke<TopicRecord[]>("list_topics", { vaultPath });
+}
+
+export async function updateTopic(
+  vaultPath: string,
+  request: UpdateTopicRequest,
+): Promise<TopicRecord> {
+  return invoke<TopicRecord>("update_topic", { vaultPath, request });
+}
+
+export async function createTheme(
+  vaultPath: string,
+  request: CreateThemeRequest,
+): Promise<ThemeRecord> {
+  return invoke<ThemeRecord>("create_theme", { vaultPath, request });
+}
+
+export async function getTheme(vaultPath: string, themeId: string): Promise<ThemeRecord> {
+  return invoke<ThemeRecord>("get_theme", { vaultPath, themeId });
+}
+
+export async function listThemes(vaultPath: string): Promise<ThemeRecord[]> {
+  return invoke<ThemeRecord[]>("list_themes", { vaultPath });
+}
+
+export async function updateTheme(
+  vaultPath: string,
+  request: UpdateThemeRequest,
+): Promise<ThemeRecord> {
+  return invoke<ThemeRecord>("update_theme", { vaultPath, request });
+}
+
+export async function addTopicRelationship(
+  vaultPath: string,
+  topicId: string,
+  relationKind: TopicRelationKind,
+  targetId: string,
+): Promise<TopicRelationshipMutationResult> {
+  return invoke<TopicRelationshipMutationResult>("add_topic_relationship", {
+    vaultPath,
+    topicId,
+    relationKind,
+    targetId,
+  });
+}
+
+export async function removeTopicRelationship(
+  vaultPath: string,
+  topicId: string,
+  relationKind: TopicRelationKind,
+  targetId: string,
+): Promise<TopicRelationshipMutationResult> {
+  return invoke<TopicRelationshipMutationResult>("remove_topic_relationship", {
+    vaultPath,
+    topicId,
+    relationKind,
+    targetId,
+  });
+}
+
+export async function listTopicLinkTargets(
+  vaultPath: string,
+  relationKind: TopicRelationKind,
+): Promise<TopicLinkTarget[]> {
+  return invoke<TopicLinkTarget[]>("list_topic_link_targets", { vaultPath, relationKind });
 }
 
 export async function startStorySeedDevelopment(
