@@ -63,10 +63,14 @@ phases:
       - Save-first typed/pasted Capture with neutral Source persistence before classification.
       - Post-save manual classification into Story Seed, Proof Point, Topic Candidate, Inspiration, or Target Context with typed relationships and idempotency.
       - Thin Capture UI and recent-unclassified recovery path without provider/model dependency.
+      - Direct canonical Story Seed guided development without a resume candidate or mandatory Role.
+      - Shared deterministic interview rules across direct-seed and legacy candidate paths, including answer classifications, skip, and do-not-remember semantics.
+      - Canonical Story creation from developed Story Seeds with explicit seed/interview lineage and attributed answers.
     architecture_notes:
       - Durable local persistence uses SQLite for canonical structured state while source bytes remain in the vault filesystem.
       - Human-readable export remains desirable.
       - The vault remains usable without a WorkLore account or hosted service.
+      - Direct Story Seed development remains local-only until provider export/preflight is explicitly generalized for canonical seed/story targets.
     exit_criteria:
       - A new user can build useful stories and topic candidates without importing a resume.
       - Capture survives restart and supports incomplete material.
