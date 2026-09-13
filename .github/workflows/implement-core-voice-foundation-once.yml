@@ -1,4 +1,4 @@
-# retry after rusqlite lifetime correction
+# retry after rusqlite lifetime correction v2
 name: One-shot Core Voice foundation implementation
 
 on:
