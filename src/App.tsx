@@ -1,11 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { CapturePanel } from "./components/CapturePanel";
+import { FutureWorkspace } from "./components/FutureWorkspace";
+import { HomeWorkspace } from "./components/HomeWorkspace";
+import { LibraryWorkspace } from "./components/LibraryWorkspace";
 import { GuidedInterviewPanel } from "./components/GuidedInterviewPanel";
 import { PerformancePanel } from "./components/PerformancePanel";
 import { PrivacyReviewPanel } from "./components/PrivacyReviewPanel";
 import { StoryBankPanel } from "./components/StoryBankPanel";
 import { StoryCandidatePanel } from "./components/StoryCandidatePanel";
+import { TopicsWorkspace } from "./components/TopicsWorkspace";
 import type {
   ActiveOperation,
   AnswerClassification,
@@ -51,7 +55,10 @@ import {
   submitGuidedInterviewResponse,
   updateCloudIdentifierMode,
 } from "./lib/workloreApi";
+import type { AppView } from "./navigation";
+import { LIBRARY_NAV_ITEMS, PRIMARY_NAV_ITEMS, SETTINGS_NAV_ITEM } from "./navigation";
 import "./styles.css";
+import "./shell.css";
 
 const SOURCE_TYPES: Array<{ value: SourceType; label: string }> = [
   { value: "resume", label: "Resume" },
@@ -71,13 +78,14 @@ function App() {
   const [selectedInterviewId, setSelectedInterviewId] = useState<string | null>(null);
   const [performance, setPerformance] = useState<PerformanceSnapshot | null>(null);
   const [selectedSourceType, setSelectedSourceType] = useState<SourceType>("resume");
-  const [vaultName, setVaultName] = useState("My Career Stories");
+  const [vaultName, setVaultName] = useState("My WorkLore");
   const [defaultVaultRoot, setDefaultVaultRoot] = useState<string | null>(null);
   const [lastImportDirectory, setLastImportDirectory] = useState<string | null>(null);
   const [startupComplete, setStartupComplete] = useState(false);
   const [busyMessage, setBusyMessage] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [activeView, setActiveView] = useState<AppView>("home");
 
   const activeInterview = useMemo(() => {
     const selected = interviews.find(
@@ -239,7 +247,7 @@ function App() {
     setBusyMessage("Creating vault");
     try {
       const created = await createDefaultVault(
-        vaultName.trim() || "My Career Stories",
+        vaultName.trim() || "My WorkLore",
       );
       await activateVault(created);
       setNotice(`Vault created at ${created.path}. WorkLore will reopen it next time.`);
@@ -548,6 +556,125 @@ function App() {
     }
   }
 
+  function renderWorkspace() {
+    switch (activeView) {
+      case "home":
+        return (
+          <HomeWorkspace
+            vaultPath={vault!.path}
+            storyCount={stories.length}
+            candidateCount={candidates.filter((item) => item.status !== "ignored" && item.status !== "converted_to_story").length}
+            activeInterview={activeInterview}
+            privacyReviewCount={reviews.length}
+            onNavigate={setActiveView}
+            onCaptureSaved={() => refreshWorkspace(vault!.path, true)}
+          />
+        );
+      case "capture":
+        return <CapturePanel vaultPath={vault!.path} />;
+      case "stories":
+        return (
+          <div className="workspace-grid shell-workspace-grid">
+            <GuidedInterviewPanel
+              interview={activeInterview}
+              onSubmit={handleInterviewResponse}
+              onExportWorkspace={handleExportWorkspace}
+              onImportResponse={handleImportStoryResponse}
+            />
+            <StoryBankPanel stories={stories} onStatusChange={handleStoryStatusChange} />
+            <StoryCandidatePanel
+              candidates={candidates.filter(
+                (candidate) =>
+                  candidate.status !== "ignored" &&
+                  candidate.status !== "interviewing" &&
+                  candidate.status !== "converted_to_story",
+              )}
+              onInterview={handleStartInterview}
+              onStatusChange={handleCandidateStatusChange}
+            />
+          </div>
+        );
+      case "topics":
+        return <TopicsWorkspace vaultPath={vault!.path} />;
+      case "voice":
+      case "posts":
+      case "insights":
+        return <FutureWorkspace view={activeView} />;
+      case "sources":
+        return (
+          <LibraryWorkspace
+            vaultPath={vault!.path}
+            sources={sources}
+            sourceTypeOptions={SOURCE_TYPES}
+            selectedSourceType={selectedSourceType}
+            onSourceTypeChange={setSelectedSourceType}
+            onImportSource={() => void handleImportSource()}
+            onExtractCandidates={(sourceId) => void handleExtractCandidates(sourceId)}
+          />
+        );
+      case "privacy":
+        return (
+          <div className="shell-stack">
+            {reviews.length > 0 ? (
+              <PrivacyReviewPanel reviews={reviews} onResolve={handleResolveReview} />
+            ) : (
+              <section className="workspace-panel">
+                <p className="eyebrow">Private Entity Registry</p>
+                <h2>Privacy</h2>
+                <div className="empty-state compact-empty">
+                  <h3>No unresolved entity reviews</h3>
+                  <p>Stable private tokens and prior decisions remain in the local vault.</p>
+                </div>
+              </section>
+            )}
+            <section className="workspace-panel settings-panel" aria-labelledby="privacy-mode-heading">
+              <p className="eyebrow">Public and provider boundary</p>
+              <h2 id="privacy-mode-heading">Private names</h2>
+              <p>Choose the default behavior when content leaves the local-only boundary. Every supported export still requires privacy preflight.</p>
+              <div className="segmented-control" role="group" aria-label="Cloud private name mode">
+                <button className={vault!.cloudIdentifierMode === "redact" ? "active" : ""} onClick={() => void handlePrivacyModeChange("redact")}>Use stable tokens</button>
+                <button className={vault!.cloudIdentifierMode === "include" ? "active" : ""} onClick={() => void handlePrivacyModeChange("include")}>Include names</button>
+              </div>
+            </section>
+          </div>
+        );
+      case "import_export":
+        return (
+          <section className="workspace-panel" aria-labelledby="import-export-heading">
+            <p className="eyebrow">Supporting workflows</p>
+            <h2 id="import-export-heading">Import / Export</h2>
+            <p>File ingestion is available through Sources. Privacy-safe manual AI workspace export/import remains attached to Story interviews where its provenance is clear.</p>
+            <div className="support-actions">
+              <button className="primary-button compact" onClick={() => setActiveView("sources")}>Open Sources</button>
+              <button className="secondary-button compact" onClick={() => setActiveView("stories")}>Open Stories</button>
+            </div>
+            <div className="next-step-card">
+              <h3>Portable vault export</h3>
+              <p>A general human-readable vault snapshot is part of the storage contract but is not implemented in this Phase 1 shell slice.</p>
+            </div>
+          </section>
+        );
+      case "settings":
+        return (
+          <div className="shell-stack">
+            <section className="workspace-panel" aria-labelledby="settings-heading">
+              <p className="eyebrow">Application</p>
+              <h2 id="settings-heading">Settings</h2>
+              <div className="next-step-card">
+                <h3>AI Providers</h3>
+                <p>Ollama and provider-neutral BYOK configuration begin in Phase 2. No provider is required for current professional-memory workflows, and WorkLore will not silently fall back to cloud execution.</p>
+              </div>
+              <div className="next-step-card">
+                <h3>Storage</h3>
+                <p title={vault!.path}>This vault is local at {vault!.path}. Backup and portable export remain explicit user-controlled operations.</p>
+              </div>
+            </section>
+            <PerformancePanel snapshot={performance} onRefresh={() => refreshPerformance(vault!.path)} />
+          </div>
+        );
+    }
+  }
+
   if (!startupComplete) {
     return (
       <main className="landing-shell">
@@ -564,9 +691,9 @@ function App() {
           <h1 id="worklore-title">WorkLore</h1>
           <p className="tagline">Turn the work you did into stories you can actually use.</p>
           <p className="landing-copy">
-            Create a local career story bank or open an existing vault. New vaults are stored in
-            WorkLore's application folder and reopen automatically until you explicitly close
-            them.
+            Create a local professional-memory vault or open an existing one. New vaults are
+            stored in WorkLore's application folder and reopen automatically until you explicitly
+            close them.
           </p>
           <label className="field-label" htmlFor="vault-name">
             Vault name
@@ -601,181 +728,81 @@ function App() {
 
   return (
     <>
-      <main className="app-shell">
-        <header className="app-header">
-          <div>
-            <p className="eyebrow">WorkLore vault</p>
-            <h1>{vault.name}</h1>
-            <p className="vault-path" title={vault.path}>
-              {vault.path}
-            </p>
+      <main className="product-shell">
+        <aside className="shell-sidebar" aria-label="WorkLore navigation">
+          <div className="shell-brand">
+            <p className="eyebrow">Three-Wheeled Sloth Studio</p>
+            <h1>WorkLore</h1>
+            <p className="shell-vault-name" title={vault.path}>{vault.name}</p>
           </div>
-          <div className="header-actions">
-            <button className="quiet-button" onClick={() => void handleOpenVault()}>
-              Open another vault
-            </button>
-            <button className="quiet-button" onClick={() => void handleCloseVault()}>
-              Close vault
-            </button>
-          </div>
-        </header>
 
-        <section className="status-strip" aria-label="Vault status">
-          <StatusItem value={sources.length} label="Sources" />
-          <StatusItem value={candidates.length} label="Candidates" />
-          <StatusItem value={interviews.length} label="Interviews" />
-          <StatusItem value={stories.length} label="Stories" />
-          <StatusItem
-            value={reviews.length}
-            label="Privacy reviews"
-            attention={reviews.length > 0}
-          />
-        </section>
+          <nav className="shell-nav-section" aria-label="Primary workspaces">
+            <p className="shell-nav-label">Work</p>
+            {PRIMARY_NAV_ITEMS.map((item) => (
+              <button
+                key={item.id}
+                className={`shell-nav-button ${activeView === item.id ? "active" : ""}`}
+                aria-current={activeView === item.id ? "page" : undefined}
+                title={item.description}
+                onClick={() => setActiveView(item.id)}
+              >
+                <span>{item.label}</span>
+                {item.availability === "planned" ? <span className="soon-badge">Soon</span> : null}
+              </button>
+            ))}
+          </nav>
 
-        <div className="workspace-grid">
-          <CapturePanel vaultPath={vault.path} />
+          <nav className="shell-nav-section" aria-label="Library and supporting tools">
+            <p className="shell-nav-label">Library</p>
+            {LIBRARY_NAV_ITEMS.map((item) => (
+              <button
+                key={item.id}
+                className={`shell-nav-button ${activeView === item.id ? "active" : ""}`}
+                aria-current={activeView === item.id ? "page" : undefined}
+                title={item.description}
+                onClick={() => setActiveView(item.id)}
+              >
+                <span>{item.label}</span>
+              </button>
+            ))}
+          </nav>
 
-          {reviews.length > 0 ? (
-            <PrivacyReviewPanel reviews={reviews} onResolve={handleResolveReview} />
-          ) : null}
+          <button
+            className={`shell-nav-button shell-settings-link ${activeView === SETTINGS_NAV_ITEM.id ? "active" : ""}`}
+            aria-current={activeView === SETTINGS_NAV_ITEM.id ? "page" : undefined}
+            onClick={() => setActiveView(SETTINGS_NAV_ITEM.id)}
+          >
+            <span>{SETTINGS_NAV_ITEM.label}</span>
+          </button>
+        </aside>
 
-          <GuidedInterviewPanel
-            interview={activeInterview}
-            onSubmit={handleInterviewResponse}
-            onExportWorkspace={handleExportWorkspace}
-            onImportResponse={handleImportStoryResponse}
-          />
-
-          <StoryBankPanel stories={stories} onStatusChange={handleStoryStatusChange} />
-
-          <StoryCandidatePanel
-            candidates={candidates.filter(
-              (candidate) =>
-                candidate.status !== "ignored" &&
-                candidate.status !== "interviewing" &&
-                candidate.status !== "converted_to_story",
-            )}
-            onInterview={handleStartInterview}
-            onStatusChange={handleCandidateStatusChange}
-          />
-
-          <section className="workspace-panel source-panel" aria-labelledby="sources-heading">
-            <div className="panel-heading-row">
-              <div>
-                <p className="eyebrow">Evidence</p>
-                <h2 id="sources-heading">Sources</h2>
-              </div>
-              <div className="import-controls">
-                <select
-                  aria-label="Source type"
-                  value={selectedSourceType}
-                  onChange={(event) =>
-                    setSelectedSourceType(event.target.value as SourceType)
-                  }
-                >
-                  {SOURCE_TYPES.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  className="primary-button compact"
-                  onClick={() => void handleImportSource()}
-                >
-                  Import
-                </button>
-              </div>
+        <section className="shell-content">
+          <header className="shell-topbar">
+            <div>
+              <p className="eyebrow">Local vault</p>
+              <h2>{PRIMARY_NAV_ITEMS.concat(LIBRARY_NAV_ITEMS, SETTINGS_NAV_ITEM).find((item) => item.id === activeView)?.label ?? "WorkLore"}</h2>
+              <p className="vault-path" title={vault.path}>{vault.path}</p>
             </div>
+            <div className="header-actions">
+              <button className="quiet-button" onClick={() => void handleOpenVault()}>Open another vault</button>
+              <button className="quiet-button" onClick={() => void handleCloseVault()}>Close vault</button>
+            </div>
+          </header>
 
-            {sources.length === 0 ? (
-              <div className="empty-state">
-                <h3>Start with a resume</h3>
-                <p>
-                  Import a resume, job description, writing sample, or plain-text note. WorkLore
-                  copies it into the vault, checks for duplicates, extracts local text, and starts
-                  its privacy scan.
-                </p>
-              </div>
-            ) : (
-              <div className="source-list">
-                {sources.map((source) => (
-                  <article className="source-row" key={source.sourceId}>
-                    <div>
-                      <h3>{source.displayName}</h3>
-                      <p>
-                        {sourceTypeLabel(source.sourceType)} | Imported {formatDate(source.importedAt)}
-                      </p>
-                    </div>
-                    <div className="source-statuses">
-                      <StatusPill label={`Text: ${source.extractionStatus}`} />
-                      <StatusPill
-                        label={`Privacy: ${source.privacyScanStatus}`}
-                        attention={source.privacyScanStatus === "needs_review"}
-                      />
-                      {source.sourceType === "resume" && source.extractionStatus === "complete" ? (
-                        <button
-                          className="quiet-button compact"
-                          onClick={() => void handleExtractCandidates(source.sourceId)}
-                        >
-                          Extract stories
-                        </button>
-                      ) : null}
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
+          <section className="status-strip" aria-label="Vault status">
+            <StatusItem value={sources.length} label="Sources" />
+            <StatusItem value={stories.length} label="Stories" />
+            <StatusItem value={reviews.length} label="Privacy reviews" attention={reviews.length > 0} />
           </section>
 
-          <aside className="workspace-panel settings-panel" aria-labelledby="privacy-heading">
-            <p className="eyebrow">Cloud boundary</p>
-            <h2 id="privacy-heading">Private names</h2>
-            <p>
-              Choose the default behavior when WorkLore prepares content for Gemini or an
-              external AI workspace. Every export still runs a local privacy preflight.
-            </p>
-            <div className="segmented-control" role="group" aria-label="Cloud private name mode">
-              <button
-                className={vault.cloudIdentifierMode === "redact" ? "active" : ""}
-                onClick={() => void handlePrivacyModeChange("redact")}
-              >
-                Use stable tokens
-              </button>
-              <button
-                className={vault.cloudIdentifierMode === "include" ? "active" : ""}
-                onClick={() => void handlePrivacyModeChange("include")}
-              >
-                Include names
-              </button>
-            </div>
-            <div className="next-step-card">
-              <h3>Current working slice</h3>
-              <p>
-                Work-history bullets can now move through interview, privacy-safe synthesis,
-                validated response import, role linking, and canonical story storage.
-              </p>
-            </div>
-          </aside>
-
-          <PerformancePanel
-            snapshot={performance}
-            onRefresh={() => refreshPerformance(vault.path)}
-          />
-        </div>
-
-        <Feedback notice={notice} error={error} />
-        <BusyLayer message={busyMessage} activeOperation={activeOperation} />
+          <div className="shell-page">{renderWorkspace()}</div>
+          <Feedback notice={notice} error={error} />
+          <BusyLayer message={busyMessage} activeOperation={activeOperation} />
+        </section>
       </main>
       <footer className="legal-notice">
         <span>WorkLore is licensed under AGPL-3.0-only.</span>
-        <a
-          href="https://github.com/Three-Wheeled-Sloth-Studio/Worklore/blob/main/LICENSE"
-          target="_blank"
-          rel="noreferrer"
-        >
-          View license
-        </a>
+        <a href="https://github.com/Three-Wheeled-Sloth-Studio/Worklore/blob/main/LICENSE" target="_blank" rel="noreferrer">View license</a>
       </footer>
     </>
   );
