@@ -1,7 +1,7 @@
 ---
 type: Handoff Prompt
 title: Next WorkLore Development Slice
-description: Bounded prompt for durable Topics and Themes on the validated Capture and direct Story Seed development foundation.
+description: Bounded prompt for Inspiration ingestion and working-object behavior on the validated Capture, Story, and Topic/Theme foundation.
 status: draft
 tags: [handoff, next-slice]
 ---
@@ -15,19 +15,21 @@ Work directly on `dev`. Do not promote `qa` or `main` unless explicitly requeste
 
 ## Accepted Starting Point
 
-Canonical SQLite persistence, save-first Capture, and direct Story Seed guided development are complete.
+Canonical SQLite persistence, save-first Capture, direct Story Seed guided development, and durable Topics/Themes are complete.
 
-Validated Story Seed development code checkpoint:
+Validated Topic/Theme code checkpoint:
 
-`f3c4824b9dce08814e50fb7bb9916aa9a768d09a`
+`6105fc6e89d152ee1679604c992691b25a695ea1`
 
 Validation evidence:
 
-- Actions run `34757490749`
-- Job `103724285496`
-- case-collision, refs, agent-context, diff, frontend build, rustfmt, and Clippy checks green
+- Actions run `34761411830`
+- Job `103734793189`
+- case-collision, refs/OKF, bounded context, diff, frontend build, Clippy, and rustfmt checks green
 - frontend tests: 3 passed, 0 failed
-- Rust tests: 62 passed, 0 failed
+- Rust tests: 64 passed, 0 failed
+
+Provider architecture is also clarified for future work: Ollama remains first-class local, remote providers are BYOK through a provider registry beginning with Gemini, credentials stay in the OS credential store, privacy preflight is mandatory, and there is no silent local-to-cloud fallback or WorkLore-hosted key proxy. Do not implement provider work in this slice.
 
 Read `refs/handoffs/currentHandoff.md` for the complete delta and current branch state before making changes.
 
@@ -36,7 +38,7 @@ Read `refs/handoffs/currentHandoff.md` for the complete delta and current branch
 From the repository root, first run:
 
 ```powershell
-python refs/tools/generate_agent_context.py --focus "WorkLore durable Topics Themes proof relationships and evergreen timely lifecycle"
+python refs/tools/generate_agent_context.py --focus "WorkLore Inspiration ingestion provenance takeaways reactions Topic Theme relationships"
 ```
 
 Treat the generated packet as derived orientation, not project truth. Load only the authoritative refs and source files needed for this slice.
@@ -45,165 +47,179 @@ Read at minimum:
 
 - `refs/product/prd.md`
 - `refs/architecture/vaultFormat.md`
+- `refs/architecture/providerArchitecture.md`
 - `refs/UI/designPrinciples.md`
 - `refs/handoffs/currentHandoff.md`
 - `src-tauri/src/services/canonical_store.rs`
 - `src-tauri/src/services/capture_service.rs`
-- `src-tauri/src/services/seed_development_service.rs`
-- the existing canonical Story/Proof/Theme/Topic table and relationship definitions
+- `src-tauri/src/services/source_service.rs`
+- `src-tauri/src/services/topic_service.rs`
+- the existing Inspiration table/relationship definitions
 - `src-tauri/src/lib.rs`
 - `src/domain/types.ts`
 - `src/lib/workloreApi.ts`
-- the current thin Capture/Story frontend surfaces after understanding the service contracts
+- current thin Capture/Topic frontend surfaces after understanding service contracts
 
 ## Immediate Objective
 
-Implement `task-028`: make Topic Candidates and Themes durable working objects with explicit relationships and evergreen-versus-timely metadata.
+Implement `task-029`: make Inspiration ingestion and Inspiration records useful, provenance-preserving Phase 1 working objects.
 
 Target flow:
 
-`captured topic -> classify evergreen/timely -> connect themes/stories/proof -> inspect standing/context -> manage lifecycle`
+`source/URL/text/file -> save neutral Source first -> create/link Inspiration -> capture summary/takeaways/reaction -> connect Topic/Theme -> reopen`
 
-The hard semantic rule is that a Topic is an idea/work object, not Evidence. Stories and Proof Points can establish the user's standing; Inspiration and Target Context may inform the Topic but cannot silently become evidence about the user.
+The hard semantic rule is that Inspiration is intentionally external material. It can influence what the user thinks or writes, but it is not Evidence about the user and it is never Voice Evidence merely because it was saved or quoted.
 
-Do not begin discovery, Voice, Posts, analytics, or the broad workspace/navigation rewrite in this slice.
+Do not begin discovery, Voice, Posts, analytics, providers, or the broad navigation rewrite in this slice.
 
-### 1. Topic as a first-class canonical object
+### 1. Preserve save-first Source semantics
 
-Capture already creates `topic_` records. Add a reusable canonical repository/service boundary so Topics can be created, loaded, listed, and updated independently of the Capture screen.
+Reuse the accepted Capture contract:
 
-Preserve stable Topic IDs.
+`enter/import -> save Source -> optionally classify/process/connect`
+
+Inspiration processing must never be required before preserving user-entered/pasted external material.
+
+Do not create fake files, fake paths, or fake evidence records to represent pasted or URL-associated content.
+
+### 2. Supported Inspiration entry paths
+
+Support the bounded entry paths already accepted by the PRD:
+
+- pasted/copied external text;
+- user-provided URL plus optional pasted excerpt/body/context;
+- existing local-file Source ingestion.
+
+Direct URL fetching is not required for this slice. If reliable fetching would materially widen networking/privacy/provider scope, preserve the URL as provenance and let the user paste the relevant content.
+
+A Source may remain Source-only. Creating Inspiration is an explicit semantic step.
+
+### 3. Inspiration as a first-class canonical object
+
+Expose a stable service/repository boundary for create/load/list/update/reopen behavior.
+
+Preserve stable `inspiration_` identity.
 
 Support the accepted lifecycle:
 
-- captured;
-- exploring;
-- ready;
-- drafted;
-- parked;
-- retired.
+- `saved`;
+- `processed`;
+- `archived`.
 
-Do not delete or recreate the Topic merely because lifecycle or metadata changes.
+Support structured fields sufficient for the PRD, refining the exact schema to current persistence conventions:
 
-### 2. Evergreen versus timely metadata
+- source URL/title/author/date when known;
+- capture timestamp through Source/provenance;
+- structured summary;
+- main takeaways;
+- useful excerpts/quote references;
+- why this is interesting;
+- explicit user reaction;
+- possible concepts/angles;
+- notes/questions/counterpoints as appropriate.
 
-Add explicit topic timing metadata with a narrow deterministic contract.
+A versioned SQLite migration is acceptable if required. Keep it transactional and portable.
 
-At minimum support:
+### 4. Provenance and excerpt handling
 
-- evergreen;
-- timely.
+Keep Source as neutral provenance and Inspiration as the external semantic object.
 
-For a timely Topic, support local user-entered relevance/freshness information such as a relevant-until date/time and/or note when useful. The exact schema may be refined based on current persistence conventions, but it must be auditable and portable.
+For excerpts/quotes:
+
+- retain attribution to the Source;
+- distinguish verbatim excerpt from user reaction/notes;
+- do not silently rewrite external language as the user's own wording;
+- do not let imported external prose become Voice Evidence.
+
+Avoid duplicating full source bodies into multiple semantic records unless the current canonical design clearly requires it.
+
+### 5. Topic and Theme connections
+
+Reuse the durable Topic/Theme relationship foundation rather than inventing a second relationship system.
+
+Support explicit idempotent Inspiration connections to at least:
+
+- Topic Candidate;
+- Theme.
+
+The direction used internally may follow the existing canonical relationship conventions, but UI/API callers need stable semantic IDs and relationship types.
+
+Removing a link must not delete either record.
+
+### 6. Semantic boundaries
 
 Hard rules:
 
-- no provider/network call is required;
-- WorkLore does not claim a Topic is currently timely unless the user or a future qualified discovery workflow supplies that context;
-- changing evergreen/timely classification does not change Topic identity;
-- clearing stale timely metadata is reversible and must not discard provenance.
+- Inspiration != Evidence about the user.
+- Inspiration != Proof Point.
+- Inspiration != Story.
+- Inspiration != Voice Evidence.
+- A user's reaction to Inspiration is user-authored material but does not automatically qualify as canonical Voice Evidence; that decision belongs to the future Voice provenance workflow.
+- Linking Inspiration to a Topic does not establish standing. Standing comes from explicit Story/Proof Point material.
 
-A schema migration is acceptable if required. Keep it transactional and versioned.
+Add tests around these boundaries rather than relying only on documentation.
 
-### 3. Durable Themes
+### 7. Provider-free first implementation
 
-Make Theme a usable first-class canonical object rather than only an existing table.
+Save, edit, lifecycle, provenance, takeaways/reaction capture, and Topic/Theme relationships must work with no model/provider/network call.
 
-Support:
+Manual/deterministic processing is acceptable for this slice.
 
-- create/load/list/update;
-- emerging, active, and retired lifecycle;
-- stable Theme identity;
-- optional descriptive text.
+Future model assistance may use Ollama or a configured BYOK adapter through the provider registry, but do not build that provider integration here.
 
-Theme lifecycle must remain independent of Topic lifecycle.
+### 8. Bounded API and thin UI
 
-### 4. Explicit Topic relationships
+Expose stable Tauri/application APIs. Keep SQLite details out of React.
 
-Use the existing typed many-to-many relationship model. Support deterministic add/remove/list operations for Topic relationships to at least:
+Add only enough UI to exercise the canonical path, for example:
 
-- Story;
-- Proof Point;
-- Theme;
-- Inspiration;
-- Target Context.
+- create/open Inspiration from a saved Source;
+- show provenance/URL/source metadata;
+- edit summary, takeaways, reaction, notes/counterpoints, lifecycle;
+- connect/disconnect Topic and Theme records;
+- reopen the same Inspiration after restart.
 
-Use explicit relationship types and stable semantic IDs.
+Do not migrate the full application into the future primary navigation in this slice.
 
-Required behavior:
-
-- repeated identical add is idempotent;
-- removal removes only the relationship, not either semantic record;
-- load/detail APIs can return enough relationship identity/type information for later workspace surfaces;
-- provenance/audit remains attributable;
-- no relationship automatically changes the semantic class of either side.
-
-### 5. Standing versus context
-
-Expose enough deterministic information for a future Topics workspace to distinguish:
-
-- user standing: explicit linked Story/Proof Point material;
-- organizing context: Theme;
-- creative/contextual input: Inspiration;
-- audience/opportunity context: Target Context.
-
-Do not create a fake standing score in this slice. Counts or explicit connection lists are sufficient.
-
-Do not auto-promote Inspiration or Target Context into Evidence, Proof Point, Story, or Voice Evidence.
-
-### 6. Bounded API and thin UI
-
-Expose stable Tauri/application APIs for Topic/Theme CRUD and relationship management. Keep SQLite details out of React.
-
-Add only enough UI to exercise the real canonical path, for example:
-
-- open a captured Topic Candidate;
-- edit title/summary/lifecycle/timing class;
-- create/select a Theme;
-- inspect/add/remove explicit relationships using existing records where practical.
-
-A compact Topic detail/editor embedded in the current shell is acceptable.
-
-Do not migrate all existing screens into the future primary navigation in this slice.
-
-### 7. Preserve current flows
+### 9. Preserve current flows
 
 Keep green:
 
-- save-first Capture and Topic classification from Capture;
+- save-first Capture;
 - direct Story Seed guided development;
+- durable Topic/Theme behavior and timing metadata;
 - legacy candidate/resume interview path;
-- Source/Inspiration/Target Context separation;
+- Source/Evidence/Inspiration/Target Context separation;
 - privacy infrastructure;
 - optional resume bootstrap.
 
-Do not change direct Story Seed development back into a provider-dependent workflow.
+### 10. Proof cases
 
-### 8. Proof cases
+Add synthetic coverage proving at least:
 
-Add synthetic tests proving at least:
-
-- a Capture-created Topic Candidate survives reopen and can be loaded/edited through the Topic API;
-- Topic lifecycle changes preserve identity;
-- evergreen/timely metadata is explicit and provider-free;
-- timely metadata can be set, changed, and cleared without changing Topic identity;
-- Theme lifecycle is independent from Topic lifecycle;
-- a Topic can connect to multiple Themes, Stories, and Proof Points;
-- repeated identical relationship creation is idempotent;
-- removing a relationship does not delete its Topic or target record;
-- Inspiration and Target Context relationships remain contextual and create no Evidence/Proof records;
-- existing Capture and Story Seed development tests remain green.
+- pasted external material persists as Source before Inspiration creation/processing;
+- URL-associated material can remain Source-only or become Inspiration without fake local paths;
+- local-file Sources can be linked to Inspiration without breaking existing import behavior;
+- Inspiration survives reopen with stable identity and Source provenance;
+- lifecycle and structured summary/takeaway/reaction edits preserve identity;
+- excerpt/quote data remains attributable to Source and distinct from user reaction;
+- Topic and Theme links are idempotent and survive reopen;
+- removing a relationship preserves both records;
+- Inspiration creates no Evidence, Proof Point, Story, or Voice Evidence implicitly;
+- no provider/network call is required;
+- existing Capture, Story Seed, and Topic/Theme tests remain green.
 
 ## Constraints
 
 - Standalone Windows-first application.
 - Local canonical storage only.
-- No WorkLore-hosted backend, account, or proprietary sync.
+- No WorkLore-hosted backend, account, proprietary sync, inference proxy, or credential gateway.
 - No automatic publishing or scheduling.
 - No Voice implementation yet.
 - No Posts or analytics.
-- No news/current-event discovery or trend ranking.
-- No provider requirement for Topic persistence, timing metadata, or relationships.
+- No news/current-event discovery, feeds, polling, or trend ranking.
+- No provider requirement for Inspiration persistence or processing.
+- Do not implement BYOK/provider adapters in this slice; only preserve the architecture contract.
 - No broad navigation rewrite.
 - Preserve Private Entity Registry behavior and privacy preflight where applicable.
 - Preserve the public repository boundary and use synthetic fixtures only.
@@ -231,6 +247,6 @@ Batch meaningful changes before pushing. Avoid repeated CI churn on draft PR #1.
 
 ## Stop Point
 
-Stop after Topics and Themes are durable first-class local objects, evergreen/timely metadata is explicit, typed Topic relationships are manageable and idempotent, the thin UI exercises the canonical path, and the delta handoff is updated.
+Stop after Inspiration is a durable first-class external-context object with Source provenance, useful structured notes/takeaways/reaction, explicit Topic/Theme links, semantic-boundary tests, and a thin canonical UI/API path.
 
-Do not continue into Inspiration extraction, Target Context ideation, discovery, Voice, Posts, Insights, or the full navigation rewrite in the same slice.
+Do not continue into Target Context ideation, discovery, Voice, Posts, Insights, provider implementation, or the full navigation rewrite in the same slice.
