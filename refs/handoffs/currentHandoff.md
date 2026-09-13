@@ -1,7 +1,7 @@
 ---
 type: Handoff
 title: Current WorkLore Handoff
-description: Validated durable Topics and Themes checkpoint, BYOK provider architecture note, current Professional Memory state, and next bounded Inspiration slice.
+description: Validated Phase 1 professional-memory checkpoint through Target Context, provider architecture boundary, and next task-oriented shell integration slice.
 status: draft
 tags: [handoff, worklore]
 ---
@@ -27,140 +27,117 @@ Locked boundaries remain:
 - Evidence, Inspiration, Target Context, and Voice Evidence remain semantically distinct;
 - resume import is an optional `Seed from resume` path rather than the product center.
 
-## Validated Durable Topics And Themes Checkpoint
+## Phase 1 Checkpoint
 
-`task-028` is implemented and complete.
+Phase 1 Professional Memory is late-stage and remains `in_progress` only because the application shell still exposes the old prototype resume/storage sequence as the dominant top-level experience.
 
-Accepted Topic code checkpoint:
+Completed bounded Phase 1 implementation slices:
 
-`6105fc6e89d152ee1679604c992691b25a695ea1`
+- `task-040`: canonical SQLite persistence and non-destructive prototype migration foundation;
+- `task-026`: save-first Capture with neutral Source persistence before classification;
+- `task-027`: direct canonical Story Seed guided development and Story creation without mandatory resume/Role;
+- `task-028`: durable Topic Candidates and Themes with lifecycle/timing and typed standing/context relationships;
+- `task-029`: Source-backed Inspiration with explicit external provenance, structured reaction/takeaways, and Topic/Theme connections;
+- `task-030`: Source-backed Target Context with structured opportunity signals and explicit Topic/Theme/Story connections.
+
+The next bounded Phase 1 closeout slice is `task-041`: task-oriented application-shell/navigation integration. Do not start Phase 2 Voice implementation before that slice is complete unless new evidence materially changes the sequencing.
+
+## Validated Target Context Checkpoint
+
+`task-030` is implemented and complete.
+
+Accepted product checkpoint:
+
+`078fad9547bd3f6728670e17b3884494e7d56af5`
 
 What landed:
 
-- Added schema version 3 for explicit Topic timing metadata while preserving existing canonical Topic identity.
-- Capture-created Topic Candidates can be loaded, listed, edited, and reopened through a dedicated canonical Topic service/Tauri API.
-- Topic lifecycle is explicit: `captured`, `exploring`, `ready`, `drafted`, `parked`, `retired`.
-- Topic timing is explicit and local: `evergreen` or `timely`, with user-managed timely relevance metadata that can be changed or cleared without changing Topic identity.
-- Theme is now a durable first-class canonical object with `emerging`, `active`, and `retired` lifecycle independent from Topic lifecycle.
-- Added idempotent typed Topic relationships to Story, Proof Point, Theme, Inspiration, and Target Context.
-- Relationship removal removes only the relationship; it does not delete either semantic record.
-- Standing and context remain distinct: Story/Proof Point links can establish factual standing; Theme organizes; Inspiration and Target Context provide context but never become Evidence or Proof implicitly.
-- Added stable application APIs for Topic/Theme create/load/list/update and relationship add/remove/list behavior.
-- Added a thin Topic editor surface and Capture entry point without beginning the broad primary-navigation rewrite.
-- Existing Capture, direct Story Seed development, legacy candidate/resume behavior, privacy infrastructure, and semantic boundaries remain green.
+- Added schema version 5 for Target Context working fields while preserving canonical `target_` identity and existing migration behavior.
+- Capture-classified job descriptions and compatible existing Sources can be opened/reopened as first-class Target Context records.
+- Target Context supports active/archived lifecycle plus source URL, organization, role/opportunity, location, summary, responsibilities, skills/qualifications, concepts, notable language, tensions/tradeoffs, and notes.
+- Added deterministic provider-free Source signal extraction from captured text and safe vault-relative extraction-cache text for imported files.
+- Extraction merges idempotently and remains advisory. It does not produce an ATS score, fit score, keyword score, Topic, Story, Proof Point, Evidence record, or claim that the user possesses a listed skill.
+- Added explicit idempotent connections to existing Topic, Theme, and Story records through the shared canonical relationship graph.
+- Relationship removal removes only the connection and retains both semantic records.
+- A Topic sees the same canonical Target Context relationship when the link is created from the Target Context surface; no parallel graph was introduced.
+- Added stable Tauri/application APIs and a thin Target Context editor reachable from Capture.
+- Existing Capture, Story Seed, Inspiration, Topic/Theme, legacy candidate/resume, privacy, and local-only behavior remain green.
 
-## Topic Proof Cases
+### Hard semantic rule
 
-Synthetic coverage demonstrates:
+`The opportunity mentions X` is not equivalent to `the user has demonstrated X`.
 
-- a Capture-created Topic survives reopen with the same `topic_` ID;
-- lifecycle and evergreen/timely edits preserve identity;
-- timely metadata can be set, updated, and cleared without a provider or network call;
-- Theme lifecycle is independent from Topic lifecycle;
-- one Topic can hold multiple typed standing/context relationships;
-- repeated identical relationship creation is idempotent;
-- relationship removal does not delete the Topic or target record;
-- Inspiration and Target Context relationships create no Evidence or Proof records;
-- prior Capture and Story Seed behavior remains green.
+Target Context is contextual input about an audience, role, organization, or opportunity. It is never factual Evidence about the user merely because a requirement appears in a job description. Even an explicit Target Context -> Story link remains contextual; standing must still come from the Story/Proof system independently.
 
 ## Validation Evidence
 
 Windows implementation validation:
 
-- Actions run: `34761411830`
-- Job: `103734793189`
-- validated code checkpoint: `6105fc6e89d152ee1679604c992691b25a695ea1`
-- case-collision guard: green, 176 tracked paths at runner checkout
+- Actions run: `34771917326`
+- Job: `103762940903`
+- validated code checkpoint: `078fad9547bd3f6728670e17b3884494e7d56af5`
+- case-collision guard: green, 182 tracked paths at runner checkout
 - refs validation: green, Agent Academy and OKF aligned
-- bounded agent-context check: green, 5,928 / 8,000 characters
+- bounded agent-context check: green, 6,157 / 8,000 characters
 - `git diff --check`: green
 - frontend tests: 3 passed, 0 failed
-- production frontend TypeScript/Vite build: green
-- Rust tests: 64 passed, 0 failed
+- production frontend TypeScript/Vite build: green, 42 modules transformed
+- Rust tests: 72 passed, 0 failed
 - Clippy with warnings denied: green
 - rustfmt: green
 
-The last Topic test-harness issue was Windows refusing to delete a synthetic temp vault while its SQLite connection remained open. The test now explicitly releases the connection before cleanup; product semantics did not need to change.
+Two validation-only defects were caught before the product checkpoint: a YAML summary needed quoting, and Clippy found one dead private helper. Neither changed product semantics.
 
-## Provider Architecture Note: Ollama + BYOK
+## Provider Architecture: Ollama + BYOK
 
-The provider direction is now explicit even though provider implementation is not part of the current Phase 1 slice.
+Provider execution remains a future Phase 2 concern, but the architecture contract is locked:
 
 - Ollama remains a first-class local provider.
-- Remote model providers use bring-your-own-key (BYOK) credentials supplied by the user.
-- Gemini remains the initial remote adapter, but workflows target a provider registry/provider-neutral contract rather than Gemini-specific networking.
+- Remote model providers use explicit bring-your-own-key credentials supplied by the user.
+- Workflows target a provider-neutral registry rather than hard-coded Gemini networking; Gemini is simply the initial bounded remote adapter.
 - Provider/model IDs and non-secret configuration may be durable; secrets may not.
 - BYOK secrets live in the operating-system credential store and must never be written to the vault, SQLite, provider-run records, logs, exports, crash reports, or frontend state.
 - Provider settings must support configure/save, validate/test, and clear/remove behavior.
 - Remote calls require privacy preflight and user-visible disclosure of what will be sent.
-- WorkLore must not silently fall back from Ollama/local/provider-free behavior to a cloud provider.
-- WorkLore does not operate a hosted key proxy, inference gateway, account, quota, or billing service for BYOK.
-- This follows the provider boundary already proven in the studio's Review Room project, adapted to Tauri/Windows credential storage.
+- WorkLore must not silently fall back from local/provider-free behavior to cloud execution.
+- WorkLore does not operate a hosted key proxy, inference gateway, account, quota, or billing service under the accepted roadmap.
 
-Authoritative details are in `refs/architecture/providerArchitecture.md`, `refs/architecture/localVsHosted.md`, and `refs/architecture/standalone-deployment-contract.md`.
+Authoritative details remain in `refs/architecture/providerArchitecture.md`, `refs/architecture/localVsHosted.md`, and `refs/architecture/standalone-deployment-contract.md`.
 
-## Current State
+## Current Local Product Path
 
-`task-040`, `task-026`, `task-027`, and `task-028` are complete. Phase 1 Professional Memory remains in progress. `task-029` is next.
+The provider-free professional-memory substrate now supports:
 
-WorkLore now has a coherent provider-free local path:
+`Capture -> neutral Source -> explicit semantic classification -> Story development and/or Topic/Theme/Inspiration/Target Context working objects -> explicit connections`
 
-`raw Capture -> neutral Source -> optional classification -> Story Seed development and/or durable Topic/Theme connections`
-
-The next gap is Inspiration. Capture can already classify material as Inspiration and the canonical schema has Inspiration records, but Inspiration is not yet a useful ingestion/working workflow with explicit provenance, structured takeaways, user reaction, and Topic/Theme connections.
+This path does not require resume import or model availability.
 
 ## Next Slice
 
-Implement `task-029`: bounded Inspiration ingestion and working-object behavior.
+Implement `task-041`: bounded Phase 1 application-shell/navigation integration.
 
-Target flow:
+Target outcome:
 
-`source/URL/text/file -> save neutral Source first -> create/link Inspiration -> capture summary/takeaways/reaction -> connect Topic/Theme -> reopen`
+- make the accepted task-oriented product model visible in the application shell;
+- make Home, Capture, Stories, and Topics coherent first-class destinations using existing functionality;
+- keep Voice, Posts, and Insights honest about being future capabilities rather than presenting fake implemented behavior;
+- move Sources, Privacy, Import/Export, Providers, Settings, and `Seed from resume` into supporting access rather than the primary workflow;
+- make existing Inspiration and Target Context workflows reachable from the professional-memory experience without inventing a second navigation/domain model;
+- preserve the current service/API behavior rather than rewriting validated domain logic.
 
-Requirements:
+Do not implement Voice semantics, provider execution, Posts, analytics, discovery, auto-publishing, or scheduling in `task-041`.
 
-1. Preserve save-first Source semantics. External material must be durable before optional processing/classification.
-2. Support Inspiration entry from pasted/captured text, user-provided URL context, and existing local-file Source ingestion. Early URL support may require user-pasted article text; direct network fetching is not required.
-3. Keep Source as provenance and Inspiration as an external semantic working object; do not mutate Source into Inspiration.
-4. Make Inspiration create/load/list/update/reopen behavior first-class and stable.
-5. Support structured local fields sufficient for the PRD: source metadata where known, summary, takeaways, useful excerpt/quote references, why it is interesting, user reaction, possible concepts/angles, and lifecycle (`saved`, `processed`, `archived`).
-6. Preserve attribution/provenance for excerpts. Do not flatten external prose into user-authored material.
-7. Support explicit idempotent connections to existing Topic/Theme records using canonical relationships.
-8. Inspiration must never become Evidence about the user, Proof Point, Story, or Voice Evidence automatically.
-9. Keep the first implementation provider-free. Deterministic/manual processing is acceptable; future model assistance may use Ollama or BYOK through the provider registry but is not required here.
-10. Add the thinnest useful UI/API path needed to exercise the canonical workflow. Do not begin the broad navigation rewrite.
-
-## Proof Cases For Next Slice
-
-Add synthetic coverage proving at least:
-
-- pasted external material persists as a neutral Source before Inspiration processing;
-- URL-associated material can remain Source-only or become Inspiration without fake local file paths;
-- an Inspiration survives reopen with stable identity and provenance;
-- local-file Sources remain compatible with Inspiration creation;
-- lifecycle and structured notes/takeaways/reaction updates preserve identity;
-- quoted/excerpted material remains attributable to its Source;
-- Topic/Theme links are idempotent and survive reopen;
-- Inspiration never creates Evidence, Proof Point, Story, or Voice Evidence implicitly;
-- no model/provider/network call is required for save, edit, or relationship behavior;
-- existing Capture, Story Seed, and Topic/Theme tests remain green.
-
-## Relevant Files
+## Relevant Files For Next Slice
 
 - `refs/product/prd.md`
-- `refs/architecture/vaultFormat.md`
-- `refs/architecture/providerArchitecture.md`
 - `refs/UI/designPrinciples.md`
 - `refs/planning/roadmap.yaml`
 - `refs/planning/todos.yaml`
-- `src-tauri/src/services/canonical_store.rs`
-- `src-tauri/src/services/capture_service.rs`
-- `src-tauri/src/services/source_service.rs`
-- `src-tauri/src/services/topic_service.rs`
-- `src-tauri/src/lib.rs`
+- `src/App.tsx`
+- existing Capture, Story, Topic, Inspiration, and Target Context components
+- current source/privacy/provider/settings supporting panels
 - `src/domain/types.ts`
 - `src/lib/workloreApi.ts`
-- the current thin Capture/Topic surfaces
 
 ## Do Not Reopen
 
@@ -171,9 +148,10 @@ Unless new runtime, test, legal, or user evidence materially changes the plan:
 - Do not implement a WorkLore-hosted inference/key proxy as part of BYOK.
 - Do not allow raw AI drafts or external Inspiration prose to train canonical voice.
 - Do not merge Evidence, Inspiration, Target Context, and Voice Evidence into one source class.
+- Do not infer user standing from Target Context requirements.
+- Do not add fit/ATS/keyword scores to Target Context.
 - Do not make Role mandatory for Stories.
 - Do not require classification or provider calls before Capture saves.
-- Do not add news discovery, feed polling, automatic trend ranking, Voice, Posts, or analytics in the bounded Inspiration slice.
-- Do not perform direct URL fetching if doing so materially widens the slice; provenance-first pasted content is acceptable.
-- Do not begin the broad navigation rewrite in the bounded Inspiration slice.
+- Do not begin Voice, Posts, analytics, or discovery during the Phase 1 shell-integration slice.
+- Do not delete legacy optional resume/bootstrap paths merely to simplify navigation.
 - Do not promote `qa` or `main` without explicit approval.
