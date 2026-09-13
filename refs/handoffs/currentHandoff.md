@@ -1,7 +1,7 @@
 ---
 type: Handoff
 title: Current WorkLore Handoff
-description: Validated direct Story Seed development checkpoint, current Professional Memory state, next bounded Topics slice, constraints, and validation.
+description: Validated durable Topics and Themes checkpoint, BYOK provider architecture note, current Professional Memory state, and next bounded Inspiration slice.
 status: draft
 tags: [handoff, worklore]
 ---
@@ -11,162 +11,169 @@ Updated: 2026-09-13
 
 ## Accepted Baseline
 
-WorkLore is a local-first professional narrative and content intelligence application. The authoritative product loop remains:
+WorkLore is a local-first professional narrative and content intelligence application. The authoritative loop remains:
 
 `Capture -> Understand -> Develop -> Connect -> Draft -> Challenge -> Publish manually -> Measure -> Learn`
 
-The existing resume-centric vertical slice remains reusable prototype foundation, not the organizing center of the product.
+Locked boundaries remain:
 
-Locked boundaries remain standalone Windows-first deployment, local canonical storage, no WorkLore-hosted backend or account, no proprietary sync requirement, no automatic social publishing or scheduling, explicit human review before publication, raw AI drafts never training canonical voice, hard confidentiality transformation, distinct Evidence/Inspiration/Target Context semantics, and resume import demoted to optional `Seed from resume`.
+- standalone Windows-first deployment;
+- local canonical storage;
+- no WorkLore-hosted backend/account/proprietary sync dependency;
+- no automatic social publishing or scheduling;
+- explicit human review before publication;
+- raw AI drafts never train canonical voice;
+- hard confidentiality transformation before public use;
+- Evidence, Inspiration, Target Context, and Voice Evidence remain semantically distinct;
+- resume import is an optional `Seed from resume` path rather than the product center.
 
-## Validated Story Seed Development Checkpoint
+## Validated Durable Topics And Themes Checkpoint
 
-`task-027` is implemented and validated.
+`task-028` is implemented and complete.
 
-Accepted code checkpoint:
+Accepted Topic code checkpoint:
 
-`f3c4824b9dce08814e50fb7bb9916aa9a768d09a`
+`6105fc6e89d152ee1679604c992691b25a695ea1`
 
 What landed:
 
-- Added a canonical direct Story Seed development service using existing SQLite `interview_sessions.target_seed_id` / `target_story_id` fields. No new schema migration was required.
-- New direct sessions use canonical `seed_` identity and a seed-development payload with no required `candidateIds`.
-- Extracted deterministic guided-development rules so direct Story Seeds and legacy resume candidates share the same question and answer semantics rather than maintaining two independent engines.
-- Preserved the existing completeness fields, bounded question rounds, one-active-question behavior, Answer/Skip/Do Not Remember actions, and Confirmed Fact/User Estimate/Uncertain/Not Applicable classifications.
-- Grounded direct-seed questions in the canonical Story Seed summary.
-- Starting the same direct Story Seed reuses the existing canonical development interview rather than silently forking duplicate active sessions.
-- Direct Story Seed sessions persist and reopen from canonical SQLite.
-- Added explicit creation of a canonical active/developing Story after the guided pass is ready for synthesis.
-- Story creation preserves attributed development answers in canonical Story content/provenance rather than flattening them into unattributed evidence.
-- Added explicit `story_seed -> seed_story_lineage -> story` and `interview -> interview_story -> story` relationships.
-- Converted the Story Seed lifecycle state when a developing Story is created.
-- Kept Role optional throughout.
-- Kept the legacy candidate-driven interview path green and using the shared deterministic rule layer.
-- Deliberately kept direct Story Seed development local-only. The legacy manual-AI exporter remains candidate/legacy-interview shaped and is not reused until its privacy preflight is explicitly generalized for canonical seed/story targets.
-- Added stable Tauri/application API calls for start, response submission, and Story creation.
-- Added a thin `SeedDevelopmentPanel` reachable from a captured item after it is classified as Story Seed. No broad navigation rewrite was started.
+- Added schema version 3 for explicit Topic timing metadata while preserving existing canonical Topic identity.
+- Capture-created Topic Candidates can be loaded, listed, edited, and reopened through a dedicated canonical Topic service/Tauri API.
+- Topic lifecycle is explicit: `captured`, `exploring`, `ready`, `drafted`, `parked`, `retired`.
+- Topic timing is explicit and local: `evergreen` or `timely`, with user-managed timely relevance metadata that can be changed or cleared without changing Topic identity.
+- Theme is now a durable first-class canonical object with `emerging`, `active`, and `retired` lifecycle independent from Topic lifecycle.
+- Added idempotent typed Topic relationships to Story, Proof Point, Theme, Inspiration, and Target Context.
+- Relationship removal removes only the relationship; it does not delete either semantic record.
+- Standing and context remain distinct: Story/Proof Point links can establish factual standing; Theme organizes; Inspiration and Target Context provide context but never become Evidence or Proof implicitly.
+- Added stable application APIs for Topic/Theme create/load/list/update and relationship add/remove/list behavior.
+- Added a thin Topic editor surface and Capture entry point without beginning the broad primary-navigation rewrite.
+- Existing Capture, direct Story Seed development, legacy candidate/resume behavior, privacy infrastructure, and semantic boundaries remain green.
 
-## Story Seed Development Proof Cases
+## Topic Proof Cases
 
 Synthetic coverage demonstrates:
 
-- a directly captured Story Seed starts guided development without a resume candidate;
-- the canonical interview survives reopen and remains attached to the same `seed_` ID;
-- starting the same target again reuses the direct canonical interview;
-- direct-session payloads do not require `candidateIds`;
-- guided questions are grounded in Story Seed context;
-- Answer, Skip, Do Not Remember, and answer classifications preserve legacy semantics;
-- direct user turns have no provider run attached and remain local-only;
-- completing guided development creates one active/developing canonical Story and repeated creation is idempotent;
-- Story Seed lineage is explicit;
-- no Role relationship is required;
-- legacy interview payloads are not misidentified as direct Story Seed sessions;
-- the legacy candidate interview suite remains green after shared-rule extraction.
+- a Capture-created Topic survives reopen with the same `topic_` ID;
+- lifecycle and evergreen/timely edits preserve identity;
+- timely metadata can be set, updated, and cleared without a provider or network call;
+- Theme lifecycle is independent from Topic lifecycle;
+- one Topic can hold multiple typed standing/context relationships;
+- repeated identical relationship creation is idempotent;
+- relationship removal does not delete the Topic or target record;
+- Inspiration and Target Context relationships create no Evidence or Proof records;
+- prior Capture and Story Seed behavior remains green.
 
 ## Validation Evidence
 
 Windows implementation validation:
 
-- Actions run: `34757490749`
-- Job: `103724285496`
-- validated code checkpoint: `f3c4824b9dce08814e50fb7bb9916aa9a768d09a`
-- case-collision guard: green, 168 tracked paths at runner checkout
-- refs validation in initialized mode: green, Agent Academy and OKF aligned
-- bounded agent-context check: green, 6,103 characters / 8,000 budget
+- Actions run: `34761411830`
+- Job: `103734793189`
+- validated code checkpoint: `6105fc6e89d152ee1679604c992691b25a695ea1`
+- case-collision guard: green, 176 tracked paths at runner checkout
+- refs validation: green, Agent Academy and OKF aligned
+- bounded agent-context check: green, 5,928 / 8,000 characters
 - `git diff --check`: green
 - frontend tests: 3 passed, 0 failed
 - production frontend TypeScript/Vite build: green
-- Rust tests: 62 passed, 0 failed
+- Rust tests: 64 passed, 0 failed
 - Clippy with warnings denied: green
-- rustfmt check: green
+- rustfmt: green
 
-Read-only normalized-state closeout validation:
+The last Topic test-harness issue was Windows refusing to delete a synthetic temp vault while its SQLite connection remained open. The test now explicitly releases the connection before cleanup; product semantics did not need to change.
 
-- validation checkpoint: `f1a75594ad5f0289e105e8d981eac7a9bf0cee91`
-- Actions run: `34757907398`
-- Job: `103725389855`
-- case-collision guard: green, 172 tracked paths at runner checkout
-- refs validation in initialized mode: green, Agent Academy and OKF aligned
-- bounded agent-context check: green, 5,502 characters / 8,000 budget
-- `git diff --check`: green
-- frontend tests: 3 passed, 0 failed
-- production frontend TypeScript/Vite build: green
-- Rust tests: 62 passed, 0 failed
-- Clippy with warnings denied: green
-- rustfmt check: green
+## Provider Architecture Note: Ollama + BYOK
 
-The one-shot implementation script/workflow were removed before closeout validation. The read-only closeout validator is removed after the successful run. None of these temporary files are standing WorkLore CI or product infrastructure.
+The provider direction is now explicit even though provider implementation is not part of the current Phase 1 slice.
+
+- Ollama remains a first-class local provider.
+- Remote model providers use bring-your-own-key (BYOK) credentials supplied by the user.
+- Gemini remains the initial remote adapter, but workflows target a provider registry/provider-neutral contract rather than Gemini-specific networking.
+- Provider/model IDs and non-secret configuration may be durable; secrets may not.
+- BYOK secrets live in the operating-system credential store and must never be written to the vault, SQLite, provider-run records, logs, exports, crash reports, or frontend state.
+- Provider settings must support configure/save, validate/test, and clear/remove behavior.
+- Remote calls require privacy preflight and user-visible disclosure of what will be sent.
+- WorkLore must not silently fall back from Ollama/local/provider-free behavior to a cloud provider.
+- WorkLore does not operate a hosted key proxy, inference gateway, account, quota, or billing service for BYOK.
+- This follows the provider boundary already proven in the studio's Review Room project, adapted to Tauri/Windows credential storage.
+
+Authoritative details are in `refs/architecture/providerArchitecture.md`, `refs/architecture/localVsHosted.md`, and `refs/architecture/standalone-deployment-contract.md`.
 
 ## Current State
 
-`task-040`, `task-026`, and `task-027` are complete. Phase 1 Professional Memory remains in progress. `task-028` is next.
+`task-040`, `task-026`, `task-027`, and `task-028` are complete. Phase 1 Professional Memory remains in progress. `task-029` is next.
 
-WorkLore now supports a useful non-resume path from raw capture through Story Seed and guided development into a canonical developing Story. The next gap is that Topic Candidates and Themes exist in the canonical model and Capture can create a Topic Candidate, but they are not yet useful working objects: lifecycle/freshness metadata is minimal and there is no reusable API/UI for connecting a topic to Themes, Stories, Proof Points, Inspiration, or Target Context.
+WorkLore now has a coherent provider-free local path:
+
+`raw Capture -> neutral Source -> optional classification -> Story Seed development and/or durable Topic/Theme connections`
+
+The next gap is Inspiration. Capture can already classify material as Inspiration and the canonical schema has Inspiration records, but Inspiration is not yet a useful ingestion/working workflow with explicit provenance, structured takeaways, user reaction, and Topic/Theme connections.
 
 ## Next Slice
 
-Implement `task-028`: durable Topics and Themes as a bounded Phase 1 slice.
+Implement `task-029`: bounded Inspiration ingestion and working-object behavior.
 
-Primary objective:
+Target flow:
 
-`captured topic -> classify evergreen/timely -> connect themes/stories/proof -> inspect standing/context -> manage lifecycle`
+`source/URL/text/file -> save neutral Source first -> create/link Inspiration -> capture summary/takeaways/reaction -> connect Topic/Theme -> reopen`
 
 Requirements:
 
-1. Make Topic Candidate a first-class reusable canonical object rather than only a Capture classification side effect.
-2. Support the accepted topic lifecycle: captured, exploring, ready, drafted, parked, retired.
-3. Add explicit evergreen-versus-timely metadata. Timely Topics may carry local user-entered freshness/relevance metadata, but this slice must not add news discovery or claim current-event freshness automatically.
-4. Make Theme usable as a durable canonical object with emerging/active/retired lifecycle.
-5. Support explicit typed many-to-many Topic relationships to Story, Proof Point, Theme, Inspiration, and Target Context. Preserve Source as provenance rather than merging semantic classes.
-6. Keep connections manual/deterministic in this slice. Provider/model suggestions may come later and must not be required for storage or editing.
-7. Expose a stable service/Tauri API for creating/updating/listing/loading Topics and Themes and adding/removing typed relationships idempotently.
-8. Add the thinnest useful Topics UI needed to exercise the real canonical path. Do not perform the full navigation rewrite.
-9. Surface factual standing only from explicit Story/Proof connections. Do not infer that Inspiration or Target Context is evidence about the user.
-10. Preserve Capture, direct Story development, resume bootstrap, privacy, and legacy paths.
+1. Preserve save-first Source semantics. External material must be durable before optional processing/classification.
+2. Support Inspiration entry from pasted/captured text, user-provided URL context, and existing local-file Source ingestion. Early URL support may require user-pasted article text; direct network fetching is not required.
+3. Keep Source as provenance and Inspiration as an external semantic working object; do not mutate Source into Inspiration.
+4. Make Inspiration create/load/list/update/reopen behavior first-class and stable.
+5. Support structured local fields sufficient for the PRD: source metadata where known, summary, takeaways, useful excerpt/quote references, why it is interesting, user reaction, possible concepts/angles, and lifecycle (`saved`, `processed`, `archived`).
+6. Preserve attribution/provenance for excerpts. Do not flatten external prose into user-authored material.
+7. Support explicit idempotent connections to existing Topic/Theme records using canonical relationships.
+8. Inspiration must never become Evidence about the user, Proof Point, Story, or Voice Evidence automatically.
+9. Keep the first implementation provider-free. Deterministic/manual processing is acceptable; future model assistance may use Ollama or BYOK through the provider registry but is not required here.
+10. Add the thinnest useful UI/API path needed to exercise the canonical workflow. Do not begin the broad navigation rewrite.
 
 ## Proof Cases For Next Slice
 
 Add synthetic coverage proving at least:
 
-- a captured Topic Candidate survives reopen and can be loaded/edited directly;
-- evergreen and timely metadata are explicit and do not depend on a provider or network call;
-- timely lifecycle metadata can be changed or cleared without changing topic identity;
-- one Topic can connect to multiple Themes, Stories, and Proof Points;
-- repeated identical relationship creation is idempotent;
-- relationship removal does not delete the related semantic record;
-- Inspiration and Target Context can be connected as context but do not become Evidence/Proof automatically;
-- Theme lifecycle is independent from Topic lifecycle;
-- Topic archive/park/retire behavior does not destroy provenance or relationship history unexpectedly;
-- existing Capture and Story Seed development tests remain green.
+- pasted external material persists as a neutral Source before Inspiration processing;
+- URL-associated material can remain Source-only or become Inspiration without fake local file paths;
+- an Inspiration survives reopen with stable identity and provenance;
+- local-file Sources remain compatible with Inspiration creation;
+- lifecycle and structured notes/takeaways/reaction updates preserve identity;
+- quoted/excerpted material remains attributable to its Source;
+- Topic/Theme links are idempotent and survive reopen;
+- Inspiration never creates Evidence, Proof Point, Story, or Voice Evidence implicitly;
+- no model/provider/network call is required for save, edit, or relationship behavior;
+- existing Capture, Story Seed, and Topic/Theme tests remain green.
 
 ## Relevant Files
 
 - `refs/product/prd.md`
 - `refs/architecture/vaultFormat.md`
+- `refs/architecture/providerArchitecture.md`
 - `refs/UI/designPrinciples.md`
 - `refs/planning/roadmap.yaml`
 - `refs/planning/todos.yaml`
 - `src-tauri/src/services/canonical_store.rs`
 - `src-tauri/src/services/capture_service.rs`
-- `src-tauri/src/services/seed_development_service.rs`
-- `src-tauri/src/domain/stories.rs`
+- `src-tauri/src/services/source_service.rs`
+- `src-tauri/src/services/topic_service.rs`
 - `src-tauri/src/lib.rs`
 - `src/domain/types.ts`
 - `src/lib/workloreApi.ts`
-- the thin Capture/Story surfaces needed to expose bounded Topic work
+- the current thin Capture/Topic surfaces
 
 ## Do Not Reopen
 
 Unless new runtime, test, legal, or user evidence materially changes the plan:
 
 - Do not recenter WorkLore on resume parsing.
-- Do not add WorkLore-hosted SaaS, accounts, proprietary sync, automatic publishing, scheduling integration, or autonomous engagement.
-- Do not allow raw AI drafts to train canonical voice.
-- Do not merge Evidence, Inspiration, Target Context, and Voice Evidence into one undifferentiated source class.
-- Do not make Role association mandatory for Stories.
+- Do not add WorkLore-hosted SaaS, accounts, proprietary sync, automatic publishing, scheduling, or autonomous engagement.
+- Do not implement a WorkLore-hosted inference/key proxy as part of BYOK.
+- Do not allow raw AI drafts or external Inspiration prose to train canonical voice.
+- Do not merge Evidence, Inspiration, Target Context, and Voice Evidence into one source class.
+- Do not make Role mandatory for Stories.
 - Do not require classification or provider calls before Capture saves.
-- Do not create fake candidates for direct Story development.
-- Do not route canonical direct-seed interviews through the legacy provider exporter until privacy/preflight is generalized for that target model.
-- Do not add news discovery, automatic trend ranking, Voice, Posts, or analytics in the bounded Topics slice.
-- Do not begin the broad navigation rewrite in the bounded Topics slice.
+- Do not add news discovery, feed polling, automatic trend ranking, Voice, Posts, or analytics in the bounded Inspiration slice.
+- Do not perform direct URL fetching if doing so materially widens the slice; provenance-first pasted content is acceptable.
+- Do not begin the broad navigation rewrite in the bounded Inspiration slice.
 - Do not promote `qa` or `main` without explicit approval.
