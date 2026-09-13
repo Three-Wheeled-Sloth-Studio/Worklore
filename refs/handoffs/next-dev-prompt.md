@@ -1,3 +1,10 @@
+---
+type: Handoff Prompt
+title: Next WorkLore Development Slice
+description: Bounded prompt for the refocused domain-model and navigation contract work.
+status: draft
+tags: [handoff, next-slice]
+---
 # Next Dev Prompt
 
 Continue implementation in:
@@ -6,27 +13,25 @@ Continue implementation in:
 
 Work directly on `dev`. Do not promote `qa` or `main` unless explicitly requested.
 
-## Start with bounded re-entry
+## Start With Bounded Re-entry
 
-Read only:
+From the repository root, first run:
 
-1. `refs/project.yaml`
-2. `refs/product/prd.md`
-3. `refs/planning/roadmap.yaml`
-4. `refs/planning/todos.yaml`
-5. `refs/architecture/standalone-deployment-contract.md`
-6. `refs/handoffs/currentHandoff.md`
-7. Relevant existing schemas/models only after the product contract is understood
+```powershell
+python refs/tools/generate_agent_context.py --focus "refocused domain model and navigation architecture"
+```
 
-Do not reread the entire repository history.
+Treat the packet as derived orientation, not project truth. Use its file-map hints to load only the relevant authoritative refs and source files. Do not reread the full repository history.
 
-## Immediate objective
+At minimum, confirm the current product contract in `refs/product/prd.md` and the standalone boundary in `refs/architecture/standalone-deployment-contract.md` before proposing architecture.
+
+## Immediate Objective
 
 Before implementing new user-facing features, complete the Phase 1 contract work for the refocused product.
 
-Produce two reviewable artifacts:
+Produce two reviewable artifacts.
 
-### A. Refocused domain model
+### A. Refocused Domain Model
 
 Define canonical schemas and relationships for:
 
@@ -49,23 +54,11 @@ Define canonical schemas and relationships for:
 - Performance Record
 - Source/Evidence record
 
-The design must include:
+The design must include IDs and lifecycle semantics, provenance, privacy relationships, many-to-many relationships where appropriate, audit/version expectations, explicit Evidence/Inspiration/Target Context separation, raw-AI voice-training exclusion, draft/edit/published lineage, analytics linkage, migration/reuse mapping from prototype records, and a recommendation for SQLite versus portable/human-readable representations.
 
-- IDs and lifecycle/status semantics;
-- provenance and source relationships;
-- privacy/confidentiality relationships;
-- many-to-many relationships where appropriate;
-- audit/version expectations;
-- distinction among Evidence, Inspiration, and Target Context;
-- explicit voice-evidence provenance so raw AI drafts cannot train canonical voice;
-- final-draft/user-edit/published-version lineage;
-- analytics linkage to exact published content;
-- a migration/reuse map from existing resume candidates, interviews, stories, roles, sources, and private entities;
-- a recommendation on which records belong in SQLite versus portable/human-readable files, without requiring cloud infrastructure.
+Do not contort the new model merely to preserve accidental prototype shapes.
 
-Do not contort the new model merely to preserve legacy shapes. Preserve useful data and behavior, not accidental prototype architecture.
-
-### B. Navigation and workspace architecture
+### B. Navigation And Workspace Architecture
 
 Propose the product-level information architecture centered on:
 
@@ -76,26 +69,13 @@ Propose the product-level information architecture centered on:
 - Posts
 - Insights
 
-Also define where supporting infrastructure belongs:
+Define where Sources, Privacy/private entities, provider settings, audit history, import/export, and settings belong.
 
-- Sources
-- Privacy/private entities
-- Provider settings
-- Audit history
-- Import/export
-- Settings
+The home surface should make the next likely task obvious and support capturing something, developing a story, exploring post ideas, drafting/refining a post, and reviewing what is working.
 
-The home surface should make the next likely task obvious and should support at least:
+Do not implement navigation before reviewing the proposed structure.
 
-- Capture something
-- Develop a story
-- Explore post ideas
-- Draft/refine a post
-- Review what is working
-
-Do not implement the navigation before reviewing the proposed structure.
-
-## Locked constraints
+## Locked Constraints
 
 - Standalone Windows-first application.
 - Local canonical storage; SQLite is allowed.
@@ -106,27 +86,16 @@ Do not implement the navigation before reviewing the proposed structure.
 - Raw AI drafts never train canonical voice.
 - Voice supports controlled tone diversity and deliberate user-directed evolution.
 - Confidentiality transformation is a hard requirement.
-- WorkLore should resist slop/generic fluff and can challenge the user rather than optimize for content volume.
-- Resume ingestion is optional `Seed from resume` support and should not dominate architecture.
+- WorkLore should resist slop and generic fluff rather than optimize for content volume.
+- Resume ingestion is optional `Seed from resume` support.
 - Job descriptions are Target Context for ideation, not keyword-stuffing targets.
-- External posts/articles/papers are Inspiration unless separately established as evidence.
+- External posts, articles, papers, and URLs are Inspiration unless separately established as evidence.
 
-## Existing code to treat as reusable foundation
+## Existing Foundation To Preserve Selectively
 
-Preserve selectively:
+Preserve useful vault lifecycle, source import/extraction, resume seeding, guided interview mechanics, evidence classifications, Private Entity Registry and stable tokens, manual AI workspace exchange, story persistence, operation instrumentation, and external build/QA storage separation.
 
-- vault lifecycle and local persistence;
-- source import/extraction;
-- resume candidate extraction as optional bootstrap;
-- guided interview mechanics;
-- evidence classifications;
-- Private Entity Registry and stable redaction tokens;
-- manual AI workspace/export-import boundary;
-- story persistence;
-- operation instrumentation;
-- external build/QA storage separation.
-
-## Stop point
+## Stop Point
 
 Stop after the domain-model and navigation/workspace proposals are documented and internally checked for consistency with the PRD.
 

@@ -22,6 +22,18 @@ if (-not (Get-Command cargo -ErrorAction SilentlyContinue)) {
     throw "cargo was not found. Install the Rust toolchain and reopen the terminal."
 }
 
+if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
+    throw "python was not found. Python 3 with PyYAML is required for repository validation."
+}
+
+Write-Host "Validating repository path safety and project memory..."
+python scripts/check-case-collisions.py
+if ($LASTEXITCODE -ne 0) { throw "Tracked-path validation failed." }
+python refs/tools/validate_refs.py --mode initialized
+if ($LASTEXITCODE -ne 0) { throw "Project-reference validation failed." }
+python refs/tools/generate_agent_context.py --check
+if ($LASTEXITCODE -ne 0) { throw "Bounded agent-context validation failed." }
+
 Show-WorkLoreLegacyBuildWarning
 $layout = Get-WorkLoreBuildLayout -Channel $Channel
 Initialize-WorkLoreBuildLayout -Layout $layout -Clean:$Clean

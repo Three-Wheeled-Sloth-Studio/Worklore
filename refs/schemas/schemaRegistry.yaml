@@ -1,6 +1,6 @@
-version: 1
+version: 2
 schema: refs/schemas/schemaRegistry.yaml
-updated: 2026-07-25
+updated: 2026-09-12
 purpose: Minimal schema hints for WorkLore project reference files.
 defaults:
   yaml_required_top_level_keys:
@@ -24,7 +24,7 @@ schemas:
       - version
       - schema
       - updated
-      - roadmap
+      - phases
   refs/planning/todos.yaml:
     required_top_level_keys:
       - version
@@ -49,3 +49,13 @@ schemas:
       - schema
       - updated
       - commands
+  refs/okfProfile.yaml:
+    required_top_level_keys:
+      - version
+      - schema
+      - updated
+      - okf
+      - agent_academy
+      - bundle
+      - compatibility
+      - indexes

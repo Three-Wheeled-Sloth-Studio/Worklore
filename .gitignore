@@ -42,6 +42,9 @@ CareerVaults/
 provider-logs/
 extraction-cache/
 
+# Derived local agent context
+.agent-context.md
+
 # Local application state
 .cache/
 .temp/

@@ -73,12 +73,16 @@ jobs:
           npm install 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\npm-install.log"
           exit $LASTEXITCODE
 
-      - name: Validate project references
+      - name: Validate project references and path safety
         shell: pwsh
         run: |
           python -m pip install pyyaml 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\pip-install.log"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python scripts/check-case-collisions.py 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\path-collisions.log"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python refs/tools/validate_refs.py --mode initialized 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\refs-validation.log"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python refs/tools/generate_agent_context.py --check 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\agent-context.log"
           exit $LASTEXITCODE
 
       - name: Run frontend tests

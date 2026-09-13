@@ -1,20 +1,44 @@
-version: 1
+version: 2
 schema: refs/schemas/schemaRegistry.yaml
-updated: 2026-07-25
+updated: 2026-09-12
 commands:
+  - id: validation-path-collisions
+    status: active
+    command: python scripts/check-case-collisions.py
+    purpose: Fail when distinct Git-tracked paths collide after full-path case folding.
+    verifies: Cross-platform repository path safety on Windows, macOS, and Linux.
   - id: validation-git-diff
     status: active
     command: git diff --check
-    verifies: Whitespace errors and malformed patch output.
+    purpose: Check whitespace and malformed patch output.
+    verifies: Clean patch formatting.
+  - id: validation-refs
+    status: active
+    command: python refs/tools/validate_refs.py --mode initialized
+    purpose: Validate durable project memory, OKF compatibility, generated indexes, portability, secret scanning, and tracked-path uniqueness.
+    verifies: WorkLore refs remain parseable, portable, internally consistent, and discoverable.
+  - id: validation-agent-context
+    status: active
+    command: python refs/tools/generate_agent_context.py --check
+    purpose: Verify the bounded derived re-entry packet can be generated within the context budget.
+    verifies: Routine coding-agent re-entry remains deterministic and compact.
+  - id: validation-frontend-tests
+    status: active
+    command: npm run test
+    purpose: Run frontend unit tests.
+    verifies: React and TypeScript behavior covered by Vitest.
+  - id: validation-frontend-build
+    status: active
+    command: npm run build:frontend
+    purpose: Typecheck and build the frontend.
+    verifies: TypeScript and Vite build integrity.
+  - id: validation-rust
+    status: active
+    command: cargo fmt --manifest-path src-tauri/Cargo.toml --all --check && cargo test --manifest-path src-tauri/Cargo.toml && cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
+    purpose: Check Rust formatting, tests, and lints.
+    verifies: Desktop backend quality.
   - id: validation-no-secrets
     status: manual
     command: Review changed files for real user data, credentials, provider logs, vault contents, and machine-local paths.
-    verifies: Public repository safety boundary.
-  - id: validation-refs
-    status: manual
-    command: Confirm required files listed in refs/templatePolicy.yaml exist and all YAML files parse successfully.
-    verifies: Durable project memory remains readable and internally consistent.
-  - id: validation-app
-    status: pending
-    command: To be defined after the Tauri application is scaffolded.
-    verifies: Application build, tests, linting, and packaging.
+    purpose: Protect the public repository boundary.
+    verifies: No private user or machine data is committed.

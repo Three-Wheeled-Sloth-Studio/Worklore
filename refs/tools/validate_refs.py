@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
-"""Validate WorkLore project references.
-
-The validator keeps durable project memory parseable, portable, initialized,
-and free of obvious credential material.
-"""
+"""Validate WorkLore project references and Agent Academy compatibility."""
 
 from __future__ import annotations
 
 import argparse
 import re
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -18,141 +15,175 @@ try:
 except ImportError as exc:
     raise SystemExit("PyYAML is required: python -m pip install pyyaml") from exc
 
+try:
+    from generate_okf_indexes import expected_indexes
+except ImportError as exc:
+    raise SystemExit("refs/tools/generate_okf_indexes.py is required") from exc
 
 ROOT = Path(__file__).resolve().parents[2]
 REFS = ROOT / "refs"
 POLICY = REFS / "templatePolicy.yaml"
+OKF_PROFILE = REFS / "okfProfile.yaml"
+OKF_RESERVED = {"index.md", "log.md"}
+OKF_STATUSES = {"draft", "stable", "deprecated"}
+OKF_TIMESTAMP_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$")
 
 
 def load_yaml(path: Path) -> Any:
-    with path.open("r", encoding="utf-8") as handle:
-        return yaml.safe_load(handle) or {}
+    with path.open("r", encoding="utf-8") as handle: return yaml.safe_load(handle) or {}
 
-
-def relative(path: Path) -> str:
-    return path.relative_to(ROOT).as_posix()
-
-
-def yaml_files() -> list[Path]:
-    return sorted(
-        path
-        for path in REFS.rglob("*")
-        if path.is_file() and path.suffix.lower() in {".yaml", ".yml"}
-    )
-
-
-def all_ref_files() -> list[Path]:
-    return sorted(path for path in REFS.rglob("*") if path.is_file())
-
-
-def add_error(errors: list[str], path: Path | str, message: str) -> None:
-    label = path if isinstance(path, str) else relative(path)
-    errors.append(f"{label}: {message}")
-
+def rel(path: Path) -> str: return path.relative_to(ROOT).as_posix()
+def text(path: Path) -> str: return path.read_text(encoding="utf-8")
+def all_ref_files() -> list[Path]: return [p for p in REFS.rglob("*") if p.is_file() and "__pycache__" not in p.parts]
+def yaml_files() -> list[Path]: return [p for p in all_ref_files() if p.suffix.lower() in {".yaml", ".yml"}]
+def markdown_files() -> list[Path]: return [p for p in all_ref_files() if p.suffix.lower() == ".md"]
+def add_error(errors: list[str], path: Path | str, message: str) -> None: errors.append(f"{path if isinstance(path, str) else rel(path)}: {message}")
 
 def validate_required_files(policy: dict[str, Any], errors: list[str]) -> None:
     for item in policy.get("required_files", []):
-        if not (ROOT / item).is_file():
-            add_error(errors, item, "required file is missing")
+        if not (ROOT / item).is_file(): add_error(errors, item, "required file is missing")
 
-
-def validate_yaml(errors: list[str]) -> dict[str, Any]:
+def validate_yaml_parse(errors: list[str]) -> dict[str, Any]:
     loaded: dict[str, Any] = {}
     for path in yaml_files():
         try:
-            data = load_yaml(path)
-            loaded[relative(path)] = data
-            if not isinstance(data, dict):
-                add_error(errors, path, "YAML root must be a mapping")
-                continue
-            for key in ("version", "schema"):
-                if key not in data:
-                    add_error(errors, path, f"missing top-level key `{key}`")
-        except yaml.YAMLError as exc:
-            add_error(errors, path, f"invalid YAML: {exc}")
+            payload = load_yaml(path); loaded[rel(path)] = payload
+            if not isinstance(payload, dict): add_error(errors, path, "YAML root must be a mapping")
+        except yaml.YAMLError as exc: add_error(errors, path, f"invalid YAML: {exc}")
     return loaded
 
+def validate_schema_keys(loaded: dict[str, Any], errors: list[str]) -> None:
+    registry_path = REFS / "schemas" / "schemaRegistry.yaml"; registry = loaded.get(rel(registry_path)) or load_yaml(registry_path); defaults = registry.get("defaults", {}).get("yaml_required_top_level_keys", [])
+    for path in yaml_files():
+        data = loaded.get(rel(path), {})
+        if not isinstance(data, dict): continue
+        for key in defaults:
+            if key not in data: add_error(errors, path, f"missing required top-level key `{key}`")
+    for item, schema in registry.get("schemas", {}).items():
+        data = loaded.get(item)
+        if data is None: continue
+        for key in schema.get("required_top_level_keys", []):
+            if key not in data: add_error(errors, item, f"missing schema top-level key `{key}`")
 
 def validate_schema_references(loaded: dict[str, Any], errors: list[str]) -> None:
     for item, data in loaded.items():
-        if not isinstance(data, dict):
-            continue
-        schema = data.get("schema")
-        if not isinstance(schema, str):
-            add_error(errors, item, "`schema` must be a repository-relative path")
-            continue
-        schema_path = Path(schema)
-        if schema_path.is_absolute() or re.match(r"^[A-Za-z]:", schema):
-            add_error(errors, item, "`schema` must be repository-relative")
-            continue
-        if not (ROOT / schema_path).is_file():
-            add_error(errors, item, f"schema reference `{schema}` does not exist")
+        if not isinstance(data, dict) or "schema" not in data: continue
+        schema_ref = data["schema"]
+        if not isinstance(schema_ref, str): add_error(errors, item, "`schema` must be a relative path string"); continue
+        if Path(schema_ref).is_absolute() or re.match(r"^[A-Za-z]:", schema_ref): add_error(errors, item, "`schema` must be relative"); continue
+        if not (ROOT / schema_ref).is_file(): add_error(errors, item, f"schema reference `{schema_ref}` does not exist")
 
-
-def validate_initialized(
-    mode: str, policy: dict[str, Any], errors: list[str]
-) -> None:
-    if mode != "initialized":
-        return
-    placeholder = re.compile(r"\b(?:TEMPLATE_TODO|TEMPLATE_TODO_DATE)\b")
-    for item in policy.get("bootstrap_files", []):
-        path = ROOT / item
-        if path.is_file() and placeholder.search(path.read_text(encoding="utf-8")):
-            add_error(errors, path, "contains an uninitialized template placeholder")
-
-
-def validate_portability(errors: list[str]) -> None:
-    windows_absolute = re.compile(r"[A-Za-z]:\\")
-    unix_absolute = re.compile(r"(?<!:)\s/[A-Za-z0-9_.-]")
-    for path in yaml_files():
-        contents = path.read_text(encoding="utf-8")
-        if windows_absolute.search(contents):
-            add_error(errors, path, "contains a Windows absolute path")
-        if unix_absolute.search(contents):
-            add_error(errors, path, "contains a Unix absolute path")
-
-
-def validate_secret_patterns(errors: list[str]) -> None:
-    key_name = re.compile(
-        r"(?i)(api[_-]?key|access[_-]?token|secret[_-]?key|password|private[_-]?key|bearer)"
-    )
-    assignment = re.compile(r"[:=]\s*['\"]?[A-Za-z0-9_./+\-=]{16,}")
+def validate_placeholders(policy: dict[str, Any], mode: str, errors: list[str]) -> None:
+    allowed_tokens = set(policy.get("placeholder_tokens", [])); token_re = re.compile(r"\b[A-Z][A-Z0-9_]*TODO[A-Z0-9_]*\b"); bootstrap = {ROOT / item for item in policy.get("bootstrap_files", [])}
     for path in all_ref_files():
-        if path.suffix.lower() not in {".md", ".yaml", ".yml", ".json", ".example"}:
-            continue
-        for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
-            if key_name.search(line) and assignment.search(line):
-                add_error(errors, path, f"possible secret-like value on line {line_number}")
+        found = set(token_re.findall(text(path))); disallowed = found - allowed_tokens
+        for token in sorted(disallowed): add_error(errors, path, f"placeholder token `{token}` is not allowed")
+        if mode == "initialized" and path in bootstrap and found: add_error(errors, path, "bootstrap file still contains template placeholders")
 
+def validate_secret_scan(policy: dict[str, Any], errors: list[str]) -> None:
+    regexes = [re.compile(pattern, re.IGNORECASE) for pattern in policy.get("validation", {}).get("disallowed_secret_patterns", [])]; assignment_re = re.compile(r"[:=]\s*['\"]?[A-Za-z0-9_/\-+=]{16,}")
+    for path in all_ref_files():
+        if rel(path).startswith("refs/examples/") or path.suffix.lower() not in {".md", ".yaml", ".yml", ".json", ".example"}: continue
+        for lineno, line in enumerate(text(path).splitlines(), start=1):
+            if any(regex.search(line) for regex in regexes) and assignment_re.search(line): add_error(errors, path, f"possible secret-like value on line {lineno}")
+
+def validate_portable_paths(errors: list[str]) -> None:
+    absolute_windows = re.compile(r"[A-Za-z]:\\"); absolute_unix = re.compile(r"(?<!:)\s/[A-Za-z0-9_.-]")
+    for path in yaml_files():
+        contents = text(path)
+        if absolute_windows.search(contents): add_error(errors, path, "contains a Windows absolute path")
+        if absolute_unix.search(contents): add_error(errors, path, "contains a Unix absolute path")
+
+def parse_okf_frontmatter(path: Path, errors: list[str]) -> dict[str, Any] | None:
+    contents = text(path)
+    if not contents.startswith("---\n"): add_error(errors, path, "OKF concept is missing YAML frontmatter"); return None
+    end = contents.find("\n---\n", 4)
+    if end < 0: add_error(errors, path, "OKF frontmatter is not closed"); return None
+    try: data = yaml.load(contents[4:end], Loader=yaml.BaseLoader) or {}
+    except yaml.YAMLError as exc: add_error(errors, path, f"invalid OKF frontmatter: {exc}"); return None
+    if not isinstance(data, dict): add_error(errors, path, "OKF frontmatter must be a mapping"); return None
+    return data
+
+def validate_timestamp(value: Any, path: Path, field: str, errors: list[str]) -> None:
+    if not isinstance(value, str) or not OKF_TIMESTAMP_RE.match(value): add_error(errors, path, f"`{field}` must be an ISO 8601 datetime with an explicit UTC offset")
+
+def validate_okf_metadata(path: Path, data: dict[str, Any], errors: list[str]) -> None:
+    concept_type = data.get("type")
+    if not isinstance(concept_type, str) or not concept_type.strip(): add_error(errors, path, "OKF frontmatter must contain a non-empty `type`")
+    status = data.get("status")
+    if status is not None and status not in OKF_STATUSES: add_error(errors, path, f"OKF status `{status}` is not supported")
+    generated = data.get("generated")
+    if generated is not None:
+        if not isinstance(generated, dict) or not generated.get("by"): add_error(errors, path, "`generated` must be a mapping with non-empty `by`")
+        elif generated.get("at") is not None: validate_timestamp(generated.get("at"), path, "generated.at", errors)
+    verified = data.get("verified")
+    if verified is not None:
+        records = verified if isinstance(verified, list) else [verified]
+        for index, record in enumerate(records):
+            if not isinstance(record, dict) or not record.get("by") or not record.get("at"): add_error(errors, path, f"`verified[{index}]` must contain `by` and `at`"); continue
+            validate_timestamp(record.get("at"), path, f"verified[{index}].at", errors)
+
+def legacy_markdown_exceptions(loaded: dict[str, Any]) -> set[str]:
+    profile = loaded.get(rel(OKF_PROFILE), {}); compatibility = profile.get("compatibility", {}) if isinstance(profile, dict) else {}; values = compatibility.get("legacy_markdown_without_frontmatter", [])
+    return {str(value) for value in values if isinstance(value, str)}
+
+def validate_okf_concepts(loaded: dict[str, Any], errors: list[str]) -> None:
+    exceptions = legacy_markdown_exceptions(loaded)
+    for item in sorted(exceptions):
+        if not (ROOT / item).is_file(): add_error(errors, OKF_PROFILE, f"legacy Markdown exception `{item}` does not exist")
+    for path in markdown_files():
+        item = rel(path)
+        if path.name in OKF_RESERVED or item in exceptions: continue
+        data = parse_okf_frontmatter(path, errors)
+        if data is not None: validate_okf_metadata(path, data, errors)
+
+def validate_okf_profile(loaded: dict[str, Any], errors: list[str]) -> None:
+    profile = loaded.get(rel(OKF_PROFILE))
+    if not isinstance(profile, dict): add_error(errors, OKF_PROFILE, "OKF profile must be a mapping"); return
+    okf = profile.get("okf"); bundle = profile.get("bundle")
+    if not isinstance(okf, dict) or not okf.get("version"): add_error(errors, OKF_PROFILE, "missing `okf.version`"); return
+    if not isinstance(bundle, dict) or bundle.get("root") != "refs": add_error(errors, OKF_PROFILE, "`bundle.root` must be `refs`")
+    for field_path, value in (("okf.baseline_commit", okf.get("baseline_commit")), ("agent_academy.baseline_commit", (profile.get("agent_academy") or {}).get("baseline_commit"))):
+        if not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{40}", value): add_error(errors, OKF_PROFILE, f"`{field_path}` must be a full commit SHA")
+    root_index = REFS / "index.md"
+    if not root_index.is_file(): add_error(errors, root_index, "OKF bundle root index is missing"); return
+    data = parse_okf_frontmatter(root_index, errors)
+    if data is not None:
+        if set(data) != {"okf_version"}: add_error(errors, root_index, "root index frontmatter may contain only `okf_version`")
+        if data.get("okf_version") != str(okf.get("version")): add_error(errors, root_index, "`okf_version` does not match refs/okfProfile.yaml")
+    for path in REFS.rglob("index.md"):
+        if path != root_index and text(path).startswith("---\n"): add_error(errors, path, "non-root OKF index files must not contain frontmatter")
+
+def validate_okf_indexes(errors: list[str]) -> None:
+    try: expected = expected_indexes()
+    except SystemExit as exc: add_error(errors, "refs/index.md", f"could not generate OKF indexes: {exc}"); return
+    expected_paths = set(expected); existing_paths = {path for path in REFS.rglob("index.md") if "__pycache__" not in path.parts}
+    for path, wanted in expected.items():
+        if not path.is_file(): add_error(errors, path, "generated OKF index is missing")
+        elif text(path) != wanted: add_error(errors, path, "generated OKF index is stale")
+    for path in existing_paths - expected_paths: add_error(errors, path, "unexpected generated OKF index")
+
+def git_tracked_paths(errors: list[str]) -> list[str]:
+    try: result = subprocess.run(["git", "ls-files", "-z"], cwd=ROOT, capture_output=True, check=False, timeout=10)
+    except (OSError, subprocess.TimeoutExpired) as exc: add_error(errors, "git", f"could not inspect Git index: {exc}"); return []
+    if result.returncode != 0: add_error(errors, "git", "git ls-files failed"); return []
+    return [item.decode("utf-8", errors="strict").replace("\\", "/") for item in result.stdout.split(b"\0") if item]
+
+def validate_case_collisions(errors: list[str]) -> None:
+    groups: dict[str, list[str]] = {}
+    for path in git_tracked_paths(errors): groups.setdefault(path.casefold(), []).append(path)
+    for values in groups.values():
+        unique = sorted(set(values))
+        if len(unique) > 1: add_error(errors, "git", "case-colliding tracked paths: " + " | ".join(unique))
 
 def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--mode", choices=["template", "initialized"], default="initialized")
-    args = parser.parse_args()
-
-    errors: list[str] = []
-    policy: dict[str, Any] = {}
-    if not POLICY.is_file():
-        add_error(errors, POLICY, "template policy is missing")
-    else:
-        policy = load_yaml(POLICY)
-        validate_required_files(policy, errors)
-
-    loaded = validate_yaml(errors)
-    validate_schema_references(loaded, errors)
-    validate_initialized(args.mode, policy, errors)
-    validate_portability(errors)
-    validate_secret_patterns(errors)
-
+    parser = argparse.ArgumentParser(); parser.add_argument("--mode", choices=["template", "initialized"], default="initialized"); args = parser.parse_args(); errors: list[str] = []
+    if not POLICY.is_file(): add_error(errors, POLICY, "template policy is missing"); print("\n".join(errors), file=sys.stderr); return 1
+    policy = load_yaml(POLICY); validate_required_files(policy, errors); loaded = validate_yaml_parse(errors); validate_schema_keys(loaded, errors); validate_schema_references(loaded, errors); validate_placeholders(policy, args.mode, errors); validate_secret_scan(policy, errors); validate_portable_paths(errors); validate_okf_profile(loaded, errors); validate_okf_concepts(loaded, errors); validate_okf_indexes(errors); validate_case_collisions(errors)
     if errors:
         print("refs validation failed:", file=sys.stderr)
-        for error in errors:
-            print(f"- {error}", file=sys.stderr)
+        for error in errors: print(f"- {error}", file=sys.stderr)
         return 1
+    print(f"refs validation passed ({args.mode} mode, Agent Academy and OKF aligned)"); return 0
 
-    print(f"refs validation passed ({args.mode} mode)")
-    return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
+if __name__ == "__main__": raise SystemExit(main())
