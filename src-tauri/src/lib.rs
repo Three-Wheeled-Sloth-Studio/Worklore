@@ -10,6 +10,10 @@ use commands::{
         classify_capture_source, create_capture_source, get_capture_source,
         list_unclassified_captures,
     },
+    development::{
+        create_story_from_seed_development, start_story_seed_development,
+        submit_story_seed_development_response,
+    },
     interviews::{
         list_guided_interviews, resume_guided_interview, start_guided_interview,
         submit_guided_interview_response,
@@ -41,6 +45,9 @@ pub fn run() {
             get_capture_source,
             list_unclassified_captures,
             classify_capture_source,
+            start_story_seed_development,
+            submit_story_seed_development_response,
+            create_story_from_seed_development,
             open_vault,
             import_source,
             list_sources,

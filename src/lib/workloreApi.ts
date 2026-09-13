@@ -19,6 +19,8 @@ import type {
   ResolveEntityReviewResult,
   SourceSummary,
   SourceType,
+  StorySeedDevelopmentStoryResult,
+  StorySeedDevelopmentSummary,
   StoryStatus,
   StorySummary,
   SubmitInterviewResponseRequest,
@@ -105,6 +107,36 @@ export async function classifyCaptureSource(
     vaultPath,
     sourceId,
     role,
+  });
+}
+
+export async function startStorySeedDevelopment(
+  vaultPath: string,
+  seedId: string,
+): Promise<StorySeedDevelopmentSummary> {
+  return invoke<StorySeedDevelopmentSummary>("start_story_seed_development", {
+    vaultPath,
+    seedId,
+  });
+}
+
+export async function submitStorySeedDevelopmentResponse(
+  vaultPath: string,
+  request: SubmitInterviewResponseRequest,
+): Promise<StorySeedDevelopmentSummary> {
+  return invoke<StorySeedDevelopmentSummary>("submit_story_seed_development_response", {
+    vaultPath,
+    request,
+  });
+}
+
+export async function createStoryFromSeedDevelopment(
+  vaultPath: string,
+  interviewId: string,
+): Promise<StorySeedDevelopmentStoryResult> {
+  return invoke<StorySeedDevelopmentStoryResult>("create_story_from_seed_development", {
+    vaultPath,
+    interviewId,
   });
 }
 

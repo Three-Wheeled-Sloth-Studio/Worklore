@@ -1,0 +1,72 @@
+.seed-development-card {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--border, #d8d8d8);
+  border-radius: 0.75rem;
+  background: var(--surface, #fff);
+}
+
+.seed-development-header,
+.seed-development-progress,
+.seed-development-controls,
+.seed-development-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.seed-development-header h3,
+.seed-development-question h4 {
+  margin: 0.2rem 0 0.4rem;
+}
+
+.seed-development-progress {
+  margin: 0.75rem 0;
+  font-size: 0.85rem;
+  opacity: 0.75;
+  flex-wrap: wrap;
+}
+
+.seed-development-question textarea {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0.75rem 0;
+}
+
+.seed-development-controls {
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.seed-development-controls label {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.seed-development-actions {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.seed-development-ready {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.9rem;
+  border-radius: 0.6rem;
+  background: rgba(127, 127, 127, 0.08);
+}
+
+.seed-development-boundary {
+  margin: 0.9rem 0 0;
+  font-size: 0.85rem;
+  opacity: 0.72;
+}
+
+@media (max-width: 760px) {
+  .seed-development-header,
+  .seed-development-controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

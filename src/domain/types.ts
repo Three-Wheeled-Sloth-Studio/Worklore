@@ -182,6 +182,26 @@ export interface InterviewSummary {
   lastUpdatedAt: string;
 }
 
+export interface StorySeedDevelopmentSummary {
+  interviewId: string;
+  seedId: string;
+  seedTitle: string;
+  seedSummary: string;
+  storyId: string | null;
+  status: InterviewStatus;
+  currentQuestion: string | null;
+  currentTargetField: string | null;
+  completedFieldCount: number;
+  totalFieldCount: number;
+  lastUpdatedAt: string;
+}
+
+export interface StorySeedDevelopmentStoryResult {
+  development: StorySeedDevelopmentSummary;
+  storyId: string;
+  created: boolean;
+}
+
 export interface SubmitInterviewResponseRequest {
   interviewId: string;
   action: InterviewResponseAction;

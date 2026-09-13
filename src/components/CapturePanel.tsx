@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from "react";
+import { SeedDevelopmentPanel } from "./SeedDevelopmentPanel";
 import type { CaptureRole, CaptureSource, SourceType } from "../domain/types";
 import { errorMessage } from "../domain/types";
 import {
@@ -32,11 +33,13 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [developmentSeedId, setDevelopmentSeedId] = useState<string | null>(null);
 
   useEffect(() => {
     setSaved(null);
     setNotice(null);
     setError(null);
+    setDevelopmentSeedId(null);
     void refreshRecent();
   }, [vaultPath]);
 
@@ -102,6 +105,10 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
       setBusy(null);
     }
   }
+
+  const storySeedClassification = saved?.classifications.find(
+    (classification) => classification.role === "story_seed",
+  );
 
   return (
     <section className="workspace-panel capture-panel" aria-labelledby="capture-heading">
@@ -181,8 +188,25 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
             <p className="capture-source-only">
               Leave it alone to keep this as Source-only material. Writing samples do not become Voice Evidence here.
             </p>
+            {storySeedClassification ? (
+              <button
+                className="primary-button compact"
+                disabled={busy !== null}
+                onClick={() => setDevelopmentSeedId(storySeedClassification.targetId)}
+              >
+                Develop this story seed
+              </button>
+            ) : null}
           </div>
         </div>
+      ) : null}
+
+      {developmentSeedId ? (
+        <SeedDevelopmentPanel
+          vaultPath={vaultPath}
+          seedId={developmentSeedId}
+          onClose={() => setDevelopmentSeedId(null)}
+        />
       ) : null}
 
       <div className="capture-feedback" aria-live="polite">
