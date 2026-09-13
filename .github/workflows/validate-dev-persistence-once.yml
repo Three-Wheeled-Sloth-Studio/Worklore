@@ -47,7 +47,7 @@ jobs:
               "pub fn create_evidence(vault_path: &Path, text: &str)",
               "pub fn create_inspiration(vault_path: &Path, title: &str)",
               "pub fn create_target_context(vault_path: &Path, context_type: &str, title: &str)",
-              "fn normalized_title(value: &str, fallback: &str)",
+              "fn normalized_title(value:&str,fallback:&str)",
           ]
           for name in names:
               replacement = "#[allow(dead_code)]\n" + name
