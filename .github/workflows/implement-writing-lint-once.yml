@@ -1,3 +1,4 @@
+# rerun after bootstrap correction
 name: One-shot deterministic writing linter implementation
 
 on:
