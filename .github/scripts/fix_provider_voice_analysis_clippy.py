@@ -102,4 +102,32 @@ if text.count(old_function) != 1:
     raise RuntimeError(f"provider audit function: expected 1 match, found {text.count(old_function)}")
 text = text.replace(old_function, new_function, 1)
 
+old_test_call = '''        audit_provider_run(
+            &path,
+            "provider_run_test",
+            "ollama",
+            "qwen3",
+            2,
+            1,
+            "succeeded",
+            None,
+        )
+        .unwrap();'''
+new_test_call = '''        audit_provider_run(
+            &path,
+            ProviderRunAudit {
+                run_id: "provider_run_test",
+                provider_id: "ollama",
+                model_id: "qwen3",
+                evidence_count: 2,
+                proposal_count: 1,
+                outcome: "succeeded",
+                error_code: None,
+            },
+        )
+        .unwrap();'''
+if text.count(old_test_call) != 1:
+    raise RuntimeError(f"provider audit test call: expected 1 match, found {text.count(old_test_call)}")
+text = text.replace(old_test_call, new_test_call, 1)
+
 PATH.write_text(text, encoding="utf-8", newline="\n")
