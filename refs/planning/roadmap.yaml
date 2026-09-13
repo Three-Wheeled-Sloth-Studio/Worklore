@@ -23,7 +23,6 @@ prototype_foundation:
     - Manual privacy-safe AI workspace export and structured response import.
     - Canonical story storage and role linking.
     - Local operation timing and external build boundaries.
-    - Canonical SQLite persistence at data/worklore.sqlite with Phase 1 schema migration and non-destructive prototype import.
   de_emphasized:
     - Robust arbitrary resume parsing beyond practical maintenance.
     - Resume-first navigation and workflow assumptions.
@@ -59,10 +58,15 @@ phases:
       - Add inspiration ingestion with provenance, user notes, extracted concepts, questions, and counterpoints.
       - Preserve Private Entity Registry and privacy preflight as infrastructure.
       - Demote resume ingestion to an optional Seed from resume path.
+    completed:
+      - Canonical SQLite persistence and non-destructive prototype migration foundation.
+      - Save-first typed/pasted Capture with neutral Source persistence before classification.
+      - Post-save manual classification into Story Seed, Proof Point, Topic Candidate, Inspiration, or Target Context with typed relationships and idempotency.
+      - Thin Capture UI and recent-unclassified recovery path without provider/model dependency.
     architecture_notes:
-      - Canonical structured state persists locally in data/worklore.sqlite behind the Phase 1 migration boundary.
+      - Durable local persistence uses SQLite for canonical structured state while source bytes remain in the vault filesystem.
       - Human-readable export remains desirable.
-      - The vault must remain usable without a WorkLore account or hosted service.
+      - The vault remains usable without a WorkLore account or hosted service.
     exit_criteria:
       - A new user can build useful stories and topic candidates without importing a resume.
       - Capture survives restart and supports incomplete material.
