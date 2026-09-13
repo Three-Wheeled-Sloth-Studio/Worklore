@@ -71,12 +71,17 @@ phases:
       - Durable Themes with emerging/active/retired lifecycle independent from Topic lifecycle.
       - Idempotent typed Topic relationships to Stories, Proof Points, Themes, Inspiration, and Target Context with standing/context semantics preserved.
       - Thin Topic editor/API path that preserves Capture-created Topic identity and remains provider-free.
+      - Source-backed Inspiration records with stable identity across captured text, URL-only captures, and imported local-file Sources.
+      - Structured Inspiration metadata for provenance, summary, takeaways, attributed excerpts, why-it-matters notes, user reaction, concepts, questions, counterpoints, and saved/processed/archived lifecycle.
+      - Idempotent Inspiration connections to Topics and Themes through the shared relationship graph without creating Evidence, Proof Points, Stories, or Voice Evidence.
+      - Thin Inspiration editor/API path that explicitly separates external wording from user-authored reaction and remains provider/network-free.
     architecture_notes:
       - Durable local persistence uses SQLite for canonical structured state while source bytes remain in the vault filesystem.
       - Human-readable export remains desirable.
       - The vault remains usable without a WorkLore account or hosted service.
       - Direct Story Seed development remains local-only until provider export/preflight is explicitly generalized for canonical seed/story targets.
       - Topic timing, lifecycle, and relationships are deterministic local state and do not require provider or network availability.
+      - Inspiration is external context, not factual evidence about the user; excerpts retain Source attribution and user reaction remains separately attributable even though neither becomes Voice Evidence automatically.
     exit_criteria:
       - A new user can build useful stories and topic candidates without importing a resume.
       - Capture survives restart and supports incomplete material.
