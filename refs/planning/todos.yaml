@@ -2,7 +2,7 @@ version: 2
 schema: refs/schemas/schemaRegistry.yaml
 updated: 2026-09-12
 
-historical_prototype_tasks:
+todos:
   - id: task-001
     status: complete
     area: repository
@@ -87,8 +87,6 @@ historical_prototype_tasks:
     status: absorbed_by_phase_2
     area: providers
     summary: Direct Ollama and Gemini adapters should be implemented only after canonical voice provenance and the refocused domain contracts are stable.
-
-active_refocus_tasks:
   - id: task-022
     status: complete
     area: product
@@ -106,7 +104,7 @@ active_refocus_tasks:
     area: ux
     summary: Design the task-oriented navigation and home flow around Capture, Stories, Topics, Voice, Posts, and Insights while demoting Sources and Privacy to supporting infrastructure.
   - id: task-040
-    status: next
+    status: in_progress
     area: data
     summary: Introduce the canonical SQLite persistence boundary, schema/migration framework, Phase 1 relational tables, and non-destructive migration seam from prototype vault records without beginning a broad UI rewrite.
   - id: task-026

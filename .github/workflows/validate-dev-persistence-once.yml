@@ -66,10 +66,8 @@ jobs:
           $artifact = Join-Path $env:RUNNER_TEMP "worklore-validation"
           New-Item -ItemType Directory -Force -Path $artifact | Out-Null
           Copy-Item "$env:RUNNER_TEMP\rustfmt.patch" "$artifact\rustfmt.patch" -ErrorAction SilentlyContinue
-          Copy-Item "src-tauri\src\services\canonical_store.rs" "$artifact\canonical_store.rs"
-          Copy-Item "src-tauri\src\services\vault_service.rs" "$artifact\vault_service.rs"
-          Copy-Item "src-tauri\src\commands\*.rs" $artifact
-          Copy-Item "src-tauri\src\error.rs" $artifact
+          Copy-Item "src-tauri\Cargo.toml" "$artifact\Cargo.toml"
+          Copy-Item "src-tauri\src" "$artifact\src" -Recurse
 
       - name: Upload validation artifact
         if: always()
