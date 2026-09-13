@@ -112,9 +112,9 @@ todos:
     area: capture
     summary: Implement save-first capture that persists ambiguous memories, ideas, proof points, URLs, excerpts, job descriptions, writing samples, and notes before classification.
   - id: task-027
-    status: next
+    status: planned
     area: stories
-    summary: Generalize guided story development so stories can originate directly from capture rather than resume bullets.
+    summary: Generalize guided story development so stories can originate directly from capture rather than resume bullets. This is the next bounded implementation slice.
   - id: task-028
     status: planned
     area: topics
