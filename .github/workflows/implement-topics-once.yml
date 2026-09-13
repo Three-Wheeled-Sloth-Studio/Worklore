@@ -57,6 +57,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python .github/scripts/fix_topics_slice.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python .github/scripts/fix_topics_sql_spacing.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cargo fmt --manifest-path src-tauri/Cargo.toml --all
 
       - name: Validate references and path safety
