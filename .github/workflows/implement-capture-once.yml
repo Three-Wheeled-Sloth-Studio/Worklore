@@ -1,4 +1,4 @@
-name: One-shot Capture documented-state validation
+name: One-shot Capture normalized-state validation
 
 on:
   push:
