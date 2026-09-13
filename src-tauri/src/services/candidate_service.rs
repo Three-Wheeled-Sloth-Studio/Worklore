@@ -34,11 +34,10 @@ pub fn extract_resume_candidates(
         ));
     }
 
-    let extracted_path = source
-        .extraction
-        .text_path
-        .as_deref()
-        .ok_or_else(|| WorkLoreError::SourceNotReady("Extracted text is missing.".to_string()))?;
+    let extracted_path =
+        source.extraction.text_path.as_deref().ok_or_else(|| {
+            WorkLoreError::SourceNotReady("Extracted text is missing.".to_string())
+        })?;
     let text = fs::read_to_string(vault_path.join(extracted_path))?;
     let existing = read_candidates(vault_path)?;
     let existing_fragments = existing
@@ -395,8 +394,7 @@ fn match_section_prefix<'a>(line: &'a str, headings: &[&str]) -> Option<&'a str>
 
 fn trim_section_separator(value: &str) -> &str {
     value.trim_start_matches(|character: char| {
-        character.is_whitespace()
-            || matches!(character, ':' | '-' | '–' | '—' | '_' | '=' | '#')
+        character.is_whitespace() || matches!(character, ':' | '-' | '–' | '—' | '_' | '=' | '#')
     })
 }
 
@@ -426,8 +424,22 @@ fn strip_bullet_prefix(line: &str) -> Option<&str> {
 fn is_bullet_character(character: char) -> bool {
     matches!(
         character,
-        '-' | '*' | '+' | '•' | '▪' | '▫' | '■' | '□' | '●' | '○' | '◦' | '‣' | '►'
-            | '–' | '—' | '·' | ''
+        '-' | '*'
+            | '+'
+            | '•'
+            | '▪'
+            | '▫'
+            | '■'
+            | '□'
+            | '●'
+            | '○'
+            | '◦'
+            | '‣'
+            | '►'
+            | '–'
+            | '—'
+            | '·'
+            | ''
     )
 }
 
@@ -611,11 +623,9 @@ fn contains_date_range(line: &str) -> bool {
 }
 
 fn date_range_match(line: &str) -> Option<regex::Match<'_>> {
-    Regex::new(
-        r"(?i)\b(?:19|20)\d{2}\s*(?:-|–|—|to)\s*(?:present|current|(?:19|20)\d{2})\b",
-    )
-    .expect("date range regex")
-    .find(line)
+    Regex::new(r"(?i)\b(?:19|20)\d{2}\s*(?:-|–|—|to)\s*(?:present|current|(?:19|20)\d{2})\b")
+        .expect("date range regex")
+        .find(line)
 }
 
 fn ends_sentence(line: &str) -> bool {
@@ -784,8 +794,12 @@ mod tests {
         let text = "PROFESSIONAL SUMMARY\nProduct leader.\nPROFESSIONAL EXPERIENCE ATI Government Solutions (2025–Present) Data Analytics Product Lead Translated complex requirements into scalable workflows, supporting modernization for 30,000 users. Defined a new reporting model for 22 service centers.\nEDUCATION Bachelor of Science";
         let bullets = parse_resume_bullets(text);
         assert_eq!(bullets.len(), 2);
-        assert!(bullets[0].claim.starts_with("Translated complex requirements"));
-        assert!(bullets[1].claim.starts_with("Defined a new reporting model"));
+        assert!(bullets[0]
+            .claim
+            .starts_with("Translated complex requirements"));
+        assert!(bullets[1]
+            .claim
+            .starts_with("Defined a new reporting model"));
         assert!(bullets
             .iter()
             .all(|bullet| !bullet.claim.contains("Product leader")));

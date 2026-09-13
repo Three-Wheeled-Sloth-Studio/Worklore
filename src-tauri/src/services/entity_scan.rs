@@ -124,7 +124,7 @@ pub fn scan_text(
                         entity_id: registry.entities[*index].entity_id.clone(),
                         score: 0.75,
                         reasons: vec![
-                            "Multiple existing entities share this normalized alias.".to_string(),
+                            "Multiple existing entities share this normalized alias.".to_string()
                         ],
                     })
                     .collect();
@@ -240,8 +240,7 @@ fn collect_detections(text: &str) -> Vec<Detection> {
     add_regex_detections(
         &mut detections,
         text,
-        &Regex::new(r"(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b")
-            .expect("email regex"),
+        &Regex::new(r"(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b").expect("email regex"),
         EntityType::Email,
         0.99,
         0.99,
@@ -250,8 +249,7 @@ fn collect_detections(text: &str) -> Vec<Detection> {
     add_regex_detections(
         &mut detections,
         text,
-        &Regex::new(r"(?i)\bhttps?://[^\s<>()\[\]{}]+")
-            .expect("url regex"),
+        &Regex::new(r"(?i)\bhttps?://[^\s<>()\[\]{}]+").expect("url regex"),
         EntityType::Url,
         0.99,
         0.99,
@@ -260,10 +258,8 @@ fn collect_detections(text: &str) -> Vec<Detection> {
     add_regex_detections(
         &mut detections,
         text,
-        &Regex::new(
-            r"(?x)\b(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?)\d{3}[-.\s]?\d{4}\b",
-        )
-        .expect("phone regex"),
+        &Regex::new(r"(?x)\b(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?)\d{3}[-.\s]?\d{4}\b")
+            .expect("phone regex"),
         EntityType::Phone,
         0.96,
         0.98,
@@ -370,10 +366,7 @@ fn trim_organization_noise(initial_start: usize, value: &str) -> (usize, &str) {
 
     let mut start = initial_start;
     let mut remaining = value;
-    loop {
-        let Some(first) = remaining.split_whitespace().next() else {
-            break;
-        };
+    while let Some(first) = remaining.split_whitespace().next() {
         if !LEADING_NOISE.contains(&first) {
             break;
         }
@@ -418,8 +411,7 @@ fn is_acronym_in_entity_context(text: &str, start: usize, end: usize) -> bool {
 pub fn is_public_domain_acronym(value: &str) -> bool {
     matches!(
         value.to_ascii_uppercase().as_str(),
-        "AI"
-            | "API"
+        "AI" | "API"
             | "ATS"
             | "BI"
             | "CEO"
@@ -746,9 +738,7 @@ mod tests {
     #[test]
     fn acronyms_in_employment_context_can_be_registered() {
         let detections = collect_detections("Lead Product Manager at FINRA | 2022 - Present");
-        assert!(detections
-            .iter()
-            .any(|detection| detection.text == "FINRA"));
+        assert!(detections.iter().any(|detection| detection.text == "FINRA"));
     }
 
     #[test]
@@ -770,9 +760,7 @@ mod tests {
                 .count(),
             1
         );
-        assert!(!detections
-            .iter()
-            .any(|detection| detection.text == "Lead"));
+        assert!(!detections.iter().any(|detection| detection.text == "Lead"));
     }
 
     #[test]

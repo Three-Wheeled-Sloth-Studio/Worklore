@@ -14,10 +14,7 @@ pub fn create_vault(path: String, name: String) -> CommandResult<VaultSummary> {
 }
 
 #[tauri::command]
-pub fn create_vault_in_parent(
-    parent_path: String,
-    name: String,
-) -> CommandResult<VaultSummary> {
+pub fn create_vault_in_parent(parent_path: String, name: String) -> CommandResult<VaultSummary> {
     vault_service::create_vault_in_parent(&PathBuf::from(parent_path), &name)
         .map_err(CommandError::from)
 }
@@ -50,12 +47,9 @@ pub async fn import_source(
 ) -> CommandResult<ImportSourceResult> {
     tauri::async_runtime::spawn_blocking(move || {
         let vault_path = PathBuf::from(vault_path);
-        let result = source_service::import_source(
-            &vault_path,
-            &PathBuf::from(source_path),
-            source_type,
-        )
-        .map_err(CommandError::from)?;
+        let result =
+            source_service::import_source(&vault_path, &PathBuf::from(source_path), source_type)
+                .map_err(CommandError::from)?;
         canonical_store::migrate_prototype(&vault_path).map_err(CommandError::from)?;
         Ok(result)
     })

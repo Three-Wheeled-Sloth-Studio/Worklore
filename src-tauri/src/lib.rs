@@ -12,8 +12,8 @@ use commands::{
     },
     performance::get_performance_snapshot,
     preferences::{
-        clear_last_vault, get_default_vault_root, get_last_import_directory,
-        get_last_vault_path, remember_last_import_file, remember_last_vault,
+        clear_last_vault, get_default_vault_root, get_last_import_directory, get_last_vault_path,
+        remember_last_import_file, remember_last_vault,
     },
     privacy::{list_entity_reviews, resolve_entity_review},
     providers::create_manual_workspace,

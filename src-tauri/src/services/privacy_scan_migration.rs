@@ -54,10 +54,13 @@ pub fn migrate_legacy_review_noise(vault_path: &Path) -> ServiceResult<usize> {
                 }
                 LegacyReviewAction::DismissNoise => {
                     if registry.entities[index].status == EntityStatus::Provisional
-                        && registry.entities[index].occurrences.iter().all(|occurrence| {
-                            occurrence.record_id == item.record_id
-                                && occurrence.locator == item.locator
-                        })
+                        && registry.entities[index]
+                            .occurrences
+                            .iter()
+                            .all(|occurrence| {
+                                occurrence.record_id == item.record_id
+                                    && occurrence.locator == item.locator
+                            })
                     {
                         registry.entities[index].status = EntityStatus::Archived;
                         registry.entities[index].updated_at = now.clone();
@@ -145,10 +148,7 @@ fn has_explicit_project_name_cue(item: &EntityReviewItem) -> bool {
     .any(|cue| context.contains(&format!("{cue} {name}")))
 }
 
-fn review_entity_index(
-    registry: &PrivateEntityRegistry,
-    item: &EntityReviewItem,
-) -> Option<usize> {
+fn review_entity_index(registry: &PrivateEntityRegistry, item: &EntityReviewItem) -> Option<usize> {
     for candidate in &item.candidate_matches {
         if let Some(index) = registry
             .entities

@@ -29,8 +29,8 @@ pub fn submit_guided_interview_response(
     request: SubmitInterviewResponseRequest,
 ) -> CommandResult<InterviewSummary> {
     let vault_path = PathBuf::from(vault_path);
-    let result = interview_service::submit_response(&vault_path, request)
-        .map_err(CommandError::from)?;
+    let result =
+        interview_service::submit_response(&vault_path, request).map_err(CommandError::from)?;
     canonical_store::migrate_prototype(&vault_path).map_err(CommandError::from)?;
     Ok(result)
 }

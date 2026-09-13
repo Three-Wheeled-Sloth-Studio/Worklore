@@ -251,13 +251,15 @@ mod tests {
     #[test]
     fn vault_creation_uses_a_named_child_folder() {
         let parent = std::env::temp_dir().join(format!("worklore-vault-test-{}", Uuid::now_v7()));
-        let summary = create_vault_in_parent(&parent, "My Career Stories")
-            .expect("vault should be created");
+        let summary =
+            create_vault_in_parent(&parent, "My Career Stories").expect("vault should be created");
         let expected = parent.join("My Career Stories");
 
         assert_eq!(summary.path, expected.to_string_lossy());
         assert!(expected.join("vault.json").is_file());
-        assert!(expected.join(canonical_store::DATABASE_RELATIVE_PATH).is_file());
+        assert!(expected
+            .join(canonical_store::DATABASE_RELATIVE_PATH)
+            .is_file());
 
         fs::remove_dir_all(parent).expect("test vault should be removable");
     }
@@ -268,8 +270,8 @@ mod tests {
         fs::create_dir_all(parent.join("My Career Stories"))
             .expect("existing folder should be created");
 
-        let summary = create_vault_in_parent(&parent, "My Career Stories")
-            .expect("vault should be created");
+        let summary =
+            create_vault_in_parent(&parent, "My Career Stories").expect("vault should be created");
         let expected = parent.join("My Career Stories-2");
 
         assert_eq!(summary.path, expected.to_string_lossy());
