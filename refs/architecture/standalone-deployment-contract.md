@@ -1,7 +1,7 @@
 # Standalone Deployment Contract
 
 Status: locked
-Updated: 2026-09-12
+Updated: 2026-09-13
 
 ## Decision
 
@@ -29,11 +29,16 @@ Local and canonical:
 Optional external operations:
 
 - Ollama for local generation;
-- Gemini or another explicit user-authorized provider;
+- BYOK cloud providers, beginning with Gemini, using credentials supplied and controlled by the user;
+- manual AI workspaces through explicit export/import;
 - web/news retrieval for discovery;
 - retrieval of user-pinned public articles, papers, posts, or URLs;
 - user-imported LinkedIn analytics;
 - manual copy/paste or export for public publishing.
+
+BYOK credentials are device-local secrets stored outside the vault in the operating-system credential store. WorkLore must not place them in canonical SQLite state, logs, exports, provider-run history, or frontend state. WorkLore does not operate a hosted credential proxy or inference gateway for these requests.
+
+Cloud-provider use is explicit. WorkLore must not silently fall back from Ollama or another local/provider-free path to a remote provider, and remote calls remain subject to privacy preflight and user-visible data disclosure.
 
 ## Persistence
 
@@ -63,4 +68,4 @@ This boundary supports both risk control and the product's anti-slop positioning
 
 ## Future reconsideration
 
-A hosted backend, proprietary sync, accounts, collaboration, or publishing integration may be reconsidered only as a new product decision. None should be introduced as an incidental implementation convenience.
+A hosted backend, proprietary sync, accounts, collaboration, WorkLore-hosted inference, or publishing integration may be reconsidered only as a new explicit product decision. None should be introduced as an incidental implementation convenience.
