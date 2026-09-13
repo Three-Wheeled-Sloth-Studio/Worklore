@@ -6,29 +6,67 @@ WorkLore owns workflow state, validation, privacy handling, durable records, and
 
 A provider must not decide where records are stored, delete data, finalize a story, merge entities, or bypass privacy review.
 
+Provider selection must not become a hidden routing decision. WorkLore may recommend a configured provider or model, but it must not silently fall back from a local provider to a cloud provider.
+
+## Provider Registry
+
+WorkLore uses a provider registry rather than embedding provider-specific networking in product workflows.
+
+The registry resolves a configured provider implementation from a stable provider ID. Workflow code supplies provider-neutral task input and receives provider-neutral structured output or normalized errors.
+
+Provider IDs are durable strings rather than a closed TypeScript union so new adapters can be added without rewriting every workflow. The initial registry is expected to contain:
+
+- `ollama` — local generation using a separately installed Ollama service;
+- `gemini` — the first remote bring-your-own-key (BYOK) adapter;
+- `manual` — export/import packages for an external AI workspace.
+
+Additional remote providers may be added later under the same BYOK contract. Adding a provider does not authorize WorkLore to send data to it automatically.
+
+## Bring Your Own Key Contract
+
+Remote model providers are user-configured BYOK integrations.
+
+Hard rules:
+
+- WorkLore ships no studio-owned cloud-model API key.
+- WorkLore does not operate a credential proxy, inference gateway, quota service, billing service, or account system for BYOK requests.
+- Provider secrets are stored outside the vault in the operating-system credential store.
+- The vault, canonical SQLite database, provider-run records, logs, exports, crash reports, and frontend state must never contain the secret value.
+- Durable settings may store only a provider ID, model ID, non-secret provider configuration, and an opaque credential lookup/reference where needed.
+- Trusted Tauri/Rust code resolves a credential only immediately before an authorized remote request; provider secrets are never exposed to React code.
+- Provider settings must support configure/save, connection or credential validation, and explicit clear/remove actions.
+- A missing or invalid credential fails closed with a useful configuration route. It must never trigger a silent provider substitution.
+- Normal CI and synthetic tests must not require real provider credentials.
+- Remote calls require the same privacy preflight and disclosure boundary regardless of which BYOK provider is selected.
+
+This adapts the provider boundary already proven in the studio's Review Room project to WorkLore's desktop/OS-credential model.
+
 ## Initial Providers
 
 ### Ollama
 
-A local provider using a separately installed Ollama service.
+Ollama remains the first-class local provider and requires no provider API key. WorkLore should remain useful when only Ollama is configured and should also remain usable for provider-free workflows when Ollama is not installed.
 
-### Gemini
+### Gemini BYOK
 
-A cloud provider using the user's Gemini API key. The key is stored in the operating system credential store and is never written to the vault.
+Gemini is the initial remote provider. It uses the user's own API key under the BYOK contract above.
+
+Gemini is an initial adapter, not a special case in workflow code. Its model catalog and structured-output capabilities are adapter concerns.
 
 ### Manual workspace
 
-An export and import provider that creates a task package for ChatGPT, Claude, Gemini, or another external workspace.
+The manual provider creates a privacy-reviewed task package for ChatGPT, Claude, Gemini, or another external workspace, then validates imported structured output. WorkLore does not store credentials for this path.
 
 ## Core Contract
 
-The application-level contract should remain independent of any provider SDK.
+The application-level contract remains independent of any provider SDK.
 
 ```ts
 export interface AgentProvider {
-  readonly id: "ollama" | "gemini" | "manual";
+  readonly id: string;
 
   testConnection(): Promise<ProviderStatus>;
+  getAvailableModels?(): Promise<ProviderModel[]>;
 
   runStructured<TInput, TOutput>(
     request: StructuredAgentRequest<TInput, TOutput>,
@@ -38,6 +76,8 @@ export interface AgentProvider {
 }
 ```
 
+The provider registry is responsible for resolving `providerId -> AgentProvider`. Credentials are deliberately absent from the provider-neutral request object and are resolved only inside the trusted adapter boundary.
+
 A structured request contains:
 
 - Operation ID
@@ -46,10 +86,13 @@ A structured request contains:
 - JSON Schema for the expected output
 - Selected source fragments
 - Privacy mode
-- Provider configuration
+- Provider ID and non-secret configuration
+- Model ID
 - Request correlation ID
 
 ## Initial Operations
+
+The operation inventory will evolve with the refocused domain. Existing/prototype operations include:
 
 - `extract_resume_candidates`
 - `extract_job_requirements`
@@ -63,7 +106,7 @@ A structured request contains:
 - `extract_private_entities`
 - `score_entity_matches`
 
-Every operation has its own versioned input and output schema.
+New operations must remain versioned and must not make provider execution a prerequisite for basic local capture, storage, editing, or relationship management.
 
 ## Structured Output
 
@@ -75,7 +118,7 @@ Provider adapters must:
 2. Parse the returned JSON.
 3. Validate it locally against the same schema.
 4. Reject malformed or schema-invalid output.
-5. Return a typed error that permits retry, model change, or manual fallback.
+5. Return a typed error that permits retry, model change, provider change, or manual fallback chosen by the user.
 
 Freeform prose is allowed only where the operation contract explicitly includes prose fields.
 
@@ -112,17 +155,22 @@ Adapters map provider-specific failures to:
 - `cancelled`
 - `unknown`
 
-The UI should offer a useful next action rather than display raw provider internals by default.
+Errors must not echo secrets, authorization headers, or complete provider response headers. The UI should offer a useful next action rather than display raw provider internals by default.
 
-## Gemini Adapter
+## Remote Provider Adapter Requirements
 
-The initial Gemini adapter should use the current Google Gen AI SDK and JSON Schema structured output.
+Each BYOK adapter must:
 
-The model identifier is configuration, not a hard-coded workflow decision. The first test default is `gemini-3.6-flash`, subject to a connection and structured-output capability test during setup.
+- run from trusted backend code;
+- retrieve its credential from the operating-system credential store at request time;
+- expose provider/model capability and connection validation without persisting the secret in application records;
+- use stable model identifiers rather than moving aliases where practical;
+- map provider-specific errors into the normalized error contract;
+- support explicit user-facing remote-data disclosure;
+- preserve the provider and model used in run metadata while excluding credentials;
+- avoid automatic fallback to another provider.
 
-The adapter should live in the Rust or trusted backend side of the Tauri application so the API key is not exposed in frontend code.
-
-The adapter stores only an opaque credential lookup ID in settings. The secret is retrieved from the operating system credential store immediately before use.
+The Gemini adapter is the first implementation of this contract. Future adapters should reuse it rather than creating new workflow-specific credential paths.
 
 ## Ollama Adapter
 
@@ -161,22 +209,22 @@ Import supports:
 
 Imported output is validated before it can update application state.
 
-## Privacy Preflight
+## Privacy Preflight And Remote Disclosure
 
-Before a cloud or manual export operation, WorkLore calculates:
+Before a BYOK cloud or manual export operation, WorkLore calculates and displays enough information for an informed user decision, including:
 
 - Provider
 - Model or target workspace
-- Selected record IDs
+- Selected record IDs/content categories
 - Active identifier mode
 - Entity replacements
 - `ask_before_cloud` entities
 - Blocked entities
 - Unresolved review items
 - Estimated input size
-- Whether bodies will be retained locally
+- Whether request/response bodies will be retained locally
 
-The preflight result is stored as local operation metadata.
+The preflight result is stored as local operation metadata. The UI must make it clear that selecting a cloud provider sends the disclosed content directly to that third party under the user's own provider account/key.
 
 ## Request Logs
 
@@ -193,7 +241,7 @@ Default logs contain:
 - Selected record IDs
 - Schema validation result
 
-Request and response bodies are not retained by default.
+Request and response bodies are not retained by default. Credentials are never logged.
 
 ## Cancellation And Retry
 
@@ -201,8 +249,10 @@ Long-running provider operations must be cancellable where the SDK or transport 
 
 Retries must not silently duplicate state changes. The provider run returns data only. The application applies results once through an idempotent command using the run ID.
 
-## Future Hosted Provider
+Retry only failures that are plausibly transient. Missing/invalid credentials and privacy blocks require explicit user correction rather than automatic retry or fallback.
 
-A future WorkLore-hosted provider implements the same contract. Account, billing, credit, and abuse-control code belongs in a separate private service repository.
+## Hosted-Service Boundary
 
-The desktop application must remain usable without that service.
+A WorkLore-hosted inference service is not part of the accepted product roadmap. Introducing one would require a new explicit product, privacy, security, billing, and deployment decision.
+
+The provider architecture must not assume such a service will exist. Ollama, BYOK providers, manual workspaces, and provider-free local workflows must remain independently usable without a WorkLore account or backend.
