@@ -42,7 +42,7 @@ jobs:
       - name: Install validation dependencies
         shell: pwsh
         run: |
-          npm install
+          npm install --legacy-peer-deps --no-audit --no-fund --package-lock=false
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -m pip install pyyaml
 
