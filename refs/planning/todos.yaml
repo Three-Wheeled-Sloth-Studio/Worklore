@@ -130,7 +130,7 @@ todos:
   - id: task-031
     status: planned
     area: voice
-    summary: Define and implement voice provenance so only user-authored or user-approved material can strengthen canonical voice and raw AI drafts are permanently excluded from training evidence.
+    summary: Define and implement voice provenance so only user-authored or explicitly user-approved material can become eligible Voice Evidence and raw AI/model drafts remain permanently ineligible.
   - id: task-032
     status: planned
     area: voice
@@ -164,6 +164,6 @@ todos:
     area: targeting
     summary: Add own-profile and selected public-profile ingestion as supplemental positioning and audience context.
   - id: task-041
-    status: planned
+    status: complete
     area: ux
-    summary: "Next Phase 1 closeout slice: replace the prototype resume-centric top-level workflow with the accepted task-oriented application shell, make Home/Capture/Stories/Topics coherently reachable, demote Seed from resume and storage/privacy utilities to supporting actions, and represent future Voice/Posts/Insights honestly without implementing Phase 2 or Phase 3 behavior."
+    summary: Replace the prototype resume-centric top-level workflow with the accepted task-oriented application shell, make Home/Capture/Stories/Topics first-class, demote resume/storage/privacy utilities to supporting access, reopen durable Inspiration and Target Context through the Library, and represent future Voice/Posts/Insights honestly without beginning later phases.
