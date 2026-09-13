@@ -1,4 +1,4 @@
-name: One-shot Capture closeout validation
+name: One-shot Capture final closeout validation
 
 on:
   push:
