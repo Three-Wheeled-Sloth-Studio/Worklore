@@ -28,7 +28,9 @@ use commands::{
         clear_last_vault, get_default_vault_root, get_last_import_directory, get_last_vault_path,
         remember_last_import_file, remember_last_vault,
     },
-    privacy::{list_entity_reviews, resolve_entity_review},
+    privacy::{
+        list_entity_reviews, resolve_entity_review, transform_confidentiality_for_public_use,
+    },
     providers::{
         analyze_voice_evidence, create_manual_workspace, get_provider_settings,
         list_provider_models, test_provider_connection, update_provider_settings,
@@ -132,6 +134,7 @@ pub fn run() {
             get_default_vault_root,
             list_entity_reviews,
             resolve_entity_review,
+            transform_confidentiality_for_public_use,
             extract_resume_candidates,
             list_story_candidates,
             set_story_candidate_status,
