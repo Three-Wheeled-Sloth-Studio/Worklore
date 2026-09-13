@@ -124,9 +124,9 @@ todos:
     area: inspiration
     summary: Implement Source-backed Inspiration ingestion with stable provenance, structured source metadata, takeaways, attributed excerpts, user reaction, concepts/questions/counterpoints, lifecycle, and idempotent Topic/Theme connections while preventing semantic collapse into Evidence or Voice Evidence.
   - id: task-030
-    status: planned
+    status: complete
     area: targeting
-    summary: "Next bounded Phase 1 slice: make Target Context a durable working object beginning with job descriptions, extracting/storing contextual responsibilities, skills, concepts, and language without keyword stuffing, fabricated standing, or single-JD overfitting."
+    summary: Implement durable Source-backed Target Context beginning with job descriptions, structured responsibilities/skills/concepts/language/tensions, deterministic provider-free signal extraction, and explicit Topic/Theme/Story links without ATS scoring, fabricated standing, or single-JD overfitting.
   - id: task-031
     status: planned
     area: voice
@@ -163,3 +163,7 @@ todos:
     status: future
     area: targeting
     summary: Add own-profile and selected public-profile ingestion as supplemental positioning and audience context.
+  - id: task-041
+    status: planned
+    area: ux
+    summary: "Next Phase 1 closeout slice: replace the prototype resume-centric top-level workflow with the accepted task-oriented application shell, make Home/Capture/Stories/Topics coherently reachable, demote Seed from resume and storage/privacy utilities to supporting actions, and represent future Voice/Posts/Insights honestly without implementing Phase 2 or Phase 3 behavior."
