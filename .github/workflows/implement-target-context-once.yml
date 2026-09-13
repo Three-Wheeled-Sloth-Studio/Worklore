@@ -98,3 +98,5 @@ jobs:
           if (git diff --cached --quiet) { throw "Target Context patch produced no staged changes." }
           git commit -m "feat: add durable target context workflow"
           git push origin HEAD:dev
+
+# Rerun after quoting the task-030 YAML summary discovered by bounded re-entry.
