@@ -104,6 +104,8 @@ phases:
     completed:
       - Governed canonical Voice Evidence with schema-v6 persistence, stable Source lineage, explicit authorship and approval, pending/eligible/rejected/retired lifecycle, revisioned audit events, and hard exclusion of raw model/external-author material from eligibility.
       - Thin provider-free Voice Evidence review UI for candidate creation, provenance review, approve/reject/retire decisions, reopen, and visible ineligibility reasons.
+      - Schema-v7 provider-free Core Voice foundation with versioned proposed/active/superseded identity, queryable attributable traits, eligible Voice Evidence/user-guidance provenance, transactional activation/supersession, and invalidated-provenance surfacing without historical rewrite.
+      - Durable Tone Modes, Voice Directions, and Writing Rules with independent lifecycles plus thin Voice workspace management that keeps observed identity, intentional tone, desired evolution, and behavioral rules semantically separate.
     scope:
       - Introduce canonical Voice Evidence, Core Voice, Tone Modes, Voice Direction, and Writing Rules.
       - Ingest representative user-authored writing and approved final posts as voice evidence.

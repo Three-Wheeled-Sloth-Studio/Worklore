@@ -190,7 +190,15 @@ The implemented authorship states are `unknown`, `user_authored`, `user_edited_m
 
 Eligibility lifecycle is `pending`, `eligible`, `rejected`, or `retired`; approval state is `unreviewed`, `approved`, `rejected`, or `revoked`. Retiring preserves the Source and Voice Evidence lineage and cannot be reversed through the normal review path. Candidate creation and eligibility changes append audit events and increment the mutable record revision. Target Context Sources are blocked from Voice Evidence, and Inspiration remains semantically separate.
 
-Core Voice inference is intentionally not part of this implementation. The next layer must consume only eligible Voice Evidence or explicit user guidance and preserve provenance back to these governed records.
+### Implemented Core Voice and intentional-range boundary
+
+The provider-free Core Voice foundation is implemented in schema version 7. Core Voice versions use `proposed`, `active`, and `superseded` lifecycle, with transactional activation so the initial single-user vault has at most one active version while preserving superseded history. Traits are separate queryable records and must retain attributable provenance to eligible Voice Evidence and/or explicit user guidance.
+
+Rejected or retired Voice Evidence cannot be newly attached to a proposed trait. If evidence that already supports historical Core Voice is later retired or rejected, WorkLore surfaces that provenance as invalid for review rather than silently rewriting the historical version.
+
+Tone Modes (`active`, `disabled`, `retired`), Voice Directions (`proposed`, `accepted`, `completed`, `retired`), and Writing Rules (`proposed`, `active`, `disabled`, `retired`) are persisted independently so intentional expression, desired evolution, and behavioral constraints do not collapse into observed identity. Accepting a Voice Direction or changing a Tone Mode/Rule never mutates Core Voice automatically.
+
+Provider-assisted analysis remains downstream of this boundary. A provider may propose attributable traits, but provider output is review material rather than authoritative identity and must enter Core Voice only through the same explicit proposed-version and provenance rules.
 
 ## Draft, edit, approval, and publication lineage
 

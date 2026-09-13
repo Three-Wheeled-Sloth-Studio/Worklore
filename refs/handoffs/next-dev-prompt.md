@@ -1,7 +1,7 @@
 ---
 type: Handoff Prompt
 title: Next WorkLore Development Slice
-description: Bounded prompt for the first task-032 Core Voice, Tone Mode, Voice Direction, and Writing Rule foundation on validated Voice Evidence provenance.
+description: Bounded prompt for provider-neutral voice proposals on the validated schema-v7 Core Voice foundation.
 status: draft
 tags: [handoff, next-slice]
 ---
@@ -15,186 +15,175 @@ Work directly on `dev`. Do not promote `qa` or `main` unless explicitly requeste
 
 ## Accepted Starting Point
 
-Phase 1 Professional Memory is complete. Phase 2 Voice Intelligence is in progress, and `task-031` Voice Evidence provenance/eligibility is complete.
+Phase 1 Professional Memory is complete. Phase 2 Voice Intelligence is in progress.
 
-Validated Voice Evidence product checkpoint:
+Validated Voice Evidence checkpoint:
 
 `faf702206eac854700b7d634ef40901afe898916`
 
-Implementation validation:
+Validated provider-free Core Voice foundation checkpoint:
 
-- Actions `34779212710`
-- Job `103782995877`
+`8344be9b3e25900d8eb59c1e6c35f97f25896bd5`
+
+Implementation validation for the Core Voice foundation:
+
+- Actions `34784149143`
+- Job `103796446983`
 - frontend: 8 passed / 0 failed across 3 files
-- Rust: 77 passed / 0 failed
+- Rust: 81 passed / 0 failed
 - production frontend build: green, 51 modules transformed
 - case-collision, refs/OKF, bounded agent context, `git diff --check`, warnings-denied Clippy, and rustfmt: green
 
-Voice Evidence now has durable Source lineage, explicit authorship, `pending/eligible/rejected/retired` state, explicit approval/revocation, revisioned audit events, and backend enforcement that raw model/external-author material cannot become eligible through normal paths.
+Schema v7 now persists semantically separate Core Voice versions/traits, eligible-evidence provenance links, Tone Modes, Voice Directions, and Writing Rules. Core Voice activation is transactional; invalidated evidence is surfaced rather than rewriting history; the UI supports manual management without provider inference.
 
 Read `refs/handoffs/currentHandoff.md` before making changes.
 
 ## Start With Bounded Re-entry
 
 ```powershell
-python refs/tools/generate_agent_context.py --focus "WorkLore Phase 2 Core Voice Tone Modes Voice Direction Writing Rules eligible Voice Evidence provenance"
+python refs/tools/generate_agent_context.py --focus "WorkLore Phase 2 provider registry Ollama structured voice analysis proposals Core Voice eligible Voice Evidence"
 ```
 
 Treat generated context as derived orientation. Read only the authoritative refs/source needed for this slice.
 
 Read at minimum:
 
-- `refs/product/prd.md`, especially sections 3.5, 4, and 7
+- `refs/product/prd.md`, especially voice/provider/privacy sections
 - `refs/architecture/vaultFormat.md`
 - `refs/architecture/providerArchitecture.md`
 - `refs/planning/roadmap.yaml`
 - `refs/planning/todos.yaml`
 - `refs/handoffs/currentHandoff.md`
-- `src-tauri/src/services/canonical_store.rs`
 - `src-tauri/src/services/voice_evidence_service.rs`
+- `src-tauri/src/services/voice_profile_service.rs`
+- `src-tauri/src/services/canonical_store.rs`
 - `src-tauri/src/commands/voice.rs`
 - `src/domain/types.ts`
 - `src/lib/workloreApi.ts`
 - `src/components/VoiceWorkspace.tsx`
 
-`refs/product/domainModel.md` does not exist; do not recreate it merely to satisfy stale historical references. The PRD and vault-format contract are authoritative.
-
 ## Immediate Objective
 
-Implement the bounded first foundation slice of `task-032`: make Core Voice and intentional voice range durable, explicit, and provenance-safe without yet requiring provider inference.
+Continue `task-032` by adding the smallest provider-neutral execution path that can propose voice observations without making provider output authoritative.
 
 This slice should answer:
 
-`How does WorkLore represent what is stable about the user's voice, what may intentionally vary, and what the user wants to change—without confusing those concepts or inventing traits?`
+`Can WorkLore ask an explicitly selected provider to analyze only eligible voice material, return structured attributable proposals, and let the user accept or discard those proposals without weakening canonical provenance?`
 
-### 1. Add canonical Core Voice versions
+### 1. Implement the provider-neutral registry seam
 
-Add durable `voice_` records with the accepted lifecycle:
-
-- `proposed`
-- `active`
-- `superseded`
-
-Core Voice is the relatively stable author identity. It is not a single prose sample and it is not a Tone Mode.
+Follow `refs/architecture/providerArchitecture.md` rather than placing Ollama-specific networking in the Voice workflow.
 
 Requirements:
 
-- stable opaque identity and timestamps/revision metadata;
-- versioned activation/supersession rather than destructive replacement;
-- explicit trait/value records or another queryable structure that can evolve without serializing the entire concept into one opaque blob;
-- every canonical trait must retain provenance to eligible Voice Evidence and/or explicit user guidance;
-- activation should be transactional so at most one Core Voice version is active under the initial single-user vault model;
-- do not derive traits from rejected/retired/ineligible Voice Evidence.
+- stable provider IDs rather than workflow-specific provider branches;
+- explicit configured provider/model selection;
+- normalized provider status and error categories;
+- structured request/response contracts with local validation;
+- no credentials in frontend, vault, SQLite canonical records, exports, or logs;
+- no silent provider fallback;
+- provider-free workflows must continue to function when no provider is configured.
 
-Do not generate or infer traits just to populate the UI. Empty/proposed state is preferable to fabricated identity.
+Do not invent a hosted WorkLore provider.
 
-### 2. Add Tone Modes as controlled range
+### 2. Prefer Ollama for the first executable adapter
 
-Add durable `tone_` records with `active`, `disabled`, and `retired` lifecycle.
+Ollama is the first-class local provider and the cheapest safe path for early voice-analysis testing.
 
-Tone Mode is an intentional register—serious, analytical, conversational, reflective, dry/funny, whimsical, etc.—that changes expression while preserving author identity.
+At minimum, the adapter should:
+
+- use an explicitly configured local base URL;
+- test connectivity cleanly;
+- enumerate/select installed models if practical under the current architecture;
+- execute structured JSON output for a versioned operation contract;
+- map transport/model/schema failures into normalized provider errors;
+- fail cleanly when Ollama is absent or stopped.
+
+Do not make Ollama installation a prerequisite for opening or using WorkLore.
+
+### 3. Add one review-only voice analysis operation
+
+Add a versioned operation such as `analyze_voice_evidence`.
+
+Input may include only:
+
+- eligible Voice Evidence selected by the user/system under the task-031 rules;
+- explicit user guidance intended for voice analysis;
+- stable source/evidence identifiers needed for attribution.
+
+The structured result should contain proposed observations/traits with enough attribution to review, for example:
+
+- proposed trait name;
+- concise trait description/value;
+- supporting Voice Evidence IDs;
+- rationale tied to observed material;
+- optional conflicts/weak-support notes.
+
+Do not request or return fake confidence percentages or AI/human probability scores.
+
+### 4. Keep proposals non-authoritative
+
+Provider output must not directly mutate active Core Voice.
 
 Requirements:
 
-- user-defined naming and description/instructions;
-- explicit enabled/lifecycle state;
-- no claim that one mode is the user's whole identity;
-- no automatic duplication of Core Voice traits into each mode;
-- leave a clean seam for later drafting/provider use.
+- proposals remain transient or explicitly review-state data until accepted;
+- user acceptance creates/updates a trait only through the existing proposed Core Voice path;
+- all accepted traits still satisfy the schema-v7 provenance rules;
+- discarded proposals leave canonical identity unchanged;
+- provider-generated wording itself never becomes Voice Evidence;
+- provider run metadata may record provider/model/operation/result status but not credentials or private request/response bodies by default.
 
-### 3. Add Voice Direction separately
+### 5. Preserve manual and BYOK seams without scope explosion
 
-Add durable `voice_direction_` records with the accepted lifecycle:
+The provider registry should leave clean adapter seams for:
 
-- `proposed`
-- `accepted`
-- `completed`
-- `retired`
+- `manual` workspace export/import;
+- Gemini BYOK as the first remote adapter.
 
-Voice Direction represents deliberate evolution such as "more concise" or "warmer," not an observation about current identity.
+Do not force Gemini credential storage into this slice if implementing the OS credential boundary would make the slice substantially broader than the Ollama + registry + review-only proposal proof. If Gemini is deferred, document the exact seam and next dependency rather than creating a placeholder that leaks credentials into ordinary settings.
 
-Requirements:
+### 6. Privacy and source boundaries remain hard
 
-- explicit user acceptance before a direction becomes authoritative;
-- provenance/notes describing who proposed it and why;
-- no silent conversion of a one-off edit into a direction;
-- do not mutate historical Core Voice evidence to make it match desired direction.
+- Rejected/retired/pending Voice Evidence cannot be sent as canonical voice evidence for analysis.
+- Inspiration and Target Context cannot enter the voice-analysis evidence set merely because they contain useful prose.
+- Raw provider output cannot become Evidence or Voice Evidence.
+- Stable redaction/private-entity behavior must remain intact.
+- Cloud/manual paths require privacy preflight before any later remote transmission; local Ollama does not authorize bypassing canonical source eligibility rules.
 
-### 4. Add Writing Rules separately
+### 7. Do not implement edit-delta learning yet
 
-Add durable `rule_` records with `proposed`, `active`, `disabled`, and `retired` lifecycle.
+Edit-delta learning depends on durable Post/Revision lineage that preserves model draft -> human edit -> final approved text.
 
-Writing Rules are behavioral generation/review constraints, not Core Voice traits.
-
-Examples may include banned phrases, closing behavior, punctuation preferences, or explicit formatting constraints, but do not seed arbitrary defaults simply to fill the screen.
-
-Requirements:
-
-- explicit user text/instruction and state;
-- source/provenance where available;
-- no silent promotion from one observed edit;
-- future provider/drafting layers should be able to consume active rules without rewriting identity.
-
-### 5. Enforce provenance from task-031
-
-Core Voice links must use only eligible Voice Evidence or explicit user guidance.
-
-Hard rules remain:
-
-- raw model output cannot train or support canonical Core Voice;
-- rejected/retired Voice Evidence cannot support new active Core Voice traits;
-- Inspiration prose and Target Context remain ineligible contextual material;
-- an explicit user-authored guidance statement may support a trait/rule/direction, but that provenance must remain distinguishable from observed writing evidence;
-- changing Voice Evidence eligibility later must not silently rewrite historical Core Voice versions. Surface invalidated provenance for review rather than mutating history without an audit trail.
-
-### 6. Keep the first foundation slice provider-free
-
-Do not implement Ollama/Gemini/BYOK merely to infer trait labels in this slice.
-
-The product can first establish the durable model, manual/user-authored configuration paths, provenance links, activation rules, and UI semantics. Provider-assisted trait proposals belong behind that contract and should be added in a later bounded task-032/provider slice.
-
-Likewise, do not fabricate edit-delta learning before durable Post/Revision lineage exists. Preserve an architecture seam for it; do not pretend one-off Voice Evidence review is edit-delta learning.
-
-### 7. Thin Voice UI
-
-Extend the existing Voice workspace only far enough to let the user:
-
-- review eligible Voice Evidence already implemented;
-- create/edit proposed Core Voice traits with explicit provenance;
-- activate a Core Voice version and see prior superseded versions;
-- create/manage Tone Modes;
-- create/accept/retire Voice Directions;
-- create/enable/disable Writing Rules;
-- see which material is observed identity, intentional tone, desired change, or behavioral rule.
-
-Avoid fake scores, confidence percentages, AI/human probability claims, and generated placeholder traits.
+That lineage belongs to the Content Studio/audit work. Leave the seam explicit, but do not infer recurring writing preferences from arbitrary current UI edits or Voice Evidence review actions.
 
 ### 8. Proof cases
 
 Cover at least:
 
-- Core Voice activation requires attributable eligible Voice Evidence or explicit user guidance;
-- rejected/retired Voice Evidence cannot be newly attached as supporting evidence for an active Core Voice trait;
-- activating a new Core Voice version supersedes the previous active version without deleting it;
-- Tone Mode lifecycle is independent from Core Voice version lifecycle;
-- Voice Direction acceptance does not mutate Core Voice automatically;
-- Writing Rules remain separate from Core Voice traits and Tone Modes;
-- provenance links survive reopen with stable identity;
-- no provider/network availability is required;
-- existing Voice Evidence invariants remain green;
-- all prior frontend and Rust regression tests remain green.
+- no configured provider leaves all existing provider-free Voice workflows functional;
+- provider selection is explicit and no automatic fallback occurs;
+- only eligible Voice Evidence can enter `analyze_voice_evidence` input;
+- provider output with missing/unknown evidence IDs is rejected locally;
+- malformed structured output is rejected without canonical mutation;
+- a valid proposal does not change active Core Voice until explicit user acceptance;
+- accepted proposal traits still pass existing provenance enforcement;
+- discarded proposals leave Core Voice unchanged;
+- Ollama unavailable/model unavailable errors normalize cleanly;
+- provider logs/records do not contain credentials;
+- existing 81 Rust tests and frontend regressions remain green.
 
 ## Constraints
 
 - Standalone Windows-first, local canonical storage.
 - No WorkLore account/backend/proprietary sync.
 - No automatic publication or scheduling.
-- No provider execution/BYOK implementation in this first task-032 foundation slice.
-- No Post/editorial workflow, analytics, or discovery.
-- Do not implement anti-slop `task-033` or confidentiality `task-034` inside this slice.
+- No silent local-to-cloud fallback.
+- No provider secret in frontend/canonical/log/export state.
+- Do not implement Content Studio, analytics, discovery, or edit-delta learning in this slice.
+- Do not implement anti-slop `task-033` or confidentiality `task-034` implicitly.
 - Preserve Evidence/Inspiration/Target Context/Voice Evidence distinctions.
 - Preserve immutable Voice Evidence authorship provenance and raw-model exclusion.
-- Preserve Private Entity Registry and privacy infrastructure.
 - Public-repository fixtures must remain synthetic.
 - Keep build/dev/QA output outside the repository.
 - Run case-collision and refs/OKF validation.
@@ -218,6 +207,6 @@ cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -
 
 ## Stop Point
 
-Stop when Core Voice versions, Tone Modes, Voice Directions, and Writing Rules are durable, reopenable, semantically distinct, and provenance-safe on top of eligible Voice Evidence.
+Stop when WorkLore has a provider-neutral registry boundary, a clean first local provider path, and one structured review-only voice-analysis operation whose proposals can be accepted through the existing provenance-safe Core Voice workflow.
 
-At that point reassess the remaining `task-032` work, including provider-assisted trait proposals and eventual edit-delta learning. Do not begin provider execution, Content Studio, anti-slop, or confidentiality work implicitly.
+Do not begin edit-delta learning or Content Studio implicitly.

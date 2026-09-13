@@ -132,9 +132,9 @@ todos:
     area: voice
     summary: Define and implement governed Voice Evidence provenance so writing samples begin pending, explicit authorship and approval control eligibility, raw AI/external-author material remains prohibited, and eligibility changes retain Source lineage, revisions, and audit events.
   - id: task-032
-    status: planned
+    status: in_progress
     area: voice
-    summary: Add Core Voice, Tone Modes, desired Voice Direction, edit-delta learning proposals, and intentional tone diversity.
+    summary: Core Voice, Tone Modes, Voice Direction, and Writing Rule foundation is complete in schema v7; remaining work is provider-assisted review-only voice proposals and later edit-delta learning after durable Post/Revision lineage exists.
   - id: task-033
     status: planned
     area: quality
