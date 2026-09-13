@@ -1,7 +1,7 @@
 # Vault Format and Canonical Domain Contract
 
 Status: accepted Phase 1 contract
-Updated: 2026-09-12
+Updated: 2026-09-13
 
 ## Purpose
 
@@ -290,11 +290,11 @@ Export does not expose provider credentials.
 
 For backup or vault copy, WorkLore should checkpoint SQLite WAL state before copying and should treat concurrent multi-machine editing through a synced filesystem as unsupported unless a future sync contract explicitly adds it.
 
-## Prototype compatibility during migration
+## Prototype compatibility after canonical migration
 
-Until the SQLite migration is implemented, the current JSON/Markdown vault remains supported by the existing prototype services.
+The canonical SQLite persistence boundary and non-destructive migration seam are now implemented. Legacy JSON/Markdown records remain valid migration and compatibility inputs where existing prototype workflows still use them, but new Phase 1 domain concepts belong behind the canonical SQLite service boundary.
 
-New feature work should not extend the old per-record layout with additional domain concepts. The next persistence slice should introduce the SQLite boundary and migration seam first, then move Phase 1 concepts behind that boundary.
+Do not extend the old per-record JSON/Markdown layout with new canonical concepts. Preserve legacy files until migration is validated and a backup or export exists, and keep compatibility paths explicit rather than treating the prototype layout as a second live canonical database.
 
 ## Validation expectations
 

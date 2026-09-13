@@ -19,18 +19,18 @@ Phase 1 professional-memory domain work is substantially complete through Target
 
 Validated Target Context product checkpoint:
 
-`078fad9547bd3f6728670e17b3884494e7d56af5`
+`9c757550a86cfc0ce263e362fe8d3512eec5834d`
 
 Implementation validation:
 
-- Actions run `34771917326`
-- Job `103762940903`
+- Actions run `34772820995`
+- Job `103765412308`
 - frontend tests: 3 passed, 0 failed
 - Rust tests: 72 passed, 0 failed
 - production frontend build: green
 - case-collision, refs/OKF, bounded agent context, `git diff --check`, warnings-denied Clippy, and rustfmt: green
 
-Completed Phase 1 foundation includes canonical persistence, save-first Capture, direct Story Seed development, durable Topics/Themes, Source-backed Inspiration, and Source-backed Target Context with explicit semantic boundaries.
+Completed Phase 1 foundation includes canonical persistence, save-first Capture, direct Story Seed development, durable Topics/Themes, Source-backed Inspiration, and Source-backed Target Context with explicit semantic boundaries. Target Context lifecycle is aligned to the accepted canonical contract as `active`, `stale`, or `archived`.
 
 Provider architecture is locked but not implemented in this slice: Ollama remains first-class local; remote adapters are explicit BYOK through a provider-neutral registry beginning with Gemini; credentials stay in the OS credential store; remote calls require privacy preflight; there is no silent local-to-cloud fallback or WorkLore-hosted inference/key proxy.
 

@@ -48,13 +48,13 @@ The next bounded Phase 1 closeout slice is `task-041`: task-oriented application
 
 Accepted product checkpoint:
 
-`078fad9547bd3f6728670e17b3884494e7d56af5`
+`9c757550a86cfc0ce263e362fe8d3512eec5834d`
 
 What landed:
 
 - Added schema version 5 for Target Context working fields while preserving canonical `target_` identity and existing migration behavior.
 - Capture-classified job descriptions and compatible existing Sources can be opened/reopened as first-class Target Context records.
-- Target Context supports active/archived lifecycle plus source URL, organization, role/opportunity, location, summary, responsibilities, skills/qualifications, concepts, notable language, tensions/tradeoffs, and notes.
+- Target Context supports active/stale/archived lifecycle plus source URL, organization, role/opportunity, location, summary, responsibilities, skills/qualifications, concepts, notable language, tensions/tradeoffs, and notes.
 - Added deterministic provider-free Source signal extraction from captured text and safe vault-relative extraction-cache text for imported files.
 - Extraction merges idempotently and remains advisory. It does not produce an ATS score, fit score, keyword score, Topic, Story, Proof Point, Evidence record, or claim that the user possesses a listed skill.
 - Added explicit idempotent connections to existing Topic, Theme, and Story records through the shared canonical relationship graph.
@@ -73,12 +73,12 @@ Target Context is contextual input about an audience, role, organization, or opp
 
 Windows implementation validation:
 
-- Actions run: `34771917326`
-- Job: `103762940903`
-- validated code checkpoint: `078fad9547bd3f6728670e17b3884494e7d56af5`
-- case-collision guard: green, 182 tracked paths at runner checkout
+- Actions run: `34772820995`
+- Job: `103765412308`
+- validated code checkpoint: `9c757550a86cfc0ce263e362fe8d3512eec5834d`
+- case-collision guard: green, 186 tracked paths at runner checkout
 - refs validation: green, Agent Academy and OKF aligned
-- bounded agent-context check: green, 6,157 / 8,000 characters
+- bounded agent-context check: green, 6,196 / 8,000 characters
 - `git diff --check`: green
 - frontend tests: 3 passed, 0 failed
 - production frontend TypeScript/Vite build: green, 42 modules transformed
@@ -86,7 +86,7 @@ Windows implementation validation:
 - Clippy with warnings denied: green
 - rustfmt: green
 
-Two validation-only defects were caught before the product checkpoint: a YAML summary needed quoting, and Clippy found one dead private helper. Neither changed product semantics.
+Two validation-only defects were caught before the initial product checkpoint: a YAML summary needed quoting, and Clippy found one dead private helper. Neither changed product semantics. Final closeout also reconciled the implementation with the already-accepted vault contract by adding the `stale` Target Context lifecycle state across Rust, TypeScript, UI, and reopen coverage.
 
 ## Provider Architecture: Ollama + BYOK
 
