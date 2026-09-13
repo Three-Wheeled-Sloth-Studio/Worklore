@@ -100,3 +100,4 @@ jobs:
           git push origin HEAD:dev
 
 # Rerun after quoting the task-030 YAML summary discovered by bounded re-entry.
+# Rerun after removing the unused relationship helper caught by warnings-denied Clippy.
