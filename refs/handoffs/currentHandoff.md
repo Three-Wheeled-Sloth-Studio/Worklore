@@ -78,7 +78,7 @@ Windows implementation validation:
 - `cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison`: green
 - `cargo fmt --manifest-path src-tauri/Cargo.toml --all --check`: green
 
-A separate read-only closeout validation is run after project-memory updates. Temporary runner files are not product infrastructure and are removed after closeout.
+A separate read-only closeout validation covers the post-implementation project-memory state. The temporary closeout workflow and implementation script are removed after that run and are not product infrastructure.
 
 ## Current State
 
