@@ -78,9 +78,11 @@ Windows implementation validation:
 - `cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison`: green
 - `cargo fmt --manifest-path src-tauri/Cargo.toml --all --check`: green
 
+A separate read-only closeout validation is run after project-memory updates. Temporary runner files are not product infrastructure and are removed after closeout.
+
 ## Current State
 
-`task-040` and `task-026` are complete. Phase 1 Professional Memory remains in progress.
+`task-040` and `task-026` are complete. Phase 1 Professional Memory remains in progress. `task-027` is the next bounded product slice.
 
 WorkLore now has a durable front door for arbitrary professional memory, but the development workflow behind that front door is still resume-candidate-centric. The existing guided interview service starts from a `StoryCandidate`, reads candidate missing fields, asks questions against the candidate claim, and repeatedly reloads the candidate during response/resume flows.
 
