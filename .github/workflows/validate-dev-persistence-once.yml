@@ -50,47 +50,21 @@ jobs:
               "fn normalized_title",
           ]
           for name in names:
-              needle = name
               replacement = "#[allow(dead_code)]\n" + name
               if replacement in text:
                   continue
-              if text.count(needle) != 1:
-                  raise SystemExit(f"Expected exactly one occurrence of {needle!r}")
-              text = text.replace(needle, replacement, 1)
+              if text.count(name) != 1:
+                  raise SystemExit(f"Expected exactly one occurrence of {name!r}")
+              text = text.replace(name, replacement, 1)
           canonical.write_text(text, encoding="utf-8")
 
           entity_scan = Path("src-tauri/src/services/entity_scan.rs")
           text = entity_scan.read_text(encoding="utf-8")
-          before = '''    loop {
-              let Some(first) = remaining.split_whitespace().next() else {
-                  break;
-              };
-              if !LEADING_NOISE.contains(&first) {
-                  break;
-              }
-              let advance = first.len();
-              start += advance;
-              remaining = &remaining[advance..];
-              let whitespace = remaining.len() - remaining.trim_start().len();
-              start += whitespace;
-              remaining = remaining.trim_start();
-          }
-          '''
-          after = '''    while let Some(first) = remaining.split_whitespace().next() {
-              if !LEADING_NOISE.contains(&first) {
-                  break;
-              }
-              let advance = first.len();
-              start += advance;
-              remaining = &remaining[advance..];
-              let whitespace = remaining.len() - remaining.trim_start().len();
-              start += whitespace;
-              remaining = remaining.trim_start();
-          }
-          '''
+          before = "    loop {\n        let Some(first) = remaining.split_whitespace().next() else {\n            break;\n        };\n"
+          after = "    while let Some(first) = remaining.split_whitespace().next() {\n"
           if after not in text:
               if text.count(before) != 1:
-                  raise SystemExit("Expected the existing organization-noise loop exactly once")
+                  raise SystemExit("Expected the existing organization-noise loop header exactly once")
               text = text.replace(before, after, 1)
           entity_scan.write_text(text, encoding="utf-8")
           '@ | python -
