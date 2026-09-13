@@ -20,3 +20,4 @@ pub mod story_service;
 pub mod target_context_service;
 pub mod topic_service;
 pub mod vault_service;
+pub mod voice_evidence_service;

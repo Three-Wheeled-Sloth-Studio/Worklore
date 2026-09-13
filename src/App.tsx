@@ -10,6 +10,7 @@ import { PrivacyReviewPanel } from "./components/PrivacyReviewPanel";
 import { StoryBankPanel } from "./components/StoryBankPanel";
 import { StoryCandidatePanel } from "./components/StoryCandidatePanel";
 import { TopicsWorkspace } from "./components/TopicsWorkspace";
+import { VoiceWorkspace } from "./components/VoiceWorkspace";
 import type {
   ActiveOperation,
   AnswerClassification,
@@ -597,6 +598,7 @@ function App() {
       case "topics":
         return <TopicsWorkspace vaultPath={vault!.path} />;
       case "voice":
+        return <VoiceWorkspace vaultPath={vault!.path} />;
       case "posts":
       case "insights":
         return <FutureWorkspace view={activeView} />;

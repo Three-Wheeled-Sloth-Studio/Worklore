@@ -1,11 +1,5 @@
-export function FutureWorkspace({ view }: { view: "voice" | "posts" | "insights" }) {
+export function FutureWorkspace({ view }: { view: "posts" | "insights" }) {
   const copy = {
-    voice: {
-      eyebrow: "Phase 2",
-      title: "Voice",
-      body: "Core Voice, Tone Modes, Writing Rules, Voice Direction, and provenance-governed Voice Evidence are intentionally not implemented yet.",
-      boundary: "Raw AI drafts will never become canonical Voice Evidence.",
-    },
     posts: {
       eyebrow: "Phase 3",
       title: "Posts",

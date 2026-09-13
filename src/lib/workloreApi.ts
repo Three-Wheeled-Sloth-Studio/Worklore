@@ -47,6 +47,10 @@ import type {
   UpdateThemeRequest,
   UpdateTopicRequest,
   VaultSummary,
+  CreateVoiceEvidenceResult,
+  ReviewVoiceEvidenceRequest,
+  VoiceEvidenceRecord,
+  VoiceSourceCandidate,
 } from "../domain/types";
 
 export async function createDefaultVault(name: string): Promise<VaultSummary> {
@@ -355,6 +359,41 @@ export async function listTargetContextLinkTargets(
   });
 }
 
+
+
+export async function listVoiceSourceCandidates(
+  vaultPath: string,
+): Promise<VoiceSourceCandidate[]> {
+  return invoke<VoiceSourceCandidate[]>("list_voice_source_candidates", { vaultPath });
+}
+
+export async function createVoiceEvidenceFromSource(
+  vaultPath: string,
+  sourceId: string,
+): Promise<CreateVoiceEvidenceResult> {
+  return invoke<CreateVoiceEvidenceResult>("create_voice_evidence_from_source", {
+    vaultPath,
+    sourceId,
+  });
+}
+
+export async function getVoiceEvidence(
+  vaultPath: string,
+  voiceEvidenceId: string,
+): Promise<VoiceEvidenceRecord> {
+  return invoke<VoiceEvidenceRecord>("get_voice_evidence", { vaultPath, voiceEvidenceId });
+}
+
+export async function listVoiceEvidence(vaultPath: string): Promise<VoiceEvidenceRecord[]> {
+  return invoke<VoiceEvidenceRecord[]>("list_voice_evidence", { vaultPath });
+}
+
+export async function reviewVoiceEvidence(
+  vaultPath: string,
+  request: ReviewVoiceEvidenceRequest,
+): Promise<VoiceEvidenceRecord> {
+  return invoke<VoiceEvidenceRecord>("review_voice_evidence", { vaultPath, request });
+}
 
 export async function startStorySeedDevelopment(
   vaultPath: string,

@@ -1,0 +1,55 @@
+.voice-workspace {
+  gap: 1rem;
+}
+
+.voice-boundary-card {
+  margin-top: 1rem;
+}
+
+.voice-card-list {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+
+.voice-candidate-card,
+.voice-evidence-card {
+  border: 1px solid var(--border-color, #d8d8d8);
+  border-radius: 0.8rem;
+  padding: 1rem;
+  background: var(--panel-background, #fff);
+}
+
+.voice-card-heading {
+  align-items: flex-start;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.voice-card-heading h3 {
+  margin: 0;
+}
+
+.voice-meta,
+.voice-rule,
+.voice-warning {
+  font-size: 0.88rem;
+}
+
+.voice-meta,
+.voice-rule {
+  color: var(--muted-text, #606060);
+}
+
+.voice-warning {
+  font-weight: 600;
+}
+
+.voice-preview {
+  white-space: pre-wrap;
+}
+
+.voice-actions {
+  margin-top: 0.85rem;
+}

@@ -22,7 +22,7 @@ use crate::{
 };
 
 pub const DATABASE_RELATIVE_PATH: &str = "data/worklore.sqlite";
-const CURRENT_SCHEMA_VERSION: i64 = 5;
+const CURRENT_SCHEMA_VERSION: i64 = 6;
 const MIGRATION_NAME: &str = "prototype_to_professional_memory_v1";
 
 const SCHEMA_V1: &str = r#"
@@ -155,6 +155,28 @@ ALTER TABLE target_contexts ADD COLUMN language_json TEXT NOT NULL DEFAULT '[]';
 ALTER TABLE target_contexts ADD COLUMN tensions_json TEXT NOT NULL DEFAULT '[]';
 CREATE INDEX idx_target_contexts_status_type ON target_contexts(status, context_type, updated_at DESC);
 CREATE INDEX idx_target_contexts_source ON target_contexts(source_id);
+"#;
+
+const SCHEMA_V6: &str = r#"
+CREATE TABLE voice_evidence (
+  voice_evidence_id TEXT PRIMARY KEY,
+  source_id TEXT NOT NULL,
+  source_locator TEXT NOT NULL,
+  text_snapshot TEXT NOT NULL,
+  content_hash TEXT NOT NULL,
+  authorship_state TEXT NOT NULL,
+  status TEXT NOT NULL,
+  eligibility_reason TEXT NOT NULL,
+  approval_state TEXT NOT NULL,
+  approved_at TEXT,
+  provenance_json TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  revision INTEGER NOT NULL CHECK (revision >= 1),
+  UNIQUE(source_id, source_locator)
+);
+CREATE INDEX idx_voice_evidence_status_updated ON voice_evidence(status, updated_at DESC);
+CREATE INDEX idx_voice_evidence_source ON voice_evidence(source_id);
 "#;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -454,6 +476,16 @@ fn migrate_schema(connection: &mut Connection) -> ServiceResult<()> {
         tx.execute_batch(SCHEMA_V5)?;
         tx.execute(
             "INSERT INTO schema_migrations(version,name,applied_at) VALUES (5,'target_context_working_fields_v5',?1)",
+            [Utc::now().to_rfc3339()],
+        )?;
+        tx.commit()?;
+        version = 5;
+    }
+    if version == 5 {
+        let tx = connection.transaction()?;
+        tx.execute_batch(SCHEMA_V6)?;
+        tx.execute(
+            "INSERT INTO schema_migrations(version,name,applied_at) VALUES (6,'voice_evidence_provenance_v6',?1)",
             [Utc::now().to_rfc3339()],
         )?;
         tx.commit()?;
@@ -804,7 +836,7 @@ mod tests {
     fn initializes_database() {
         let p = vault();
         assert!(database_path(&p).is_file());
-        assert_eq!(schema_version(&p).unwrap(), 5);
+        assert_eq!(schema_version(&p).unwrap(), 6);
         fs::remove_dir_all(p).unwrap();
     }
     #[test]

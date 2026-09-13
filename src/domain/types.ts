@@ -314,6 +314,53 @@ export interface TargetContextRelationshipMutationResult {
 }
 
 
+
+export type VoiceAuthorshipState =
+  | "unknown"
+  | "user_authored"
+  | "user_edited_model"
+  | "model_generated"
+  | "external_author";
+export type VoiceEvidenceStatus = "pending" | "eligible" | "rejected" | "retired";
+export type VoiceApprovalState = "unreviewed" | "approved" | "rejected" | "revoked";
+export type VoiceEvidenceDecision = "approve" | "reject" | "retire";
+
+export interface VoiceEvidenceRecord {
+  voiceEvidenceId: string;
+  sourceId: string;
+  sourceDisplayName: string;
+  sourceOrigin: string;
+  textPreview: string;
+  authorshipState: VoiceAuthorshipState;
+  status: VoiceEvidenceStatus;
+  eligibilityReason: string;
+  approvalState: VoiceApprovalState;
+  approvedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  revision: number;
+}
+
+export interface VoiceSourceCandidate {
+  sourceId: string;
+  displayName: string;
+  sourceOrigin: string;
+  textPreview: string;
+  voiceEvidenceId: string | null;
+  blockedReason: string | null;
+}
+
+export interface CreateVoiceEvidenceResult {
+  voiceEvidence: VoiceEvidenceRecord;
+  created: boolean;
+}
+
+export interface ReviewVoiceEvidenceRequest {
+  voiceEvidenceId: string;
+  authorshipState: VoiceAuthorshipState;
+  decision: VoiceEvidenceDecision;
+}
+
 export type PrivacyScanStatus =
   | "pending"
   | "complete"

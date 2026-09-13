@@ -46,6 +46,10 @@ use commands::{
         create_default_vault, create_vault, create_vault_in_parent, import_source, list_sources,
         open_vault, update_cloud_identifier_mode,
     },
+    voice::{
+        create_voice_evidence_from_source, get_voice_evidence, list_voice_evidence,
+        list_voice_source_candidates, review_voice_evidence,
+    },
 };
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -78,6 +82,11 @@ pub fn run() {
             add_target_context_relationship,
             remove_target_context_relationship,
             list_target_context_link_targets,
+            list_voice_source_candidates,
+            create_voice_evidence_from_source,
+            get_voice_evidence,
+            list_voice_evidence,
+            review_voice_evidence,
             create_topic,
             get_topic,
             list_topics,
