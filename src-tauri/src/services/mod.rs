@@ -7,6 +7,7 @@ pub mod document_extraction;
 pub mod entity_review;
 pub mod entity_scan;
 pub mod guided_development_rules;
+pub mod inspiration_service;
 pub mod interview_service;
 pub mod manual_workspace_service;
 pub mod performance_service;

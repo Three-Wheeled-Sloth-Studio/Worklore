@@ -22,7 +22,7 @@ use crate::{
 };
 
 pub const DATABASE_RELATIVE_PATH: &str = "data/worklore.sqlite";
-const CURRENT_SCHEMA_VERSION: i64 = 3;
+const CURRENT_SCHEMA_VERSION: i64 = 4;
 const MIGRATION_NAME: &str = "prototype_to_professional_memory_v1";
 
 const SCHEMA_V1: &str = r#"
@@ -123,6 +123,23 @@ ALTER TABLE topic_candidates ADD COLUMN timing_class TEXT NOT NULL DEFAULT 'ever
 ALTER TABLE topic_candidates ADD COLUMN relevant_until TEXT;
 ALTER TABLE topic_candidates ADD COLUMN timely_note TEXT;
 CREATE INDEX idx_topics_status_timing ON topic_candidates(status, timing_class, updated_at DESC);
+"#;
+
+const SCHEMA_V4: &str = r#"
+ALTER TABLE inspirations ADD COLUMN source_url TEXT;
+ALTER TABLE inspirations ADD COLUMN source_title TEXT;
+ALTER TABLE inspirations ADD COLUMN source_author TEXT;
+ALTER TABLE inspirations ADD COLUMN source_published_at TEXT;
+ALTER TABLE inspirations ADD COLUMN summary TEXT NOT NULL DEFAULT '';
+ALTER TABLE inspirations ADD COLUMN takeaways_json TEXT NOT NULL DEFAULT '[]';
+ALTER TABLE inspirations ADD COLUMN excerpts_json TEXT NOT NULL DEFAULT '[]';
+ALTER TABLE inspirations ADD COLUMN why_interesting TEXT NOT NULL DEFAULT '';
+ALTER TABLE inspirations ADD COLUMN user_reaction TEXT NOT NULL DEFAULT '';
+ALTER TABLE inspirations ADD COLUMN concepts_json TEXT NOT NULL DEFAULT '[]';
+ALTER TABLE inspirations ADD COLUMN questions_json TEXT NOT NULL DEFAULT '[]';
+ALTER TABLE inspirations ADD COLUMN counterpoints_json TEXT NOT NULL DEFAULT '[]';
+CREATE INDEX idx_inspirations_status_updated ON inspirations(status, updated_at DESC);
+CREATE INDEX idx_inspirations_source ON inspirations(source_id);
 "#;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -402,6 +419,16 @@ fn migrate_schema(connection: &mut Connection) -> ServiceResult<()> {
         tx.execute_batch(SCHEMA_V3)?;
         tx.execute(
             "INSERT INTO schema_migrations(version,name,applied_at) VALUES (3,'topic_timing_v3',?1)",
+            [Utc::now().to_rfc3339()],
+        )?;
+        tx.commit()?;
+        version = 3;
+    }
+    if version == 3 {
+        let tx = connection.transaction()?;
+        tx.execute_batch(SCHEMA_V4)?;
+        tx.execute(
+            "INSERT INTO schema_migrations(version,name,applied_at) VALUES (4,'inspiration_working_fields_v4',?1)",
             [Utc::now().to_rfc3339()],
         )?;
         tx.commit()?;
@@ -752,7 +779,7 @@ mod tests {
     fn initializes_database() {
         let p = vault();
         assert!(database_path(&p).is_file());
-        assert_eq!(schema_version(&p).unwrap(), 3);
+        assert_eq!(schema_version(&p).unwrap(), 4);
         fs::remove_dir_all(p).unwrap();
     }
     #[test]

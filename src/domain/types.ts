@@ -127,6 +127,105 @@ export interface TopicRelationshipMutationResult {
   changed: boolean;
 }
 
+
+export type InspirationLifecycle = "saved" | "processed" | "archived";
+export type InspirationRelationKind = "topic" | "theme";
+
+export interface InspirationExcerptInput {
+  text: string;
+  locator: string;
+}
+
+export interface InspirationExcerpt {
+  text: string;
+  locator: string;
+  sourceId: string;
+}
+
+export interface InspirationSource {
+  sourceId: string;
+  sourceType: string;
+  displayName: string;
+  sourceOrigin: string;
+  originalFileName: string;
+  storedPath: string;
+  sourceUrl: string | null;
+  capturedText: string;
+}
+
+export interface InspirationRelationship {
+  relationshipId: string;
+  relationKind: InspirationRelationKind;
+  targetId: string;
+  targetLabel: string;
+  targetDetail: string;
+  targetStatus: string;
+}
+
+export interface InspirationRecord {
+  inspirationId: string;
+  source: InspirationSource | null;
+  title: string;
+  lifecycle: InspirationLifecycle;
+  sourceUrl: string | null;
+  sourceTitle: string | null;
+  sourceAuthor: string | null;
+  sourcePublishedAt: string | null;
+  summary: string;
+  takeaways: string[];
+  excerpts: InspirationExcerpt[];
+  whyInteresting: string;
+  userReaction: string;
+  concepts: string[];
+  questions: string[];
+  counterpoints: string[];
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+  revision: number;
+  relationships: InspirationRelationship[];
+}
+
+export interface CreateInspirationResult {
+  inspiration: InspirationRecord;
+  created: boolean;
+}
+
+export interface UpdateInspirationRequest {
+  inspirationId: string;
+  title: string;
+  lifecycle: InspirationLifecycle;
+  sourceUrl?: string | null;
+  sourceTitle?: string | null;
+  sourceAuthor?: string | null;
+  sourcePublishedAt?: string | null;
+  summary: string;
+  takeaways: string[];
+  excerpts: InspirationExcerptInput[];
+  whyInteresting: string;
+  userReaction: string;
+  concepts: string[];
+  questions: string[];
+  counterpoints: string[];
+  notes: string;
+}
+
+export interface InspirationLinkTarget {
+  relationKind: InspirationRelationKind;
+  targetId: string;
+  label: string;
+  detail: string;
+  status: string;
+}
+
+export interface InspirationRelationshipMutationResult {
+  inspirationId: string;
+  relationKind: InspirationRelationKind;
+  targetId: string;
+  changed: boolean;
+}
+
+
 export type PrivacyScanStatus =
   | "pending"
   | "complete"

@@ -1,5 +1,5 @@
-
 import { useEffect, useState } from "react";
+import { InspirationPanel } from "./InspirationPanel";
 import { SeedDevelopmentPanel } from "./SeedDevelopmentPanel";
 import { TopicPanel } from "./TopicPanel";
 import type { CaptureRole, CaptureSource, SourceType } from "../domain/types";
@@ -36,6 +36,7 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
   const [error, setError] = useState<string | null>(null);
   const [developmentSeedId, setDevelopmentSeedId] = useState<string | null>(null);
   const [developmentTopicId, setDevelopmentTopicId] = useState<string | null>(null);
+  const [developmentInspirationId, setDevelopmentInspirationId] = useState<string | null>(null);
 
   useEffect(() => {
     setSaved(null);
@@ -43,6 +44,7 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
     setError(null);
     setDevelopmentSeedId(null);
     setDevelopmentTopicId(null);
+    setDevelopmentInspirationId(null);
     void refreshRecent();
   }, [vaultPath]);
 
@@ -115,6 +117,9 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
   const topicClassification = saved?.classifications.find(
     (classification) => classification.role === "topic_candidate",
   );
+  const inspirationClassification = saved?.classifications.find(
+    (classification) => classification.role === "inspiration",
+  );
 
   return (
     <section className="workspace-panel capture-panel" aria-labelledby="capture-heading">
@@ -123,8 +128,8 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
           <p className="eyebrow">Capture</p>
           <h2 id="capture-heading">Save it before you sort it</h2>
           <p className="capture-intro">
-            Paste a memory, result, idea, question, job description, writing sample, or note.
-            WorkLore saves the original text first. Classification is optional.
+            Paste a memory, result, idea, question, URL, excerpt, job description, writing sample,
+            or note. WorkLore saves the original text first. Classification is optional.
           </p>
         </div>
         <select
@@ -143,7 +148,7 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
       <textarea
         className="capture-input"
         aria-label="Capture text"
-        placeholder="What happened, what did you notice, or what should future-you remember?"
+        placeholder="What happened, what did you notice, or what should future-you remember? For a URL-only Inspiration, paste the URL here first."
         value={text}
         onChange={(event) => setText(event.target.value)}
         rows={6}
@@ -192,7 +197,8 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
               })}
             </div>
             <p className="capture-source-only">
-              Leave it alone to keep this as Source-only material. Writing samples do not become Voice Evidence here.
+              Leave it alone to keep this as Source-only material. External Inspiration does not
+              become Evidence or Voice Evidence here.
             </p>
             {storySeedClassification ? (
               <button
@@ -212,6 +218,15 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
                 Open this topic
               </button>
             ) : null}
+            {inspirationClassification ? (
+              <button
+                className="primary-button compact"
+                disabled={busy !== null}
+                onClick={() => setDevelopmentInspirationId(inspirationClassification.targetId)}
+              >
+                Work with this inspiration
+              </button>
+            ) : null}
           </div>
         </div>
       ) : null}
@@ -229,6 +244,14 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
           vaultPath={vaultPath}
           topicId={developmentTopicId}
           onClose={() => setDevelopmentTopicId(null)}
+        />
+      ) : null}
+
+      {developmentInspirationId ? (
+        <InspirationPanel
+          vaultPath={vaultPath}
+          inspirationId={developmentInspirationId}
+          onClose={() => setDevelopmentInspirationId(null)}
         />
       ) : null}
 

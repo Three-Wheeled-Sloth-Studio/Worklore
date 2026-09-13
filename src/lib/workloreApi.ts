@@ -14,6 +14,11 @@ import type {
   ImportSourceResult,
   ImportStoryResponseRequest,
   ImportStoryResponseResult,
+  InspirationLinkTarget,
+  InspirationRecord,
+  InspirationRelationKind,
+  InspirationRelationshipMutationResult,
+  CreateInspirationResult,
   InterviewSummary,
   ManualWorkspaceResult,
   PerformanceSnapshot,
@@ -31,6 +36,7 @@ import type {
   TopicRecord,
   TopicRelationKind,
   TopicRelationshipMutationResult,
+  UpdateInspirationRequest,
   UpdateThemeRequest,
   UpdateTopicRequest,
   VaultSummary,
@@ -197,6 +203,74 @@ export async function listTopicLinkTargets(
 ): Promise<TopicLinkTarget[]> {
   return invoke<TopicLinkTarget[]>("list_topic_link_targets", { vaultPath, relationKind });
 }
+
+
+export async function createInspirationFromSource(
+  vaultPath: string,
+  sourceId: string,
+): Promise<CreateInspirationResult> {
+  return invoke<CreateInspirationResult>("create_inspiration_from_source", {
+    vaultPath,
+    sourceId,
+  });
+}
+
+export async function getInspiration(
+  vaultPath: string,
+  inspirationId: string,
+): Promise<InspirationRecord> {
+  return invoke<InspirationRecord>("get_inspiration", { vaultPath, inspirationId });
+}
+
+export async function listInspirations(vaultPath: string): Promise<InspirationRecord[]> {
+  return invoke<InspirationRecord[]>("list_inspirations", { vaultPath });
+}
+
+export async function updateInspiration(
+  vaultPath: string,
+  request: UpdateInspirationRequest,
+): Promise<InspirationRecord> {
+  return invoke<InspirationRecord>("update_inspiration", { vaultPath, request });
+}
+
+export async function addInspirationRelationship(
+  vaultPath: string,
+  inspirationId: string,
+  relationKind: InspirationRelationKind,
+  targetId: string,
+): Promise<InspirationRelationshipMutationResult> {
+  return invoke<InspirationRelationshipMutationResult>("add_inspiration_relationship", {
+    vaultPath,
+    inspirationId,
+    relationKind,
+    targetId,
+  });
+}
+
+export async function removeInspirationRelationship(
+  vaultPath: string,
+  inspirationId: string,
+  relationKind: InspirationRelationKind,
+  targetId: string,
+): Promise<InspirationRelationshipMutationResult> {
+  return invoke<InspirationRelationshipMutationResult>("remove_inspiration_relationship", {
+    vaultPath,
+    inspirationId,
+    relationKind,
+    targetId,
+  });
+}
+
+export async function listInspirationLinkTargets(
+  vaultPath: string,
+  relationKind: InspirationRelationKind,
+): Promise<InspirationLinkTarget[]> {
+  return invoke<InspirationLinkTarget[]>("list_inspiration_link_targets", {
+    vaultPath,
+    relationKind,
+  });
+}
+
 
 export async function startStorySeedDevelopment(
   vaultPath: string,
