@@ -17,5 +17,17 @@ new = '''        let rows = statement
 if old not in text:
     raise RuntimeError("Expected target-context list query block was not generated.")
 text = text.replace(old, new, 1)
+unused = '''    fn relationship_type(self) -> &'static str {
+        match self {
+            Self::Topic => "topic_target_context",
+            Self::Theme => "target_theme",
+            Self::Story => "target_story",
+        }
+    }
+
+'''
+if unused not in text:
+    raise RuntimeError("Expected unused Target Context relationship helper was not generated.")
+text = text.replace(unused, "", 1)
 path.write_text(text, encoding="utf-8", newline="\n")
-print("Normalized generated Target Context query lifetime.")
+print("Normalized generated Target Context query lifetime and removed unused helper.")
