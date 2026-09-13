@@ -52,9 +52,9 @@ todos:
     area: stories
     summary: Resume work-history candidate extraction exists as optional Seed from resume foundation.
   - id: task-013
-    status: preserve_and_generalize
+    status: generalized_for_direct_seeds
     area: stories
-    summary: Guided interview and evidence-labeling state machine should be generalized beyond resume bullets.
+    summary: Guided interview and evidence-labeling rules now support canonical Story Seed development while the legacy candidate path remains compatible.
   - id: task-014
     status: preserve
     area: observability
@@ -74,7 +74,7 @@ todos:
   - id: task-018
     status: preserve_and_adapt
     area: stories
-    summary: Privacy-safe manual AI workspace export and strict structured response import remain useful provider-neutral foundations.
+    summary: Privacy-safe manual AI workspace export and strict structured response import remain useful provider-neutral foundations; direct canonical seed/story export still requires explicit preflight generalization.
   - id: task-019
     status: preserve
     area: roles
@@ -112,13 +112,13 @@ todos:
     area: capture
     summary: Implement save-first capture that persists ambiguous memories, ideas, proof points, URLs, excerpts, job descriptions, writing samples, and notes before classification.
   - id: task-027
-    status: planned
+    status: complete
     area: stories
-    summary: Generalize guided story development so stories can originate directly from capture rather than resume bullets. This is the next bounded implementation slice.
+    summary: Generalize guided story development so a directly captured canonical Story Seed can be interviewed, reopened, and converted into a developing Story without a resume candidate or Role.
   - id: task-028
-    status: planned
+    status: next
     area: topics
-    summary: Implement durable topic candidates, themes, proof-point relationships, and evergreen versus timely lifecycle metadata.
+    summary: Implement durable topic candidates, themes, proof-point/story relationships, and evergreen versus timely lifecycle metadata as the next bounded Phase 1 slice.
   - id: task-029
     status: planned
     area: inspiration
