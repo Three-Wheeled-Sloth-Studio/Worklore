@@ -17,6 +17,10 @@ pnpm-debug.log*
 target/
 src-tauri/target/
 
+# Python tooling output
+__pycache__/
+*.py[cod]
+
 # Environment and credentials
 .env
 .env.*
