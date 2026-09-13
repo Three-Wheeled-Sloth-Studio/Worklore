@@ -1,6 +1,6 @@
 version: 2
 schema: refs/schemas/schemaRegistry.yaml
-updated: 2026-09-12
+updated: 2026-09-13
 product_reference: refs/product/prd.md
 
 roadmap_principles:
@@ -23,6 +23,7 @@ prototype_foundation:
     - Manual privacy-safe AI workspace export and structured response import.
     - Canonical story storage and role linking.
     - Local operation timing and external build boundaries.
+    - Canonical SQLite persistence at data/worklore.sqlite with Phase 1 schema migration and non-destructive prototype import.
   de_emphasized:
     - Robust arbitrary resume parsing beyond practical maintenance.
     - Resume-first navigation and workflow assumptions.
@@ -46,7 +47,7 @@ phases:
   - id: phase-1
     name: Professional Memory
     horizon: now
-    status: next
+    status: in_progress
     objective: Recenter WorkLore around durable capture, stories, topics, themes, proof points, inspiration, and target context.
     scope:
       - Replace the resume-centric primary navigation with Capture, Stories, Topics, Voice, Posts, and Insights-oriented navigation.
@@ -59,7 +60,7 @@ phases:
       - Preserve Private Entity Registry and privacy preflight as infrastructure.
       - Demote resume ingestion to an optional Seed from resume path.
     architecture_notes:
-      - Durable local persistence may use SQLite or similar local storage where beneficial.
+      - Canonical structured state persists locally in data/worklore.sqlite behind the Phase 1 migration boundary.
       - Human-readable export remains desirable.
       - The vault must remain usable without a WorkLore account or hosted service.
     exit_criteria:
