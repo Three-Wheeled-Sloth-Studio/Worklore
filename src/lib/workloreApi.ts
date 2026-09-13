@@ -31,6 +31,13 @@ import type {
   StoryStatus,
   StorySummary,
   SubmitInterviewResponseRequest,
+  TargetContextExtractionResult,
+  TargetContextLinkTarget,
+  TargetContextRecord,
+  TargetContextRelationKind,
+  TargetContextRelationshipMutationResult,
+  CreateTargetContextResult,
+  UpdateTargetContextRequest,
   ThemeRecord,
   TopicLinkTarget,
   TopicRecord,
@@ -266,6 +273,83 @@ export async function listInspirationLinkTargets(
   relationKind: InspirationRelationKind,
 ): Promise<InspirationLinkTarget[]> {
   return invoke<InspirationLinkTarget[]>("list_inspiration_link_targets", {
+    vaultPath,
+    relationKind,
+  });
+}
+
+
+export async function createTargetContextFromSource(
+  vaultPath: string,
+  sourceId: string,
+): Promise<CreateTargetContextResult> {
+  return invoke<CreateTargetContextResult>("create_target_context_from_source", {
+    vaultPath,
+    sourceId,
+  });
+}
+
+export async function getTargetContext(
+  vaultPath: string,
+  targetId: string,
+): Promise<TargetContextRecord> {
+  return invoke<TargetContextRecord>("get_target_context", { vaultPath, targetId });
+}
+
+export async function listTargetContexts(vaultPath: string): Promise<TargetContextRecord[]> {
+  return invoke<TargetContextRecord[]>("list_target_contexts", { vaultPath });
+}
+
+export async function updateTargetContext(
+  vaultPath: string,
+  request: UpdateTargetContextRequest,
+): Promise<TargetContextRecord> {
+  return invoke<TargetContextRecord>("update_target_context", { vaultPath, request });
+}
+
+export async function extractTargetContextSignals(
+  vaultPath: string,
+  targetId: string,
+): Promise<TargetContextExtractionResult> {
+  return invoke<TargetContextExtractionResult>("extract_target_context_signals", {
+    vaultPath,
+    targetId,
+  });
+}
+
+export async function addTargetContextRelationship(
+  vaultPath: string,
+  targetContextId: string,
+  relationKind: TargetContextRelationKind,
+  targetId: string,
+): Promise<TargetContextRelationshipMutationResult> {
+  return invoke<TargetContextRelationshipMutationResult>("add_target_context_relationship", {
+    vaultPath,
+    targetContextId,
+    relationKind,
+    targetId,
+  });
+}
+
+export async function removeTargetContextRelationship(
+  vaultPath: string,
+  targetContextId: string,
+  relationKind: TargetContextRelationKind,
+  targetId: string,
+): Promise<TargetContextRelationshipMutationResult> {
+  return invoke<TargetContextRelationshipMutationResult>("remove_target_context_relationship", {
+    vaultPath,
+    targetContextId,
+    relationKind,
+    targetId,
+  });
+}
+
+export async function listTargetContextLinkTargets(
+  vaultPath: string,
+  relationKind: TargetContextRelationKind,
+): Promise<TargetContextLinkTarget[]> {
+  return invoke<TargetContextLinkTarget[]>("list_target_context_link_targets", {
     vaultPath,
     relationKind,
   });

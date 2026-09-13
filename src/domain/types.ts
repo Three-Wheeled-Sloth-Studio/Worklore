@@ -226,6 +226,94 @@ export interface InspirationRelationshipMutationResult {
 }
 
 
+export type TargetContextLifecycle = "active" | "archived";
+export type TargetContextRelationKind = "topic" | "theme" | "story";
+
+export interface TargetContextSource {
+  sourceId: string;
+  sourceType: string;
+  displayName: string;
+  sourceOrigin: string;
+  originalFileName: string;
+  storedPath: string;
+  sourceUrl: string | null;
+}
+
+export interface TargetContextRelationship {
+  relationshipId: string;
+  relationKind: TargetContextRelationKind;
+  targetId: string;
+  targetLabel: string;
+  targetDetail: string;
+  targetStatus: string;
+}
+
+export interface TargetContextRecord {
+  targetId: string;
+  source: TargetContextSource | null;
+  contextType: string;
+  title: string;
+  lifecycle: TargetContextLifecycle;
+  sourceUrl: string | null;
+  organizationName: string | null;
+  roleTitle: string | null;
+  location: string | null;
+  summary: string;
+  responsibilities: string[];
+  skills: string[];
+  concepts: string[];
+  language: string[];
+  tensions: string[];
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+  revision: number;
+  relationships: TargetContextRelationship[];
+}
+
+export interface CreateTargetContextResult {
+  targetContext: TargetContextRecord;
+  created: boolean;
+}
+
+export interface UpdateTargetContextRequest {
+  targetId: string;
+  title: string;
+  lifecycle: TargetContextLifecycle;
+  sourceUrl?: string | null;
+  organizationName?: string | null;
+  roleTitle?: string | null;
+  location?: string | null;
+  summary: string;
+  responsibilities: string[];
+  skills: string[];
+  concepts: string[];
+  language: string[];
+  tensions: string[];
+  notes: string;
+}
+
+export interface TargetContextExtractionResult {
+  targetContext: TargetContextRecord;
+  changed: boolean;
+}
+
+export interface TargetContextLinkTarget {
+  relationKind: TargetContextRelationKind;
+  targetId: string;
+  label: string;
+  detail: string;
+  status: string;
+}
+
+export interface TargetContextRelationshipMutationResult {
+  targetContextId: string;
+  relationKind: TargetContextRelationKind;
+  targetId: string;
+  changed: boolean;
+}
+
+
 export type PrivacyScanStatus =
   | "pending"
   | "complete"

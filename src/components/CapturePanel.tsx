@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { InspirationPanel } from "./InspirationPanel";
 import { SeedDevelopmentPanel } from "./SeedDevelopmentPanel";
 import { TopicPanel } from "./TopicPanel";
+import { TargetContextPanel } from "./TargetContextPanel";
 import type { CaptureRole, CaptureSource, SourceType } from "../domain/types";
 import { errorMessage } from "../domain/types";
 import {
@@ -37,6 +38,7 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
   const [developmentSeedId, setDevelopmentSeedId] = useState<string | null>(null);
   const [developmentTopicId, setDevelopmentTopicId] = useState<string | null>(null);
   const [developmentInspirationId, setDevelopmentInspirationId] = useState<string | null>(null);
+  const [developmentTargetContextId, setDevelopmentTargetContextId] = useState<string | null>(null);
 
   useEffect(() => {
     setSaved(null);
@@ -45,6 +47,7 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
     setDevelopmentSeedId(null);
     setDevelopmentTopicId(null);
     setDevelopmentInspirationId(null);
+    setDevelopmentTargetContextId(null);
     void refreshRecent();
   }, [vaultPath]);
 
@@ -119,6 +122,9 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
   );
   const inspirationClassification = saved?.classifications.find(
     (classification) => classification.role === "inspiration",
+  );
+  const targetContextClassification = saved?.classifications.find(
+    (classification) => classification.role === "target_context",
   );
 
   return (
@@ -227,6 +233,15 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
                 Work with this inspiration
               </button>
             ) : null}
+            {targetContextClassification ? (
+              <button
+                className="primary-button compact"
+                disabled={busy !== null}
+                onClick={() => setDevelopmentTargetContextId(targetContextClassification.targetId)}
+              >
+                Work with this target context
+              </button>
+            ) : null}
           </div>
         </div>
       ) : null}
@@ -252,6 +267,14 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
           vaultPath={vaultPath}
           inspirationId={developmentInspirationId}
           onClose={() => setDevelopmentInspirationId(null)}
+        />
+      ) : null}
+
+      {developmentTargetContextId ? (
+        <TargetContextPanel
+          vaultPath={vaultPath}
+          targetId={developmentTargetContextId}
+          onClose={() => setDevelopmentTargetContextId(null)}
         />
       ) : null}
 

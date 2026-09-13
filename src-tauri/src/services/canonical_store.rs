@@ -22,7 +22,7 @@ use crate::{
 };
 
 pub const DATABASE_RELATIVE_PATH: &str = "data/worklore.sqlite";
-const CURRENT_SCHEMA_VERSION: i64 = 4;
+const CURRENT_SCHEMA_VERSION: i64 = 5;
 const MIGRATION_NAME: &str = "prototype_to_professional_memory_v1";
 
 const SCHEMA_V1: &str = r#"
@@ -140,6 +140,21 @@ ALTER TABLE inspirations ADD COLUMN questions_json TEXT NOT NULL DEFAULT '[]';
 ALTER TABLE inspirations ADD COLUMN counterpoints_json TEXT NOT NULL DEFAULT '[]';
 CREATE INDEX idx_inspirations_status_updated ON inspirations(status, updated_at DESC);
 CREATE INDEX idx_inspirations_source ON inspirations(source_id);
+"#;
+
+const SCHEMA_V5: &str = r#"
+ALTER TABLE target_contexts ADD COLUMN source_url TEXT;
+ALTER TABLE target_contexts ADD COLUMN organization_name TEXT;
+ALTER TABLE target_contexts ADD COLUMN role_title TEXT;
+ALTER TABLE target_contexts ADD COLUMN location TEXT;
+ALTER TABLE target_contexts ADD COLUMN summary TEXT NOT NULL DEFAULT '';
+ALTER TABLE target_contexts ADD COLUMN responsibilities_json TEXT NOT NULL DEFAULT '[]';
+ALTER TABLE target_contexts ADD COLUMN skills_json TEXT NOT NULL DEFAULT '[]';
+ALTER TABLE target_contexts ADD COLUMN concepts_json TEXT NOT NULL DEFAULT '[]';
+ALTER TABLE target_contexts ADD COLUMN language_json TEXT NOT NULL DEFAULT '[]';
+ALTER TABLE target_contexts ADD COLUMN tensions_json TEXT NOT NULL DEFAULT '[]';
+CREATE INDEX idx_target_contexts_status_type ON target_contexts(status, context_type, updated_at DESC);
+CREATE INDEX idx_target_contexts_source ON target_contexts(source_id);
 "#;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -429,6 +444,16 @@ fn migrate_schema(connection: &mut Connection) -> ServiceResult<()> {
         tx.execute_batch(SCHEMA_V4)?;
         tx.execute(
             "INSERT INTO schema_migrations(version,name,applied_at) VALUES (4,'inspiration_working_fields_v4',?1)",
+            [Utc::now().to_rfc3339()],
+        )?;
+        tx.commit()?;
+        version = 4;
+    }
+    if version == 4 {
+        let tx = connection.transaction()?;
+        tx.execute_batch(SCHEMA_V5)?;
+        tx.execute(
+            "INSERT INTO schema_migrations(version,name,applied_at) VALUES (5,'target_context_working_fields_v5',?1)",
             [Utc::now().to_rfc3339()],
         )?;
         tx.commit()?;
@@ -779,7 +804,7 @@ mod tests {
     fn initializes_database() {
         let p = vault();
         assert!(database_path(&p).is_file());
-        assert_eq!(schema_version(&p).unwrap(), 4);
+        assert_eq!(schema_version(&p).unwrap(), 5);
         fs::remove_dir_all(p).unwrap();
     }
     #[test]
