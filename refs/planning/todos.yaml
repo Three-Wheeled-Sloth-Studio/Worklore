@@ -30,7 +30,7 @@ todos:
   - id: task-007
     status: replan_under_phase_2
     area: providers
-    summary: Provider contract for Ollama, Gemini bring-your-own-key, and manual workspace packages. Manual path exists; direct provider work should follow the voice/domain refocus rather than lead it.
+    summary: Implement a provider registry with Ollama as a first-class local provider, manual workspace packages, and explicit BYOK remote adapters beginning with Gemini; keep credentials in the operating-system credential store with configure/validate/clear behavior and no WorkLore-hosted proxy.
   - id: task-008
     status: complete
     area: testing
@@ -86,7 +86,7 @@ todos:
   - id: task-021
     status: absorbed_by_phase_2
     area: providers
-    summary: Direct Ollama and Gemini adapters should be implemented only after canonical voice provenance and the refocused domain contracts are stable.
+    summary: Introduce provider-neutral workflow contracts and adapters after canonical voice provenance is stable; preserve explicit Ollama selection, BYOK remote-provider credentials outside canonical state, privacy preflight, and no silent local-to-cloud fallback.
   - id: task-022
     status: complete
     area: product
@@ -116,9 +116,9 @@ todos:
     area: stories
     summary: Generalize guided story development so a directly captured canonical Story Seed can be interviewed, reopened, and converted into a developing Story without a resume candidate or Role.
   - id: task-028
-    status: in_progress
+    status: complete
     area: topics
-    summary: Implement durable topic candidates, themes, proof-point/story relationships, and evergreen versus timely lifecycle metadata as the next bounded Phase 1 slice.
+    summary: Implement durable Topic Candidates and Themes, explicit evergreen/timely metadata, lifecycle management, and idempotent typed relationships to Stories, Proof Points, Themes, Inspiration, and Target Context while preserving standing/context boundaries.
   - id: task-029
     status: planned
     area: inspiration
