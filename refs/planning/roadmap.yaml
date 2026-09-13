@@ -99,8 +99,11 @@ phases:
   - id: phase-2
     name: Voice Intelligence
     horizon: next
-    status: planned
+    status: in_progress
     objective: Make authentic, auditable, intentionally variable user voice a first-class system capability.
+    completed:
+      - Governed canonical Voice Evidence with schema-v6 persistence, stable Source lineage, explicit authorship and approval, pending/eligible/rejected/retired lifecycle, revisioned audit events, and hard exclusion of raw model/external-author material from eligibility.
+      - Thin provider-free Voice Evidence review UI for candidate creation, provenance review, approve/reject/retire decisions, reopen, and visible ineligibility reasons.
     scope:
       - Introduce canonical Voice Evidence, Core Voice, Tone Modes, Voice Direction, and Writing Rules.
       - Ingest representative user-authored writing and approved final posts as voice evidence.

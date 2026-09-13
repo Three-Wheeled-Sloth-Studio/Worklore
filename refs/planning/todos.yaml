@@ -128,9 +128,9 @@ todos:
     area: targeting
     summary: Implement durable Source-backed Target Context beginning with job descriptions, structured responsibilities/skills/concepts/language/tensions, deterministic provider-free signal extraction, and explicit Topic/Theme/Story links without ATS scoring, fabricated standing, or single-JD overfitting.
   - id: task-031
-    status: planned
+    status: complete
     area: voice
-    summary: Define and implement voice provenance so only user-authored or explicitly user-approved material can become eligible Voice Evidence and raw AI/model drafts remain permanently ineligible.
+    summary: Define and implement governed Voice Evidence provenance so writing samples begin pending, explicit authorship and approval control eligibility, raw AI/external-author material remains prohibited, and eligibility changes retain Source lineage, revisions, and audit events.
   - id: task-032
     status: planned
     area: voice

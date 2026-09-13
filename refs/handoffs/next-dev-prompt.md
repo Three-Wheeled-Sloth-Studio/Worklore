@@ -1,7 +1,7 @@
 ---
 type: Handoff Prompt
 title: Next WorkLore Development Slice
-description: Bounded prompt for Phase 2 task-031 Voice Evidence provenance and eligibility on the completed Phase 1 professional-memory foundation.
+description: Bounded prompt for the first task-032 Core Voice, Tone Mode, Voice Direction, and Writing Rule foundation on validated Voice Evidence provenance.
 status: draft
 tags: [handoff, next-slice]
 ---
@@ -15,151 +15,185 @@ Work directly on `dev`. Do not promote `qa` or `main` unless explicitly requeste
 
 ## Accepted Starting Point
 
-Phase 1 Professional Memory is complete.
+Phase 1 Professional Memory is complete. Phase 2 Voice Intelligence is in progress, and `task-031` Voice Evidence provenance/eligibility is complete.
 
-Validated Phase 1 product checkpoint:
+Validated Voice Evidence product checkpoint:
 
-`e3393d7f95d5e060a23719b72b0ac9f051df5e92`
+`faf702206eac854700b7d634ef40901afe898916`
 
 Implementation validation:
 
-- Actions `34775461730`
-- Job `103772650411`
-- frontend: 6 passed / 0 failed across 2 files
-- Rust: 72 passed / 0 failed
-- production frontend build: green, 48 modules transformed
+- Actions `34779212710`
+- Job `103782995877`
+- frontend: 8 passed / 0 failed across 3 files
+- Rust: 77 passed / 0 failed
+- production frontend build: green, 51 modules transformed
 - case-collision, refs/OKF, bounded agent context, `git diff --check`, warnings-denied Clippy, and rustfmt: green
 
-The task-oriented shell now exposes Home, Capture, Stories, Topics, Voice, Posts, and Insights in the accepted order. Home/Capture/Stories/Topics are real Phase 1 workspaces. Sources/Privacy/Import-Export/Settings are supporting access. Inspiration and Target Context are reopenable from the Library. Voice/Posts/Insights are intentionally honest future surfaces.
+Voice Evidence now has durable Source lineage, explicit authorship, `pending/eligible/rejected/retired` state, explicit approval/revocation, revisioned audit events, and backend enforcement that raw model/external-author material cannot become eligible through normal paths.
 
 Read `refs/handoffs/currentHandoff.md` before making changes.
 
 ## Start With Bounded Re-entry
 
 ```powershell
-python refs/tools/generate_agent_context.py --focus "WorkLore Phase 2 Voice Evidence provenance authorship eligibility raw AI exclusion writing samples"
+python refs/tools/generate_agent_context.py --focus "WorkLore Phase 2 Core Voice Tone Modes Voice Direction Writing Rules eligible Voice Evidence provenance"
 ```
 
 Treat generated context as derived orientation. Read only the authoritative refs/source needed for this slice.
 
 Read at minimum:
 
-- `refs/product/prd.md`
-- `refs/product/domainModel.md`
+- `refs/product/prd.md`, especially sections 3.5, 4, and 7
 - `refs/architecture/vaultFormat.md`
 - `refs/architecture/providerArchitecture.md`
 - `refs/planning/roadmap.yaml`
 - `refs/planning/todos.yaml`
 - `refs/handoffs/currentHandoff.md`
-- canonical store / migration code relevant to Voice Evidence and Sources
-- Capture writing-sample classification behavior
+- `src-tauri/src/services/canonical_store.rs`
+- `src-tauri/src/services/voice_evidence_service.rs`
+- `src-tauri/src/commands/voice.rs`
 - `src/domain/types.ts`
 - `src/lib/workloreApi.ts`
-- current Voice future workspace entry point
+- `src/components/VoiceWorkspace.tsx`
+
+`refs/product/domainModel.md` does not exist; do not recreate it merely to satisfy stale historical references. The PRD and vault-format contract are authoritative.
 
 ## Immediate Objective
 
-Implement `task-031`: establish durable, auditable Voice Evidence provenance and eligibility before Core Voice inference or provider execution.
+Implement the bounded first foundation slice of `task-032`: make Core Voice and intentional voice range durable, explicit, and provenance-safe without yet requiring provider inference.
 
-This slice answers one question reliably:
+This slice should answer:
 
-`What text is allowed to teach WorkLore how this user writes?`
+`How does WorkLore represent what is stable about the user's voice, what may intentionally vary, and what the user wants to change—without confusing those concepts or inventing traits?`
 
-### 1. Voice Evidence is a governed semantic object
+### 1. Add canonical Core Voice versions
 
-Add or complete first-class Voice Evidence persistence/API behavior with stable identity and reopen semantics.
+Add durable `voice_` records with the accepted lifecycle:
 
-At minimum retain:
+- `proposed`
+- `active`
+- `superseded`
 
-- source/provenance lineage;
-- evidence text or a stable reference to attributable source text without unnecessary duplication;
-- authorship assertion/state;
-- eligibility state;
-- eligibility/ineligibility reason;
-- explicit user approval state and timestamp where approval is required;
-- created/updated/revision metadata;
-- audit events for eligibility/approval changes.
+Core Voice is the relatively stable author identity. It is not a single prose sample and it is not a Tone Mode.
 
-Prefer an extensible eligibility model over a boolean if the accepted domain contracts already distinguish pending/eligible/ineligible/revoked states.
+Requirements:
 
-### 2. Enforce provenance before inference
+- stable opaque identity and timestamps/revision metadata;
+- versioned activation/supersession rather than destructive replacement;
+- explicit trait/value records or another queryable structure that can evolve without serializing the entire concept into one opaque blob;
+- every canonical trait must retain provenance to eligible Voice Evidence and/or explicit user guidance;
+- activation should be transactional so at most one Core Voice version is active under the initial single-user vault model;
+- do not derive traits from rejected/retired/ineligible Voice Evidence.
 
-Eligible Voice Evidence must be demonstrably user-authored or explicitly approved as eligible user writing.
+Do not generate or infer traits just to populate the UI. Empty/proposed state is preferable to fabricated identity.
 
-Examples:
+### 2. Add Tone Modes as controlled range
 
-- imported writing sample: candidate/pending until authorship and approval are established;
-- explicitly user-authored pasted writing: may become eligible only through an explicit eligibility/approval action consistent with the domain contract;
-- future final user-approved Posts: eventual eligible source class, but Posts are not implemented in this slice.
+Add durable `tone_` records with `active`, `disabled`, and `retired` lifecycle.
 
-Do not infer authorship merely from file location, Capture ownership, or the fact that text is stored in the user's vault.
+Tone Mode is an intentional register—serious, analytical, conversational, reflective, dry/funny, whimsical, etc.—that changes expression while preserving author identity.
 
-### 3. Make contamination structurally difficult
+Requirements:
 
-Normal application/API paths must refuse or permanently mark ineligible:
+- user-defined naming and description/instructions;
+- explicit enabled/lifecycle state;
+- no claim that one mode is the user's whole identity;
+- no automatic duplication of Core Voice traits into each mode;
+- leave a clean seam for later drafting/provider use.
 
-- raw AI/model drafts;
-- rejected drafts;
-- unedited provider output;
-- external Inspiration excerpts/prose;
-- Target Context text;
-- job descriptions or public-profile material.
+### 3. Add Voice Direction separately
 
-A user-authored reaction or note attached to Inspiration/Target Context remains user-authored text, but it must not silently become Voice Evidence. Require an explicit governed action if such text is ever eligible under the contract.
+Add durable `voice_direction_` records with the accepted lifecycle:
 
-### 4. Keep semantic classes separate
+- `proposed`
+- `accepted`
+- `completed`
+- `retired`
 
-Voice Evidence is not factual Evidence/Proof about accomplishments.
+Voice Direction represents deliberate evolution such as "more concise" or "warmer," not an observation about current identity.
 
-Factual Evidence supports `Did this happen?` / standing.
-Voice Evidence supports `How does this user write?`.
-Inspiration supports external creative/contextual influence.
-Target Context supports audience/opportunity context.
+Requirements:
 
-Do not collapse these into one generic source-role flag.
+- explicit user acceptance before a direction becomes authoritative;
+- provenance/notes describing who proposed it and why;
+- no silent conversion of a one-off edit into a direction;
+- do not mutate historical Core Voice evidence to make it match desired direction.
 
-### 5. Keep this slice provider-free
+### 4. Add Writing Rules separately
 
-Do not implement Ollama/Gemini/BYOK execution merely to analyze voice yet.
+Add durable `rule_` records with `proposed`, `active`, `disabled`, and `retired` lifecycle.
 
-The first Phase 2 invariant is trustworthy provenance. Core Voice trait inference, Tone Modes, Voice Direction, edit-delta learning, and provider-assisted analysis belong to later bounded work after eligibility is proven.
+Writing Rules are behavioral generation/review constraints, not Core Voice traits.
 
-### 6. Thin Voice UI
+Examples may include banned phrases, closing behavior, punctuation preferences, or explicit formatting constraints, but do not seed arbitrary defaults simply to fill the screen.
 
-Replace the current honest Voice future surface only as far as necessary to let the user:
+Requirements:
 
-- see Voice Evidence candidates/evidence;
-- understand provenance/authorship;
-- approve or reject eligibility where appropriate;
-- reopen evidence after restart;
-- see why an item is ineligible.
+- explicit user text/instruction and state;
+- source/provenance where available;
+- no silent promotion from one observed edit;
+- future provider/drafting layers should be able to consume active rules without rewriting identity.
 
-Do not fabricate Core Voice traits or a voice score before `task-032`.
+### 5. Enforce provenance from task-031
 
-### 7. Proof cases
+Core Voice links must use only eligible Voice Evidence or explicit user guidance.
+
+Hard rules remain:
+
+- raw model output cannot train or support canonical Core Voice;
+- rejected/retired Voice Evidence cannot support new active Core Voice traits;
+- Inspiration prose and Target Context remain ineligible contextual material;
+- an explicit user-authored guidance statement may support a trait/rule/direction, but that provenance must remain distinguishable from observed writing evidence;
+- changing Voice Evidence eligibility later must not silently rewrite historical Core Voice versions. Surface invalidated provenance for review rather than mutating history without an audit trail.
+
+### 6. Keep the first foundation slice provider-free
+
+Do not implement Ollama/Gemini/BYOK merely to infer trait labels in this slice.
+
+The product can first establish the durable model, manual/user-authored configuration paths, provenance links, activation rules, and UI semantics. Provider-assisted trait proposals belong behind that contract and should be added in a later bounded task-032/provider slice.
+
+Likewise, do not fabricate edit-delta learning before durable Post/Revision lineage exists. Preserve an architecture seam for it; do not pretend one-off Voice Evidence review is edit-delta learning.
+
+### 7. Thin Voice UI
+
+Extend the existing Voice workspace only far enough to let the user:
+
+- review eligible Voice Evidence already implemented;
+- create/edit proposed Core Voice traits with explicit provenance;
+- activate a Core Voice version and see prior superseded versions;
+- create/manage Tone Modes;
+- create/accept/retire Voice Directions;
+- create/enable/disable Writing Rules;
+- see which material is observed identity, intentional tone, desired change, or behavioral rule.
+
+Avoid fake scores, confidence percentages, AI/human probability claims, and generated placeholder traits.
+
+### 8. Proof cases
 
 Cover at least:
 
-- writing-sample Source starts pending rather than silently eligible;
-- explicit authorship/approval can make valid user writing eligible;
-- eligibility and approval survive reopen with stable identity;
-- raw AI/model-origin material cannot become eligible through normal service/API calls;
-- Inspiration source prose cannot become eligible merely by linking/copying it;
-- Target Context cannot become Voice Evidence;
-- eligibility changes are audited and revisioned;
-- removing/revoking eligibility does not delete the underlying Source;
+- Core Voice activation requires attributable eligible Voice Evidence or explicit user guidance;
+- rejected/retired Voice Evidence cannot be newly attached as supporting evidence for an active Core Voice trait;
+- activating a new Core Voice version supersedes the previous active version without deleting it;
+- Tone Mode lifecycle is independent from Core Voice version lifecycle;
+- Voice Direction acceptance does not mutate Core Voice automatically;
+- Writing Rules remain separate from Core Voice traits and Tone Modes;
+- provenance links survive reopen with stable identity;
 - no provider/network availability is required;
-- all Phase 1 frontend and 72 Rust regression tests remain green.
+- existing Voice Evidence invariants remain green;
+- all prior frontend and Rust regression tests remain green.
 
 ## Constraints
 
 - Standalone Windows-first, local canonical storage.
 - No WorkLore account/backend/proprietary sync.
 - No automatic publication or scheduling.
-- No Core Voice inference or Tone Modes in this slice.
-- No provider execution/BYOK implementation in this slice.
-- No Posts/editorial workflow, analytics, or discovery.
+- No provider execution/BYOK implementation in this first task-032 foundation slice.
+- No Post/editorial workflow, analytics, or discovery.
+- Do not implement anti-slop `task-033` or confidentiality `task-034` inside this slice.
 - Preserve Evidence/Inspiration/Target Context/Voice Evidence distinctions.
+- Preserve immutable Voice Evidence authorship provenance and raw-model exclusion.
 - Preserve Private Entity Registry and privacy infrastructure.
 - Public-repository fixtures must remain synthetic.
 - Keep build/dev/QA output outside the repository.
@@ -184,6 +218,6 @@ cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -
 
 ## Stop Point
 
-Stop when Voice Evidence provenance/eligibility is durable, reopenable, explicit to the user, and structurally prevents raw model/external contextual material from contaminating canonical voice.
+Stop when Core Voice versions, Tone Modes, Voice Directions, and Writing Rules are durable, reopenable, semantically distinct, and provenance-safe on top of eligible Voice Evidence.
 
-At that point reassess the next Phase 2 slice. Do not begin Core Voice inference or provider execution implicitly.
+At that point reassess the remaining `task-032` work, including provider-assisted trait proposals and eventual edit-delta learning. Do not begin provider execution, Content Studio, anti-slop, or confidentiality work implicitly.

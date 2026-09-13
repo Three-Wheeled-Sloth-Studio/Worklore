@@ -1,6 +1,6 @@
 # Vault Format and Canonical Domain Contract
 
-Status: accepted Phase 1 contract
+Status: accepted canonical domain contract
 Updated: 2026-09-13
 
 ## Purpose
@@ -182,6 +182,16 @@ Approval of a later Revision never changes the eligibility of an earlier raw mod
 
 Inspiration and Target Context are never automatically eligible for voice learning, even when their source text happens to resemble the user.
 
+### Implemented Voice Evidence provenance boundary
+
+`task-031` implements the first canonical Voice Evidence boundary in schema version 6. A writing-sample Source may create one idempotent governed `voice_evidence_` record for the full attributable source text, but the record begins `pending` with authorship `unknown` and approval `unreviewed`.
+
+The implemented authorship states are `unknown`, `user_authored`, `user_edited_model`, `model_generated`, and `external_author`. Once explicitly asserted, authorship provenance is immutable through the normal review path. Only `user_authored` and `user_edited_model` can become `eligible`, and only after explicit approval. Attempts to approve `model_generated` or `external_author` material result in durable rejection with an explicit prohibition reason.
+
+Eligibility lifecycle is `pending`, `eligible`, `rejected`, or `retired`; approval state is `unreviewed`, `approved`, `rejected`, or `revoked`. Retiring preserves the Source and Voice Evidence lineage and cannot be reversed through the normal review path. Candidate creation and eligibility changes append audit events and increment the mutable record revision. Target Context Sources are blocked from Voice Evidence, and Inspiration remains semantically separate.
+
+Core Voice inference is intentionally not part of this implementation. The next layer must consume only eligible Voice Evidence or explicit user guidance and preserve provenance back to these governed records.
+
 ## Draft, edit, approval, and publication lineage
 
 A Post is a workflow container. A Revision is an immutable text snapshot.
@@ -292,7 +302,7 @@ For backup or vault copy, WorkLore should checkpoint SQLite WAL state before cop
 
 ## Prototype compatibility after canonical migration
 
-The canonical SQLite persistence boundary and non-destructive migration seam are now implemented. Legacy JSON/Markdown records remain valid migration and compatibility inputs where existing prototype workflows still use them, but new Phase 1 domain concepts belong behind the canonical SQLite service boundary.
+The canonical SQLite persistence boundary and non-destructive migration seam are now implemented. Legacy JSON/Markdown records remain valid migration and compatibility inputs where existing prototype workflows still use them, but new canonical domain concepts belong behind the canonical SQLite service boundary.
 
 Do not extend the old per-record JSON/Markdown layout with new canonical concepts. Preserve legacy files until migration is validated and a backup or export exists, and keep compatibility paths explicit rather than treating the prototype layout as a second live canonical database.
 
