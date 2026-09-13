@@ -1,4 +1,4 @@
-# retry after rusqlite lifetime correction v2
+# retry after schema v7 compatibility assertions
 name: One-shot Core Voice foundation implementation
 
 on:
@@ -58,6 +58,10 @@ jobs:
         shell: pwsh
         run: python .github/scripts/fix_core_voice_foundation.py
 
+      - name: Align schema v7 compatibility assertions
+        shell: pwsh
+        run: python .github/scripts/fix_core_voice_schema_expectations.py
+
       - name: Format Rust changes
         shell: pwsh
         run: cargo fmt --manifest-path src-tauri/Cargo.toml --all
@@ -98,7 +102,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- src-tauri/src/services/canonical_store.rs src-tauri/src/services/voice_profile_service.rs src-tauri/src/services/mod.rs src-tauri/src/commands/voice.rs src-tauri/src/lib.rs src/domain/types.ts src/lib/workloreApi.ts src/components/VoiceWorkspace.tsx src/voice.css
+          git add -- src-tauri/src/services/canonical_store.rs src-tauri/src/services/voice_profile_service.rs src-tauri/src/services/mod.rs src-tauri/src/services/target_context_service.rs src-tauri/src/services/topic_service.rs src-tauri/src/commands/voice.rs src-tauri/src/lib.rs src/domain/types.ts src/lib/workloreApi.ts src/components/VoiceWorkspace.tsx src/voice.css
           if (git diff --cached --quiet) { throw "Core Voice foundation slice produced no staged changes." }
           git commit -m "feat: add Core Voice foundation"
           git push origin HEAD:dev
