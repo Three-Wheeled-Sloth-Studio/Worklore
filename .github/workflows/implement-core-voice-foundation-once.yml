@@ -1,5 +1,4 @@
-# retry after schema v7 compatibility assertions
-name: One-shot Core Voice foundation implementation
+name: One-shot Core Voice foundation closeout
 
 on:
   push:
@@ -11,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  implement-core-voice-foundation:
+  close-core-voice-foundation:
     runs-on: windows-2025
     steps:
       - name: Check out repository
@@ -29,11 +28,11 @@ jobs:
         with:
           components: rustfmt, clippy
 
-      - name: Keep build output outside checkout
+      - name: Keep validation output outside checkout
         shell: pwsh
         run: |
-          $frontendDist = Join-Path $env:RUNNER_TEMP "worklore-core-voice-frontend"
-          $cargoTarget = Join-Path $env:RUNNER_TEMP "worklore-core-voice-cargo"
+          $frontendDist = Join-Path $env:RUNNER_TEMP "worklore-core-voice-closeout-frontend"
+          $cargoTarget = Join-Path $env:RUNNER_TEMP "worklore-core-voice-closeout-cargo"
           "WORKLORE_FRONTEND_DIST=$frontendDist" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "CARGO_TARGET_DIR=$cargoTarget" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           New-Item -ItemType Directory -Force -Path $frontendDist | Out-Null
@@ -46,25 +45,18 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -m pip install pyyaml
 
-      - name: Bounded re-entry packet
+      - name: Apply closeout documentation
         shell: pwsh
-        run: python refs/tools/generate_agent_context.py --focus "WorkLore Phase 2 Core Voice Tone Modes Voice Direction Writing Rules eligible Voice Evidence provenance"
+        run: python .github/scripts/close_core_voice_foundation.py
 
-      - name: Apply bounded Core Voice foundation
+      - name: Remove temporary implementation scaffolding
         shell: pwsh
-        run: python .github/scripts/apply_core_voice_foundation.py
-
-      - name: Correct generated foundation details
-        shell: pwsh
-        run: python .github/scripts/fix_core_voice_foundation.py
-
-      - name: Align schema v7 compatibility assertions
-        shell: pwsh
-        run: python .github/scripts/fix_core_voice_schema_expectations.py
-
-      - name: Format Rust changes
-        shell: pwsh
-        run: cargo fmt --manifest-path src-tauri/Cargo.toml --all
+        run: |
+          git rm -- .github/scripts/apply_core_voice_foundation.py
+          git rm -- .github/scripts/fix_core_voice_foundation.py
+          git rm -- .github/scripts/fix_core_voice_schema_expectations.py
+          git rm -- .github/scripts/close_core_voice_foundation.py
+          git rm -- .github/workflows/implement-core-voice-foundation-once.yml
 
       - name: Validate references and path safety
         shell: pwsh
@@ -97,12 +89,14 @@ jobs:
         shell: pwsh
         run: cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
 
-      - name: Commit validated Core Voice foundation
+      - name: Commit validated closeout
         shell: pwsh
         run: |
+          if (Test-Path src-tauri/Cargo.lock) { Remove-Item src-tauri/Cargo.lock -Force }
+          if (Test-Path src-tauri/gen) { Remove-Item src-tauri/gen -Recurse -Force }
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- src-tauri/src/services/canonical_store.rs src-tauri/src/services/voice_profile_service.rs src-tauri/src/services/mod.rs src-tauri/src/services/target_context_service.rs src-tauri/src/services/topic_service.rs src-tauri/src/commands/voice.rs src-tauri/src/lib.rs src/domain/types.ts src/lib/workloreApi.ts src/components/VoiceWorkspace.tsx src/voice.css
-          if (git diff --cached --quiet) { throw "Core Voice foundation slice produced no staged changes." }
-          git commit -m "feat: add Core Voice foundation"
+          git add -- refs/architecture/vaultFormat.md refs/planning/roadmap.yaml refs/planning/todos.yaml refs/handoffs/currentHandoff.md refs/handoffs/next-dev-prompt.md
+          if (git diff --cached --quiet) { throw "Core Voice closeout produced no staged changes." }
+          git commit -m "docs: close out Core Voice foundation"
           git push origin HEAD:dev
