@@ -78,7 +78,22 @@ Windows implementation validation:
 - `cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison`: green
 - `cargo fmt --manifest-path src-tauri/Cargo.toml --all --check`: green
 
-A separate read-only closeout validation covers the post-implementation project-memory state. The temporary closeout workflow and implementation script are removed after that run and are not product infrastructure.
+Read-only normalized-state closeout validation:
+
+- validation checkpoint: `2df9527d38ccb331dde1cf26310b5db1db80ad55`
+- Actions run: `34756154075`
+- Job: `103720750341`
+- case-collision guard: green, 168 tracked paths
+- refs validation in initialized mode: green, Agent Academy and OKF aligned
+- bounded agent-context check: green, 5,597 characters / 8,000 budget
+- `git diff --check`: green
+- frontend tests: 3 passed, 0 failed
+- production frontend TypeScript/Vite build: green
+- Rust tests: 56 passed, 0 failed
+- Clippy with warnings denied: green
+- rustfmt check: green
+
+The temporary implementation script and closeout workflow used to obtain this evidence were removed after the successful run. They are not product or standing CI infrastructure.
 
 ## Current State
 
