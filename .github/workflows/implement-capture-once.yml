@@ -48,7 +48,17 @@ jobs:
 
       - name: Apply bounded Capture slice
         shell: pwsh
-        run: python .github/scripts/apply_capture_slice.py
+        run: |
+          @'
+          from pathlib import Path
+          script = Path(".github/scripts/apply_capture_slice.py")
+          text = script.read_text(encoding="utf-8")
+          cut = text.rfind("\nreplace_once(")
+          if cut < 0:
+              raise SystemExit("Could not find final optional copy replacement")
+          script.write_text(text[:cut] + "\n", encoding="utf-8")
+          '@ | python -
+          python .github/scripts/apply_capture_slice.py
 
       - name: Format Rust
         shell: pwsh
