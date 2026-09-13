@@ -20,892 +20,357 @@ def replace_once(text: str, old: str, new: str, label: str) -> str:
     return text.replace(old, new, 1)
 
 
+roadmap = read("refs/planning/roadmap.yaml")
+roadmap = replace_once(
+    roadmap,
+    "  - id: phase-1\n    name: Professional Memory\n    horizon: now\n    status: in_progress\n",
+    "  - id: phase-1\n    name: Professional Memory\n    horizon: now\n    status: complete\n",
+    "Phase 1 status",
+)
+roadmap = replace_once(
+    roadmap,
+    "      - Thin Target Context editor/API path that makes the semantic boundary visible and keeps Capture, Story, Topic, and Inspiration flows green.\n",
+    "      - Thin Target Context editor/API path that makes the semantic boundary visible and keeps Capture, Story, Topic, and Inspiration flows green.\n      - Task-oriented application shell with first-class Home, Capture, Stories, and Topics; supporting Library/Privacy/Import-Export/Settings access; reopenable Inspiration and Target Context; and honest future Voice, Posts, and Insights destinations.\n",
+    "Phase 1 shell completion",
+)
+roadmap = replace_once(
+    roadmap,
+    "      - Phase 1 domain work is substantially complete. The remaining bounded Phase 1 slice is the task-oriented application-shell/navigation integration described by task-041 before Phase 2 begins.\n",
+    "      - Phase 1 is complete. The task-oriented shell now exposes the professional-memory model directly while retaining resume bootstrap and infrastructure as supporting paths. Phase 2 begins explicitly with Voice Evidence provenance rather than provider execution or trait inference.\n",
+    "Phase 1 architecture note",
+)
+write("refs/planning/roadmap.yaml", roadmap)
+
 write(
-    "src/navigation.ts",
-    '''export type PrimaryView = "home" | "capture" | "stories" | "topics" | "voice" | "posts" | "insights";
-export type LibraryView = "sources" | "privacy" | "import_export";
-export type AppView = PrimaryView | LibraryView | "settings";
-export type WorkspaceAvailability = "available" | "planned";
+    "refs/handoffs/currentHandoff.md",
+    '''---
+type: Handoff
+title: Current WorkLore Handoff
+description: Validated Phase 1 completion checkpoint and bounded handoff into Phase 2 Voice Evidence provenance.
+status: draft
+tags: [handoff, worklore]
+---
+# Current Handoff
 
-export interface NavigationItem {
-  id: AppView;
-  label: string;
-  availability: WorkspaceAvailability;
-  description: string;
-}
+Updated: 2026-09-13
 
-export const PRIMARY_NAV_ITEMS: NavigationItem[] = [
-  { id: "home", label: "Home", availability: "available", description: "Orient and continue work" },
-  { id: "capture", label: "Capture", availability: "available", description: "Save first, classify second" },
-  { id: "stories", label: "Stories", availability: "available", description: "Develop professional memory" },
-  { id: "topics", label: "Topics", availability: "available", description: "Connect ideas before drafting" },
-  { id: "voice", label: "Voice", availability: "planned", description: "Phase 2 voice intelligence" },
-  { id: "posts", label: "Posts", availability: "planned", description: "Phase 3 editorial workflow" },
-  { id: "insights", label: "Insights", availability: "planned", description: "Phase 4 learning loop" },
-];
+## Accepted Baseline
 
-export const LIBRARY_NAV_ITEMS: NavigationItem[] = [
-  { id: "sources", label: "Sources", availability: "available", description: "Provenance, Inspiration, and Target Context" },
-  { id: "privacy", label: "Privacy", availability: "available", description: "Private entities and public-use controls" },
-  { id: "import_export", label: "Import / Export", availability: "available", description: "Supporting transfer workflows" },
-];
+WorkLore is a local-first professional narrative and content intelligence application. The authoritative loop remains:
 
-export const SETTINGS_NAV_ITEM: NavigationItem = {
-  id: "settings",
-  label: "Settings",
-  availability: "available",
-  description: "Providers, storage, and diagnostics",
-};
+`Capture -> Understand -> Develop -> Connect -> Draft -> Challenge -> Publish manually -> Measure -> Learn`
 
-export function isPlannedPrimaryView(view: AppView): view is "voice" | "posts" | "insights" {
-  return view === "voice" || view === "posts" || view === "insights";
-}
+Locked boundaries remain:
+
+- standalone Windows-first deployment;
+- local canonical storage;
+- no WorkLore-hosted backend/account/proprietary sync dependency;
+- no automatic social publishing or scheduling;
+- explicit human review before publication;
+- raw AI drafts never train canonical voice;
+- hard confidentiality transformation before public use;
+- Evidence, Inspiration, Target Context, and Voice Evidence remain semantically distinct;
+- resume import remains an optional `Seed from resume` path rather than the product center.
+
+## Phase 1 Professional Memory: Complete
+
+Phase 1 exit criteria are satisfied.
+
+Completed bounded slices:
+
+- `task-040`: canonical SQLite persistence and non-destructive prototype migration foundation;
+- `task-026`: save-first Capture with neutral Source persistence before classification;
+- `task-027`: direct canonical Story Seed development and Story creation without mandatory resume/Role;
+- `task-028`: durable Topic Candidates and Themes with typed standing/context relationships;
+- `task-029`: Source-backed Inspiration with explicit external provenance and Topic/Theme connections;
+- `task-030`: Source-backed Target Context with structured opportunity signals and contextual Topic/Theme/Story links;
+- `task-041`: task-oriented application shell/navigation integration.
+
+Accepted Phase 1 product checkpoint:
+
+`e3393d7f95d5e060a23719b72b0ac9f051df5e92`
+
+### What task-041 landed
+
+- Replaced the prototype resume/storage-centric top-level sequence with stable task-oriented navigation.
+- Primary destinations are, in order: Home, Capture, Stories, Topics, Voice, Posts, Insights.
+- Home offers provider-free quick Capture, useful continuation prompts, and direct paths into Stories, Topics, and contextual material without fake scores or recommendations.
+- Capture, Stories, and Topics route to real existing Phase 1 workflows rather than placeholders.
+- Sources, Privacy, Import/Export, and Settings are supporting destinations rather than the product center.
+- `Seed from resume` remains available from imported resume Sources but is no longer a primary workflow requirement.
+- Durable Inspiration and Target Context records are listable and reopenable from the supporting Library, not only immediately after Capture classification.
+- Voice, Posts, and Insights are visible as honest future-phase destinations and do not simulate unimplemented behavior.
+- The shell remains fully useful with no provider configured and introduced no schema, Rust service, relationship-graph, or hosted-service dependency.
+
+## Validation Evidence
+
+Windows implementation validation:
+
+- Actions run: `34775461730`
+- Job: `103772650411`
+- validated product checkpoint: `e3393d7f95d5e060a23719b72b0ac9f051df5e92`
+- case-collision guard: green, 185 tracked paths at implementation checkout
+- refs validation: green, Agent Academy and OKF aligned
+- bounded agent-context check: green, 6,144 / 8,000 characters
+- `git diff --check`: green
+- frontend tests: 6 passed, 0 failed across 2 test files
+- production frontend TypeScript/Vite build: green, 48 modules transformed
+- Rust tests: 72 passed, 0 failed
+- Clippy with warnings denied: green
+- rustfmt: green
+
+## Current Provider Boundary
+
+Provider execution has not been pulled into Phase 1. The accepted Phase 2 architecture remains:
+
+- Ollama is a first-class local provider;
+- remote providers are explicit BYOK adapters behind a provider-neutral registry, beginning with Gemini;
+- credentials stay in the operating-system credential store and never enter vault/SQLite/provider-run/log/export/frontend state;
+- remote calls require privacy preflight and visible disclosure;
+- no silent local-to-cloud fallback;
+- no WorkLore-hosted credential proxy, inference gateway, account, quota, or billing layer.
+
+Do not implement provider execution before Voice Evidence provenance is stable unless new evidence materially changes sequencing.
+
+## Next Slice
+
+Implement `task-031`: bounded Phase 2 Voice Evidence provenance and eligibility.
+
+The purpose of the first Voice slice is to establish what material is allowed to inform canonical voice before attempting Core Voice inference, Tone Modes, edit-delta learning, or provider-assisted analysis.
+
+Required invariants:
+
+- Only demonstrably user-authored or explicitly user-approved material may become eligible Voice Evidence.
+- Raw AI/model drafts, rejected drafts, and unedited provider output are permanently ineligible through normal application paths.
+- Inspiration remains external material and cannot become Voice Evidence merely because the user saved or linked it.
+- Target Context remains external professional context and cannot become Voice Evidence.
+- A writing-sample Source is a candidate, not eligible evidence, until authorship/approval is established.
+- User reaction or notes attached to another semantic object remain attributed user text but do not silently become Voice Evidence.
+- Voice Evidence must preserve stable identity, Source/provenance lineage, eligibility state/reason, user approval state, and auditability.
+- The slice should remain provider-free if provenance and eligibility can be proven deterministically.
+
+Do not begin Core Voice trait inference (`task-032`), provider registry execution, Post drafting, analytics, discovery, auto-publishing, or scheduling inside `task-031`.
+
+## Relevant Files For Next Slice
+
+- `refs/product/prd.md`
+- `refs/product/domainModel.md`
+- `refs/architecture/vaultFormat.md`
+- `refs/architecture/providerArchitecture.md`
+- `refs/planning/roadmap.yaml`
+- `refs/planning/todos.yaml`
+- `src/domain/types.ts`
+- `src/lib/workloreApi.ts`
+- canonical store and Source services
+- Capture classification behavior for writing samples
+- the current Voice future workspace entry point
+
+## Do Not Reopen
+
+Unless new runtime, test, legal, or user evidence materially changes the plan:
+
+- Do not recenter WorkLore on resume parsing.
+- Do not merge Evidence, Inspiration, Target Context, and Voice Evidence into one source class.
+- Do not let raw model output train canonical voice.
+- Do not infer user standing from Target Context.
+- Do not implement Core Voice traits before Voice Evidence eligibility/provenance is trustworthy.
+- Do not require a provider for Phase 1 workflows or the initial Voice Evidence provenance slice.
+- Do not add WorkLore-hosted SaaS, account, sync, inference proxy, automatic publishing, scheduling, or autonomous engagement.
+- Do not hand-edit generated OKF indexes.
+- Do not promote `qa` or `main` without explicit approval.
 ''',
 )
 
 write(
-    "src/navigation.test.ts",
-    '''import { describe, expect, it } from "vitest";
-import { LIBRARY_NAV_ITEMS, PRIMARY_NAV_ITEMS, SETTINGS_NAV_ITEM } from "./navigation";
+    "refs/handoffs/next-dev-prompt.md",
+    '''---
+type: Handoff Prompt
+title: Next WorkLore Development Slice
+description: Bounded prompt for Phase 2 task-031 Voice Evidence provenance and eligibility on the completed Phase 1 professional-memory foundation.
+status: draft
+tags: [handoff, next-slice]
+---
+# Next Dev Prompt
 
-describe("task-oriented navigation contract", () => {
-  it("keeps the accepted primary workspaces in order", () => {
-    expect(PRIMARY_NAV_ITEMS.map((item) => item.id)).toEqual([
-      "home",
-      "capture",
-      "stories",
-      "topics",
-      "voice",
-      "posts",
-      "insights",
-    ]);
-  });
+Continue implementation in:
 
-  it("marks current Phase 1 workspaces available and future phases planned", () => {
-    expect(
-      PRIMARY_NAV_ITEMS.filter((item) => item.availability === "available").map((item) => item.id),
-    ).toEqual(["home", "capture", "stories", "topics"]);
-    expect(
-      PRIMARY_NAV_ITEMS.filter((item) => item.availability === "planned").map((item) => item.id),
-    ).toEqual(["voice", "posts", "insights"]);
-  });
+`https://github.com/Three-Wheeled-Sloth-Studio/Worklore`
 
-  it("keeps infrastructure out of primary navigation", () => {
-    expect(LIBRARY_NAV_ITEMS.map((item) => item.id)).toEqual([
-      "sources",
-      "privacy",
-      "import_export",
-    ]);
-    expect(SETTINGS_NAV_ITEM.id).toBe("settings");
-    expect(PRIMARY_NAV_ITEMS.some((item) => item.label.toLowerCase().includes("resume"))).toBe(false);
-  });
-});
+Work directly on `dev`. Do not promote `qa` or `main` unless explicitly requested.
+
+## Accepted Starting Point
+
+Phase 1 Professional Memory is complete.
+
+Validated Phase 1 product checkpoint:
+
+`e3393d7f95d5e060a23719b72b0ac9f051df5e92`
+
+Implementation validation:
+
+- Actions `34775461730`
+- Job `103772650411`
+- frontend: 6 passed / 0 failed across 2 files
+- Rust: 72 passed / 0 failed
+- production frontend build: green, 48 modules transformed
+- case-collision, refs/OKF, bounded agent context, `git diff --check`, warnings-denied Clippy, and rustfmt: green
+
+The task-oriented shell now exposes Home, Capture, Stories, Topics, Voice, Posts, and Insights in the accepted order. Home/Capture/Stories/Topics are real Phase 1 workspaces. Sources/Privacy/Import-Export/Settings are supporting access. Inspiration and Target Context are reopenable from the Library. Voice/Posts/Insights are intentionally honest future surfaces.
+
+Read `refs/handoffs/currentHandoff.md` before making changes.
+
+## Start With Bounded Re-entry
+
+```powershell
+python refs/tools/generate_agent_context.py --focus "WorkLore Phase 2 Voice Evidence provenance authorship eligibility raw AI exclusion writing samples"
+```
+
+Treat generated context as derived orientation. Read only the authoritative refs/source needed for this slice.
+
+Read at minimum:
+
+- `refs/product/prd.md`
+- `refs/product/domainModel.md`
+- `refs/architecture/vaultFormat.md`
+- `refs/architecture/providerArchitecture.md`
+- `refs/planning/roadmap.yaml`
+- `refs/planning/todos.yaml`
+- `refs/handoffs/currentHandoff.md`
+- canonical store / migration code relevant to Voice Evidence and Sources
+- Capture writing-sample classification behavior
+- `src/domain/types.ts`
+- `src/lib/workloreApi.ts`
+- current Voice future workspace entry point
+
+## Immediate Objective
+
+Implement `task-031`: establish durable, auditable Voice Evidence provenance and eligibility before Core Voice inference or provider execution.
+
+This slice answers one question reliably:
+
+`What text is allowed to teach WorkLore how this user writes?`
+
+### 1. Voice Evidence is a governed semantic object
+
+Add or complete first-class Voice Evidence persistence/API behavior with stable identity and reopen semantics.
+
+At minimum retain:
+
+- source/provenance lineage;
+- evidence text or a stable reference to attributable source text without unnecessary duplication;
+- authorship assertion/state;
+- eligibility state;
+- eligibility/ineligibility reason;
+- explicit user approval state and timestamp where approval is required;
+- created/updated/revision metadata;
+- audit events for eligibility/approval changes.
+
+Prefer an extensible eligibility model over a boolean if the accepted domain contracts already distinguish pending/eligible/ineligible/revoked states.
+
+### 2. Enforce provenance before inference
+
+Eligible Voice Evidence must be demonstrably user-authored or explicitly approved as eligible user writing.
+
+Examples:
+
+- imported writing sample: candidate/pending until authorship and approval are established;
+- explicitly user-authored pasted writing: may become eligible only through an explicit eligibility/approval action consistent with the domain contract;
+- future final user-approved Posts: eventual eligible source class, but Posts are not implemented in this slice.
+
+Do not infer authorship merely from file location, Capture ownership, or the fact that text is stored in the user's vault.
+
+### 3. Make contamination structurally difficult
+
+Normal application/API paths must refuse or permanently mark ineligible:
+
+- raw AI/model drafts;
+- rejected drafts;
+- unedited provider output;
+- external Inspiration excerpts/prose;
+- Target Context text;
+- job descriptions or public-profile material.
+
+A user-authored reaction or note attached to Inspiration/Target Context remains user-authored text, but it must not silently become Voice Evidence. Require an explicit governed action if such text is ever eligible under the contract.
+
+### 4. Keep semantic classes separate
+
+Voice Evidence is not factual Evidence/Proof about accomplishments.
+
+Factual Evidence supports `Did this happen?` / standing.
+Voice Evidence supports `How does this user write?`.
+Inspiration supports external creative/contextual influence.
+Target Context supports audience/opportunity context.
+
+Do not collapse these into one generic source-role flag.
+
+### 5. Keep this slice provider-free
+
+Do not implement Ollama/Gemini/BYOK execution merely to analyze voice yet.
+
+The first Phase 2 invariant is trustworthy provenance. Core Voice trait inference, Tone Modes, Voice Direction, edit-delta learning, and provider-assisted analysis belong to later bounded work after eligibility is proven.
+
+### 6. Thin Voice UI
+
+Replace the current honest Voice future surface only as far as necessary to let the user:
+
+- see Voice Evidence candidates/evidence;
+- understand provenance/authorship;
+- approve or reject eligibility where appropriate;
+- reopen evidence after restart;
+- see why an item is ineligible.
+
+Do not fabricate Core Voice traits or a voice score before `task-032`.
+
+### 7. Proof cases
+
+Cover at least:
+
+- writing-sample Source starts pending rather than silently eligible;
+- explicit authorship/approval can make valid user writing eligible;
+- eligibility and approval survive reopen with stable identity;
+- raw AI/model-origin material cannot become eligible through normal service/API calls;
+- Inspiration source prose cannot become eligible merely by linking/copying it;
+- Target Context cannot become Voice Evidence;
+- eligibility changes are audited and revisioned;
+- removing/revoking eligibility does not delete the underlying Source;
+- no provider/network availability is required;
+- all Phase 1 frontend and 72 Rust regression tests remain green.
+
+## Constraints
+
+- Standalone Windows-first, local canonical storage.
+- No WorkLore account/backend/proprietary sync.
+- No automatic publication or scheduling.
+- No Core Voice inference or Tone Modes in this slice.
+- No provider execution/BYOK implementation in this slice.
+- No Posts/editorial workflow, analytics, or discovery.
+- Preserve Evidence/Inspiration/Target Context/Voice Evidence distinctions.
+- Preserve Private Entity Registry and privacy infrastructure.
+- Public-repository fixtures must remain synthetic.
+- Keep build/dev/QA output outside the repository.
+- Run case-collision and refs/OKF validation.
+- Do not hand-edit generated OKF indexes.
+
+## Validation
+
+Run at minimum:
+
+```powershell
+python scripts/check-case-collisions.py
+git diff --check
+python refs/tools/validate_refs.py --mode initialized
+python refs/tools/generate_agent_context.py --check
+npm run test
+npm run build:frontend
+cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
+cargo test --manifest-path src-tauri/Cargo.toml
+cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
+```
+
+## Stop Point
+
+Stop when Voice Evidence provenance/eligibility is durable, reopenable, explicit to the user, and structurally prevents raw model/external contextual material from contaminating canonical voice.
+
+At that point reassess the next Phase 2 slice. Do not begin Core Voice inference or provider execution implicitly.
 ''',
 )
-
-write(
-    "src/components/HomeWorkspace.tsx",
-    '''import { useState } from "react";
-import type { InterviewSummary } from "../domain/types";
-import { errorMessage } from "../domain/types";
-import { createCaptureSource } from "../lib/workloreApi";
-import type { AppView } from "../navigation";
-
-export function HomeWorkspace({
-  vaultPath,
-  storyCount,
-  candidateCount,
-  activeInterview,
-  privacyReviewCount,
-  onNavigate,
-  onCaptureSaved,
-}: {
-  vaultPath: string;
-  storyCount: number;
-  candidateCount: number;
-  activeInterview: InterviewSummary | null;
-  privacyReviewCount: number;
-  onNavigate: (view: AppView) => void;
-  onCaptureSaved: () => Promise<void> | void;
-}) {
-  const [text, setText] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  async function saveQuickCapture() {
-    if (!text.trim()) {
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    setNotice(null);
-    try {
-      await createCaptureSource(vaultPath, text, "other");
-      setText("");
-      setNotice("Saved locally as a neutral Source. Classify it later when the destination is clear.");
-      await onCaptureSaved();
-    } catch (caught) {
-      setError(errorMessage(caught));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <div className="shell-stack">
-      <section className="workspace-panel home-hero" aria-labelledby="home-heading">
-        <p className="eyebrow">Professional memory</p>
-        <h2 id="home-heading">What do you want to move forward?</h2>
-        <p>
-          Capture something while it is fresh, develop a Story, or connect an idea to the context
-          that makes it useful. WorkLore stays useful without an AI provider configured.
-        </p>
-        <div className="quick-action-grid">
-          <button className="primary-button" onClick={() => onNavigate("capture")}>Capture something</button>
-          <button className="secondary-button" onClick={() => onNavigate("stories")}>Develop a story</button>
-          <button className="secondary-button" onClick={() => onNavigate("topics")}>Explore topics</button>
-        </div>
-      </section>
-
-      <section className="workspace-panel" aria-labelledby="quick-capture-heading">
-        <div className="panel-heading-row">
-          <div>
-            <p className="eyebrow">Quick capture</p>
-            <h2 id="quick-capture-heading">Save first. Sort it out later.</h2>
-          </div>
-        </div>
-        <textarea
-          className="quick-capture-input"
-          value={text}
-          onChange={(event) => setText(event.target.value)}
-          placeholder="A result you remembered, a question, an idea, a URL, an excerpt..."
-          rows={4}
-        />
-        <div className="primary-actions">
-          <button className="primary-button compact" disabled={busy || !text.trim()} onClick={() => void saveQuickCapture()}>
-            {busy ? "Saving..." : "Save locally"}
-          </button>
-          <button className="quiet-button compact" onClick={() => onNavigate("capture")}>Open full Capture</button>
-        </div>
-        {notice ? <p className="inline-notice">{notice}</p> : null}
-        {error ? <p className="inline-error" role="alert">{error}</p> : null}
-      </section>
-
-      <section className="workspace-panel" aria-labelledby="continue-heading">
-        <p className="eyebrow">Continue</p>
-        <h2 id="continue-heading">Work already in motion</h2>
-        <div className="continue-grid">
-          {activeInterview ? (
-            <button className="continue-card" onClick={() => onNavigate("stories")}>
-              <strong>Continue story interview</strong>
-              <span>{activeInterview.currentQuestion ?? "The interview is ready for its next step."}</span>
-            </button>
-          ) : null}
-          {candidateCount > 0 ? (
-            <button className="continue-card" onClick={() => onNavigate("stories")}>
-              <strong>{candidateCount} story seed{candidateCount === 1 ? "" : "s"} from resume bootstrap</strong>
-              <span>Optional imported career material is waiting for review.</span>
-            </button>
-          ) : null}
-          {privacyReviewCount > 0 ? (
-            <button className="continue-card" onClick={() => onNavigate("privacy")}>
-              <strong>{privacyReviewCount} privacy review{privacyReviewCount === 1 ? "" : "s"}</strong>
-              <span>Resolve private-entity ambiguity before public or provider use.</span>
-            </button>
-          ) : null}
-          {!activeInterview && candidateCount === 0 && privacyReviewCount === 0 ? (
-            <div className="empty-state compact-empty">
-              <h3>No urgent follow-up</h3>
-              <p>Capture something new or explore the professional memory you already have.</p>
-            </div>
-          ) : null}
-        </div>
-      </section>
-
-      <section className="workspace-panel" aria-labelledby="explore-heading">
-        <p className="eyebrow">Explore</p>
-        <h2 id="explore-heading">Build connections before prose</h2>
-        <div className="quick-action-grid">
-          <button className="continue-card" onClick={() => onNavigate("topics")}>
-            <strong>Topics</strong>
-            <span>Connect Stories, Proof Points, Inspiration, and Target Context.</span>
-          </button>
-          <button className="continue-card" onClick={() => onNavigate("sources")}>
-            <strong>Sources and context</strong>
-            <span>Reopen provenance, Inspiration, and opportunity context.</span>
-          </button>
-          <button className="continue-card" onClick={() => onNavigate("stories")}>
-            <strong>{storyCount} canonical Stor{storyCount === 1 ? "y" : "ies"}</strong>
-            <span>Review or continue developing reusable professional memory.</span>
-          </button>
-        </div>
-      </section>
-    </div>
-  );
-}
-''',
-)
-
-write(
-    "src/components/TopicsWorkspace.tsx",
-    '''import { useEffect, useState } from "react";
-import type { TopicRecord } from "../domain/types";
-import { errorMessage } from "../domain/types";
-import { createTopic, listTopics } from "../lib/workloreApi";
-import { TopicPanel } from "./TopicPanel";
-
-export function TopicsWorkspace({ vaultPath }: { vaultPath: string }) {
-  const [topics, setTopics] = useState<TopicRecord[]>([]);
-  const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
-  const [newTitle, setNewTitle] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setSelectedTopicId(null);
-    void refresh();
-  }, [vaultPath]);
-
-  async function refresh() {
-    try {
-      setTopics(await listTopics(vaultPath));
-    } catch (caught) {
-      setError(errorMessage(caught));
-    }
-  }
-
-  async function createNewTopic() {
-    if (!newTitle.trim()) {
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    try {
-      const topic = await createTopic(vaultPath, {
-        title: newTitle.trim(),
-        summary: "",
-        timingClass: "evergreen",
-      });
-      setNewTitle("");
-      setSelectedTopicId(topic.topicId);
-      await refresh();
-    } catch (caught) {
-      setError(errorMessage(caught));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  if (selectedTopicId) {
-    return (
-      <TopicPanel
-        vaultPath={vaultPath}
-        topicId={selectedTopicId}
-        onClose={() => {
-          setSelectedTopicId(null);
-          void refresh();
-        }}
-      />
-    );
-  }
-
-  return (
-    <section className="workspace-panel" aria-labelledby="topics-workspace-heading">
-      <div className="panel-heading-row">
-        <div>
-          <p className="eyebrow">Connect before drafting</p>
-          <h2 id="topics-workspace-heading">Topics</h2>
-          <p>Durable ideas can stay useful even when they never become a Post.</p>
-        </div>
-      </div>
-      <div className="inline-create-row">
-        <input
-          value={newTitle}
-          onChange={(event) => setNewTitle(event.target.value)}
-          placeholder="New topic"
-          aria-label="New topic title"
-        />
-        <button className="primary-button compact" disabled={busy || !newTitle.trim()} onClick={() => void createNewTopic()}>
-          Add topic
-        </button>
-      </div>
-      {error ? <p className="inline-error" role="alert">{error}</p> : null}
-      {topics.length === 0 ? (
-        <div className="empty-state">
-          <h3>No topics yet</h3>
-          <p>Capture an idea as a Topic Candidate or add one here, then connect standing and context.</p>
-        </div>
-      ) : (
-        <div className="record-list">
-          {topics.map((topic) => (
-            <button className="record-row" key={topic.topicId} onClick={() => setSelectedTopicId(topic.topicId)}>
-              <span>
-                <strong>{topic.title}</strong>
-                <small>{topic.summary || "No summary yet."}</small>
-              </span>
-              <span className="record-meta">{topic.lifecycle} · {topic.timingClass} · {topic.relationships.length} links</span>
-            </button>
-          ))}
-        </div>
-      )}
-    </section>
-  );
-}
-''',
-)
-
-write(
-    "src/components/LibraryWorkspace.tsx",
-    '''import { useEffect, useState } from "react";
-import type { InspirationRecord, SourceSummary, SourceType, TargetContextRecord } from "../domain/types";
-import { errorMessage } from "../domain/types";
-import { listInspirations, listTargetContexts } from "../lib/workloreApi";
-import { InspirationPanel } from "./InspirationPanel";
-import { TargetContextPanel } from "./TargetContextPanel";
-
-export function LibraryWorkspace({
-  vaultPath,
-  sources,
-  sourceTypeOptions,
-  selectedSourceType,
-  onSourceTypeChange,
-  onImportSource,
-  onExtractCandidates,
-}: {
-  vaultPath: string;
-  sources: SourceSummary[];
-  sourceTypeOptions: Array<{ value: SourceType; label: string }>;
-  selectedSourceType: SourceType;
-  onSourceTypeChange: (sourceType: SourceType) => void;
-  onImportSource: () => void;
-  onExtractCandidates: (sourceId: string) => void;
-}) {
-  const [inspirations, setInspirations] = useState<InspirationRecord[]>([]);
-  const [targets, setTargets] = useState<TargetContextRecord[]>([]);
-  const [selectedInspirationId, setSelectedInspirationId] = useState<string | null>(null);
-  const [selectedTargetId, setSelectedTargetId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setSelectedInspirationId(null);
-    setSelectedTargetId(null);
-    void refreshContext();
-  }, [vaultPath]);
-
-  async function refreshContext() {
-    try {
-      const [inspirationRows, targetRows] = await Promise.all([
-        listInspirations(vaultPath),
-        listTargetContexts(vaultPath),
-      ]);
-      setInspirations(inspirationRows);
-      setTargets(targetRows);
-    } catch (caught) {
-      setError(errorMessage(caught));
-    }
-  }
-
-  if (selectedInspirationId) {
-    return (
-      <InspirationPanel
-        vaultPath={vaultPath}
-        inspirationId={selectedInspirationId}
-        onClose={() => {
-          setSelectedInspirationId(null);
-          void refreshContext();
-        }}
-      />
-    );
-  }
-
-  if (selectedTargetId) {
-    return (
-      <TargetContextPanel
-        vaultPath={vaultPath}
-        targetId={selectedTargetId}
-        onClose={() => {
-          setSelectedTargetId(null);
-          void refreshContext();
-        }}
-      />
-    );
-  }
-
-  return (
-    <div className="shell-stack">
-      <section className="workspace-panel source-panel" aria-labelledby="library-sources-heading">
-        <div className="panel-heading-row">
-          <div>
-            <p className="eyebrow">Provenance library</p>
-            <h2 id="library-sources-heading">Sources</h2>
-            <p>Original material stays neutral. Semantic roles are explicit working records.</p>
-          </div>
-          <div className="import-controls">
-            <select
-              aria-label="Source type"
-              value={selectedSourceType}
-              onChange={(event) => onSourceTypeChange(event.target.value as SourceType)}
-            >
-              {sourceTypeOptions.map((option) => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-            <button className="primary-button compact" onClick={onImportSource}>Import file</button>
-          </div>
-        </div>
-        {sources.length === 0 ? (
-          <div className="empty-state">
-            <h3>No imported files yet</h3>
-            <p>Capture pasted material directly, or import a supporting document when file provenance matters.</p>
-          </div>
-        ) : (
-          <div className="source-list">
-            {sources.map((source) => (
-              <article className="source-row" key={source.sourceId}>
-                <div>
-                  <h3>{source.displayName}</h3>
-                  <p>{sourceTypeOptions.find((item) => item.value === source.sourceType)?.label ?? "Source"} · Imported {formatDate(source.importedAt)}</p>
-                </div>
-                <div className="source-statuses">
-                  <span className="status-pill">Text: {source.extractionStatus}</span>
-                  <span className={`status-pill ${source.privacyScanStatus === "needs_review" ? "attention" : ""}`}>Privacy: {source.privacyScanStatus}</span>
-                  {source.sourceType === "resume" && source.extractionStatus === "complete" ? (
-                    <button className="quiet-button compact" onClick={() => onExtractCandidates(source.sourceId)}>Seed from resume</button>
-                  ) : null}
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
-      </section>
-
-      <section className="workspace-panel" aria-labelledby="inspiration-library-heading">
-        <p className="eyebrow">External creative context</p>
-        <h2 id="inspiration-library-heading">Inspiration</h2>
-        <p>External material can influence thinking without becoming Evidence or Voice Evidence.</p>
-        {inspirations.length === 0 ? (
-          <div className="empty-state compact-empty"><p>No Inspiration records yet. Capture a URL, excerpt, or source and classify it explicitly.</p></div>
-        ) : (
-          <div className="record-list">
-            {inspirations.map((item) => (
-              <button className="record-row" key={item.inspirationId} onClick={() => setSelectedInspirationId(item.inspirationId)}>
-                <span><strong>{item.title}</strong><small>{item.summary || item.whyInteresting || "No summary yet."}</small></span>
-                <span className="record-meta">{item.lifecycle} · {item.relationships.length} links</span>
-              </button>
-            ))}
-          </div>
-        )}
-      </section>
-
-      <section className="workspace-panel" aria-labelledby="target-library-heading">
-        <p className="eyebrow">External professional context</p>
-        <h2 id="target-library-heading">Target Context</h2>
-        <p>Requirements and audience signals describe the opportunity. They do not prove user standing.</p>
-        {targets.length === 0 ? (
-          <div className="empty-state compact-empty"><p>No Target Context records yet. Capture a job description or other target material and classify it explicitly.</p></div>
-        ) : (
-          <div className="record-list">
-            {targets.map((item) => (
-              <button className="record-row" key={item.targetId} onClick={() => setSelectedTargetId(item.targetId)}>
-                <span><strong>{item.title}</strong><small>{item.summary || item.organizationName || "No summary yet."}</small></span>
-                <span className="record-meta">{item.lifecycle} · {item.relationships.length} links</span>
-              </button>
-            ))}
-          </div>
-        )}
-      </section>
-      {error ? <p className="inline-error" role="alert">{error}</p> : null}
-    </div>
-  );
-}
-
-function formatDate(value: string): string {
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return value;
-  }
-  return new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(parsed);
-}
-''',
-)
-
-write(
-    "src/components/FutureWorkspace.tsx",
-    '''export function FutureWorkspace({ view }: { view: "voice" | "posts" | "insights" }) {
-  const copy = {
-    voice: {
-      eyebrow: "Phase 2",
-      title: "Voice",
-      body: "Core Voice, Tone Modes, Writing Rules, Voice Direction, and provenance-governed Voice Evidence are intentionally not implemented yet.",
-      boundary: "Raw AI drafts will never become canonical Voice Evidence.",
-    },
-    posts: {
-      eyebrow: "Phase 3",
-      title: "Posts",
-      body: "Angle development, drafting, challenge, editorial review, and manual-publication tracking are planned after Voice provenance is stable.",
-      boundary: "WorkLore will not auto-publish or schedule social content.",
-    },
-    insights: {
-      eyebrow: "Phase 4",
-      title: "Insights",
-      body: "Analytics import, experiments, repetition checks, and confidence-aware learning are planned after the editorial workflow exists.",
-      boundary: "No engagement-maximization score or fake KPI is being shown before evidence exists.",
-    },
-  }[view];
-
-  return (
-    <section className="workspace-panel future-workspace" aria-labelledby={`${view}-heading`}>
-      <p className="eyebrow">{copy.eyebrow}</p>
-      <h2 id={`${view}-heading`}>{copy.title}</h2>
-      <p>{copy.body}</p>
-      <div className="next-step-card">
-        <h3>Not a placeholder pretending to work</h3>
-        <p>{copy.boundary}</p>
-      </div>
-    </section>
-  );
-}
-''',
-)
-
-write(
-    "src/shell.css",
-    '''.product-shell {
-  min-height: calc(100vh - 44px);
-  display: grid;
-  grid-template-columns: minmax(190px, 232px) minmax(0, 1fr);
-  background: var(--page-bg, #f4f1ea);
-}
-
-.shell-sidebar {
-  position: sticky;
-  top: 0;
-  align-self: start;
-  min-height: 100vh;
-  padding: 24px 16px;
-  border-right: 1px solid rgba(36, 42, 48, 0.12);
-  background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(12px);
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-}
-
-.shell-brand h1 { margin: 2px 0 4px; font-size: 1.55rem; }
-.shell-brand p { margin: 0; }
-.shell-vault-name { color: #5a646c; font-size: 0.86rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.shell-nav-section { display: grid; gap: 6px; }
-.shell-nav-label { margin: 0 8px 3px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #707980; }
-.shell-nav-button {
-  width: 100%;
-  border: 0;
-  border-radius: 10px;
-  padding: 9px 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  background: transparent;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-.shell-nav-button:hover { background: rgba(67, 79, 89, 0.08); }
-.shell-nav-button.active { background: rgba(67, 79, 89, 0.14); font-weight: 700; }
-.shell-nav-button .soon-badge { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; color: #777; }
-.shell-settings-link { margin-top: auto; }
-
-.shell-content { min-width: 0; padding: 28px clamp(18px, 4vw, 54px) 48px; }
-.shell-topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 18px; }
-.shell-topbar h2 { margin: 2px 0 4px; font-size: clamp(1.4rem, 2.5vw, 2rem); }
-.shell-topbar .vault-path { max-width: 72ch; }
-.shell-page { max-width: 1180px; }
-.shell-stack { display: grid; gap: 18px; }
-.shell-workspace-grid { align-items: start; }
-.quick-action-grid, .continue-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
-.quick-capture-input { width: 100%; resize: vertical; margin-bottom: 10px; }
-.continue-card, .record-row {
-  border: 1px solid rgba(40, 50, 58, 0.14);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.72);
-  padding: 14px;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-.continue-card { display: grid; gap: 5px; }
-.continue-card span, .record-row small { color: #606a72; line-height: 1.45; }
-.record-list { display: grid; gap: 8px; }
-.record-row { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 18px; }
-.record-row > span:first-child { min-width: 0; display: grid; gap: 4px; }
-.record-row small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.record-meta { flex: 0 0 auto; color: #68737b; font-size: 0.78rem; text-transform: capitalize; }
-.inline-create-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; margin: 14px 0; }
-.inline-notice { color: #335f48; }
-.inline-error { color: #8a332e; }
-.compact-empty { padding: 12px 0; }
-.home-hero { padding-block: 28px; }
-.future-workspace { max-width: 760px; }
-.support-actions { display: flex; flex-wrap: wrap; gap: 10px; }
-
-@media (max-width: 840px) {
-  .product-shell { grid-template-columns: 1fr; }
-  .shell-sidebar { position: static; min-height: auto; border-right: 0; border-bottom: 1px solid rgba(36, 42, 48, 0.12); }
-  .shell-nav-section { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
-  .shell-nav-label { grid-column: 1 / -1; }
-  .shell-settings-link { margin-top: 0; }
-  .shell-topbar { flex-direction: column; }
-  .record-row { align-items: flex-start; flex-direction: column; gap: 7px; }
-}
-''',
-)
-
-app = read("src/App.tsx")
-app = replace_once(
-    app,
-    'import { CapturePanel } from "./components/CapturePanel";\n',
-    'import { CapturePanel } from "./components/CapturePanel";\nimport { FutureWorkspace } from "./components/FutureWorkspace";\nimport { HomeWorkspace } from "./components/HomeWorkspace";\nimport { LibraryWorkspace } from "./components/LibraryWorkspace";\n',
-    "shell component imports",
-)
-app = replace_once(
-    app,
-    'import { StoryCandidatePanel } from "./components/StoryCandidatePanel";\n',
-    'import { StoryCandidatePanel } from "./components/StoryCandidatePanel";\nimport { TopicsWorkspace } from "./components/TopicsWorkspace";\n',
-    "topics import",
-)
-app = replace_once(
-    app,
-    'import "./styles.css";\n',
-    'import type { AppView } from "./navigation";\nimport { LIBRARY_NAV_ITEMS, PRIMARY_NAV_ITEMS, SETTINGS_NAV_ITEM } from "./navigation";\nimport "./styles.css";\nimport "./shell.css";\n',
-    "navigation imports",
-)
-app = replace_once(app, 'const [vaultName, setVaultName] = useState("My Career Stories");', 'const [vaultName, setVaultName] = useState("My WorkLore");', "default vault name")
-app = replace_once(app, 'vaultName.trim() || "My Career Stories",', 'vaultName.trim() || "My WorkLore",', "create vault fallback")
-app = replace_once(
-    app,
-    '  const [error, setError] = useState<string | null>(null);\n',
-    '  const [error, setError] = useState<string | null>(null);\n  const [activeView, setActiveView] = useState<AppView>("home");\n',
-    "active view state",
-)
-app = replace_once(
-    app,
-    '            Create a local career story bank or open an existing vault. New vaults are stored in\n            WorkLore\'s application folder and reopen automatically until you explicitly close\n            them.\n',
-    '            Create a local professional-memory vault or open an existing one. New vaults are\n            stored in WorkLore\'s application folder and reopen automatically until you explicitly\n            close them.\n',
-    "landing copy",
-)
-
-render_marker = '  if (!startupComplete) {\n'
-render_workspace = '''  function renderWorkspace() {
-    switch (activeView) {
-      case "home":
-        return (
-          <HomeWorkspace
-            vaultPath={vault!.path}
-            storyCount={stories.length}
-            candidateCount={candidates.filter((item) => item.status !== "ignored" && item.status !== "converted_to_story").length}
-            activeInterview={activeInterview}
-            privacyReviewCount={reviews.length}
-            onNavigate={setActiveView}
-            onCaptureSaved={() => refreshWorkspace(vault!.path, true)}
-          />
-        );
-      case "capture":
-        return <CapturePanel vaultPath={vault!.path} />;
-      case "stories":
-        return (
-          <div className="workspace-grid shell-workspace-grid">
-            <GuidedInterviewPanel
-              interview={activeInterview}
-              onSubmit={handleInterviewResponse}
-              onExportWorkspace={handleExportWorkspace}
-              onImportResponse={handleImportStoryResponse}
-            />
-            <StoryBankPanel stories={stories} onStatusChange={handleStoryStatusChange} />
-            <StoryCandidatePanel
-              candidates={candidates.filter(
-                (candidate) =>
-                  candidate.status !== "ignored" &&
-                  candidate.status !== "interviewing" &&
-                  candidate.status !== "converted_to_story",
-              )}
-              onInterview={handleStartInterview}
-              onStatusChange={handleCandidateStatusChange}
-            />
-          </div>
-        );
-      case "topics":
-        return <TopicsWorkspace vaultPath={vault!.path} />;
-      case "voice":
-      case "posts":
-      case "insights":
-        return <FutureWorkspace view={activeView} />;
-      case "sources":
-        return (
-          <LibraryWorkspace
-            vaultPath={vault!.path}
-            sources={sources}
-            sourceTypeOptions={SOURCE_TYPES}
-            selectedSourceType={selectedSourceType}
-            onSourceTypeChange={setSelectedSourceType}
-            onImportSource={() => void handleImportSource()}
-            onExtractCandidates={(sourceId) => void handleExtractCandidates(sourceId)}
-          />
-        );
-      case "privacy":
-        return (
-          <div className="shell-stack">
-            {reviews.length > 0 ? (
-              <PrivacyReviewPanel reviews={reviews} onResolve={handleResolveReview} />
-            ) : (
-              <section className="workspace-panel">
-                <p className="eyebrow">Private Entity Registry</p>
-                <h2>Privacy</h2>
-                <div className="empty-state compact-empty">
-                  <h3>No unresolved entity reviews</h3>
-                  <p>Stable private tokens and prior decisions remain in the local vault.</p>
-                </div>
-              </section>
-            )}
-            <section className="workspace-panel settings-panel" aria-labelledby="privacy-mode-heading">
-              <p className="eyebrow">Public and provider boundary</p>
-              <h2 id="privacy-mode-heading">Private names</h2>
-              <p>Choose the default behavior when content leaves the local-only boundary. Every supported export still requires privacy preflight.</p>
-              <div className="segmented-control" role="group" aria-label="Cloud private name mode">
-                <button className={vault!.cloudIdentifierMode === "redact" ? "active" : ""} onClick={() => void handlePrivacyModeChange("redact")}>Use stable tokens</button>
-                <button className={vault!.cloudIdentifierMode === "include" ? "active" : ""} onClick={() => void handlePrivacyModeChange("include")}>Include names</button>
-              </div>
-            </section>
-          </div>
-        );
-      case "import_export":
-        return (
-          <section className="workspace-panel" aria-labelledby="import-export-heading">
-            <p className="eyebrow">Supporting workflows</p>
-            <h2 id="import-export-heading">Import / Export</h2>
-            <p>File ingestion is available through Sources. Privacy-safe manual AI workspace export/import remains attached to Story interviews where its provenance is clear.</p>
-            <div className="support-actions">
-              <button className="primary-button compact" onClick={() => setActiveView("sources")}>Open Sources</button>
-              <button className="secondary-button compact" onClick={() => setActiveView("stories")}>Open Stories</button>
-            </div>
-            <div className="next-step-card">
-              <h3>Portable vault export</h3>
-              <p>A general human-readable vault snapshot is part of the storage contract but is not implemented in this Phase 1 shell slice.</p>
-            </div>
-          </section>
-        );
-      case "settings":
-        return (
-          <div className="shell-stack">
-            <section className="workspace-panel" aria-labelledby="settings-heading">
-              <p className="eyebrow">Application</p>
-              <h2 id="settings-heading">Settings</h2>
-              <div className="next-step-card">
-                <h3>AI Providers</h3>
-                <p>Ollama and provider-neutral BYOK configuration begin in Phase 2. No provider is required for current professional-memory workflows, and WorkLore will not silently fall back to cloud execution.</p>
-              </div>
-              <div className="next-step-card">
-                <h3>Storage</h3>
-                <p title={vault!.path}>This vault is local at {vault!.path}. Backup and portable export remain explicit user-controlled operations.</p>
-              </div>
-            </section>
-            <PerformancePanel snapshot={performance} onRefresh={() => refreshPerformance(vault!.path)} />
-          </div>
-        );
-    }
-  }
-
-'''
-app = replace_once(app, render_marker, render_workspace + render_marker, "workspace renderer")
-
-start_marker = '  return (\n    <>\n      <main className="app-shell">'
-end_marker = '\n  );\n}\n\nfunction StatusItem'
-if start_marker not in app or end_marker not in app:
-    raise RuntimeError("logged-in shell markers not found")
-prefix, remainder = app.split(start_marker, 1)
-_, suffix = remainder.split(end_marker, 1)
-new_return = '''  return (
-    <>
-      <main className="product-shell">
-        <aside className="shell-sidebar" aria-label="WorkLore navigation">
-          <div className="shell-brand">
-            <p className="eyebrow">Three-Wheeled Sloth Studio</p>
-            <h1>WorkLore</h1>
-            <p className="shell-vault-name" title={vault.path}>{vault.name}</p>
-          </div>
-
-          <nav className="shell-nav-section" aria-label="Primary workspaces">
-            <p className="shell-nav-label">Work</p>
-            {PRIMARY_NAV_ITEMS.map((item) => (
-              <button
-                key={item.id}
-                className={`shell-nav-button ${activeView === item.id ? "active" : ""}`}
-                aria-current={activeView === item.id ? "page" : undefined}
-                title={item.description}
-                onClick={() => setActiveView(item.id)}
-              >
-                <span>{item.label}</span>
-                {item.availability === "planned" ? <span className="soon-badge">Soon</span> : null}
-              </button>
-            ))}
-          </nav>
-
-          <nav className="shell-nav-section" aria-label="Library and supporting tools">
-            <p className="shell-nav-label">Library</p>
-            {LIBRARY_NAV_ITEMS.map((item) => (
-              <button
-                key={item.id}
-                className={`shell-nav-button ${activeView === item.id ? "active" : ""}`}
-                aria-current={activeView === item.id ? "page" : undefined}
-                title={item.description}
-                onClick={() => setActiveView(item.id)}
-              >
-                <span>{item.label}</span>
-              </button>
-            ))}
-          </nav>
-
-          <button
-            className={`shell-nav-button shell-settings-link ${activeView === SETTINGS_NAV_ITEM.id ? "active" : ""}`}
-            aria-current={activeView === SETTINGS_NAV_ITEM.id ? "page" : undefined}
-            onClick={() => setActiveView(SETTINGS_NAV_ITEM.id)}
-          >
-            <span>{SETTINGS_NAV_ITEM.label}</span>
-          </button>
-        </aside>
-
-        <section className="shell-content">
-          <header className="shell-topbar">
-            <div>
-              <p className="eyebrow">Local vault</p>
-              <h2>{PRIMARY_NAV_ITEMS.concat(LIBRARY_NAV_ITEMS, SETTINGS_NAV_ITEM).find((item) => item.id === activeView)?.label ?? "WorkLore"}</h2>
-              <p className="vault-path" title={vault.path}>{vault.path}</p>
-            </div>
-            <div className="header-actions">
-              <button className="quiet-button" onClick={() => void handleOpenVault()}>Open another vault</button>
-              <button className="quiet-button" onClick={() => void handleCloseVault()}>Close vault</button>
-            </div>
-          </header>
-
-          <section className="status-strip" aria-label="Vault status">
-            <StatusItem value={sources.length} label="Sources" />
-            <StatusItem value={stories.length} label="Stories" />
-            <StatusItem value={reviews.length} label="Privacy reviews" attention={reviews.length > 0} />
-          </section>
-
-          <div className="shell-page">{renderWorkspace()}</div>
-          <Feedback notice={notice} error={error} />
-          <BusyLayer message={busyMessage} activeOperation={activeOperation} />
-        </section>
-      </main>
-      <footer className="legal-notice">
-        <span>WorkLore is licensed under AGPL-3.0-only.</span>
-        <a href="https://github.com/Three-Wheeled-Sloth-Studio/Worklore/blob/main/LICENSE" target="_blank" rel="noreferrer">View license</a>
-      </footer>
-    </>
-  );
-}
-
-function StatusItem'''
-app = prefix + new_return + suffix
-write("src/App.tsx", app)
