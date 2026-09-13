@@ -10,6 +10,7 @@ roadmap_principles:
   - Public content always crosses an explicit human review and manual publication boundary.
   - Automatic social publishing, social scheduling integration, WorkLore-hosted SaaS, proprietary cloud sync, and multi-user collaboration are outside the accepted roadmap.
   - Existing resume ingestion and story-interview work is prototype foundation, not the organizing center of the product.
+  - Ollama remains a first-class local provider; remote model access uses explicit bring-your-own-key adapters with credentials outside the vault and no WorkLore-hosted proxy.
 
 prototype_foundation:
   status: preserve_and_reuse_selectively
@@ -66,11 +67,16 @@ phases:
       - Direct canonical Story Seed guided development without a resume candidate or mandatory Role.
       - Shared deterministic interview rules across direct-seed and legacy candidate paths, including answer classifications, skip, and do-not-remember semantics.
       - Canonical Story creation from developed Story Seeds with explicit seed/interview lineage and attributed answers.
+      - Durable Topic Candidates with captured/exploring/ready/drafted/parked/retired lifecycle and explicit evergreen/timely metadata.
+      - Durable Themes with emerging/active/retired lifecycle independent from Topic lifecycle.
+      - Idempotent typed Topic relationships to Stories, Proof Points, Themes, Inspiration, and Target Context with standing/context semantics preserved.
+      - Thin Topic editor/API path that preserves Capture-created Topic identity and remains provider-free.
     architecture_notes:
       - Durable local persistence uses SQLite for canonical structured state while source bytes remain in the vault filesystem.
       - Human-readable export remains desirable.
       - The vault remains usable without a WorkLore account or hosted service.
       - Direct Story Seed development remains local-only until provider export/preflight is explicitly generalized for canonical seed/story targets.
+      - Topic timing, lifecycle, and relationships are deterministic local state and do not require provider or network availability.
     exit_criteria:
       - A new user can build useful stories and topic candidates without importing a resume.
       - Capture survives restart and supports incomplete material.
@@ -93,13 +99,16 @@ phases:
       - Add cross-draft repetition detection and proof-point rotation.
       - Add confidentiality transformation as a hard pre-publication requirement.
       - Add evidence and Do I Have Standing review.
-      - Implement direct Ollama and user-authorized Gemini/provider adapters where needed for these workflows.
+      - Introduce the provider registry around Ollama, manual workspace packages, and explicit BYOK remote adapters beginning with Gemini.
+      - Keep remote-provider credentials in the operating-system credential store, outside vaults, logs, exports, provider-run records, and frontend state.
+      - Require privacy preflight and user-visible remote-data disclosure before BYOK calls; never silently fall back from local to cloud.
     exit_criteria:
       - Every canonical voice trait has auditable source provenance.
       - Raw AI drafts cannot contaminate the voice model.
       - A user can deliberately select or approve tone variation without losing core identity.
       - WorkLore can identify meaningful AI-default and repetitive writing patterns without claiming a fake human/AI probability score.
       - Confidential entities can be transformed for public drafts while preserving factual meaning.
+      - Ollama and configured BYOK adapters can serve the same provider-neutral workflow contracts without exposing credentials to canonical state or frontend code.
 
   - id: phase-3
     name: Content Studio
@@ -167,6 +176,7 @@ explicit_non_goals:
   - WorkLore-hosted SaaS backend.
   - WorkLore user accounts.
   - Proprietary WorkLore cloud vault synchronization.
+  - WorkLore-hosted inference proxy or credential gateway under the accepted roadmap.
   - Multi-user collaboration.
   - Automatic LinkedIn or social publishing.
   - LinkedIn scheduling integration.
