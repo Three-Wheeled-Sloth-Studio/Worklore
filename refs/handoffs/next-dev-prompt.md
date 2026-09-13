@@ -1,7 +1,7 @@
 ---
 type: Handoff Prompt
 title: Next WorkLore Development Slice
-description: Bounded prompt for the deterministic anti-slop Writing Pattern Linter foundation on the validated provider-neutral Voice stack.
+description: Bounded prompt for provider-free confidentiality transformation on the validated deterministic quality and privacy foundations.
 status: draft
 tags: [handoff, next-slice]
 ---
@@ -17,134 +17,138 @@ Work directly on `dev`. Do not promote `qa` or `main` unless explicitly requeste
 
 Phase 1 Professional Memory is complete. Phase 2 Voice Intelligence is in progress.
 
-Validated provider-neutral voice analysis checkpoint:
+Validated deterministic Writing Pattern Linter checkpoint:
 
-`34def4aca4e52eaa32d59546cbf174964c9eae66`
+`f83c6b6b263c304464379e40b6a2f11f37051a94`
 
 Implementation validation:
 
-- Actions `34786970170`
-- Job `103804095335`
+- Actions `34788734444`
+- Job `103808889194`
 - frontend: 8 passed / 0 failed across 3 files
-- Rust: 90 passed / 0 failed
+- Rust: 99 passed / 0 failed
 - production frontend build: green, 53 modules transformed
 - case-collision, refs/OKF, bounded agent context, `git diff --check`, warnings-denied Clippy, and rustfmt: green
 
-This checkpoint includes governed Voice Evidence, schema-v7 Core Voice/Tone/Direction/Writing Rules, and an executable provider-neutral registry with Ollama plus review-only `analyze_voice_evidence` v1 proposals. Provider output remains non-authoritative until explicit user acceptance through the existing provenance-safe Core Voice path.
+This checkpoint includes governed Voice Evidence, schema-v7 Core Voice/Tone/Direction/Writing Rules, provider-neutral Ollama review-only voice proposals, and a provider-free deterministic single-draft Writing Pattern Linter. The linter produces explainable findings and explicit Writing Rule violations without draft persistence, canonical mutation, provider execution, AI/human probability, or an opaque quality score.
 
 Read `refs/handoffs/currentHandoff.md` before making changes.
 
 ## Start With Bounded Re-entry
 
 ```powershell
-python refs/tools/generate_agent_context.py --focus "WorkLore task-033 deterministic anti-slop writing pattern linter Writing Rules draft quality"
+python refs/tools/generate_agent_context.py --focus "WorkLore task-034 confidentiality transformation public-safe descriptions Private Entity Registry privacy redaction"
 ```
 
 Treat generated context as derived orientation. Read only the authoritative refs/source needed for this slice.
 
 Read at minimum:
 
-- `refs/product/prd.md`, especially the anti-slop and voice-quality sections
+- `refs/product/prd.md`, especially confidentiality/privacy requirements
+- `refs/architecture/vaultFormat.md`
+- `refs/architecture/providerArchitecture.md`
 - `refs/planning/roadmap.yaml`
 - `refs/planning/todos.yaml`
 - `refs/handoffs/currentHandoff.md`
-- `refs/architecture/providerArchitecture.md`
-- `src-tauri/src/services/voice_profile_service.rs`
+- `src-tauri/src/services/redaction_service.rs`
+- `src-tauri/src/services/entity_scan.rs`
+- `src-tauri/src/services/entity_review.rs`
+- `src-tauri/src/commands/privacy.rs`
+- relevant private-entity domain/provider types
 - `src/domain/types.ts`
 - `src/lib/workloreApi.ts`
 
 ## Immediate Objective
 
-Begin `task-033` with the smallest deterministic Writing Pattern Linter foundation that can challenge a supplied draft without requiring provider execution or inventing durable Post/Revision state.
+Begin `task-034` with the smallest provider-free confidentiality transformation foundation that can turn supplied private text into reviewable public-safe text without destroying the canonical private facts or inventing replacement facts.
 
 This slice should answer:
 
-`Can WorkLore identify specific, explainable AI-default/repetitive writing patterns and explicit Writing Rule violations in one supplied draft without claiming a fake AI probability or opaque quality score?`
+`Can WorkLore transform known private entities in supplied text into explicit public-safe representations, surface unresolved privacy risk for human review, and preserve factual meaning without a provider or network dependency?`
 
-### 1. Define a provider-free lint contract first
+### 1. Reuse the existing privacy model
 
-Create a stable structured contract for deterministic findings.
+Do not create a parallel confidentiality registry.
 
-Each finding should carry enough information for a UI or later workflow to explain itself, such as:
+Build on the existing:
 
-- stable rule ID;
-- category;
-- severity/level with documented semantics;
-- concise human-readable reason;
-- matched text and/or start/end location when practical;
-- deterministic remediation guidance when the rule has an obvious correction;
-- whether the finding came from a built-in pattern or an explicit user Writing Rule.
+- Private Entity Registry;
+- stable public tokens;
+- entity aliases;
+- sensitivity values, including `never_send_to_cloud` and `ask_before_cloud` semantics;
+- pending entity-review items and risk levels;
+- `redact_for_external_use` replacement/preflight behavior.
 
-Do not collapse findings into a fake overall "slop score", AI probability, or quality percentage.
+If the existing redaction service needs a cleaner internal seam so token redaction and public-safe transformation can share matching/review logic, refactor that seam narrowly rather than duplicating matching rules.
 
-### 2. Implement only single-draft checks with stable semantics
+### 2. Separate token redaction from public-safe prose
 
-Start with deterministic rules that are useful without a portfolio/history corpus. Candidate checks include:
+External-provider redaction and public publication are related but not identical problems.
 
-- rhetorical-question opening;
-- forced closing question;
-- repeated engagement-bait phrasing;
-- excessive hashtag count;
-- strongly list-dominated/numbered structure when it crosses a transparent threshold;
-- explicit banned phrase/word rules from active Writing Rules;
-- explicit punctuation/style constraints that can be represented deterministically from Writing Rules;
-- certainty-language warnings for patterns that make unsupported absolute claims, only where the heuristic can be clearly explained.
+The public transformation contract should distinguish at least:
 
-Prefer a smaller reliable rule set over a broad fuzzy detector.
+- original private text supplied for transformation;
+- deterministic stable-token redaction where appropriate;
+- human-readable public-safe replacement candidates or accepted public descriptions;
+- unresolved/blocked entities that still need human review;
+- metadata explaining exactly what changed and why.
 
-### 3. Writing Rules are explicit constraints, not inferred identity
+Do not silently replace `[EMPLOYER_1]` with an invented phrase such as "a Fortune 500 healthcare company" unless that description is explicitly stored/approved and supported by canonical facts.
 
-Active Writing Rules should participate in linting where their instruction can be represented by a deterministic matcher.
+### 3. Preserve private canonical truth
 
 Requirements:
 
-- do not silently convert arbitrary prose instructions into unreliable hidden regexes;
-- if only a subset of Writing Rule forms is machine-enforceable in this slice, model that distinction explicitly;
-- disabled/retired/proposed rules must not behave as active enforcement;
-- linting must not mutate Core Voice, Tone Modes, Voice Direction, or Writing Rules.
+- transformation returns derived output; it does not overwrite the Source, Story, Proof Point, or other private canonical record;
+- real private names remain available in canonical state;
+- transformed text retains a traceable relationship to the matched entity IDs and replacement decisions;
+- repeated aliases for the same entity resolve consistently within one transformation;
+- replacements must not create false employer/client/project relationships or alter metrics/outcomes;
+- public-safe wording must not imply anonymity guarantees the system cannot make.
 
-### 4. Preserve the provider boundary
+### 4. Fail closed on unresolved risk
 
-Deterministic linting must run with no configured provider and no network availability.
+The system must not present unsafe output as publication-ready merely because some replacements succeeded.
 
-Leave a clean seam for later model-assisted quality review through the existing provider registry, but:
+Return an explicit state such as `ready`, `needs_review`, or `blocked` based on deterministic privacy conditions.
 
-- do not automatically call Ollama;
-- do not silently fall back to a provider;
-- do not make provider output authoritative;
-- do not add Gemini/BYOK work merely to implement the linter.
+At minimum:
 
-### 5. Explicitly defer corpus-dependent checks
+- high/critical unresolved privacy review must block when the accepted privacy rules require it;
+- unresolved lower-risk items remain visible warnings/review work;
+- `never_send_to_cloud` semantics remain strict for provider-bound content and must not be weakened by the public transformation path;
+- unknown/unreviewed sensitive-looking material must not be silently declared safe.
 
-`task-033` also names cross-draft repetition and proof-point rotation. Those need durable draft/published-content lineage that does not yet exist.
+### 5. Keep the first slice provider-free
 
-Do not invent transient pseudo-history or begin broad Content Studio/Post persistence in this slice merely to claim those boxes are checked.
+Confidentiality is a hard pre-publication safety requirement and must not depend on Ollama, Gemini, or network availability.
 
-Instead, define the lint API/data seam so later portfolio checks can add findings under the same contract once durable Post/Revision lineage exists.
+A later provider may help suggest human-readable generalizations, but any such suggestion must remain review-only and pass the same entity/privacy checks. Do not add a provider call in this foundation merely to generate nicer wording.
 
-Likewise, do not pretend a single draft can prove "batch mode collapse" across multiple outputs.
+### 6. Keep Content Studio out of scope
 
-### 6. Evidence and standing challenges stay grounded
+A transient supplied-text transformation/review surface is acceptable if useful for proving the contract.
 
-Do not infer standing from Target Context or Inspiration.
+Do not begin broad Post/Revision persistence, automatic publication, scheduling, Audience Lens, or general Content Studio workflow in this slice.
 
-If this slice includes a simple unsupported-certainty warning, make clear it is a writing-pattern challenge, not proof that the factual claim is false. Full evidence/standing review can follow once the content workflow supplies explicit claim/evidence context.
+The derived transformation contract should be reusable by Content Studio later.
 
 ### 7. Proof cases
 
 Cover at least:
 
-- linter runs with no provider configured;
-- clean ordinary prose can return zero findings;
-- rhetorical-question opening is detected deterministically;
-- forced closing question/engagement-bait example is detected without treating every legitimate question as bait;
-- hashtag threshold is deterministic and boundary-tested;
-- active enforceable Writing Rule can generate a finding;
-- disabled/retired/proposed Writing Rule does not enforce;
-- findings contain stable IDs and useful locations/matched text where applicable;
-- no linter operation mutates Voice or canonical content state;
-- no AI/human probability or overall fake quality score is produced;
-- existing 90 Rust tests and 8 frontend tests remain green.
+- transformation works with no provider configured;
+- known private entity aliases are replaced consistently;
+- public entities are not unnecessarily transformed;
+- `never_send_to_cloud` behavior remains protected for provider/external paths;
+- high-risk pending review blocks or clearly prevents a ready state according to current vault policy;
+- lower-risk pending review remains visible rather than being lost;
+- accepted/stored public descriptions can be used only when explicitly present and attributable;
+- missing public description does not trigger invented prose;
+- replacements preserve surrounding metrics and factual claims;
+- original canonical/private text remains unchanged;
+- replacement metadata exposes entity ID/type and resulting representation without leaking a secret into logs;
+- existing 99 Rust tests and 8 frontend tests remain green.
 
 ## Constraints
 
@@ -152,12 +156,14 @@ Cover at least:
 - No WorkLore account/backend/proprietary sync.
 - No automatic publication or scheduling.
 - No silent provider fallback.
-- Deterministic linter must remain provider-free.
+- Confidentiality transformation foundation must remain provider-free.
 - Preserve Evidence/Inspiration/Target Context/Voice Evidence distinctions.
-- Preserve Core Voice/Tone/Direction/Writing Rule semantic separation.
+- Preserve the existing Private Entity Registry as the source of truth for known private entities.
+- Do not overwrite private canonical facts with public-safe derived wording.
+- Do not invent replacement facts, anonymity claims, employer/client relationships, or classifications.
 - Do not implement edit-delta learning before durable Post/Revision lineage exists.
 - Do not implement cross-draft repetition/proof-point rotation by inventing temporary history.
-- Do not begin Content Studio broadly in this slice.
+- Do not begin broad Content Studio in this slice.
 - Public-repository fixtures must remain synthetic.
 - Keep build/dev/QA output outside the repository.
 - Run case-collision and refs/OKF validation.
@@ -181,6 +187,6 @@ cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -
 
 ## Stop Point
 
-Stop when WorkLore has a deterministic provider-free single-draft lint contract plus a small, well-tested set of explainable anti-slop/Writing Rule checks that can be extended later to provider-assisted and portfolio-aware review.
+Stop when WorkLore has a provider-free confidentiality transformation contract that reuses the existing entity/privacy infrastructure, produces derived reviewable public-safe output with explicit replacement/risk metadata, and never destroys private canonical truth or invents replacement facts.
 
-Do not begin cross-draft history, edit-delta learning, or broad Content Studio work implicitly.
+Do not begin broad Content Studio, provider-assisted rewriting, or automatic publication implicitly.

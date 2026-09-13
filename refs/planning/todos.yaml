@@ -136,9 +136,9 @@ todos:
     area: voice
     summary: Core Voice foundation and Ollama-backed provider-neutral review-only voice proposals are complete; edit-delta learning remains intentionally deferred until durable Post/Revision lineage exists.
   - id: task-033
-    status: planned
+    status: in_progress
     area: quality
-    summary: Implement anti-slop writing-pattern linting, cross-draft repetition checks, proof-point rotation, and evidence/standing challenges.
+    summary: Deterministic provider-free single-draft Writing Pattern Linter foundation is complete with explainable built-in checks, browser-compatible locations, and explicit active Writing Rule enforcement; remaining cross-draft repetition, proof-point rotation, portfolio mode-collapse, and fuller evidence/standing review await durable Post/Revision content lineage.
   - id: task-034
     status: planned
     area: privacy
