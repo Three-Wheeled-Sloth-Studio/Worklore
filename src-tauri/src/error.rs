@@ -66,6 +66,9 @@ pub enum WorkLoreError {
     #[error("The manual workspace could not be created: {0}")]
     ManualWorkspace(String),
 
+    #[error("SQLite operation failed: {0}")]
+    Sqlite(#[from] rusqlite::Error),
+
     #[error("File operation failed: {0}")]
     Io(#[from] std::io::Error),
 
@@ -115,6 +118,7 @@ impl From<WorkLoreError> for CommandError {
             WorkLoreError::InvalidReviewResolution(_) => "invalid_review_resolution",
             WorkLoreError::ProviderPreflightBlocked(_) => "provider_preflight_blocked",
             WorkLoreError::ManualWorkspace(_) => "manual_workspace_failed",
+            WorkLoreError::Sqlite(_) => "sqlite_error",
             WorkLoreError::Io(_) => "io_error",
             WorkLoreError::Json(_) => "json_error",
         };

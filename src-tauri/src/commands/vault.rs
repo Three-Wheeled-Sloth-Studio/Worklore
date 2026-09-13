@@ -5,7 +5,7 @@ use crate::{
         CloudIdentifierMode, ImportSourceResult, SourceSummary, SourceType, VaultSummary,
     },
     error::{CommandError, CommandResult},
-    services::{app_preferences_service, source_service, vault_service},
+    services::{app_preferences_service, canonical_store, source_service, vault_service},
 };
 
 #[tauri::command]
@@ -49,12 +49,15 @@ pub async fn import_source(
     source_type: SourceType,
 ) -> CommandResult<ImportSourceResult> {
     tauri::async_runtime::spawn_blocking(move || {
-        source_service::import_source(
-            &PathBuf::from(vault_path),
+        let vault_path = PathBuf::from(vault_path);
+        let result = source_service::import_source(
+            &vault_path,
             &PathBuf::from(source_path),
             source_type,
         )
-        .map_err(CommandError::from)
+        .map_err(CommandError::from)?;
+        canonical_store::migrate_prototype(&vault_path).map_err(CommandError::from)?;
+        Ok(result)
     })
     .await
     .map_err(CommandError::background_task)?

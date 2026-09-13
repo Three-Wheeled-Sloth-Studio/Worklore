@@ -5,7 +5,7 @@ use serde_json::{Map, Value};
 use crate::{
     domain::candidates::{CandidateStatus, CandidateSummary, ExtractCandidatesResult},
     error::{CommandError, CommandResult},
-    services::{candidate_service, performance_service::OperationSession},
+    services::{candidate_service, canonical_store, performance_service::OperationSession},
 };
 
 #[tauri::command]
@@ -24,7 +24,9 @@ pub async fn extract_resume_candidates(
         let result = operation.step("parse_and_write_candidates", Map::new(), || {
             candidate_service::extract_resume_candidates(&vault_path, &source_id)
         });
-        operation.finish(result).map_err(CommandError::from)
+        let result = operation.finish(result).map_err(CommandError::from)?;
+        canonical_store::migrate_prototype(&vault_path).map_err(CommandError::from)?;
+        Ok(result)
     })
     .await
     .map_err(CommandError::background_task)?
@@ -41,6 +43,9 @@ pub fn set_story_candidate_status(
     candidate_id: String,
     status: CandidateStatus,
 ) -> CommandResult<CandidateSummary> {
-    candidate_service::set_candidate_status(&PathBuf::from(vault_path), &candidate_id, status)
-        .map_err(CommandError::from)
+    let vault_path = PathBuf::from(vault_path);
+    let result = candidate_service::set_candidate_status(&vault_path, &candidate_id, status)
+        .map_err(CommandError::from)?;
+    canonical_store::migrate_prototype(&vault_path).map_err(CommandError::from)?;
+    Ok(result)
 }

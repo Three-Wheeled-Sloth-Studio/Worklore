@@ -1,0 +1,80 @@
+name: One-shot dev persistence validation
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - .github/workflows/validate-dev-persistence-once.yml
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: windows-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Install refs validator dependency
+        shell: pwsh
+        run: python -m pip install pyyaml
+
+      - name: Format staged Rust
+        shell: pwsh
+        run: cargo fmt --manifest-path src-tauri/Cargo.toml --all
+
+      - name: Capture formatting patch
+        shell: pwsh
+        run: git diff -- src-tauri | Out-File -FilePath "$env:RUNNER_TEMP\rustfmt.patch" -Encoding utf8
+
+      - name: Validate path safety and project memory
+        shell: pwsh
+        run: |
+          python scripts/check-case-collisions.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python refs/tools/validate_refs.py --mode initialized
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python refs/tools/generate_agent_context.py --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git diff --check
+
+      - name: Run Rust tests
+        shell: pwsh
+        run: cargo test --manifest-path src-tauri/Cargo.toml
+
+      - name: Run Rust lints
+        shell: pwsh
+        run: cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
+
+      - name: Confirm formatted tree
+        shell: pwsh
+        run: cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
+
+      - name: Stage validation artifact
+        if: always()
+        shell: pwsh
+        run: |
+          $artifact = Join-Path $env:RUNNER_TEMP "worklore-validation"
+          New-Item -ItemType Directory -Force -Path $artifact | Out-Null
+          Copy-Item "$env:RUNNER_TEMP\rustfmt.patch" "$artifact\rustfmt.patch" -ErrorAction SilentlyContinue
+          Copy-Item "src-tauri\src\services\canonical_store.rs" "$artifact\canonical_store.rs"
+          Copy-Item "src-tauri\src\services\vault_service.rs" "$artifact\vault_service.rs"
+          Copy-Item "src-tauri\src\commands\*.rs" $artifact
+          Copy-Item "src-tauri\src\error.rs" $artifact
+
+      - name: Upload validation artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: persistence-validation-${{ github.run_id }}
+          path: ${{ runner.temp }}\worklore-validation
+          retention-days: 2

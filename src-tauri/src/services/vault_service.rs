@@ -13,12 +13,16 @@ use crate::{
     error::{ServiceResult, WorkLoreError},
     io_utils::{read_json, sanitize_file_name, write_json_atomic},
     services::{
+        canonical_store,
         entity_scan::{count_pending_review_items, initialize_registry, save_registry},
         performance_service, privacy_scan_migration,
     },
 };
 
 const VAULT_DIRECTORIES: &[&str] = &[
+    "data",
+    "sources/originals",
+    "sources/attachments",
     "sources/resumes",
     "sources/job-descriptions",
     "sources/writing-samples",
@@ -34,11 +38,14 @@ const VAULT_DIRECTORIES: &[&str] = &[
     "voice",
     "privacy/review-items",
     "privacy/scan-log",
+    "exports/snapshots",
     "exports/manual-workspaces",
     "exports/markdown",
     "exports/json",
     "backups",
     ".worklore/extraction-cache",
+    ".worklore/search-cache",
+    ".worklore/embeddings",
     ".worklore/provider-logs",
     ".worklore/operation-journal",
     ".worklore/operation-metrics/active",
@@ -100,6 +107,7 @@ pub fn create_vault(path: &Path, name: &str) -> ServiceResult<VaultSummary> {
     write_json_atomic(&path.join("vault.json"), &vault)?;
     let registry = initialize_registry(&vault.vault_id);
     save_registry(path, &registry)?;
+    canonical_store::initialize_and_migrate(path)?;
 
     summarize(path, vault)
 }
@@ -129,6 +137,7 @@ pub fn open_vault(path: &Path) -> ServiceResult<VaultSummary> {
     }
     performance_service::recover_interrupted(path)?;
     privacy_scan_migration::migrate_legacy_review_noise(path)?;
+    canonical_store::initialize_and_migrate(path)?;
 
     summarize(path, vault)
 }
@@ -248,6 +257,7 @@ mod tests {
 
         assert_eq!(summary.path, expected.to_string_lossy());
         assert!(expected.join("vault.json").is_file());
+        assert!(expected.join(canonical_store::DATABASE_RELATIVE_PATH).is_file());
 
         fs::remove_dir_all(parent).expect("test vault should be removable");
     }
