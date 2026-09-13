@@ -108,7 +108,7 @@ todos:
     area: data
     summary: Introduce the canonical SQLite persistence boundary, schema/migration framework, Phase 1 relational tables, and non-destructive migration seam from prototype vault records without beginning a broad UI rewrite.
   - id: task-026
-    status: planned
+    status: complete
     area: capture
     summary: Implement save-first capture that persists ambiguous memories, ideas, proof points, URLs, excerpts, job descriptions, writing samples, and notes before classification.
   - id: task-027
