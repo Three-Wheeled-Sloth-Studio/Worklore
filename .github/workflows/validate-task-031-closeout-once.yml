@@ -76,11 +76,28 @@ jobs:
         shell: pwsh
         run: cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
 
-      - name: Confirm validation was read-only
+      - name: Confirm validation changed no canonical checkout state
         shell: pwsh
         run: |
           $changes = @(git status --porcelain)
-          if ($changes.Count -ne 0) {
-            Write-Host ($changes -join "`n")
-            throw "Validation modified the checkout."
+          $allowed = @(
+            '?? src-tauri/Cargo.lock',
+            '?? src-tauri/gen/'
+          )
+          foreach ($change in $changes) {
+            if ($allowed -notcontains $change) {
+              Write-Host ($changes -join "`n")
+              throw "Validation produced an unexpected checkout change: $change"
+            }
+          }
+
+          # Cargo/Tauri generate these untracked validation artifacts when invoked
+          # from the src-tauri manifest. They are not canonical repository state.
+          if (Test-Path src-tauri/Cargo.lock) { Remove-Item src-tauri/Cargo.lock -Force }
+          if (Test-Path src-tauri/gen) { Remove-Item src-tauri/gen -Recurse -Force }
+
+          $remaining = @(git status --porcelain)
+          if ($remaining.Count -ne 0) {
+            Write-Host ($remaining -join "`n")
+            throw "Validation left the checkout dirty after known generated artifacts were removed."
           }
