@@ -8,6 +8,36 @@ export type SourceType =
   | "git_snapshot"
   | "other";
 
+
+export type CaptureRole =
+  | "story_seed"
+  | "proof_point"
+  | "topic_candidate"
+  | "inspiration"
+  | "target_context";
+
+export interface CaptureClassification {
+  role: CaptureRole;
+  targetId: string;
+}
+
+export interface CaptureSource {
+  sourceId: string;
+  sourceType: SourceType;
+  displayName: string;
+  text: string;
+  createdAt: string;
+  updatedAt: string;
+  classifications: CaptureClassification[];
+}
+
+export interface CaptureClassificationResult {
+  sourceId: string;
+  role: CaptureRole;
+  targetId: string;
+  created: boolean;
+}
+
 export type PrivacyScanStatus =
   | "pending"
   | "complete"

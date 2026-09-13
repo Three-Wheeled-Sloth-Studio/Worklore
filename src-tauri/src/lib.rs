@@ -6,6 +6,10 @@ mod services;
 
 use commands::{
     candidates::{extract_resume_candidates, list_story_candidates, set_story_candidate_status},
+    capture::{
+        classify_capture_source, create_capture_source, get_capture_source,
+        list_unclassified_captures,
+    },
     interviews::{
         list_guided_interviews, resume_guided_interview, start_guided_interview,
         submit_guided_interview_response,
@@ -33,6 +37,10 @@ pub fn run() {
             create_vault,
             create_vault_in_parent,
             create_default_vault,
+            create_capture_source,
+            get_capture_source,
+            list_unclassified_captures,
+            classify_capture_source,
             open_vault,
             import_source,
             list_sources,

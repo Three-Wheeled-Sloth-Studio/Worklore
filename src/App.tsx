@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
+import { CapturePanel } from "./components/CapturePanel";
 import { GuidedInterviewPanel } from "./components/GuidedInterviewPanel";
 import { PerformancePanel } from "./components/PerformancePanel";
 import { PrivacyReviewPanel } from "./components/PrivacyReviewPanel";
@@ -632,6 +633,8 @@ function App() {
         </section>
 
         <div className="workspace-grid">
+          <CapturePanel vaultPath={vault.path} />
+
           {reviews.length > 0 ? (
             <PrivacyReviewPanel reviews={reviews} onResolve={handleResolveReview} />
           ) : null}

@@ -2,6 +2,9 @@ import { invoke } from "@tauri-apps/api/core";
 import type {
   CandidateStatus,
   CandidateSummary,
+  CaptureClassificationResult,
+  CaptureRole,
+  CaptureSource,
   CloudIdentifierMode,
   CreateManualWorkspaceRequest,
   EntityReviewView,
@@ -68,6 +71,41 @@ export async function importSource(
 
 export async function listSources(vaultPath: string): Promise<SourceSummary[]> {
   return invoke<SourceSummary[]>("list_sources", { vaultPath });
+}
+
+
+export async function createCaptureSource(
+  vaultPath: string,
+  text: string,
+  sourceType: SourceType = "other",
+): Promise<CaptureSource> {
+  return invoke<CaptureSource>("create_capture_source", { vaultPath, text, sourceType });
+}
+
+export async function getCaptureSource(
+  vaultPath: string,
+  sourceId: string,
+): Promise<CaptureSource> {
+  return invoke<CaptureSource>("get_capture_source", { vaultPath, sourceId });
+}
+
+export async function listUnclassifiedCaptures(
+  vaultPath: string,
+  limit = 8,
+): Promise<CaptureSource[]> {
+  return invoke<CaptureSource[]>("list_unclassified_captures", { vaultPath, limit });
+}
+
+export async function classifyCaptureSource(
+  vaultPath: string,
+  sourceId: string,
+  role: CaptureRole,
+): Promise<CaptureClassificationResult> {
+  return invoke<CaptureClassificationResult>("classify_capture_source", {
+    vaultPath,
+    sourceId,
+    role,
+  });
 }
 
 export async function updateCloudIdentifierMode(

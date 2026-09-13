@@ -22,7 +22,7 @@ use crate::{
 };
 
 pub const DATABASE_RELATIVE_PATH: &str = "data/worklore.sqlite";
-const CURRENT_SCHEMA_VERSION: i64 = 1;
+const CURRENT_SCHEMA_VERSION: i64 = 2;
 const MIGRATION_NAME: &str = "prototype_to_professional_memory_v1";
 
 const SCHEMA_V1: &str = r#"
@@ -110,6 +110,12 @@ CREATE TABLE audit_events (
 CREATE INDEX idx_relationships_from ON record_relationships(from_type, from_id);
 CREATE INDEX idx_relationships_to ON record_relationships(to_type, to_id);
 CREATE INDEX idx_lineage_legacy ON migration_lineage(legacy_type, legacy_id);
+"#;
+
+const SCHEMA_V2: &str = r#"
+ALTER TABLE sources ADD COLUMN source_origin TEXT NOT NULL DEFAULT 'imported_file';
+ALTER TABLE sources ADD COLUMN captured_text TEXT;
+CREATE INDEX idx_sources_origin_imported_at ON sources(source_origin, imported_at DESC);
 "#;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -354,22 +360,33 @@ fn migrate_schema(connection: &mut Connection) -> ServiceResult<()> {
         "CREATE TABLE IF NOT EXISTS schema_migrations(
         version INTEGER PRIMARY KEY,name TEXT NOT NULL,applied_at TEXT NOT NULL);",
     )?;
-    let version: i64 = connection.query_row(
+    let mut version: i64 = connection.query_row(
         "SELECT COALESCE(MAX(version),0) FROM schema_migrations",
         [],
         |r| r.get(0),
     )?;
     if version > CURRENT_SCHEMA_VERSION {
-        return Err(WorkLoreError::InvalidVault(
-            format!(
-        "Canonical database schema version {version} is newer than this WorkLore build supports."),
-        ));
+        return Err(WorkLoreError::InvalidVault(format!(
+            "Canonical database schema version {version} is newer than this WorkLore build supports."
+        )));
     }
     if version == 0 {
         let tx = connection.transaction()?;
         tx.execute_batch(SCHEMA_V1)?;
-        tx.execute("INSERT INTO schema_migrations(version,name,applied_at) VALUES (1,'professional_memory_v1',?1)",
-            [Utc::now().to_rfc3339()])?;
+        tx.execute(
+            "INSERT INTO schema_migrations(version,name,applied_at) VALUES (1,'professional_memory_v1',?1)",
+            [Utc::now().to_rfc3339()],
+        )?;
+        tx.commit()?;
+        version = 1;
+    }
+    if version == 1 {
+        let tx = connection.transaction()?;
+        tx.execute_batch(SCHEMA_V2)?;
+        tx.execute(
+            "INSERT INTO schema_migrations(version,name,applied_at) VALUES (2,'capture_text_sources_v2',?1)",
+            [Utc::now().to_rfc3339()],
+        )?;
         tx.commit()?;
     }
     Ok(())
@@ -718,7 +735,7 @@ mod tests {
     fn initializes_database() {
         let p = vault();
         assert!(database_path(&p).is_file());
-        assert_eq!(schema_version(&p).unwrap(), 1);
+        assert_eq!(schema_version(&p).unwrap(), 2);
         fs::remove_dir_all(p).unwrap();
     }
     #[test]
