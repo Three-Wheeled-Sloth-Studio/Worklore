@@ -1,7 +1,8 @@
-version: 1
+version: 2
 schema: refs/schemas/schemaRegistry.yaml
-updated: 2026-07-25
-todos:
+updated: 2026-09-12
+
+historical_prototype_tasks:
   - id: task-001
     status: complete
     area: repository
@@ -11,78 +12,152 @@ todos:
     area: repository
     summary: Add a user-facing README, defensive gitignore, security policy, and durable refs structure.
   - id: task-003
-    status: complete
+    status: superseded_by_refocus
     area: product
-    summary: Write the MVP product requirements and acceptance criteria for the story bank core.
+    summary: Original resume/story-bank MVP requirements. Superseded by refs/product/prd.md.
   - id: task-004
-    status: complete
+    status: superseded_in_part
     area: data
-    summary: Define canonical schemas for vault metadata, sources, roles, stories, interviews, jobs, voice profiles, and private entities.
+    summary: Original schemas for vault, sources, roles, stories, interviews, jobs, voice profiles, and private entities. Reuse selectively after the refocused domain model is defined.
   - id: task-005
-    status: active
+    status: preserve
     area: privacy
-    summary: Implement durable entity extraction, identity matching, confidence review, stable tokens, merge redirects, and record-scan reconciliation.
+    summary: Durable entity extraction, stable tokens, and user-assisted entity resolution remain useful infrastructure.
   - id: task-006
     status: implemented_pending_validation
     area: architecture
-    summary: Scaffold the Tauri 2, React, TypeScript, and Rust application with vault and source import commands.
+    summary: Tauri 2, React, TypeScript, and Rust application shell with vault and source import commands.
   - id: task-007
-    status: active
+    status: replan_under_phase_2
     area: providers
-    summary: Implement the provider contract for Ollama, Gemini bring-your-own-key, and manual workspace packages. The manual workspace path is implemented; direct providers remain open.
+    summary: Provider contract for Ollama, Gemini bring-your-own-key, and manual workspace packages. Manual path exists; direct provider work should follow the voice/domain refocus rather than lead it.
   - id: task-008
     status: complete
     area: testing
-    summary: Create synthetic fixtures for resumes, job descriptions, writing samples, entity ambiguity, and Git history.
+    summary: Synthetic fixtures for original resume/job/writing/entity/Git workflows. Add refocused fixtures rather than discarding these.
   - id: task-009
-    status: active
+    status: ongoing
     area: validation
-    summary: Keep Windows CI green for frontend, refs, Rust formatting, tests, clippy, and repository/build separation.
+    summary: Keep Windows validation healthy while avoiding unnecessary CI churn.
   - id: task-010
     status: implemented_pending_validation
     area: parsing
-    summary: Add local PDF and DOCX text extraction and route extracted text through the entity scan pipeline.
+    summary: Local PDF and DOCX extraction exists and is now a supporting ingestion utility rather than a core product focus.
   - id: task-011
-    status: active
+    status: preserve
     area: privacy
-    summary: Complete and validate private entity review and reconcile resolved reviews back into source and story scan status.
+    summary: Private entity review and scan-status reconciliation remain useful supporting infrastructure.
   - id: task-012
     status: implemented_pending_validation
     area: stories
-    summary: Extract only recognized work-history resume bullets into triageable story candidates while ignoring headline titles and non-employment sections.
+    summary: Resume work-history candidate extraction exists as optional Seed from resume foundation.
   - id: task-013
-    status: implemented_pending_validation
+    status: preserve_and_generalize
     area: stories
-    summary: Implement the resumable guided interview and evidence-labeling state machine.
+    summary: Guided interview and evidence-labeling state machine should be generalized beyond resume bullets.
   - id: task-014
-    status: implemented_pending_validation
+    status: preserve
     area: observability
-    summary: Record local operation phases and durations without storing private source content in performance metrics.
+    summary: Local operation timing without private payload logging remains desirable.
   - id: task-015
-    status: implemented_pending_validation
+    status: preserve
     area: distribution
-    summary: Enforce external development, build, QA staging, and QA installation paths outside the repository.
+    summary: Keep development/build/QA output outside the repository and on the checkout drive by default.
   - id: task-016
     status: complete
     area: licensing
-    summary: Apply AGPL-3.0-only to WorkLore and document the public-repository licensing default and exception review.
+    summary: AGPL-3.0-only licensing applied.
   - id: task-017
-    status: planned
+    status: planned_before_broad_distribution
     area: security
-    summary: Implement vault-level encryption after the first technical workflow test and before broad public distribution.
+    summary: Add vault-level encryption before broad public distribution; OS disk encryption is acceptable for early testing.
   - id: task-018
-    status: implemented_pending_validation
+    status: preserve_and_adapt
     area: stories
-    summary: Export privacy-safe manual AI synthesis workspaces and import strict structured responses into paired Markdown and JSON story records.
+    summary: Privacy-safe manual AI workspace export and strict structured response import remain useful provider-neutral foundations.
   - id: task-019
-    status: implemented_pending_validation
+    status: preserve
     area: roles
-    summary: Infer canonical employment roles from work-history headings and link discrete stories to those roles without using headline resume titles.
+    summary: Existing employment-role inference may remain for imported career material but should not drive the new domain.
   - id: task-020
-    status: open
+    status: absorbed_by_phase_3
     area: stories
-    summary: Add full story editing, claim review, evidence inspection, undo, and version-history controls.
+    summary: Story editing, evidence inspection, undo, and version history become part of the broader content audit trail.
   - id: task-021
-    status: open
+    status: absorbed_by_phase_2
     area: providers
-    summary: Implement direct Ollama and Gemini adapters behind the provider-neutral structured operation contract.
+    summary: Direct Ollama and Gemini adapters should be implemented only after canonical voice provenance and the refocused domain contracts are stable.
+
+active_refocus_tasks:
+  - id: task-022
+    status: complete
+    area: product
+    summary: Lock the refocused PRD around professional memory, topics, voice intelligence, anti-slop behavior, Audience Lens, analytics learning, and manual publication.
+  - id: task-023
+    status: complete
+    area: architecture
+    summary: Lock the standalone local deployment contract with no hosted backend, proprietary sync, or automatic social publishing in the accepted roadmap.
+  - id: task-024
+    status: next
+    area: data
+    summary: Define the refocused domain model and migration mapping for Story, Story Seed, Proof Point, Topic Candidate, Theme, Inspiration, Target Context, Voice Evidence, Core Voice, Tone Mode, Voice Direction, Writing Rule, Audience Model, Post, Revision, Experiment, Performance Record, and Source/Evidence.
+  - id: task-025
+    status: next
+    area: ux
+    summary: Design the task-oriented navigation and home flow around Capture, Stories, Topics, Voice, Posts, and Insights while demoting Sources and Privacy to supporting infrastructure.
+  - id: task-026
+    status: planned
+    area: capture
+    summary: Implement save-first capture that persists ambiguous memories, ideas, proof points, URLs, excerpts, job descriptions, writing samples, and notes before classification.
+  - id: task-027
+    status: planned
+    area: stories
+    summary: Generalize guided story development so stories can originate directly from capture rather than resume bullets.
+  - id: task-028
+    status: planned
+    area: topics
+    summary: Implement durable topic candidates, themes, proof-point relationships, and evergreen versus timely lifecycle metadata.
+  - id: task-029
+    status: planned
+    area: inspiration
+    summary: Add Inspiration ingestion with provenance, user notes, extracted concepts, questions, and counterpoints while preventing external prose from becoming voice evidence.
+  - id: task-030
+    status: planned
+    area: targeting
+    summary: Add Target Context ingestion beginning with job descriptions for topic/concept/skill ideation without keyword stuffing or single-JD overfitting.
+  - id: task-031
+    status: planned
+    area: voice
+    summary: Define and implement voice provenance so only user-authored or user-approved material can strengthen canonical voice and raw AI drafts are permanently excluded from training evidence.
+  - id: task-032
+    status: planned
+    area: voice
+    summary: Add Core Voice, Tone Modes, desired Voice Direction, edit-delta learning proposals, and intentional tone diversity.
+  - id: task-033
+    status: planned
+    area: quality
+    summary: Implement anti-slop writing-pattern linting, cross-draft repetition checks, proof-point rotation, and evidence/standing challenges.
+  - id: task-034
+    status: planned
+    area: privacy
+    summary: Implement reliable confidentiality transformation from private canonical facts to public-safe descriptions as a hard pre-publication check.
+  - id: task-035
+    status: planned
+    area: content
+    summary: Implement angle generation, Audience Lens, post drafting, comments/replies, and a human editorial approval workflow without social auto-publishing.
+  - id: task-036
+    status: planned
+    area: audit
+    summary: Build the robust provenance and revision audit trail linking sources, model drafts, user edits, final approved text, publication metadata, and later analytics.
+  - id: task-037
+    status: planned
+    area: analytics
+    summary: Import LinkedIn-native analytics exports and produce confidence-aware observations by topic, tone, structure, proof point, timing, audience intent, and experiment.
+  - id: task-038
+    status: future
+    area: discovery
+    summary: Add qualified news/topic discovery tied to themes, evidence, audience, freshness, novelty, saturation, and risk rather than a generic trending feed.
+  - id: task-039
+    status: future
+    area: targeting
+    summary: Add own-profile and selected public-profile ingestion as supplemental positioning and audience context.
