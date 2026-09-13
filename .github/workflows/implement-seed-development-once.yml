@@ -1,0 +1,127 @@
+name: One-shot Story Seed development implementation
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - .github/workflows/implement-seed-development-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  implement-and-validate:
+    runs-on: windows-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Initialize external validation folders
+        shell: pwsh
+        run: |
+          $frontendDist = Join-Path $env:RUNNER_TEMP "worklore-seed-development-frontend"
+          $cargoTarget = Join-Path $env:RUNNER_TEMP "worklore-seed-development-cargo"
+          "WORKLORE_FRONTEND_DIST=$frontendDist" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "CARGO_TARGET_DIR=$cargoTarget" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          New-Item -ItemType Directory -Force -Path $frontendDist | Out-Null
+          New-Item -ItemType Directory -Force -Path $cargoTarget | Out-Null
+
+      - name: Install validation dependencies
+        shell: pwsh
+        run: |
+          npm install --legacy-peer-deps --no-audit --no-fund --package-lock=false
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m pip install pyyaml
+
+      - name: Apply bounded Story Seed development slice
+        shell: pwsh
+        run: |
+          @'
+          from pathlib import Path
+          script = Path(".github/scripts/apply_seed_development_slice.py")
+          text = script.read_text(encoding="utf-8")
+          text = text.replace(
+              'replace_between(interview_service, "fn response_values(\\n", "fn add_next_question(", "fn add_next_question(")',
+              'replace_between(interview_service, "fn response_values(\\n", "fn add_next_question(", "")',
+          )
+          text = text.replace(
+              'replace_between(interview_service, "fn question_for_field(", "fn summarize(\\n", "fn summarize(\\n")',
+              'replace_between(interview_service, "fn question_for_field(", "fn summarize(\\n", "")',
+          )
+          script.write_text(text, encoding="utf-8")
+          '@ | python -
+          python .github/scripts/apply_seed_development_slice.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          @'
+          from pathlib import Path
+          path = Path("src-tauri/src/services/seed_development_service.rs")
+          text = path.read_text(encoding="utf-8")
+          text = text.replace(
+              "CompletenessItem, CompletenessStatus, InterviewSession, InterviewStatus,",
+              "CompletenessItem, CompletenessStatus, InterviewStatus,",
+          )
+          text = text.replace(
+              "interviews::{AnswerClassification, InterviewResponseAction},",
+              "interviews::{AnswerClassification, InterviewResponseAction, InterviewSession},",
+          )
+          path.write_text(text, encoding="utf-8")
+          '@ | python -
+
+      - name: Format Rust
+        shell: pwsh
+        run: cargo fmt --manifest-path src-tauri/Cargo.toml --all
+
+      - name: Validate references and path safety
+        shell: pwsh
+        run: |
+          python scripts/check-case-collisions.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python refs/tools/validate_refs.py --mode initialized
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python refs/tools/generate_agent_context.py --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git diff --check
+
+      - name: Run frontend tests
+        shell: pwsh
+        run: npm run test
+
+      - name: Build frontend
+        shell: pwsh
+        run: npm run build:frontend
+
+      - name: Run Rust tests
+        shell: pwsh
+        run: cargo test --manifest-path src-tauri/Cargo.toml
+
+      - name: Run Rust lints
+        shell: pwsh
+        run: cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
+
+      - name: Confirm Rust formatting
+        shell: pwsh
+        run: cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
+
+      - name: Commit validated Story Seed development slice
+        shell: pwsh
+        run: |
+          git add src-tauri/src/services/guided_development_rules.rs src-tauri/src/services/seed_development_service.rs src-tauri/src/services/interview_service.rs src-tauri/src/services/mod.rs src-tauri/src/commands/development.rs src-tauri/src/commands/mod.rs src-tauri/src/lib.rs src/domain/types.ts src/lib/workloreApi.ts src/components/SeedDevelopmentPanel.tsx src/components/CapturePanel.tsx src/seed-development.css
+          if (-not (git diff --cached --quiet)) {
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "feat: develop captured story seeds"
+            git push origin HEAD:dev
+          }
