@@ -80,7 +80,22 @@ Windows implementation validation:
 - Clippy with warnings denied: green
 - rustfmt check: green
 
-The one-shot implementation script/workflow are temporary closeout infrastructure and must be removed after normalized-state validation. They are not standing WorkLore CI.
+Read-only normalized-state closeout validation:
+
+- validation checkpoint: `f1a75594ad5f0289e105e8d981eac7a9bf0cee91`
+- Actions run: `34757907398`
+- Job: `103725389855`
+- case-collision guard: green, 172 tracked paths at runner checkout
+- refs validation in initialized mode: green, Agent Academy and OKF aligned
+- bounded agent-context check: green, 5,502 characters / 8,000 budget
+- `git diff --check`: green
+- frontend tests: 3 passed, 0 failed
+- production frontend TypeScript/Vite build: green
+- Rust tests: 62 passed, 0 failed
+- Clippy with warnings denied: green
+- rustfmt check: green
+
+The one-shot implementation script/workflow were removed before closeout validation. The read-only closeout validator is removed after the successful run. None of these temporary files are standing WorkLore CI or product infrastructure.
 
 ## Current State
 
