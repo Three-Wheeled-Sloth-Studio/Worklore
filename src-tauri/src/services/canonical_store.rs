@@ -22,7 +22,7 @@ use crate::{
 };
 
 pub const DATABASE_RELATIVE_PATH: &str = "data/worklore.sqlite";
-const CURRENT_SCHEMA_VERSION: i64 = 7;
+const CURRENT_SCHEMA_VERSION: i64 = 8;
 const MIGRATION_NAME: &str = "prototype_to_professional_memory_v1";
 
 const SCHEMA_V1: &str = r#"
@@ -259,6 +259,42 @@ CREATE TABLE writing_rules (
   revision INTEGER NOT NULL CHECK (revision >= 1)
 );
 CREATE INDEX idx_writing_rules_status_updated ON writing_rules(status, updated_at DESC);
+"#;
+
+const SCHEMA_V8: &str = r#"
+CREATE TABLE posts (
+  post_id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('working','final_approved')),
+  current_revision_id TEXT,
+  final_approved_revision_id TEXT,
+  approved_at TEXT,
+  provenance_json TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  revision INTEGER NOT NULL CHECK (revision >= 1)
+);
+CREATE INDEX idx_posts_status_updated ON posts(status, updated_at DESC);
+
+CREATE TABLE post_revisions (
+  revision_id TEXT PRIMARY KEY,
+  post_id TEXT NOT NULL,
+  sequence INTEGER NOT NULL CHECK (sequence >= 1),
+  parent_revision_id TEXT,
+  text_snapshot TEXT NOT NULL,
+  origin TEXT NOT NULL CHECK (origin IN ('user','model')),
+  authorship_state TEXT NOT NULL CHECK (authorship_state IN ('user_authored','user_edited_model','model_generated')),
+  provider_run_id TEXT,
+  provider_id TEXT,
+  model_id TEXT,
+  provenance_json TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  UNIQUE(post_id, sequence),
+  FOREIGN KEY(post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
+  FOREIGN KEY(parent_revision_id) REFERENCES post_revisions(revision_id)
+);
+CREATE INDEX idx_post_revisions_post_sequence ON post_revisions(post_id, sequence);
+CREATE INDEX idx_post_revisions_parent ON post_revisions(parent_revision_id);
 "#;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -578,6 +614,16 @@ fn migrate_schema(connection: &mut Connection) -> ServiceResult<()> {
         tx.execute_batch(SCHEMA_V7)?;
         tx.execute(
             "INSERT INTO schema_migrations(version,name,applied_at) VALUES (7,'core_voice_foundation_v7',?1)",
+            [Utc::now().to_rfc3339()],
+        )?;
+        tx.commit()?;
+        version = 7;
+    }
+    if version == 7 {
+        let tx = connection.transaction()?;
+        tx.execute_batch(SCHEMA_V8)?;
+        tx.execute(
+            "INSERT INTO schema_migrations(version,name,applied_at) VALUES (8,'post_revision_lineage_v8',?1)",
             [Utc::now().to_rfc3339()],
         )?;
         tx.commit()?;
@@ -928,7 +974,7 @@ mod tests {
     fn initializes_database() {
         let p = vault();
         assert!(database_path(&p).is_file());
-        assert_eq!(schema_version(&p).unwrap(), 7);
+        assert_eq!(schema_version(&p).unwrap(), 8);
         fs::remove_dir_all(p).unwrap();
     }
     #[test]
