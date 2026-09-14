@@ -1,7 +1,7 @@
 ---
 type: Handoff Prompt
 title: Next WorkLore Development Slice
-description: Bounded prompt for provider-free confidentiality transformation on the validated deterministic quality and privacy foundations.
+description: Bounded prompt for durable Post/Revision lineage on the validated professional-memory, voice, quality, and confidentiality foundations.
 status: draft
 tags: [handoff, next-slice]
 ---
@@ -13,161 +13,200 @@ Continue implementation in:
 
 Work directly on `dev`. Do not promote `qa` or `main` unless explicitly requested.
 
+Draft PR #1 remains `dev -> qa`. Leave it draft.
+
 ## Accepted Starting Point
 
-Phase 1 Professional Memory is complete. Phase 2 Voice Intelligence is in progress.
+Phase 1 Professional Memory is complete. Phase 2 Voice Intelligence has validated foundations for governed Voice Evidence, Core Voice, review-only provider proposals, deterministic single-draft linting, and provider-free confidentiality transformation.
 
-Validated deterministic Writing Pattern Linter checkpoint:
+Accepted confidentiality implementation checkpoint:
 
-`f83c6b6b263c304464379e40b6a2f11f37051a94`
+`33c081a30b982eafe542b8efa9beea9f3c4f242a`
 
 Implementation validation:
 
-- Actions `34788734444`
-- Job `103808889194`
+- Actions `34792809384`
+- Job `103820125275`
 - frontend: 8 passed / 0 failed across 3 files
-- Rust: 99 passed / 0 failed
+- Rust: 104 passed / 0 failed
 - production frontend build: green, 53 modules transformed
-- case-collision, refs/OKF, bounded agent context, `git diff --check`, warnings-denied Clippy, and rustfmt: green
+- external build layout, case/path validation, refs/OKF, bounded agent context, warnings-denied Clippy, rustfmt, and repository/source-only checks: green
 
-This checkpoint includes governed Voice Evidence, schema-v7 Core Voice/Tone/Direction/Writing Rules, provider-neutral Ollama review-only voice proposals, and a provider-free deterministic single-draft Writing Pattern Linter. The linter produces explainable findings and explicit Writing Rule violations without draft persistence, canonical mutation, provider execution, AI/human probability, or an opaque quality score.
+The confidentiality foundation reuses the Private Entity Registry and existing external redaction path, separates stable-token redaction from explicitly stored public descriptions, surfaces unresolved risk as `ready`, `needs_review`, or `blocked`, scans supplied text for unknown sensitive-looking material using transient privacy state, preserves canonical private truth, and makes no provider or network call.
 
 Read `refs/handoffs/currentHandoff.md` before making changes.
 
 ## Start With Bounded Re-entry
 
+Do not reread repository history.
+
+First run:
+
 ```powershell
-python refs/tools/generate_agent_context.py --focus "WorkLore task-034 confidentiality transformation public-safe descriptions Private Entity Registry privacy redaction"
+python refs/tools/generate_agent_context.py --focus "WorkLore task-036 Post Revision durable lineage audit trail model draft human edit final approval provenance"
 ```
 
-Treat generated context as derived orientation. Read only the authoritative refs/source needed for this slice.
+Treat generated context as derived orientation, not source of truth. Follow it into only the authoritative product, architecture, schema, and implementation files needed for this slice.
 
 Read at minimum:
 
-- `refs/product/prd.md`, especially confidentiality/privacy requirements
+- `refs/handoffs/currentHandoff.md`
+- `refs/product/prd.md`, especially Post/Revision, audit, voice provenance, confidentiality, and publication requirements
 - `refs/architecture/vaultFormat.md`
-- `refs/architecture/providerArchitecture.md`
+- the authoritative domain-model architecture material referenced by the generated context
 - `refs/planning/roadmap.yaml`
 - `refs/planning/todos.yaml`
-- `refs/handoffs/currentHandoff.md`
-- `src-tauri/src/services/redaction_service.rs`
-- `src-tauri/src/services/entity_scan.rs`
-- `src-tauri/src/services/entity_review.rs`
-- `src-tauri/src/commands/privacy.rs`
-- relevant private-entity domain/provider types
-- `src/domain/types.ts`
-- `src/lib/workloreApi.ts`
+- canonical SQLite schema/migration/store code
+- current domain types and typed-relationship persistence patterns
+- Voice Evidence eligibility/provenance code
+- current Writing Pattern Linter and confidentiality contracts only where needed to preserve downstream boundaries
 
-## Immediate Objective
+Load deeper files only as needed.
 
-Begin `task-034` with the smallest provider-free confidentiality transformation foundation that can turn supplied private text into reviewable public-safe text without destroying the canonical private facts or inventing replacement facts.
+## Immediate Objective: task-036 lineage foundation
 
-This slice should answer:
+Implement the smallest provider-free durable Post/Revision lineage foundation that can answer:
 
-`Can WorkLore transform known private entities in supplied text into explicit public-safe representations, surface unresolved privacy risk for human review, and preserve factual meaning without a provider or network dependency?`
+`Can WorkLore record a real post from initial draft through human edits and explicit final approval, preserve exact revision ancestry and provenance after reopen, and keep raw model-origin text out of canonical voice without generating or publishing content?`
 
-### 1. Reuse the existing privacy model
+This is a lineage and audit slice, not broad Content Studio implementation.
 
-Do not create a parallel confidentiality registry.
+### 1. Reuse canonical persistence
 
-Build on the existing:
+Build on the existing canonical SQLite schema/migration/store patterns.
 
-- Private Entity Registry;
-- stable public tokens;
-- entity aliases;
-- sensitivity values, including `never_send_to_cloud` and `ask_before_cloud` semantics;
-- pending entity-review items and risk levels;
-- `redact_for_external_use` replacement/preflight behavior.
+Do not introduce a parallel JSON post store or a second audit database.
 
-If the existing redaction service needs a cleaner internal seam so token redaction and public-safe transformation can share matching/review logic, refactor that seam narrowly rather than duplicating matching rules.
+Add only the minimal durable structures needed for real Post and Revision lineage.
 
-### 2. Separate token redaction from public-safe prose
+### 2. Preserve exact revision ancestry
 
-External-provider redaction and public publication are related but not identical problems.
+At minimum, support:
 
-The public transformation contract should distinguish at least:
+- stable Post identity;
+- stable Revision identity;
+- explicit Post -> Revision relationship;
+- deterministic revision order or sequence;
+- parent/predecessor revision identity where appropriate;
+- created/updated timestamps using current repository conventions;
+- exact stored revision text;
+- explicit current/final-approved revision reference on the Post or an equivalent unambiguous contract.
 
-- original private text supplied for transformation;
-- deterministic stable-token redaction where appropriate;
-- human-readable public-safe replacement candidates or accepted public descriptions;
-- unresolved/blocked entities that still need human review;
-- metadata explaining exactly what changed and why.
+Do not synthesize revision history for material created before this foundation exists.
 
-Do not silently replace `[EMPLOYER_1]` with an invented phrase such as "a Fortune 500 healthcare company" unless that description is explicitly stored/approved and supported by canonical facts.
+### 3. Make origin and authorship explicit
 
-### 3. Preserve private canonical truth
+Revision provenance must distinguish real origins rather than inferring them later.
+
+Support the smallest explicit origin vocabulary required by current product contracts, for example manual/user-authored, model/provider-origin, or imported, but follow existing authoritative domain terminology if it already exists.
 
 Requirements:
 
-- transformation returns derived output; it does not overwrite the Source, Story, Proof Point, or other private canonical record;
-- real private names remain available in canonical state;
-- transformed text retains a traceable relationship to the matched entity IDs and replacement decisions;
-- repeated aliases for the same entity resolve consistently within one transformation;
-- replacements must not create false employer/client/project relationships or alter metrics/outcomes;
-- public-safe wording must not imply anonymity guarantees the system cannot make.
+- a model-origin revision may be stored as an audit record;
+- raw model-origin text must not automatically become Voice Evidence or train Core Voice;
+- a later human-edited or explicitly approved final revision must remain distinguishable from its model ancestor;
+- do not infer human authorship merely because a model draft was edited;
+- preserve provider run/reference metadata only where current provider/audit contracts already support it, and never store credentials or private provider payload logs merely for this slice.
 
-### 4. Fail closed on unresolved risk
+### 4. Add explicit editorial state without publication automation
 
-The system must not present unsafe output as publication-ready merely because some replacements succeeded.
+Support only the minimal lifecycle needed to prove lineage, such as working/draft and final-approved, using existing product terminology where defined.
 
-Return an explicit state such as `ready`, `needs_review`, or `blocked` based on deterministic privacy conditions.
+Explicit user approval must be a real state transition or recorded audit action, not inferred from text content.
 
-At minimum:
+Do not add automatic publication, scheduling, autonomous engagement, or social API integration.
 
-- high/critical unresolved privacy review must block when the accepted privacy rules require it;
-- unresolved lower-risk items remain visible warnings/review work;
-- `never_send_to_cloud` semantics remain strict for provider-bound content and must not be weakened by the public transformation path;
-- unknown/unreviewed sensitive-looking material must not be silently declared safe.
+Published-state metadata may remain deferred unless the existing authoritative model requires a harmless placeholder now for migration compatibility.
 
-### 5. Keep the first slice provider-free
+### 5. Preserve semantic source boundaries
 
-Confidentiality is a hard pre-publication safety requirement and must not depend on Ollama, Gemini, or network availability.
+A Post/Revision may need traceable relationships to the material that informed it, but those links must preserve meaning.
 
-A later provider may help suggest human-readable generalizations, but any such suggestion must remain review-only and pass the same entity/privacy checks. Do not add a provider call in this foundation merely to generate nicer wording.
+Do not collapse:
 
-### 6. Keep Content Studio out of scope
+- Evidence or Proof Points into Inspiration;
+- Inspiration into Evidence;
+- Target Context into user standing;
+- Voice Evidence into generic Source material;
+- confidentiality-derived wording into replacement canonical truth.
 
-A transient supplied-text transformation/review surface is acceptable if useful for proving the contract.
+Use existing typed relationship patterns where practical rather than inventing untyped link blobs.
 
-Do not begin broad Post/Revision persistence, automatic publication, scheduling, Audience Lens, or general Content Studio workflow in this slice.
+### 6. Keep confidentiality derived
 
-The derived transformation contract should be reusable by Content Studio later.
+The task-034 public-safe transformation is a review/output layer.
 
-### 7. Proof cases
+Do not overwrite stored private revision text with public-safe wording.
+
+Later Content Studio may run confidentiality transformation against a revision before approval/publication. This slice only needs to ensure the lineage model does not destroy the private canonical revision in order to support that future gate.
+
+### 7. Keep provider execution out of scope
+
+No provider is required to prove revision lineage.
+
+A synthetic/model-origin revision fixture is sufficient for provenance tests. Do not call Ollama or add Gemini/BYOK generation merely to create a model draft.
+
+### 8. Keep task-032 and task-033 analysis deferred
+
+Real revision lineage is the prerequisite for:
+
+- edit-delta learning;
+- cross-draft repetition;
+- proof-point rotation;
+- portfolio mode-collapse;
+- richer evidence/standing review.
+
+Do not implement those analyses in this slice. Do not create pseudo-history to exercise them.
+
+### 9. Keep broad Content Studio out of scope
+
+Do not begin:
+
+- angle generation;
+- Audience Lens;
+- provider-assisted post drafting;
+- comments or replies;
+- publication workflow beyond explicit local final approval;
+- scheduling;
+- analytics;
+- discovery/news scanning.
+
+A thin local/transient or minimal persistence test surface is acceptable if needed to prove create/edit/approve/reopen behavior, but avoid a broad Posts UI rewrite.
+
+## Proof Cases
 
 Cover at least:
 
-- transformation works with no provider configured;
-- known private entity aliases are replaced consistently;
-- public entities are not unnecessarily transformed;
-- `never_send_to_cloud` behavior remains protected for provider/external paths;
-- high-risk pending review blocks or clearly prevents a ready state according to current vault policy;
-- lower-risk pending review remains visible rather than being lost;
-- accepted/stored public descriptions can be used only when explicitly present and attributable;
-- missing public description does not trigger invented prose;
-- replacements preserve surrounding metrics and factual claims;
-- original canonical/private text remains unchanged;
-- replacement metadata exposes entity ID/type and resulting representation without leaking a secret into logs;
-- existing 99 Rust tests and 8 frontend tests remain green.
+- works with no provider configured;
+- a user-authored initial draft creates one durable Post and one durable Revision;
+- editing creates a new Revision instead of silently overwriting prior text;
+- revision order/parentage is deterministic and survives reopen;
+- explicit final approval identifies the exact approved Revision;
+- earlier revision text remains inspectable after approval;
+- a synthetic model-origin Revision can be stored with explicit provenance but does not become Voice Evidence automatically;
+- a later human edit remains linked to its model-origin ancestor without falsely relabeling the ancestor as human-authored;
+- typed links to supporting material remain traceable while Evidence, Inspiration, Target Context, and Voice Evidence semantics stay distinct;
+- no revision history is fabricated for pre-lineage content;
+- confidentiality transformation remains derived and does not overwrite stored private revision text;
+- existing 104 Rust tests and 8 frontend tests remain green.
 
-## Constraints
+## Locked Constraints
 
-- Standalone Windows-first, local canonical storage.
-- No WorkLore account/backend/proprietary sync.
-- No automatic publication or scheduling.
-- No silent provider fallback.
-- Confidentiality transformation foundation must remain provider-free.
-- Preserve Evidence/Inspiration/Target Context/Voice Evidence distinctions.
-- Preserve the existing Private Entity Registry as the source of truth for known private entities.
-- Do not overwrite private canonical facts with public-safe derived wording.
-- Do not invent replacement facts, anonymity claims, employer/client relationships, or classifications.
-- Do not implement edit-delta learning before durable Post/Revision lineage exists.
-- Do not implement cross-draft repetition/proof-point rotation by inventing temporary history.
-- Do not begin broad Content Studio in this slice.
-- Public-repository fixtures must remain synthetic.
-- Keep build/dev/QA output outside the repository.
-- Run case-collision and refs/OKF validation.
-- Do not hand-edit generated OKF indexes.
+- standalone Windows-first;
+- local canonical storage;
+- no WorkLore-hosted backend/account/proprietary sync;
+- no automatic publication or scheduling;
+- no silent provider fallback;
+- raw AI drafts never train canonical voice;
+- preserve Evidence/Inspiration/Target Context/Voice Evidence distinctions;
+- preserve Private Entity Registry as privacy source of truth;
+- public-safe wording remains derived output, not replacement canonical truth;
+- do not implement edit-delta learning before real revision lineage is proven;
+- do not implement cross-draft analysis using fake history;
+- public fixtures remain synthetic;
+- keep build/dev/QA output outside the repository;
+- do not hand-edit generated OKF indexes;
+- do not promote `qa` or `main`.
 
 ## Validation
 
@@ -187,6 +226,6 @@ cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -
 
 ## Stop Point
 
-Stop when WorkLore has a provider-free confidentiality transformation contract that reuses the existing entity/privacy infrastructure, produces derived reviewable public-safe output with explicit replacement/risk metadata, and never destroys private canonical truth or invents replacement facts.
+Stop when WorkLore has real durable Post/Revision ancestry that survives reopen, records explicit provenance and final approval, preserves prior revisions and semantic source boundaries, and prevents raw model drafts from silently becoming canonical voice material.
 
-Do not begin broad Content Studio, provider-assisted rewriting, or automatic publication implicitly.
+Do not implicitly begin broad task-035 Content Studio, provider-assisted drafting, publication automation, edit-delta learning, or portfolio analysis.
