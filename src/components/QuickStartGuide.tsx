@@ -41,7 +41,7 @@ export function QuickStartGuide({ open, onClose }: { open: boolean; onClose: () 
             <p className="quick-start-lede">Build professional memory first. Draft from it later.</p>
           </div>
           <button
-            className="shell-icon-button neutral"
+            className="shell-icon-button"
             type="button"
             aria-label="Close quick start"
             title="Close quick start"
