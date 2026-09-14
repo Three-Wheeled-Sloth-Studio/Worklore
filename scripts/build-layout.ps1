@@ -115,6 +115,29 @@ function Get-WorkLoreBuildLayout {
     }
 }
 
+function Get-WorkLoreTauriFrontendDist {
+    param(
+        [Parameter(Mandatory = $true)]
+        $Layout
+    )
+
+    $repoRoot = Get-WorkLoreRepoRoot
+    $tauriProjectRoot = Get-NormalizedPath (Join-Path $repoRoot "src-tauri")
+    $relative = [System.IO.Path]::GetRelativePath(
+        $tauriProjectRoot,
+        (Get-NormalizedPath $Layout.FrontendDist)
+    ).Replace('\', '/')
+
+    # Tauri currently treats a Windows absolute frontendDist such as D:\... as a URL,
+    # causing packaged apps to navigate to the directory instead of embedding index.html.
+    # Keep this value relative to src-tauri so the frontend is embedded into the binary.
+    if ([System.IO.Path]::IsPathRooted($relative) -or $relative -match '^[A-Za-z]:') {
+        throw "Tauri frontend output must be reachable by a relative path from src-tauri. Keep WORKLORE_EXTERNAL_ROOT on the same drive as the repository. Refusing value: $relative"
+    }
+
+    return $relative
+}
+
 function Initialize-WorkLoreBuildLayout {
     param(
         [Parameter(Mandatory = $true)]
