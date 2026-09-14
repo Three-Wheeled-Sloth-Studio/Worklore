@@ -16,7 +16,7 @@ export const PRIMARY_NAV_ITEMS: NavigationItem[] = [
   { id: "stories", label: "Stories", availability: "available", description: "Develop professional memory" },
   { id: "topics", label: "Topics", availability: "available", description: "Connect ideas before drafting" },
   { id: "voice", label: "Voice", availability: "available", description: "Govern Voice Evidence provenance" },
-  { id: "posts", label: "Posts", availability: "planned", description: "Phase 3 editorial workflow" },
+  { id: "posts", label: "Posts", availability: "available", description: "Draft, challenge, revise, and explicitly approve" },
   { id: "insights", label: "Insights", availability: "planned", description: "Phase 4 learning loop" },
 ];
 
@@ -33,6 +33,6 @@ export const SETTINGS_NAV_ITEM: NavigationItem = {
   description: "Providers, storage, and diagnostics",
 };
 
-export function isPlannedPrimaryView(view: AppView): view is "posts" | "insights" {
-  return view === "posts" || view === "insights";
+export function isPlannedPrimaryView(view: AppView): view is "insights" {
+  return view === "insights";
 }
