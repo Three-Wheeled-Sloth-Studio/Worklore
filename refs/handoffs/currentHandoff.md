@@ -1,7 +1,7 @@
 ---
 type: Handoff
 title: Current WorkLore Handoff
-description: Validated Phase 2 deterministic Writing Pattern Linter checkpoint and bounded handoff into confidentiality transformation.
+description: Validated provider-free confidentiality transformation checkpoint and bounded handoff into real Post/Revision lineage.
 status: draft
 tags: [handoff, worklore]
 ---
@@ -23,132 +23,148 @@ Locked boundaries remain:
 - no automatic social publishing or scheduling;
 - explicit human review before publication;
 - raw AI drafts never train canonical voice;
-- hard confidentiality transformation before public use;
+- confidentiality transformation is a hard pre-publication requirement;
 - Evidence, Inspiration, Target Context, and Voice Evidence remain semantically distinct;
 - resume import remains an optional `Seed from resume` path rather than the product center.
 
-## Phase 1 Professional Memory: Complete
+## Accepted Product Checkpoints
 
-Accepted Phase 1 product checkpoint:
+Phase 1 Professional Memory:
 
 `e3393d7f95d5e060a23719b72b0ac9f051df5e92`
 
-## Phase 2 Voice Intelligence: In Progress
-
-Accepted Voice Evidence checkpoint:
+Voice Evidence:
 
 `faf702206eac854700b7d634ef40901afe898916`
 
-Accepted provider-free Core Voice foundation checkpoint:
+Provider-free Core Voice foundation:
 
 `8344be9b3e25900d8eb59c1e6c35f97f25896bd5`
 
-Accepted provider-neutral review-only voice proposal checkpoint:
+Provider-neutral review-only voice proposals:
 
 `34def4aca4e52eaa32d59546cbf174964c9eae66`
 
-Accepted deterministic Writing Pattern Linter checkpoint:
+Deterministic Writing Pattern Linter:
 
 `f83c6b6b263c304464379e40b6a2f11f37051a94`
 
-### What the deterministic linter slice landed
+Provider-free confidentiality transformation implementation:
 
-- A provider-free `lint_draft` command accepts transient supplied text and returns structured findings without persisting the draft or mutating canonical content, Core Voice, Tone Modes, Voice Directions, or Writing Rules.
-- Findings use stable rule IDs, categories, advisory/warning severity, human-readable reasons, optional remediation, matched text, source kind/source ID, and browser-compatible UTF-16 start/end offsets where a concrete match exists.
-- Built-in single-draft checks are intentionally bounded and explainable:
-  - rhetorical-question opening;
-  - explicit engagement-bait closing stems;
-  - explicit engagement-bait phrases;
-  - more than five hashtags;
-  - list-dominated structure when at least four list lines make up at least 60 percent of at least five non-empty lines.
-- The linter does not claim that every question, list, or hashtag is bad. Each built-in threshold is deterministic and visible in the result rationale.
-- Active Writing Rules are machine-enforced only when the instruction uses an explicit supported form:
-  - `ban phrase: ...`;
-  - `ban word: ...`;
-  - `forbid punctuation: em dash|en dash|semicolon|exclamation mark|ellipsis`.
-- Proposed, disabled, and retired Writing Rules do not enforce.
-- Arbitrary active prose Writing Rules remain visible as advisory-only unsupported rules rather than being silently converted into hidden regexes or fuzzy policy.
-- The Voice workspace exposes a transient Draft Pattern Check test surface. It explicitly states that no provider is called, no draft is saved, no AI/human probability is calculated, and no overall quality/slop score is produced.
-- The shared finding contract is intentionally extensible so future provider-assisted or portfolio-aware review can add findings without replacing the deterministic foundation.
+`33c081a30b982eafe542b8efa9beea9f3c4f242a`
 
-### What remains in task-033
+## task-034: Complete
 
-`task-033` remains `in_progress` rather than being closed artificially.
+The confidentiality foundation now answers the bounded question: WorkLore can transform known private entities in supplied text into explicit public-safe representations, surface unresolved privacy risk for human review, and preserve private canonical truth without a provider or network dependency.
 
-The following work requires durable Post/Revision or published-content corpus state that does not exist yet:
+### What landed
+
+- `transform_for_public_use` is provider-free and transient. It does not persist the supplied draft or overwrite Sources, Stories, Proof Points, or other private canonical records.
+- The transformation reuses the existing Private Entity Registry and `redact_for_external_use` path rather than creating a second confidentiality registry or matching model.
+- Results distinguish:
+  - original supplied private text;
+  - deterministic stable-token redaction;
+  - derived public-safe text;
+  - explicit replacement metadata;
+  - unresolved privacy risks;
+  - overall `ready`, `needs_review`, or `blocked` state.
+- Human-readable replacements come only from an explicitly stored nonblank `public_description`. Missing descriptions remain stable public tokens. No replacement prose is invented.
+- Repeated aliases for one entity resolve consistently through the existing registry/redaction behavior.
+- Public entities remain unchanged when the current privacy model does not require transformation.
+- Surrounding metrics and factual claims are preserved because the transformation changes matched entity representations only.
+- Replacement metadata exposes entity ID, entity type, sensitivity, representation kind, replacement value, and occurrence count without returning the matched private payload as metadata.
+- Persistent pending entity-review work remains visible in the result.
+- High/critical pending review blocks when the existing vault policy says high-risk pending review should block.
+- Lower-risk pending review produces `needs_review` rather than disappearing or being called safe.
+- A transient copy of the privacy state is used to scan supplied text for sensitive-looking material that is not represented by reviewed canonical entities. This does not mutate the real registry.
+- Unknown high-risk material such as an unregistered email address fails closed with `blocked`.
+- A narrow wrapper filter suppresses scanner artifacts only when a newly detected range is inside a known entity or encloses it by no more than five characters. Distinct unknown material remains review work.
+- Existing `never_send_to_cloud` behavior remains strict on the provider/external redaction path.
+- No Ollama, Gemini, BYOK, provider fallback, content generation, publication, or scheduling work was added.
+
+### Proof coverage
+
+The Rust suite now includes task-034 cases for:
+
+- provider-free execution;
+- known aliases replaced consistently;
+- public entities unchanged;
+- explicitly stored public descriptions used when present;
+- stable-token fallback when a public description is absent;
+- metrics and surrounding claims preserved;
+- canonical registry unchanged by transformation;
+- high-risk pending review blocking under current vault policy;
+- lower-risk pending review remaining visible;
+- unknown high-risk sensitive text failing closed without registry mutation;
+- `never_send_to_cloud` continuing to redact on the existing external/provider path.
+
+## Validation Evidence
+
+Accepted task-034 implementation validation:
+
+- Actions run: `34792809384`
+- Job: `103820125275`
+- validated implementation checkpoint: `33c081a30b982eafe542b8efa9beea9f3c4f242a`
+- external build layout: green
+- case-collision and refs/OKF/path-safety validation: green
+- bounded agent-context check: green
+- frontend tests: 8 passed, 0 failed across 3 files
+- production frontend TypeScript/Vite build: green, 53 modules transformed
+- Rust tests: 104 passed, 0 failed
+- warnings-denied Clippy: green
+- rustfmt: green
+- repository/source-only check: green
+
+An earlier task-034 run, Actions `34791399737`, Job `103816187230`, had all behavioral tests and Clippy green but failed only on rustfmt line wrapping. Commit `33c081a30b982eafe542b8efa9beea9f3c4f242a` applies those mechanical formatter changes and is the accepted implementation checkpoint above.
+
+The repository currently carries `.npmrc` with `legacy-peer-deps=true` as a narrow CI bootstrap workaround for an npm 10.9.8 Arborist `edgesOut` failure observed on the hosted Windows runner. It should be revisited when the runner/npm defect is no longer relevant; it is not part of the confidentiality product contract.
+
+## Remaining Phase 2 Work
+
+`task-032` remains `in_progress` only for edit-delta learning. That requires real durable model-draft -> human-edit -> final-approved lineage.
+
+`task-033` remains `in_progress` for work that likewise needs a real content corpus and revision history:
 
 - cross-draft repetition detection;
 - proof-point rotation;
 - portfolio-level opening/structure repetition;
 - batch mode-collapse analysis;
-- fuller evidence/standing challenges tied to explicit draft claims and supporting evidence.
+- fuller evidence/standing challenges tied to actual draft claims and supporting evidence.
 
-Do not create transient pseudo-history or begin broad Content Studio persistence merely to mark these items complete.
+Do not create pseudo-history, transient fake revisions, or synthetic usage history merely to close these items.
 
-`task-032` also remains `in_progress` only for edit-delta learning, which likewise depends on durable model-draft -> human-edit -> final-approved lineage.
+## Recommended Next Slice
 
-## Validation Evidence
-
-Deterministic Writing Pattern Linter validation:
-
-- Actions run: `34788734444`
-- Job: `103808889194`
-- validated product checkpoint: `f83c6b6b263c304464379e40b6a2f11f37051a94`
-- case-collision guard: green, 202 tracked paths
-- refs validation: green, Agent Academy and OKF aligned
-- bounded agent-context check: green, 5701 / 8000 characters
-- `git diff --check`: green
-- frontend tests: 8 passed, 0 failed across 3 files
-- production frontend TypeScript/Vite build: green, 53 modules transformed
-- Rust tests: 99 passed, 0 failed
-- warnings-denied Clippy: green
-- rustfmt: green
-
-Two earlier one-shot attempts failed before applying product code because the temporary workflow did not initially match the repository's no-lockfile npm bootstrap. The validated run used the same tested install pattern as the prior green provider closeout; those setup-only failures introduced no product changes.
-
-## Current Quality Boundary
-
-The implemented quality path is intentionally layered:
-
-- deterministic single-draft checks run locally with no provider or network dependency;
-- user Writing Rules are authoritative constraints only where their machine-enforceable syntax is explicit;
-- unsupported prose rules remain advisory rather than receiving hidden interpretation;
-- later provider-assisted quality review must use the existing explicit provider registry and remain review/challenge material rather than authoritative truth;
-- portfolio checks must wait for real durable content history;
-- no component may produce a fake AI/human probability or opaque overall quality score.
-
-## Next Slice
-
-Begin `task-034` with a bounded provider-free confidentiality transformation foundation.
+Begin `task-036` with the smallest durable Post/Revision lineage foundation before broad `task-035` Content Studio generation.
 
 Immediate objective:
 
-- reuse the existing Private Entity Registry, stable public tokens, entity sensitivity, pending-review semantics, and `redact_for_external_use` behavior rather than creating a parallel privacy model;
-- add a public-safe transformation contract that accepts supplied text and returns transformed text plus explicit replacement/review metadata without overwriting private canonical source material;
-- distinguish deterministic token redaction from human-readable public descriptions so functional substitutions can be reviewed rather than silently invented;
-- fail closed or return `needs_review` when high-risk/unresolved material cannot be safely transformed under the current privacy rules;
-- preserve factual meaning and avoid fabricating anonymity, employer/client relationships, project types, or other details;
-- keep the first transformation path provider-free and network-independent;
-- keep later provider-bound content behind the existing privacy preflight/disclosure boundary;
-- provide a thin transient test/review surface only if it helps prove the contract without beginning broad Content Studio/Post persistence.
+- create real durable lineage for a Post and its Revisions using the existing canonical SQLite/migration patterns;
+- preserve exact revision ancestry and explicit origin/provenance;
+- support manual draft -> edit -> explicit final approval as a provider-free proof path;
+- permit model-origin revisions to exist as audit records later without allowing raw model text to become canonical Voice Evidence automatically;
+- preserve typed links to Sources, Stories, Proof Points, Topics, Inspiration, and Target Context without collapsing their semantic roles;
+- make the lineage inspectable after reopen;
+- keep confidentiality transformation derived and non-destructive rather than rewriting private revision truth.
 
-Do not begin automatic publishing, broad Content Studio, or durable Post/Revision persistence in this slice.
+This ordering is intentional. Real Post/Revision lineage is the dependency needed to implement task-032 edit-delta learning and task-033 portfolio checks honestly, and it gives task-035 an audit-safe editorial substrate instead of forcing those features to invent history later.
+
+Do not begin broad angle generation, Audience Lens, provider-assisted drafting, comment/reply generation, social publication, scheduling, analytics, edit-delta inference, or cross-draft scoring in the lineage slice.
 
 ## Relevant Files For Next Slice
 
-- `refs/product/prd.md`, especially confidentiality/privacy requirements
-- `refs/architecture/vaultFormat.md`
-- `refs/architecture/providerArchitecture.md`
-- `refs/planning/roadmap.yaml`
-- `refs/planning/todos.yaml`
-- `refs/handoffs/currentHandoff.md`
-- `src-tauri/src/services/redaction_service.rs`
-- `src-tauri/src/services/entity_scan.rs`
-- `src-tauri/src/services/entity_review.rs`
-- `src-tauri/src/commands/privacy.rs`
-- `src/domain/types.ts`
-- `src/lib/workloreApi.ts`
-- existing Privacy/supporting UI only after the transformation contract is stable
+Start with bounded re-entry and follow authoritative refs into only the files needed. At minimum inspect:
+
+- `refs/product/prd.md`, especially Post/Revision, audit, voice provenance, privacy, and publication requirements;
+- `refs/architecture/vaultFormat.md`;
+- the authoritative domain-model architecture material referenced by the agent-context packet;
+- `refs/planning/roadmap.yaml`;
+- `refs/planning/todos.yaml`;
+- `refs/handoffs/currentHandoff.md`;
+- canonical SQLite schema/migration/store code;
+- existing domain types and persistence patterns for provenance and typed relationships;
+- Voice Evidence eligibility boundaries;
+- Writing Pattern Linter and confidentiality contracts only as downstream review boundaries, not as reasons to expand the slice.
 
 ## Do Not Reopen
 
@@ -162,8 +178,8 @@ Unless new runtime, test, legal, or user evidence materially changes the plan:
 - Do not represent Tone Modes as separate identities.
 - Do not silently turn observed edits into Core Voice traits or Writing Rules.
 - Do not automatically accept provider-proposed traits or directions.
-- Do not implement edit-delta learning before durable Post/Revision lineage exists.
-- Do not invent cross-draft history or proof-point usage history before durable content lineage exists.
+- Do not implement edit-delta learning before real durable revision lineage exists.
+- Do not invent cross-draft or proof-point history.
 - Do not add fake AI/human probability scores or opaque quality scores.
 - Do not create a second confidentiality/private-entity model beside the existing registry/redaction infrastructure.
 - Do not overwrite private canonical facts with public-safe substitutions.
