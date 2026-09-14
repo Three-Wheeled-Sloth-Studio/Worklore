@@ -14,6 +14,7 @@ use commands::{
         create_story_from_seed_development, start_story_seed_development,
         submit_story_seed_development_response,
     },
+    feedback::{get_feedback_snapshot, mark_post_published, record_post_performance},
     inspirations::{
         add_inspiration_relationship, create_inspiration_from_source, get_inspiration,
         list_inspiration_link_targets, list_inspirations, remove_inspiration_relationship,
@@ -136,6 +137,9 @@ pub fn run() {
             approve_post_revision,
             get_post_lineage,
             link_post_supporting_material,
+            mark_post_published,
+            record_post_performance,
+            get_feedback_snapshot,
             open_vault,
             import_source,
             list_sources,
