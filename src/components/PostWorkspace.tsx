@@ -12,7 +12,7 @@ import {
   linkPostSupportingMaterial,
   listPosts,
 } from "../lib/postApi";
-import { getLastVaultPath, lintDraft, listStories, listTopics } from "../lib/workloreApi";
+import { lintDraft, listStories, listTopics } from "../lib/workloreApi";
 import "../posts.css";
 
 interface ChallengeResult {
@@ -21,8 +21,7 @@ interface ChallengeResult {
   confidentiality: ConfidentialityTransformResult;
 }
 
-export function PostWorkspace() {
-  const [vaultPath, setVaultPath] = useState<string | null>(null);
+export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
   const [posts, setPosts] = useState<PostRecordView[]>([]);
   const [topics, setTopics] = useState<TopicRecord[]>([]);
   const [stories, setStories] = useState<StorySummary[]>([]);
@@ -51,9 +50,10 @@ export function PostWorkspace() {
 
   const unsavedChanges = Boolean(currentRevision && editorText !== currentRevision.text);
   const challengeMatchesEditor = challenge?.text === editorText;
-  const standingLinks = lineage?.supportingMaterial.filter((item) =>
-    ["evidence_source", "evidence", "story", "proof_point"].includes(item.role),
-  ) ?? [];
+  const standingLinks =
+    lineage?.supportingMaterial.filter((item) =>
+      ["evidence_source", "evidence", "story", "proof_point"].includes(item.role),
+    ) ?? [];
   const canApprove = Boolean(
     lineage?.post.status === "working" &&
       currentRevision &&
@@ -63,40 +63,13 @@ export function PostWorkspace() {
   );
 
   useEffect(() => {
-    let active = true;
-
-    async function syncActiveVault() {
-      try {
-        const currentPath = await getLastVaultPath();
-        if (!active) {
-          return;
-        }
-        if (!currentPath) {
-          setVaultPath(null);
-          setPosts([]);
-          setTopics([]);
-          setStories([]);
-          setLineage(null);
-          setError("No active WorkLore vault was found.");
-          return;
-        }
-        if (currentPath !== vaultPath) {
-          setVaultPath(currentPath);
-          await loadWorkspace(currentPath);
-        }
-      } catch (caught) {
-        if (active) {
-          setError(errorMessage(caught));
-        }
-      }
-    }
-
-    void syncActiveVault();
-    window.addEventListener("focus", syncActiveVault);
-    return () => {
-      active = false;
-      window.removeEventListener("focus", syncActiveVault);
-    };
+    setSelectedPostId(null);
+    setLineage(null);
+    setEditorText("");
+    setChallenge(null);
+    setNotice(null);
+    setError(null);
+    void loadWorkspace(vaultPath);
   }, [vaultPath]);
 
   async function loadWorkspace(path: string, preferredPostId?: string | null) {
@@ -156,7 +129,7 @@ export function PostWorkspace() {
   }
 
   async function createDraft() {
-    if (!vaultPath || !newText.trim()) {
+    if (!newText.trim()) {
       return;
     }
     setBusy(true);
@@ -204,7 +177,7 @@ export function PostWorkspace() {
   }
 
   async function saveRevision() {
-    if (!vaultPath || !lineage || !currentRevision || !unsavedChanges) {
+    if (!lineage || !currentRevision || !unsavedChanges) {
       return;
     }
     setBusy(true);
@@ -237,7 +210,7 @@ export function PostWorkspace() {
   }
 
   async function challengeDraft() {
-    if (!vaultPath || !editorText.trim()) {
+    if (!editorText.trim()) {
       return;
     }
     setBusy(true);
@@ -262,7 +235,7 @@ export function PostWorkspace() {
   }
 
   async function approveFinal() {
-    if (!vaultPath || !lineage || !currentRevision || !canApprove) {
+    if (!lineage || !currentRevision || !canApprove) {
       return;
     }
     setBusy(true);
@@ -391,7 +364,7 @@ export function PostWorkspace() {
                   <button
                     key={post.postId}
                     className={`record-row ${selectedPostId === post.postId ? "selected" : ""}`}
-                    onClick={() => vaultPath && void openPost(vaultPath, post.postId)}
+                    onClick={() => void openPost(vaultPath, post.postId)}
                   >
                     <span>
                       <strong>{post.title}</strong>
