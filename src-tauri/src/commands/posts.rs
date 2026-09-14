@@ -2,8 +2,8 @@ use std::path::PathBuf;
 
 use crate::{
     domain::posts::{
-        AppendPostRevisionRequest, ApprovePostRevisionRequest, CreatePostRequest, PostLineageView,
-        LinkPostSupportingMaterialRequest,
+        AppendPostRevisionRequest, ApprovePostRevisionRequest, CreatePostRequest,
+        LinkPostSupportingMaterialRequest, PostLineageView,
     },
     error::{CommandError, CommandResult},
     services::post_lineage_service,
