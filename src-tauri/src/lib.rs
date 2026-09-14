@@ -59,10 +59,11 @@ use commands::{
     voice::{
         activate_core_voice, analyze_edit_learning, create_core_voice, create_tone_mode,
         create_voice_direction, create_voice_evidence_from_source, create_writing_rule,
-        delete_core_voice_trait, get_voice_evidence, list_core_voices, list_tone_modes,
-        list_voice_directions, list_voice_evidence, list_voice_source_candidates,
-        list_writing_rules, review_voice_evidence, save_core_voice_trait,
-        set_voice_direction_status, update_tone_mode, update_writing_rule,
+        decide_edit_learning_proposal, delete_core_voice_trait, get_voice_evidence,
+        list_core_voices, list_edit_learning_decisions, list_tone_modes, list_voice_directions,
+        list_voice_evidence, list_voice_source_candidates, list_writing_rules,
+        review_voice_evidence, save_core_voice_trait, set_voice_direction_status, update_tone_mode,
+        update_writing_rule,
     },
 };
 
@@ -97,6 +98,8 @@ pub fn run() {
             remove_target_context_relationship,
             list_target_context_link_targets,
             analyze_edit_learning,
+            decide_edit_learning_proposal,
+            list_edit_learning_decisions,
             list_voice_source_candidates,
             create_voice_evidence_from_source,
             get_voice_evidence,
