@@ -1,7 +1,7 @@
 ---
 type: Handoff
 title: Current WorkLore Handoff
-description: Accepted provider-free edit-learning checkpoint and bounded handoff into explicit proposal decisions with durable revision-pair provenance.
+description: Accepted thin Capture-to-Learn QA loop checkpoint and handoff into bounded real-world dogfood validation.
 status: draft
 tags: [handoff, worklore]
 ---
@@ -18,9 +18,9 @@ WorkLore remains a local-first professional narrative and content intelligence a
 Locked boundaries remain:
 
 - standalone Windows-first deployment and local canonical storage;
-- no WorkLore-hosted backend/account/proprietary sync/inference proxy;
+- no WorkLore-hosted backend, account, proprietary sync, or inference proxy;
 - no automatic publishing, scheduling, or autonomous engagement;
-- explicit human review before publication and before edit-derived learning changes canonical voice;
+- explicit human review before publication and before edit-derived learning changes governed voice;
 - raw AI drafts never train canonical voice;
 - confidentiality transformation remains derived and non-destructive;
 - Evidence, Inspiration, Target Context, and Voice Evidence remain semantically distinct;
@@ -37,113 +37,117 @@ Locked boundaries remain:
 - Provider-free confidentiality transformation: `33c081a30b982eafe542b8efa9beea9f3c4f242a`
 - Provider-free Post/Revision lineage: `28b6860212c9daf87ec925d1478a83d08f423092`
 - Provider-free edit-learning observation/proposal foundation: `dec9ce74188d97a3d6b96669b6cffbb967be23ff`
+- Accepted thin Capture-to-Learn QA loop implementation: `85f33f1b7eb29f006ec26e283e166f4f350532ed`
 
-## task-032: Edit-Learning Observation/Proposal Foundation Accepted
+## What Is Now Accepted
 
-The accepted task-032 slice now answers the bounded question: WorkLore can inspect real persisted parent/child Post Revisions, derive explainable user-edit observations, preserve exact ancestry and model provenance, recognize the same correction across distinct Posts, and surface a review-only recurring-preference proposal without silently changing governed voice state.
+### task-032: explicit edit-learning governance complete
 
-### What landed
+The edit-learning path is now complete for the accepted bounded contract:
 
-- `src-tauri/src/services/edit_learning_service.rs` analyzes only real persisted schema-v8 parent/child Revision pairs.
-- Only user-origin child revisions with `user_authored` or `user_edited_model` authorship are eligible observations.
-- Model-origin ancestors remain model-origin context. They are never relabeled as user voice and never become Voice Evidence through analysis.
-- The deterministic comparison emits one inspectable addition, removal, or replacement for the bounded changed span.
-- Each observation retains exact Post ID, parent Revision ID, child Revision ID, parent/child origin, and parent/child authorship state.
-- Proposal keys normalize the changed fragments deterministically. Long one-off rewrites beyond the bounded proposal fragment limit remain observations and do not become brittle recurring rules.
-- A recurring-preference proposal requires the same normalized correction across at least two distinct Posts. Multiple revisions inside one Post are not enough.
-- Proposals retain the exact supporting Post/parent Revision/child Revision pairs.
-- Proposals are transient review objects. This slice adds no new canonical proposal table, no provider call, and no automatic activation path.
-- Analysis does not mutate Core Voice, Voice Direction, Tone Modes, Writing Rules, or Voice Evidence eligibility.
-- No task-033 portfolio analysis, task-035 Content Studio generation, publication workflow, scheduling, analytics, or discovery work was added.
+- real persisted parent/child Post Revisions are the only learning source;
+- recurring corrections require the same normalized correction across at least two distinct Posts;
+- proposals preserve exact Post, parent Revision, and child Revision provenance;
+- accept/reject is explicit and provider-free;
+- decision time re-validates the currently reproducible proposal and exact support set;
+- stale or tampered evidence is rejected;
+- decisions are durable through the existing append-only audit ledger;
+- unchanged decided evidence is suppressed, while materially expanded real support can resurface;
+- accepted preferences create only a `proposed` Writing Rule and never silently activate it;
+- active Core Voice, Tone Modes, Voice Directions, active Writing Rules, and Voice Evidence eligibility are not silently mutated;
+- model ancestors remain model-origin context and raw model text never becomes Voice Evidence.
 
-### Proof coverage
+No new preference table or schema bump was introduced. The decision bridge reuses `audit_events` and existing `writing_rules` governance.
 
-The expanded Rust suite proves:
+### Thin Content Studio QA seam
 
-- empty real history yields no observations or proposals;
-- persisted user edits expose deterministic additions, removals, and replacements;
-- model-generated -> user-edited-model lineage produces a user-change observation while preserving the model ancestor and keeping Voice Evidence empty;
-- one correction alone does not produce a recurring preference;
-- the same correction across two distinct Posts produces one traceable review-only proposal;
-- analysis leaves existing Core Voice, Tone Modes, Voice Directions, Writing Rules, and Voice Evidence unchanged.
+A first user-traversable content path now exists without pretending the broader Content Studio is complete:
+
+- Posts catalog and reopen behavior;
+- manual Post creation;
+- immutable exact Revision snapshots and deterministic ancestry;
+- typed supporting-material links;
+- deterministic writing-pattern challenge checks;
+- confidentiality preflight;
+- user edits as new Revisions;
+- exact final approval;
+- final approval requires both confidentiality state `Ready` and the exact saved Revision text to equal the derived `public_safe_text`;
+- confidentiality transformation never overwrites private canonical Revision truth.
+
+The hard approval gate fixes a real boundary issue: a transform may be safe while the saved private Revision is not. WorkLore now refuses to freeze that private Revision until the user saves the exact public-safe wording as a new Revision and challenges it again.
+
+### Thin manual-publication and feedback seam
+
+The literal loop can now continue after external manual publication:
+
+- WorkLore itself does not publish or schedule anything;
+- the user can record that an exact final-approved Revision was manually published externally;
+- publication identity is idempotent for the same Post, Revision, and platform;
+- performance measurements are append-only cumulative snapshots linked to that exact publication;
+- the latest snapshot drives the current view without rewriting historical measurements;
+- thin Insights surfaces baseline/small-sample warnings;
+- after enough measured Posts, descriptive observed rates can be shown with an explicit non-causality boundary rather than turning small samples into rules.
+
+Publication and performance records reuse the append-only audit ledger rather than adding a remote service or publishing integration.
 
 ## Validation Evidence
 
-Accepted task-032 implementation validation:
+Accepted implementation checkpoint:
 
-- implementation checkpoint: `dec9ce74188d97a3d6b96669b6cffbb967be23ff`
-- Actions run: `34799693936`
-- Job: `103839679015`
+- exact `dev` implementation head: `85f33f1b7eb29f006ec26e283e166f4f350532ed`
+- Actions run: `34857116434`
+- Job: `104019423399`
 - external build layout: green
-- case-collision and refs/OKF/path-safety validation: green
-- bounded agent-context check: green
+- case-collision check: green, 227 tracked paths
+- refs/OKF/path-safety validation: green
+- bounded agent-context check: green, 5665 / 8000 characters
 - frontend tests: 8 passed / 0 failed across 3 files
-- production frontend build: green, 53 modules transformed
-- Rust tests: 115 passed / 0 failed
+- production frontend build: green, 59 modules transformed
+- Rust tests: 123 passed / 0 failed
 - warnings-denied Clippy: green
 - rustfmt: green
 - repository/source-only check: green
 
-The first implementation head was behaviorally green but needed only rustfmt changes. The accepted checkpoint above includes those formatter-only follow-ups.
+The implementation was also validated as the PR merge test against the locked `qa` baseline; no promotion occurred.
 
-The repository still carries `.npmrc` with `legacy-peer-deps=true` as a narrow hosted-CI workaround for the npm 10.9.8 Arborist `edgesOut` bootstrap failure. It is not part of the edit-learning product contract.
+The repository still carries `.npmrc` with `legacy-peer-deps=true` as a narrow hosted-CI workaround for the npm 10.9.8 Arborist `edgesOut` bootstrap failure. It is not part of the product contract.
 
 ## Current Task State
 
-`task-032` remains `in_progress`.
+- `task-032`: complete. Explicit durable edit-learning accept/reject governance is accepted.
+- `task-033`: in progress. Cross-draft repetition, proof-point rotation, portfolio mode-collapse, and broader evidence/standing review should wait for meaningful real corpus data rather than invented history.
+- `task-035`: in progress. The thin Posts/challenge/edit/approval QA seam exists; angle generation, Audience Lens, provider-assisted drafting, comments/replies, and broader editorial workflow remain.
+- `task-036`: complete for the accepted audit contract. Exact immutable lineage, final approval, exact user-marked manual-publication identity, and downstream performance association are durable. Automatic publication remains explicitly out of scope.
+- `task-037`: in progress. Manual performance snapshots and conservative Insights exist; LinkedIn-native export import and multidimensional analysis remain.
 
-Accepted task-032 scope now includes:
+Phase 2, Phase 3, and Phase 4 remain broader work in progress even though the thin structural loop is now testable end to end.
 
-- governed Voice Evidence and Core Voice foundations;
-- provider-neutral review-only voice analysis proposals;
-- real schema-v8 Post/Revision ancestry;
-- provider-free deterministic edit observations;
-- recurring-preference proposal generation with exact supporting revision-pair provenance and a distinct-Post threshold.
+## Recommended Next Mode: Dogfood QA
 
-Remaining task-032 scope for the next bounded slice:
+Stop expanding architecture breadth for the next slice. Use real local material to exercise the implemented loop and let observed failures drive the next changes.
 
-- explicit accept/reject of an edit-learning proposal;
-- durable retention of the exact supporting revision pairs and the human decision;
-- a safe bridge into the existing governed voice model without silently activating or overwriting canonical voice state;
-- clear prevention of accepting stale/tampered proposal provenance.
+The next bounded question is:
 
-`task-036` remains `in_progress` only for later publication metadata and analytics association in their proper phases.
+`Can a user take real professional material through the implemented structural loop, manually publish outside WorkLore, record the exact publication and LinkedIn measurements, reopen the vault around key transitions, and expose any correctness, friction, provenance, privacy, or recoverability defects before broader Content Studio work?`
 
-`task-033` remains `in_progress`; portfolio repetition, proof-point rotation, mode-collapse, and broader evidence/standing review should still wait for meaningful real corpus data rather than pseudo-history.
+Prioritize concrete defects that block or confuse the real loop. Do not pre-emptively broaden into planned features merely because they are on the roadmap.
 
-## Recommended Next Slice
+## Dogfood Path To Exercise
 
-Continue `task-032` with the smallest durable explicit-decision bridge for edit-learning proposals.
+Use real local user material and existing product surfaces:
 
-The next slice should answer:
-
-`Can a user explicitly accept or reject a currently reproducible recurring edit proposal, preserve the exact real Revision pairs that justified that decision, and route an accepted preference into existing voice governance without silently activating it or inventing a second voice model?`
-
-Preferred direction:
-
-- keep analysis deterministic and provider-free;
-- use a stable proposal key plus the exact supporting revision-pair set as the decision input;
-- re-derive or validate the proposal at decision time so stale/tampered inputs cannot create unsupported voice state;
-- persist the human decision and supporting revision provenance in the canonical store;
-- reuse existing Writing Rule / Voice Direction / Core Voice proposal governance rather than creating a parallel active-preference system;
-- an accepted edit-learning proposal may create a reviewable governed artifact, but must not silently activate a Writing Rule, mutate active Core Voice, or change Voice Evidence eligibility;
-- rejection should be durable enough to avoid immediately resurfacing the identical supported proposal unless the evidence set materially changes;
-- preserve model-ancestor metadata exactly;
-- keep broad UI work out of scope; a thin local API and proof tests are enough.
-
-## Relevant Files For Next Slice
-
-Begin with bounded re-entry and inspect only what the generated packet points to. At minimum:
-
-- `refs/handoffs/currentHandoff.md`;
-- `refs/product/prd.md` edit-learning and human-acceptance requirements;
-- `refs/architecture/vaultFormat.md` and authoritative domain-model material;
-- `refs/planning/roadmap.yaml` and `refs/planning/todos.yaml`;
-- `src-tauri/src/domain/edit_learning.rs`;
-- `src-tauri/src/services/edit_learning_service.rs`;
-- schema-v8 Post/Revision storage and migration code;
-- existing Voice Evidence/Core Voice/Voice Direction/Writing Rule governance and audit patterns;
-- Tauri/API registration for the current `analyze_edit_learning` command.
+1. Capture a memory, proof point, idea, writing sample, inspiration item, or target context.
+2. Classify/develop it into useful Story, Topic, Proof Point, Inspiration, or Target Context state as appropriate.
+3. Connect explicit supporting/context material without collapsing semantic roles.
+4. Create a Post and preserve exact Revision ancestry through edits.
+5. Run deterministic challenge checks and confidentiality preflight.
+6. Exercise the public-safe-text mismatch/recovery path where appropriate.
+7. Final-approve only the exact saved public-safe Revision.
+8. Manually publish outside WorkLore.
+9. Record the exact approved Revision as published in WorkLore.
+10. Record one or more cumulative LinkedIn performance snapshots.
+11. Inspect Insights and verify that small samples remain conservative.
+12. Reopen/restart the vault around meaningful transitions and confirm identity/provenance survive.
 
 ## Do Not Reopen
 
@@ -157,9 +161,8 @@ Unless new runtime, test, legal, or user evidence materially changes the plan:
 - Do not infer user standing from Target Context.
 - Do not represent Tone Modes as separate identities.
 - Do not turn one edit into a durable preference.
-- Do not automatically accept edit-derived proposals.
-- Do not silently activate accepted edit-learning suggestions.
-- Do not invent revision or cross-draft history.
+- Do not automatically accept or activate edit-derived proposals.
+- Do not invent revision, publication, analytics, or cross-draft history.
 - Do not add fake AI/human probability scores or opaque quality scores.
 - Do not create a second confidentiality/private-entity model.
 - Do not overwrite private canonical facts or Revision text with public-safe substitutions.
