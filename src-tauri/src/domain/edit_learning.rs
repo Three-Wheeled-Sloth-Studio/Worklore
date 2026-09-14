@@ -67,15 +67,6 @@ pub enum EditLearningDecisionKind {
     Rejected,
 }
 
-impl EditLearningDecisionKind {
-    pub fn as_str(self) -> &'static str {
-        match self {
-            Self::Accepted => "accepted",
-            Self::Rejected => "rejected",
-        }
-    }
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct DecideEditLearningProposalRequest {
