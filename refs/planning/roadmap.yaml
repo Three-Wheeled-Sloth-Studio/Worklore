@@ -112,6 +112,7 @@ phases:
       - Provider-free confidentiality transformation that reuses the Private Entity Registry, stable token redaction, explicitly stored public descriptions, current review/risk policy, and transient sensitive-text scanning to return derived public-safe text plus explicit ready/needs-review/blocked state without mutating canonical private truth or inventing replacement facts.
       - Schema-v8 provider-free durable Post/Revision lineage with immutable exact revision snapshots, deterministic parentage, explicit user/model authorship provenance, exact final approval, typed supporting-material links, and a non-destructive confidentiality boundary.
       - Provider-free deterministic edit-learning foundation over real persisted parent/child Revisions, with explainable additions/removals/replacements, exact Post/Revision provenance, model-ancestor preservation, and recurring-preference proposals only after the same normalized correction appears across at least two distinct Posts; proposals remain transient and do not mutate governed voice state.
+      - Explicit provider-free edit-learning decisions using the existing audit ledger: accept/reject validates the currently reproducible proposal and exact supporting Revision-pair set, persists hashed proposal/support identity plus exact Post/Revision IDs, suppresses unchanged decided evidence, allows materially expanded evidence to resurface, and routes acceptance only into a proposed Writing Rule without automatic activation or canonical voice mutation.
     scope:
       - Introduce canonical Voice Evidence, Core Voice, Tone Modes, Voice Direction, and Writing Rules.
       - Ingest representative user-authored writing and approved final posts as voice evidence.
@@ -137,8 +138,14 @@ phases:
   - id: phase-3
     name: Content Studio
     horizon: next
-    status: planned
+    status: in_progress
     objective: Turn stories, topics, inspiration, and target context into evidence-backed professional content through an explicit human editorial workflow.
+    completed:
+      - Thin Posts workspace with durable catalog/reopen behavior, manual Post creation, immutable Revision editing, and explicit human authorship state.
+      - Typed supporting-material links preserve Story, Proof Point, Inspiration, and Target Context roles without collapsing context into evidence.
+      - Deterministic challenge flow combines writing-pattern linting with confidentiality preflight before approval.
+      - Final approval freezes an exact current Revision only when the exact saved text already equals the derived public-safe text; private canonical Revision truth is never overwritten by confidentiality transformation.
+      - Exact final-approved Revisions can be user-marked as manually published after external publication while WorkLore itself performs no publishing or scheduling.
     scope:
       - Generate multiple genuinely different angles before drafting prose.
       - Connect angles to stories, proof points, themes, inspiration, target context, and audience intent.
@@ -163,8 +170,12 @@ phases:
   - id: phase-4
     name: Feedback Intelligence
     horizon: later
-    status: planned
+    status: in_progress
     objective: Close the loop between published content and measured audience response without overfitting small samples.
+    completed:
+      - Exact final-approved Revisions can be associated with user-recorded manual external publications without adding a WorkLore publishing or scheduling path.
+      - LinkedIn performance can be entered as append-only cumulative snapshots associated with the exact publication record; the latest snapshot drives the current view without rewriting historical measurements.
+      - Thin Insights feedback displays conservative baseline and small-sample warnings, and only after enough measured Posts exposes descriptive observed rates with an explicit non-causality boundary.
     scope:
       - Import LinkedIn-native analytics exports manually.
       - Associate analytics with exact published-post records.
