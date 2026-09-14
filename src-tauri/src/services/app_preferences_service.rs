@@ -87,9 +87,8 @@ pub fn remember_last_import_file(file_path: &Path) -> ServiceResult<String> {
 }
 
 pub fn default_vault_root() -> ServiceResult<PathBuf> {
-    let root = application_root()?.join("Vaults");
-    fs::create_dir_all(&root)?;
-    Ok(root)
+    let executable = env::current_exe().map_err(WorkLoreError::Io)?;
+    default_vault_root_from_executable(&executable)
 }
 
 pub fn get_default_vault_root() -> ServiceResult<String> {
@@ -155,6 +154,13 @@ fn application_root() -> ServiceResult<PathBuf> {
     Ok(root)
 }
 
+fn default_vault_root_from_executable(executable: &Path) -> ServiceResult<PathBuf> {
+    executable
+        .parent()
+        .map(Path::to_path_buf)
+        .ok_or(WorkLoreError::InvalidPath)
+}
+
 #[cfg(target_os = "windows")]
 fn local_config_root() -> Option<PathBuf> {
     env::var_os("LOCALAPPDATA").map(PathBuf::from)
@@ -206,6 +212,15 @@ mod tests {
         let missing = std::env::temp_dir().join(format!("missing-{stamp}"));
         assert!(
             existing_directory_value(Some(missing.to_string_lossy().to_string()), false).is_none()
+        );
+    }
+
+    #[test]
+    fn default_vault_root_is_the_executable_folder() {
+        let executable = PathBuf::from(r"D:\Portable\WorkLore\WorkLore-QA.exe");
+        assert_eq!(
+            default_vault_root_from_executable(&executable).unwrap(),
+            PathBuf::from(r"D:\Portable\WorkLore")
         );
     }
 }
