@@ -1,3 +1,36 @@
+.help-launcher {
+  position: fixed;
+  top: 0.7rem;
+  right: 0.7rem;
+  z-index: 18;
+  width: 2.35rem;
+  height: 2.35rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(105, 78, 28, 0.42);
+  border-radius: 999px;
+  color: #584116;
+  background: #e7d6af;
+  box-shadow: 0 2px 8px rgba(32, 29, 22, 0.16);
+  cursor: pointer;
+}
+
+.help-launcher:hover {
+  border-color: rgba(125, 88, 23, 0.7);
+  background: #f0dfb8;
+}
+
+.help-launcher:focus-visible {
+  outline: 3px solid rgba(181, 132, 47, 0.48);
+  outline-offset: 2px;
+}
+
+.help-launcher span {
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
 .shell-header-actions {
   gap: 0.45rem;
 }
