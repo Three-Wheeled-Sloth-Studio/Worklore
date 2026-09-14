@@ -38,6 +38,7 @@ if ($LASTEXITCODE -ne 0) { throw "Bounded agent-context validation failed with e
 Show-WorkLoreLegacyBuildWarning
 $layout = Get-WorkLoreBuildLayout -Channel $Channel
 Initialize-WorkLoreBuildLayout -Layout $layout -Clean:$Clean
+$relativeFrontendDist = Get-WorkLoreTauriFrontendDist -Layout $layout
 
 $env:WORKLORE_BUILD_CHANNEL = $Channel
 $env:WORKLORE_BUILD_ROOT = $layout.BuildRoot
@@ -49,6 +50,7 @@ Write-Host "External root: $($layout.ExternalRoot)"
 Write-Host "Build root: $($layout.BuildRoot)"
 Write-Host "Cargo target: $($layout.CargoTarget)"
 Write-Host "Frontend output: $($layout.FrontendDist)"
+Write-Host "Tauri frontend path: $relativeFrontendDist"
 
 if (-not (Test-Path "node_modules")) {
     Write-Host "Installing frontend dependencies..."
@@ -92,20 +94,6 @@ if ($shouldBundle) {
         "org.threewheeledsloth.worklore"
     }
 
-    # Tauri currently mis-parses Windows absolute frontendDist values (for example D:\\...)
-    # as URL targets instead of asset directories. That produces a packaged app which opens a
-    # filesystem directory listing rather than embedding and serving index.html. Keep the build
-    # output external, but give Tauri a relative path from src-tauri so the assets are embedded.
-    $tauriProjectRoot = Join-Path $repoRoot "src-tauri"
-    $relativeFrontendDist = [System.IO.Path]::GetRelativePath(
-        $tauriProjectRoot,
-        $layout.FrontendDist
-    ).Replace('\', '/')
-
-    if ([System.IO.Path]::IsPathRooted($relativeFrontendDist) -or $relativeFrontendDist -match '^[A-Za-z]:') {
-        throw "Tauri frontendDist must remain relative on Windows. Refusing value: $relativeFrontendDist"
-    }
-
     $override = @{
         productName = $productName
         identifier = $identifier
@@ -124,8 +112,6 @@ if ($shouldBundle) {
     if ([System.IO.Path]::IsPathRooted([string]$writtenConfig.build.frontendDist) -or [string]$writtenConfig.build.frontendDist -match '^[A-Za-z]:') {
         throw "Generated Tauri config contains an absolute frontendDist and would launch a filesystem path instead of the WorkLore UI."
     }
-
-    Write-Host "Tauri embedded frontend: $relativeFrontendDist"
 
     $tauriCli = Join-Path $repoRoot "node_modules\.bin\tauri.cmd"
     if (-not (Test-Path $tauriCli)) {
@@ -153,6 +139,7 @@ $manifest = [ordered]@{
     externalRoot = $layout.ExternalRoot
     buildRoot = $layout.BuildRoot
     frontendDist = $layout.FrontendDist
+    tauriFrontendDist = $relativeFrontendDist
     cargoTarget = $layout.CargoTarget
     bundled = $shouldBundle
     gitCommit = $gitCommit
