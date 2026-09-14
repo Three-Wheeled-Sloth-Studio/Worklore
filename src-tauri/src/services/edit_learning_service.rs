@@ -376,7 +376,11 @@ fn load_decisions(connection: &Connection) -> ServiceResult<Vec<EditLearningDeci
     )?;
     let rows = statement
         .query_map(
-            params![DECISION_RECORD_TYPE, ACCEPTED_EVENT_TYPE, REJECTED_EVENT_TYPE],
+            params![
+                DECISION_RECORD_TYPE,
+                ACCEPTED_EVENT_TYPE,
+                REJECTED_EVENT_TYPE
+            ],
             |row| {
                 Ok((
                     row.get::<_, String>(0)?,
@@ -411,7 +415,11 @@ fn load_decision_keys(connection: &Connection) -> ServiceResult<BTreeSet<Decisio
     )?;
     let rows = statement
         .query_map(
-            params![DECISION_RECORD_TYPE, ACCEPTED_EVENT_TYPE, REJECTED_EVENT_TYPE],
+            params![
+                DECISION_RECORD_TYPE,
+                ACCEPTED_EVENT_TYPE,
+                REJECTED_EVENT_TYPE
+            ],
             |row| row.get::<_, String>(0),
         )?
         .collect::<Result<Vec<_>, _>>()?;
@@ -423,9 +431,7 @@ fn load_decision_keys(connection: &Connection) -> ServiceResult<BTreeSet<Decisio
         .collect()
 }
 
-fn normalize_pairs(
-    pairs: &[EditPairProvenanceView],
-) -> ServiceResult<Vec<EditPairProvenanceView>> {
+fn normalize_pairs(pairs: &[EditPairProvenanceView]) -> ServiceResult<Vec<EditPairProvenanceView>> {
     let mut normalized = BTreeMap::<String, EditPairProvenanceView>::new();
     for pair in pairs {
         let key = pair_key(pair);
@@ -919,7 +925,10 @@ mod tests {
         )
         .unwrap();
         assert_eq!(decision.decision, EditLearningDecisionKind::Accepted);
-        assert_eq!(decision.resulting_artifact_type.as_deref(), Some("writing_rule"));
+        assert_eq!(
+            decision.resulting_artifact_type.as_deref(),
+            Some("writing_rule")
+        );
         assert!(decision.resulting_artifact_id.is_some());
 
         let rules = voice_profile_service::list_writing_rules(&path).unwrap();
@@ -928,8 +937,13 @@ mod tests {
             rules[0].status,
             voice_profile_service::WritingRuleStatus::Proposed
         );
-        assert_eq!(decision.resulting_artifact_id.as_deref(), Some(rules[0].rule_id.as_str()));
-        assert!(voice_profile_service::list_core_voices(&path).unwrap().is_empty());
+        assert_eq!(
+            decision.resulting_artifact_id.as_deref(),
+            Some(rules[0].rule_id.as_str())
+        );
+        assert!(voice_profile_service::list_core_voices(&path)
+            .unwrap()
+            .is_empty());
         assert!(voice_evidence_service::list_voice_evidence(&path)
             .unwrap()
             .is_empty());
