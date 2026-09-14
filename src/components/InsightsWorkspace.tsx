@@ -1,7 +1,19 @@
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import type { FeedbackSnapshotView, PerformanceMetrics } from "../domain/feedback";
+import type { PostRecordView } from "../domain/posts";
 import { errorMessage } from "../domain/types";
-import { getFeedbackSnapshot, recordPostPerformance } from "../lib/feedbackApi";
+import {
+  getFeedbackSnapshot,
+  markPostPublished,
+  recordPostPerformance,
+} from "../lib/feedbackApi";
+import { listPosts } from "../lib/postApi";
 import "../insights.css";
 
 const EMPTY_METRICS: PerformanceMetrics = {
@@ -15,6 +27,10 @@ const EMPTY_METRICS: PerformanceMetrics = {
 
 export function InsightsWorkspace({ vaultPath }: { vaultPath: string }) {
   const [snapshot, setSnapshot] = useState<FeedbackSnapshotView | null>(null);
+  const [approvedPosts, setApprovedPosts] = useState<PostRecordView[]>([]);
+  const [selectedApprovedPostId, setSelectedApprovedPostId] = useState("");
+  const [publishedAt, setPublishedAt] = useState(defaultPublicationTime());
+  const [publicationUrl, setPublicationUrl] = useState("");
   const [selectedPublicationId, setSelectedPublicationId] = useState("");
   const [metrics, setMetrics] = useState<Record<keyof PerformanceMetrics, string>>(
     metricsToForm(EMPTY_METRICS),
@@ -24,6 +40,10 @@ export function InsightsWorkspace({ vaultPath }: { vaultPath: string }) {
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const selectedApprovedPost = useMemo(
+    () => approvedPosts.find((post) => post.postId === selectedApprovedPostId) ?? null,
+    [approvedPosts, selectedApprovedPostId],
+  );
   const selectedPublication = useMemo(
     () => snapshot?.publications.find((item) => item.publicationId === selectedPublicationId) ?? null,
     [snapshot, selectedPublicationId],
@@ -34,9 +54,21 @@ export function InsightsWorkspace({ vaultPath }: { vaultPath: string }) {
       null,
     [snapshot, selectedPublicationId],
   );
+  const alreadyPublishedPostIds = useMemo(
+    () => new Set(snapshot?.publications.map((publication) => publication.postId) ?? []),
+    [snapshot],
+  );
+  const unpublishedApprovedPosts = useMemo(
+    () => approvedPosts.filter((post) => !alreadyPublishedPostIds.has(post.postId)),
+    [approvedPosts, alreadyPublishedPostIds],
+  );
 
   useEffect(() => {
     setSnapshot(null);
+    setApprovedPosts([]);
+    setSelectedApprovedPostId("");
+    setPublishedAt(defaultPublicationTime());
+    setPublicationUrl("");
     setSelectedPublicationId("");
     setMetrics(metricsToForm(EMPTY_METRICS));
     setNotes("");
@@ -55,18 +87,64 @@ export function InsightsWorkspace({ vaultPath }: { vaultPath: string }) {
     }
   }, [selectedPublicationId, selectedPerformance?.performanceId]);
 
+  useEffect(() => {
+    if (
+      selectedApprovedPostId &&
+      unpublishedApprovedPosts.some((post) => post.postId === selectedApprovedPostId)
+    ) {
+      return;
+    }
+    setSelectedApprovedPostId(unpublishedApprovedPosts[0]?.postId ?? "");
+  }, [unpublishedApprovedPosts, selectedApprovedPostId]);
+
   async function refresh(path: string, preferredPublicationId?: string) {
     setBusy(true);
     setError(null);
     try {
-      const next = await getFeedbackSnapshot(path);
+      const [next, postResult] = await Promise.all([
+        getFeedbackSnapshot(path),
+        listPosts(path),
+      ]);
       setSnapshot(next);
+      setApprovedPosts(postResult.filter((post) => post.status === "final_approved"));
       const nextSelected =
         preferredPublicationId &&
         next.publications.some((item) => item.publicationId === preferredPublicationId)
           ? preferredPublicationId
           : next.publications[0]?.publicationId ?? "";
       setSelectedPublicationId(nextSelected);
+    } catch (caught) {
+      setError(errorMessage(caught));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function recordPublication() {
+    if (
+      !selectedApprovedPost ||
+      !selectedApprovedPost.finalApprovedRevisionId ||
+      !publishedAt
+    ) {
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    setNotice(null);
+    try {
+      const publication = await markPostPublished(vaultPath, {
+        postId: selectedApprovedPost.postId,
+        revisionId: selectedApprovedPost.finalApprovedRevisionId,
+        platform: "linkedin",
+        publishedAt: new Date(publishedAt).toISOString(),
+        publicationUrl: publicationUrl.trim() || null,
+      });
+      setPublicationUrl("");
+      setPublishedAt(defaultPublicationTime());
+      await refresh(vaultPath, publication.publicationId);
+      setNotice(
+        "Manual LinkedIn publication recorded against the exact final-approved Revision. WorkLore did not publish or schedule it.",
+      );
     } catch (caught) {
       setError(errorMessage(caught));
     } finally {
@@ -104,43 +182,100 @@ export function InsightsWorkspace({ vaultPath }: { vaultPath: string }) {
         <p className="eyebrow">Phase 4 thin feedback seam</p>
         <h2 id="insights-heading">Insights</h2>
         <p>
-          Record LinkedIn-native outcomes against the exact Revision you manually published. WorkLore
-          reports descriptive evidence and sample limits instead of turning one successful Post into a rule.
+          Record the LinkedIn publication you performed manually, then attach LinkedIn-native
+          outcomes to that exact approved Revision. WorkLore reports descriptive evidence and sample
+          limits instead of turning one successful Post into a rule.
         </p>
       </div>
 
       <div className="insights-layout">
-        <section className="workspace-panel">
-          <p className="eyebrow">Published corpus</p>
-          <h3>Manual publications</h3>
-          {!snapshot || snapshot.publications.length === 0 ? (
-            <div className="empty-state">
-              <h4>No published Posts recorded</h4>
-              <p>Approve a Post, publish it manually, then mark that exact Revision published in Posts.</p>
-            </div>
-          ) : (
-            <div className="record-list">
-              {snapshot.publications.map((publication) => {
-                const measured = snapshot.latestPerformance.some(
-                  (item) => item.publicationId === publication.publicationId,
-                );
-                return (
-                  <button
-                    key={publication.publicationId}
-                    className={`record-row ${selectedPublicationId === publication.publicationId ? "selected" : ""}`}
-                    onClick={() => setSelectedPublicationId(publication.publicationId)}
-                  >
-                    <span>
-                      <strong>{publication.postTitle}</strong>
-                      <small>{publication.platform} · {formatDate(publication.publishedAt)}</small>
-                    </span>
-                    <span className="record-meta">{measured ? "measured" : "needs metrics"}</span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </section>
+        <div className="shell-stack">
+          <section className="workspace-panel">
+            <p className="eyebrow">Manual publication boundary</p>
+            <h3>Record a published Post</h3>
+            {unpublishedApprovedPosts.length === 0 ? (
+              <div className="empty-state compact-empty">
+                <p>
+                  No unrecorded final-approved Posts are available. Approve a Post first, publish it
+                  manually outside WorkLore, then return here.
+                </p>
+              </div>
+            ) : (
+              <>
+                <label className="field-label" htmlFor="published-post">Final-approved Post</label>
+                <select
+                  id="published-post"
+                  value={selectedApprovedPostId}
+                  onChange={(event) => setSelectedApprovedPostId(event.target.value)}
+                  disabled={busy}
+                >
+                  {unpublishedApprovedPosts.map((post) => (
+                    <option key={post.postId} value={post.postId}>{post.title}</option>
+                  ))}
+                </select>
+                <label className="field-label" htmlFor="published-at">Published at</label>
+                <input
+                  id="published-at"
+                  type="datetime-local"
+                  value={publishedAt}
+                  onChange={(event) => setPublishedAt(event.target.value)}
+                  disabled={busy}
+                />
+                <label className="field-label" htmlFor="publication-url">LinkedIn URL (optional)</label>
+                <input
+                  id="publication-url"
+                  type="url"
+                  value={publicationUrl}
+                  onChange={(event) => setPublicationUrl(event.target.value)}
+                  placeholder="https://www.linkedin.com/posts/..."
+                  disabled={busy}
+                />
+                <p className="record-meta">
+                  This records what you already published. It does not send anything to LinkedIn.
+                </p>
+                <button
+                  className="primary-button compact"
+                  disabled={busy || !selectedApprovedPost || !publishedAt}
+                  onClick={() => void recordPublication()}
+                >
+                  Record manual publication
+                </button>
+              </>
+            )}
+          </section>
+
+          <section className="workspace-panel">
+            <p className="eyebrow">Published corpus</p>
+            <h3>Manual publications</h3>
+            {!snapshot || snapshot.publications.length === 0 ? (
+              <div className="empty-state">
+                <h4>No published Posts recorded</h4>
+                <p>Record the external publication above after you have published an approved Post.</p>
+              </div>
+            ) : (
+              <div className="record-list">
+                {snapshot.publications.map((publication) => {
+                  const measured = snapshot.latestPerformance.some(
+                    (item) => item.publicationId === publication.publicationId,
+                  );
+                  return (
+                    <button
+                      key={publication.publicationId}
+                      className={`record-row ${selectedPublicationId === publication.publicationId ? "selected" : ""}`}
+                      onClick={() => setSelectedPublicationId(publication.publicationId)}
+                    >
+                      <span>
+                        <strong>{publication.postTitle}</strong>
+                        <small>{publication.platform} · {formatDate(publication.publishedAt)}</small>
+                      </span>
+                      <span className="record-meta">{measured ? "measured" : "needs metrics"}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+        </div>
 
         <div className="shell-stack">
           <section className="workspace-panel">
@@ -218,7 +353,7 @@ function MetricField({
   label: string;
   field: keyof PerformanceMetrics;
   metrics: Record<keyof PerformanceMetrics, string>;
-  setMetrics: React.Dispatch<React.SetStateAction<Record<keyof PerformanceMetrics, string>>>;
+  setMetrics: Dispatch<SetStateAction<Record<keyof PerformanceMetrics, string>>>;
 }) {
   return (
     <label className="metric-field">
@@ -264,6 +399,12 @@ function formToMetrics(
 function metricNumber(value: string): number {
   const parsed = Number.parseInt(value, 10);
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+}
+
+function defaultPublicationTime(): string {
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60_000);
+  return local.toISOString().slice(0, 16);
 }
 
 function formatDate(value: string): string {
