@@ -1,0 +1,138 @@
+.posts-workspace {
+  display: grid;
+  gap: 18px;
+}
+
+.posts-intro {
+  max-width: 880px;
+}
+
+.posts-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.72fr) minmax(0, 1.65fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.posts-sidebar,
+.posts-main {
+  min-width: 0;
+}
+
+.posts-sidebar .workspace-panel,
+.posts-main .workspace-panel {
+  min-width: 0;
+}
+
+.post-draft-input,
+.post-editor,
+.public-safe-preview textarea {
+  width: 100%;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.post-draft-input {
+  min-height: 180px;
+}
+
+.post-editor {
+  min-height: 320px;
+  margin-bottom: 12px;
+}
+
+.public-safe-preview textarea {
+  min-height: 190px;
+}
+
+.post-record-list .record-row.selected {
+  outline: 2px solid rgba(67, 79, 89, 0.28);
+  background: rgba(67, 79, 89, 0.09);
+}
+
+.post-support-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 10px 0 14px;
+}
+
+.post-support-chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(40, 50, 58, 0.16);
+  border-radius: 999px;
+  padding: 4px 9px;
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 0.76rem;
+  text-transform: capitalize;
+}
+
+.post-standing-warning {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border-left: 3px solid rgba(138, 86, 46, 0.58);
+  background: rgba(160, 114, 69, 0.08);
+  line-height: 1.5;
+}
+
+.challenge-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0 16px;
+}
+
+.challenge-grid .next-step-card {
+  margin: 0;
+}
+
+.challenge-findings {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.challenge-finding {
+  border: 1px solid rgba(40, 50, 58, 0.14);
+  border-radius: 10px;
+  padding: 11px 12px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.challenge-finding p {
+  margin: 5px 0;
+}
+
+.challenge-finding small {
+  color: #606a72;
+  line-height: 1.45;
+}
+
+.public-safe-preview {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(40, 50, 58, 0.14);
+}
+
+.public-safe-preview p {
+  color: #606a72;
+  line-height: 1.5;
+}
+
+.challenge-ready {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-left: 3px solid rgba(51, 95, 72, 0.65);
+  background: rgba(51, 95, 72, 0.08);
+}
+
+@media (max-width: 980px) {
+  .posts-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .challenge-grid {
+    grid-template-columns: 1fr;
+  }
+}
