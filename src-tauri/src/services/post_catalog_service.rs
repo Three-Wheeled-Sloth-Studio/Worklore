@@ -1,6 +1,6 @@
 use std::{path::Path, time::Duration};
 
-use rusqlite::{Connection, OptionalExtension};
+use rusqlite::Connection;
 
 use crate::{
     domain::posts::{PostRecordView, PostStatus},
