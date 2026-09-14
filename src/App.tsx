@@ -34,7 +34,6 @@ import type {
 import { errorMessage } from "./domain/types";
 import {
   clearLastVault,
-  createDefaultVault,
   createManualWorkspace,
   extractResumeCandidates,
   getDefaultVaultRoot,
@@ -58,6 +57,7 @@ import {
   submitGuidedInterviewResponse,
   updateCloudIdentifierMode,
 } from "./lib/workloreApi";
+import { createVaultInParent } from "./lib/vaultApi";
 import type { AppView } from "./navigation";
 import { LIBRARY_NAV_ITEMS, PRIMARY_NAV_ITEMS, SETTINGS_NAV_ITEM } from "./navigation";
 import "./styles.css";
@@ -83,6 +83,7 @@ function App() {
   const [selectedSourceType, setSelectedSourceType] = useState<SourceType>("resume");
   const [vaultName, setVaultName] = useState("My WorkLore");
   const [defaultVaultRoot, setDefaultVaultRoot] = useState<string | null>(null);
+  const [vaultParentPath, setVaultParentPath] = useState<string | null>(null);
   const [lastImportDirectory, setLastImportDirectory] = useState<string | null>(null);
   const [startupComplete, setStartupComplete] = useState(false);
   const [busyMessage, setBusyMessage] = useState<string | null>(null);
@@ -121,6 +122,7 @@ function App() {
         }
 
         setDefaultVaultRoot(vaultRoot);
+        setVaultParentPath(vaultRoot);
         setLastImportDirectory(importDirectory);
 
         if (!lastVaultPath) {
@@ -245,11 +247,18 @@ function App() {
   }
 
   async function handleCreateVault() {
+    const parentPath = vaultParentPath ?? defaultVaultRoot;
+    if (!parentPath) {
+      setError("Choose a vault location before creating the vault.");
+      return;
+    }
+
     setError(null);
     setNotice(null);
     setBusyMessage("Creating vault");
     try {
-      const created = await createDefaultVault(
+      const created = await createVaultInParent(
+        parentPath,
         vaultName.trim() || "My WorkLore",
       );
       await activateVault(created);
@@ -261,13 +270,27 @@ function App() {
     }
   }
 
+  async function handleChooseVaultLocation() {
+    setError(null);
+    const selected = await open({
+      directory: true,
+      multiple: false,
+      defaultPath: vaultParentPath ?? defaultVaultRoot ?? undefined,
+      title: "Choose where WorkLore should store this vault",
+    });
+    if (!selected || Array.isArray(selected)) {
+      return;
+    }
+    setVaultParentPath(selected);
+  }
+
   async function handleOpenVault() {
     setError(null);
     setNotice(null);
     const selected = await open({
       directory: true,
       multiple: false,
-      defaultPath: defaultVaultRoot ?? undefined,
+      defaultPath: vaultParentPath ?? defaultVaultRoot ?? undefined,
       title: "Open a WorkLore vault",
     });
     if (!selected || Array.isArray(selected)) {
@@ -686,6 +709,7 @@ function App() {
   }
 
   if (!vault) {
+    const selectedParent = vaultParentPath ?? defaultVaultRoot;
     return (
       <main className="landing-shell">
         <section className="landing-card" aria-labelledby="worklore-title">
@@ -693,9 +717,9 @@ function App() {
           <h1 id="worklore-title">WorkLore</h1>
           <p className="tagline">Turn the work you did into stories you can actually use.</p>
           <p className="landing-copy">
-            Create a local professional-memory vault or open an existing one. New vaults are
-            stored in WorkLore's application folder and reopen automatically until you explicitly
-            close them.
+            Create a local professional-memory vault or open an existing one. By default, WorkLore
+            creates a new vault beside the application you launched. You can change that location
+            before creating it.
           </p>
           <label className="field-label" htmlFor="vault-name">
             Vault name
@@ -706,9 +730,23 @@ function App() {
             onChange={(event) => setVaultName(event.target.value)}
             maxLength={120}
           />
-          {defaultVaultRoot ? (
-            <p className="vault-path" title={defaultVaultRoot}>
-              New vault location: {defaultVaultRoot}
+          <label className="field-label" htmlFor="vault-location">
+            Vault location
+          </label>
+          <div className="vault-location-row">
+            <input
+              id="vault-location"
+              value={selectedParent ?? "Choose a folder"}
+              readOnly
+              title={selectedParent ?? undefined}
+            />
+            <button className="secondary-button" onClick={() => void handleChooseVaultLocation()}>
+              Change location
+            </button>
+          </div>
+          {selectedParent ? (
+            <p className="vault-location-preview" title={displayVaultPath(selectedParent, vaultName)}>
+              New vault: {displayVaultPath(selectedParent, vaultName)}
             </p>
           ) : null}
           <div className="primary-actions">
@@ -772,9 +810,13 @@ function App() {
           <button
             className={`shell-nav-button shell-settings-link ${activeView === SETTINGS_NAV_ITEM.id ? "active" : ""}`}
             aria-current={activeView === SETTINGS_NAV_ITEM.id ? "page" : undefined}
+            title="Configure AI providers, storage, and application settings"
             onClick={() => setActiveView(SETTINGS_NAV_ITEM.id)}
           >
-            <span>{SETTINGS_NAV_ITEM.label}</span>
+            <span className="shell-settings-copy">
+              <span>{SETTINGS_NAV_ITEM.label}</span>
+              <small>AI providers</small>
+            </span>
           </button>
         </aside>
 
@@ -786,6 +828,7 @@ function App() {
               <p className="vault-path" title={vault.path}>{vault.path}</p>
             </div>
             <div className="header-actions">
+              <button className="quiet-button" onClick={() => setActiveView("settings")}>AI settings</button>
               <button className="quiet-button" onClick={() => void handleOpenVault()}>Open another vault</button>
               <button className="quiet-button" onClick={() => void handleCloseVault()}>Close vault</button>
             </div>
@@ -884,6 +927,12 @@ function candidateStatusMessage(status: CandidateStatus): string {
     default:
       return "Candidate updated.";
   }
+}
+
+function displayVaultPath(parentPath: string, name: string): string {
+  const trimmedParent = parentPath.replace(/[\\/]+$/, "");
+  const separator = trimmedParent.includes("\\") ? "\\" : "/";
+  return `${trimmedParent}${separator}${name.trim() || "My WorkLore"}`;
 }
 
 function formatDate(value: string): string {
