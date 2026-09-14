@@ -66,6 +66,11 @@ if (-not $SkipTests) {
 npm run build:frontend
 if ($LASTEXITCODE -ne 0) { throw "Frontend build failed with exit code $LASTEXITCODE." }
 
+$frontendIndex = Join-Path $layout.FrontendDist "index.html"
+if (-not (Test-Path $frontendIndex)) {
+    throw "Frontend build did not produce index.html at $frontendIndex. Refusing to package a broken desktop shell."
+}
+
 if (-not $SkipTests) {
     cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
     if ($LASTEXITCODE -ne 0) { throw "Rust formatting check failed with exit code $LASTEXITCODE." }
@@ -87,12 +92,26 @@ if ($shouldBundle) {
         "org.threewheeledsloth.worklore"
     }
 
+    # Tauri currently mis-parses Windows absolute frontendDist values (for example D:\\...)
+    # as URL targets instead of asset directories. That produces a packaged app which opens a
+    # filesystem directory listing rather than embedding and serving index.html. Keep the build
+    # output external, but give Tauri a relative path from src-tauri so the assets are embedded.
+    $tauriProjectRoot = Join-Path $repoRoot "src-tauri"
+    $relativeFrontendDist = [System.IO.Path]::GetRelativePath(
+        $tauriProjectRoot,
+        $layout.FrontendDist
+    ).Replace('\', '/')
+
+    if ([System.IO.Path]::IsPathRooted($relativeFrontendDist) -or $relativeFrontendDist -match '^[A-Za-z]:') {
+        throw "Tauri frontendDist must remain relative on Windows. Refusing value: $relativeFrontendDist"
+    }
+
     $override = @{
         productName = $productName
         identifier = $identifier
         build = @{
             beforeBuildCommand = "cmd /c echo Using externally staged frontend."
-            frontendDist = $layout.FrontendDist
+            frontendDist = $relativeFrontendDist
         }
         bundle = @{
             active = $true
@@ -100,6 +119,13 @@ if ($shouldBundle) {
         }
     }
     $override | ConvertTo-Json -Depth 10 | Set-Content -Encoding UTF8 $layout.ConfigPath
+
+    $writtenConfig = Get-Content -Raw $layout.ConfigPath | ConvertFrom-Json
+    if ([System.IO.Path]::IsPathRooted([string]$writtenConfig.build.frontendDist) -or [string]$writtenConfig.build.frontendDist -match '^[A-Za-z]:') {
+        throw "Generated Tauri config contains an absolute frontendDist and would launch a filesystem path instead of the WorkLore UI."
+    }
+
+    Write-Host "Tauri embedded frontend: $relativeFrontendDist"
 
     $tauriCli = Join-Path $repoRoot "node_modules\.bin\tauri.cmd"
     if (-not (Test-Path $tauriCli)) {
