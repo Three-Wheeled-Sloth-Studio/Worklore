@@ -24,6 +24,10 @@ use commands::{
         submit_guided_interview_response,
     },
     performance::get_performance_snapshot,
+    posts::{
+        append_post_revision, approve_post_revision, create_post, get_post_lineage,
+        link_post_supporting_material,
+    },
     preferences::{
         clear_last_vault, get_default_vault_root, get_last_import_directory, get_last_vault_path,
         remember_last_import_file, remember_last_vault,
@@ -122,6 +126,11 @@ pub fn run() {
             add_topic_relationship,
             remove_topic_relationship,
             list_topic_link_targets,
+            create_post,
+            append_post_revision,
+            approve_post_revision,
+            get_post_lineage,
+            link_post_supporting_material,
             open_vault,
             import_source,
             list_sources,
