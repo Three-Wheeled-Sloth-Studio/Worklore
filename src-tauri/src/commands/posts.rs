@@ -3,10 +3,10 @@ use std::path::PathBuf;
 use crate::{
     domain::posts::{
         AppendPostRevisionRequest, ApprovePostRevisionRequest, CreatePostRequest,
-        LinkPostSupportingMaterialRequest, PostLineageView,
+        LinkPostSupportingMaterialRequest, PostLineageView, PostRecordView,
     },
     error::{CommandError, CommandResult},
-    services::post_lineage_service,
+    services::{post_catalog_service, post_lineage_service},
 };
 
 #[tauri::command]
@@ -16,6 +16,11 @@ pub fn create_post(
 ) -> CommandResult<PostLineageView> {
     post_lineage_service::create_post(&PathBuf::from(vault_path), request)
         .map_err(CommandError::from)
+}
+
+#[tauri::command]
+pub fn list_posts(vault_path: String) -> CommandResult<Vec<PostRecordView>> {
+    post_catalog_service::list_posts(&PathBuf::from(vault_path)).map_err(CommandError::from)
 }
 
 #[tauri::command]
