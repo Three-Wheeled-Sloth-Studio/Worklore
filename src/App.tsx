@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { CapturePanel } from "./components/CapturePanel";
-import { FutureWorkspace } from "./components/FutureWorkspace";
 import { HomeWorkspace } from "./components/HomeWorkspace";
 import { LibraryWorkspace } from "./components/LibraryWorkspace";
 import { GuidedInterviewPanel } from "./components/GuidedInterviewPanel";
+import { InsightsWorkspace } from "./components/InsightsWorkspace";
 import { PerformancePanel } from "./components/PerformancePanel";
 import { PostWorkspace } from "./components/PostWorkspace";
 import { ProviderSettingsPanel } from "./components/ProviderSettingsPanel";
@@ -604,7 +604,7 @@ function App() {
       case "posts":
         return <PostWorkspace vaultPath={vault!.path} />;
       case "insights":
-        return <FutureWorkspace view="insights" />;
+        return <InsightsWorkspace vaultPath={vault!.path} />;
       case "sources":
         return (
           <LibraryWorkspace
