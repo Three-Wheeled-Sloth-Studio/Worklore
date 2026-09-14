@@ -14,13 +14,13 @@ describe("task-oriented navigation contract", () => {
     ]);
   });
 
-  it("marks completed Phase 1 plus the bounded Voice Evidence workspace available", () => {
+  it("marks the bounded editorial Posts seam available without pretending Insights exists", () => {
     expect(
       PRIMARY_NAV_ITEMS.filter((item) => item.availability === "available").map((item) => item.id),
-    ).toEqual(["home", "capture", "stories", "topics", "voice"]);
+    ).toEqual(["home", "capture", "stories", "topics", "voice", "posts"]);
     expect(
       PRIMARY_NAV_ITEMS.filter((item) => item.availability === "planned").map((item) => item.id),
-    ).toEqual(["posts", "insights"]);
+    ).toEqual(["insights"]);
   });
 
   it("keeps infrastructure out of primary navigation", () => {
