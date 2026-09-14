@@ -1,14 +1,8 @@
-import { PostWorkspace } from "./PostWorkspace";
-
-export function FutureWorkspace({ view }: { view: "posts" | "insights" }) {
-  if (view === "posts") {
-    return <PostWorkspace />;
-  }
-
+export function FutureWorkspace({ view }: { view: "insights" }) {
   return (
-    <section className="workspace-panel future-workspace" aria-labelledby="insights-heading">
+    <section className="workspace-panel future-workspace" aria-labelledby={`${view}-heading`}>
       <p className="eyebrow">Phase 4</p>
-      <h2 id="insights-heading">Insights</h2>
+      <h2 id={`${view}-heading`}>Insights</h2>
       <p>
         Analytics import, experiments, repetition checks, and confidence-aware learning are planned
         after the editorial workflow has enough real published content to learn from.
