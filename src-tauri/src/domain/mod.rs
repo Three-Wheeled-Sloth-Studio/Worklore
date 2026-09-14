@@ -1,5 +1,6 @@
 pub mod candidates;
 pub mod edit_learning;
+pub mod feedback;
 pub mod interviews;
 pub mod models;
 pub mod performance;
