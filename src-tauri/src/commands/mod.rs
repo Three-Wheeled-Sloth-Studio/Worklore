@@ -4,6 +4,7 @@ pub mod development;
 pub mod inspirations;
 pub mod interviews;
 pub mod performance;
+pub mod posts;
 pub mod preferences;
 pub mod privacy;
 pub mod providers;
