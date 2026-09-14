@@ -110,7 +110,10 @@ pub fn link_post_supporting_material(
 mod tests {
     use super::*;
 
-    fn preflight(state: ConfidentialityState, public_safe_text: &str) -> ConfidentialityTransformResult {
+    fn preflight(
+        state: ConfidentialityState,
+        public_safe_text: &str,
+    ) -> ConfidentialityTransformResult {
         ConfidentialityTransformResult {
             original_text: "Private draft".to_string(),
             token_redacted_text: public_safe_text.to_string(),
