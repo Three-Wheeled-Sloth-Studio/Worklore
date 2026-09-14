@@ -1,7 +1,9 @@
 use std::path::PathBuf;
 
 use crate::{
-    domain::edit_learning::EditLearningAnalysisView,
+    domain::edit_learning::{
+        DecideEditLearningProposalRequest, EditLearningAnalysisView, EditLearningDecisionView,
+    },
     error::{CommandError, CommandResult},
     services::{
         edit_learning_service,
@@ -21,6 +23,23 @@ use crate::{
 #[tauri::command]
 pub fn analyze_edit_learning(vault_path: String) -> CommandResult<EditLearningAnalysisView> {
     edit_learning_service::analyze_edit_learning(&PathBuf::from(vault_path))
+        .map_err(CommandError::from)
+}
+
+#[tauri::command]
+pub fn decide_edit_learning_proposal(
+    vault_path: String,
+    request: DecideEditLearningProposalRequest,
+) -> CommandResult<EditLearningDecisionView> {
+    edit_learning_service::decide_edit_learning_proposal(&PathBuf::from(vault_path), request)
+        .map_err(CommandError::from)
+}
+
+#[tauri::command]
+pub fn list_edit_learning_decisions(
+    vault_path: String,
+) -> CommandResult<Vec<EditLearningDecisionView>> {
+    edit_learning_service::list_edit_learning_decisions(&PathBuf::from(vault_path))
         .map_err(CommandError::from)
 }
 
