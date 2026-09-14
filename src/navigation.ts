@@ -17,7 +17,7 @@ export const PRIMARY_NAV_ITEMS: NavigationItem[] = [
   { id: "topics", label: "Topics", availability: "available", description: "Connect ideas before drafting" },
   { id: "voice", label: "Voice", availability: "available", description: "Govern Voice Evidence provenance" },
   { id: "posts", label: "Posts", availability: "available", description: "Draft, challenge, revise, and explicitly approve" },
-  { id: "insights", label: "Insights", availability: "planned", description: "Phase 4 learning loop" },
+  { id: "insights", label: "Insights", availability: "available", description: "Record published outcomes and learn cautiously" },
 ];
 
 export const LIBRARY_NAV_ITEMS: NavigationItem[] = [
@@ -32,7 +32,3 @@ export const SETTINGS_NAV_ITEM: NavigationItem = {
   availability: "available",
   description: "Providers, storage, and diagnostics",
 };
-
-export function isPlannedPrimaryView(view: AppView): view is "insights" {
-  return view === "insights";
-}
