@@ -1,6 +1,6 @@
 version: 2
 schema: refs/schemas/schemaRegistry.yaml
-updated: 2026-09-13
+updated: 2026-09-14
 
 todos:
   - id: task-001
@@ -134,7 +134,7 @@ todos:
   - id: task-032
     status: in_progress
     area: voice
-    summary: Core Voice foundation and Ollama-backed provider-neutral review-only voice proposals are complete; schema-v8 durable Post/Revision lineage now unblocks bounded edit-delta learning, which must surface recurring preferences for explicit human acceptance rather than silently mutating voice state.
+    summary: Core Voice and provider-neutral review-only voice proposals are complete; accepted provider-free edit learning now derives inspectable additions/removals/replacements from real schema-v8 Revision ancestry and surfaces recurring corrections across distinct Posts as transient proposals with exact revision-pair provenance. Remaining scope is an explicit accept/reject bridge that durably preserves supporting Revision pairs without silently activating or mutating canonical voice state.
   - id: task-033
     status: in_progress
     area: quality
