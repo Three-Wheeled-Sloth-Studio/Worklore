@@ -5,6 +5,7 @@ pub mod capture_service;
 pub mod confidentiality_service;
 pub mod contextual_entity_scan;
 pub mod document_extraction;
+pub mod edit_learning_service;
 pub mod entity_review;
 pub mod entity_scan;
 pub mod guided_development_rules;
