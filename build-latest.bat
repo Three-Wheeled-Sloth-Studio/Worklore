@@ -23,22 +23,28 @@ if defined WORKLORE_DIRTY (
 )
 
 echo.
-echo [1/3] Switching to dev...
+echo [1/4] Switching to dev...
 git switch dev
 if errorlevel 1 goto :failed
 
 echo.
-echo [2/3] Pulling latest origin/dev...
+echo [2/4] Pulling latest origin/dev...
 git pull --ff-only origin dev
 if errorlevel 1 goto :failed
 
 echo.
-echo [3/3] Building the WorkLore desktop executable...
+echo [3/4] Building the WorkLore desktop executable...
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build.ps1 -Channel qa -SkipTests
 if errorlevel 1 goto :failed
 
 echo.
+echo [4/4] Staging the fresh QA executable...
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\install-qa.ps1 -SkipBuild
+if errorlevel 1 goto :failed
+
+echo.
 echo WorkLore desktop build completed successfully.
+echo Launch the staged QA app from the installed\qa folder printed above.
 exit /b 0
 
 :failed
