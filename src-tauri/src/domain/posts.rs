@@ -8,13 +8,6 @@ pub enum PostStatus {
 }
 
 impl PostStatus {
-    pub fn as_str(self) -> &'static str {
-        match self {
-            Self::Working => "working",
-            Self::FinalApproved => "final_approved",
-        }
-    }
-
     pub fn parse(value: &str) -> Result<Self, String> {
         match value {
             "working" => Ok(Self::Working),
