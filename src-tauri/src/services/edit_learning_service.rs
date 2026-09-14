@@ -146,7 +146,9 @@ struct PatternAccumulator {
     supporting_pairs: Vec<EditPairProvenanceView>,
 }
 
-fn build_proposals(observations: &[EditObservationView]) -> Vec<RecurringEditPreferenceProposalView> {
+fn build_proposals(
+    observations: &[EditObservationView],
+) -> Vec<RecurringEditPreferenceProposalView> {
     let mut patterns = BTreeMap::<String, PatternAccumulator>::new();
     for observation in observations {
         for change in &observation.changes {
@@ -362,7 +364,10 @@ mod tests {
             .unwrap();
         assert_eq!(replacement.changes[0].kind, EditChangeKind::Replacement);
         assert_eq!(replacement.changes[0].removed_text.as_deref(), Some("very"));
-        assert_eq!(replacement.changes[0].added_text.as_deref(), Some("sharply"));
+        assert_eq!(
+            replacement.changes[0].added_text.as_deref(),
+            Some("sharply")
+        );
         fs::remove_dir_all(path).unwrap();
     }
 
@@ -518,7 +523,9 @@ mod tests {
         let before_tones = voice_profile_service::list_tone_modes(&path).unwrap();
         let before_directions = voice_profile_service::list_voice_directions(&path).unwrap();
         let before_rules = voice_profile_service::list_writing_rules(&path).unwrap();
-        let before_evidence_count = voice_evidence_service::list_voice_evidence(&path).unwrap().len();
+        let before_evidence_count = voice_evidence_service::list_voice_evidence(&path)
+            .unwrap()
+            .len();
 
         create_user_edit_pair(
             &path,
@@ -535,15 +542,26 @@ mod tests {
         let analysis = analyze_edit_learning(&path).unwrap();
         assert_eq!(analysis.proposals.len(), 1);
 
-        assert_eq!(voice_profile_service::list_core_voices(&path).unwrap(), before_core);
-        assert_eq!(voice_profile_service::list_tone_modes(&path).unwrap(), before_tones);
+        assert_eq!(
+            voice_profile_service::list_core_voices(&path).unwrap(),
+            before_core
+        );
+        assert_eq!(
+            voice_profile_service::list_tone_modes(&path).unwrap(),
+            before_tones
+        );
         assert_eq!(
             voice_profile_service::list_voice_directions(&path).unwrap(),
             before_directions
         );
-        assert_eq!(voice_profile_service::list_writing_rules(&path).unwrap(), before_rules);
         assert_eq!(
-            voice_evidence_service::list_voice_evidence(&path).unwrap().len(),
+            voice_profile_service::list_writing_rules(&path).unwrap(),
+            before_rules
+        );
+        assert_eq!(
+            voice_evidence_service::list_voice_evidence(&path)
+                .unwrap()
+                .len(),
             before_evidence_count
         );
         fs::remove_dir_all(path).unwrap();
