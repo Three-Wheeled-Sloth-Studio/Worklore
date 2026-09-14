@@ -9,6 +9,7 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot "build-layout.ps1")
+. (Join-Path $PSScriptRoot "windows-build-env.ps1")
 
 $repoRoot = Get-WorkLoreRepoRoot
 Set-Location $repoRoot
@@ -28,11 +29,11 @@ if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
 
 Write-Host "Validating repository path safety and project memory..."
 python scripts/check-case-collisions.py
-if ($LASTEXITCODE -ne 0) { throw "Tracked-path validation failed." }
+if ($LASTEXITCODE -ne 0) { throw "Tracked-path validation failed with exit code $LASTEXITCODE." }
 python refs/tools/validate_refs.py --mode initialized
-if ($LASTEXITCODE -ne 0) { throw "Project-reference validation failed." }
+if ($LASTEXITCODE -ne 0) { throw "Project-reference validation failed with exit code $LASTEXITCODE." }
 python refs/tools/generate_agent_context.py --check
-if ($LASTEXITCODE -ne 0) { throw "Bounded agent-context validation failed." }
+if ($LASTEXITCODE -ne 0) { throw "Bounded agent-context validation failed with exit code $LASTEXITCODE." }
 
 Show-WorkLoreLegacyBuildWarning
 $layout = Get-WorkLoreBuildLayout -Channel $Channel
@@ -52,18 +53,28 @@ Write-Host "Frontend output: $($layout.FrontendDist)"
 if (-not (Test-Path "node_modules")) {
     Write-Host "Installing frontend dependencies..."
     npm install
+    if ($LASTEXITCODE -ne 0) { throw "npm install failed with exit code $LASTEXITCODE." }
 }
+
+Import-WorkLoreVisualStudioEnvironment
 
 if (-not $SkipTests) {
     npm run test
+    if ($LASTEXITCODE -ne 0) { throw "Frontend tests failed with exit code $LASTEXITCODE." }
 }
 
 npm run build:frontend
+if ($LASTEXITCODE -ne 0) { throw "Frontend build failed with exit code $LASTEXITCODE." }
 
 if (-not $SkipTests) {
     cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
+    if ($LASTEXITCODE -ne 0) { throw "Rust formatting check failed with exit code $LASTEXITCODE." }
+
     cargo test --manifest-path src-tauri/Cargo.toml
+    if ($LASTEXITCODE -ne 0) { throw "Rust tests failed with exit code $LASTEXITCODE." }
+
     cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
+    if ($LASTEXITCODE -ne 0) { throw "Rust lint failed with exit code $LASTEXITCODE." }
 }
 
 $shouldBundle = -not $SkipBundle -and $Channel -ne "validate"
@@ -90,7 +101,14 @@ if ($shouldBundle) {
     }
     $override | ConvertTo-Json -Depth 10 | Set-Content -Encoding UTF8 $layout.ConfigPath
 
-    npm run tauri -- build --config $layout.ConfigPath
+    $tauriCli = Join-Path $repoRoot "node_modules\.bin\tauri.cmd"
+    if (-not (Test-Path $tauriCli)) {
+        throw "The local Tauri CLI was not found at $tauriCli. Delete node_modules and run npm install, then retry."
+    }
+
+    Write-Host "Building Tauri desktop bundle..."
+    & $tauriCli build --config $layout.ConfigPath
+    if ($LASTEXITCODE -ne 0) { throw "Tauri desktop build failed with exit code $LASTEXITCODE." }
 }
 
 $gitCommit = $null
@@ -117,3 +135,16 @@ $manifest | ConvertTo-Json -Depth 5 | Set-Content -Encoding UTF8 (Join-Path $lay
 
 & (Join-Path $PSScriptRoot "assert-repo-clean.ps1")
 Write-Host "WorkLore $Channel build completed outside the repository."
+
+if ($shouldBundle) {
+    $appExecutable = Join-Path $layout.CargoTarget "release\worklore.exe"
+    $installerRoot = Join-Path $layout.CargoTarget "release\bundle\nsis"
+    if (Test-Path $appExecutable) {
+        Write-Host "Application executable: $appExecutable"
+    }
+    if (Test-Path $installerRoot) {
+        Get-ChildItem -Path $installerRoot -Filter "*.exe" -File | ForEach-Object {
+            Write-Host "Windows installer: $($_.FullName)"
+        }
+    }
+}
