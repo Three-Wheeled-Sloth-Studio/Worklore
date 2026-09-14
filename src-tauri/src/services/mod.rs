@@ -18,6 +18,7 @@ pub mod post_catalog_service;
 pub mod post_lineage_service;
 pub mod privacy_scan_migration;
 pub mod provider_registry;
+pub mod publication_feedback_service;
 pub mod redaction_service;
 pub mod role_service;
 pub mod seed_development_service;
