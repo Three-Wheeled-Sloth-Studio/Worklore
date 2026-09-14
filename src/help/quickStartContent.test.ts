@@ -4,6 +4,10 @@ import { QUICK_START_SECTIONS } from "./quickStartContent";
 describe("quick-start contract", () => {
   it("leads with the resume-bullet professional-memory bootstrap", () => {
     const first = QUICK_START_SECTIONS[0];
+    if (!first) {
+      throw new Error("Quick start must contain at least one section.");
+    }
+
     expect(first.id).toBe("resume-seeds");
     expect(first.title.toLowerCase()).toContain("resume bullets");
     expect(first.steps.join(" ")).toContain("Story seed");
