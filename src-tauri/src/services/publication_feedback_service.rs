@@ -323,10 +323,7 @@ fn derive_insights(
     insights
 }
 
-fn best_rate<F>(
-    performance: &[PerformanceRecordView],
-    metric: F,
-) -> Option<&PerformanceRecordView>
+fn best_rate<F>(performance: &[PerformanceRecordView], metric: F) -> Option<&PerformanceRecordView>
 where
     F: Fn(&PerformanceMetrics) -> u64,
 {
@@ -334,10 +331,10 @@ where
         .iter()
         .filter(|record| record.metrics.impressions > 0)
         .max_by(|left, right| {
-            let left_score = u128::from(metric(&left.metrics))
-                * u128::from(right.metrics.impressions);
-            let right_score = u128::from(metric(&right.metrics))
-                * u128::from(left.metrics.impressions);
+            let left_score =
+                u128::from(metric(&left.metrics)) * u128::from(right.metrics.impressions);
+            let right_score =
+                u128::from(metric(&right.metrics)) * u128::from(left.metrics.impressions);
             left_score.cmp(&right_score)
         })
 }
@@ -380,7 +377,10 @@ fn required(value: &str, label: &str) -> ServiceResult<String> {
 }
 
 fn optional_trimmed(value: Option<&str>) -> Option<String> {
-    value.map(str::trim).filter(|value| !value.is_empty()).map(ToOwned::to_owned)
+    value
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+        .map(ToOwned::to_owned)
 }
 
 fn open_connection(vault_path: &Path) -> ServiceResult<Connection> {
@@ -501,7 +501,10 @@ mod tests {
         .unwrap();
         let snapshot = get_feedback_snapshot(&path).unwrap();
         assert_eq!(snapshot.latest_performance.len(), 1);
-        assert_eq!(snapshot.latest_performance[0].performance_id, latest.performance_id);
+        assert_eq!(
+            snapshot.latest_performance[0].performance_id,
+            latest.performance_id
+        );
         assert_eq!(snapshot.latest_performance[0].metrics.impressions, 250);
         assert_eq!(snapshot.insights[0].kind, "sample_warning");
         fs::remove_dir_all(path).unwrap();
