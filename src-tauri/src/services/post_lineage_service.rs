@@ -777,7 +777,7 @@ mod tests {
         let source = capture_service::create_capture_source(
             &path,
             "Synthetic source evidence.",
-            SourceType::Note,
+            SourceType::Other,
         )
         .unwrap();
         let evidence_id = canonical_store::create_evidence(&path, "Synthetic fact.").unwrap();
