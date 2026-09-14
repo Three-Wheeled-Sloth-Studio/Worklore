@@ -132,9 +132,9 @@ todos:
     area: voice
     summary: Define and implement governed Voice Evidence provenance so writing samples begin pending, explicit authorship and approval control eligibility, raw AI/external-author material remains prohibited, and eligibility changes retain Source lineage, revisions, and audit events.
   - id: task-032
-    status: in_progress
+    status: complete
     area: voice
-    summary: Core Voice and provider-neutral review-only voice proposals are complete; accepted provider-free edit learning now derives inspectable additions/removals/replacements from real schema-v8 Revision ancestry and surfaces recurring corrections across distinct Posts as transient proposals with exact revision-pair provenance. Remaining scope is an explicit accept/reject bridge that durably preserves supporting Revision pairs without silently activating or mutating canonical voice state.
+    summary: Governed Voice Evidence/Core Voice foundations, provider-neutral review-only voice analysis, deterministic edit-delta learning over real Revision ancestry, recurring-preference proposals across distinct Posts, and explicit durable accept/reject governance are complete. Decisions preserve exact Post/Revision-pair provenance, reject stale or tampered evidence, suppress unchanged decided evidence, allow materially expanded support to resurface, and route acceptance only into a proposed Writing Rule without silently activating or mutating canonical voice state.
   - id: task-033
     status: in_progress
     area: quality
@@ -144,17 +144,17 @@ todos:
     area: privacy
     summary: Provider-free confidentiality transformation now reuses the Private Entity Registry and external redaction path to return stable token redaction, explicitly stored public descriptions, unresolved privacy risk, replacement metadata, and ready/needs-review/blocked state without mutating private canonical truth or inventing replacement facts.
   - id: task-035
-    status: planned
-    area: content
-    summary: Implement angle generation, Audience Lens, post drafting, comments/replies, and a human editorial approval workflow without social auto-publishing.
-  - id: task-036
     status: in_progress
+    area: content
+    summary: A thin QA-able Content Studio seam now supports a Posts catalog/editor, immutable Revision creation, typed supporting material, deterministic challenge checks, human editing, and exact public-safe final approval. Remaining scope includes angle generation, Audience Lens, provider-assisted drafting, comments/replies, portfolio-level checks, and broader editorial workflow refinement; social publication remains manual and external.
+  - id: task-036
+    status: complete
     area: audit
-    summary: Durable provider-free schema-v8 Post/Revision lineage is complete with immutable exact snapshots, deterministic ancestry, explicit user/model authorship and provider provenance, typed supporting-material links, and exact final approval; publication metadata and later analytics association remain deferred to Content Studio and Feedback Intelligence.
+    summary: Durable provider-free schema-v8 Post/Revision lineage is complete with immutable exact snapshots, deterministic ancestry, explicit user/model authorship and provider provenance, typed supporting-material links, exact final approval, and exact user-marked manual-publication association to the approved Revision. Publication remains external to WorkLore, and downstream performance records retain that exact publication lineage.
   - id: task-037
-    status: planned
+    status: in_progress
     area: analytics
-    summary: Import LinkedIn-native analytics exports and produce confidence-aware observations by topic, tone, structure, proof point, timing, audience intent, and experiment.
+    summary: A minimum Feedback Intelligence seam now records exact manual publications, append-only cumulative LinkedIn performance snapshots, and conservative small-sample observations with explicit non-causality boundaries. Remaining scope includes LinkedIn-native export import and broader analysis by topic, tone, structure, proof point, timing, audience intent, and experiment.
   - id: task-038
     status: future
     area: discovery
