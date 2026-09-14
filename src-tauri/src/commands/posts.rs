@@ -9,6 +9,7 @@ use crate::{
     services::{
         confidentiality_service::{
             self, ConfidentialityState, ConfidentialityTransformRequest,
+            ConfidentialityTransformResult,
         },
         post_catalog_service, post_lineage_service,
     },
@@ -62,20 +63,27 @@ pub fn approve_post_revision(
         },
     )
     .map_err(CommandError::from)?;
-
-    if preflight.state != ConfidentialityState::Ready {
-        return Err(CommandError::from(WorkLoreError::InvalidVault(
-            "Final approval is blocked until confidentiality review is resolved.".to_string(),
-        )));
-    }
-    if preflight.public_safe_text != revision.text {
-        return Err(CommandError::from(WorkLoreError::InvalidVault(
-            "Final approval requires the exact saved Revision to match WorkLore's public-safe text. Load the public-safe text, save a new Revision, and challenge it again."
-                .to_string(),
-        )));
-    }
+    ensure_public_safe_revision(&revision.text, &preflight).map_err(CommandError::from)?;
 
     post_lineage_service::approve_revision(&vault_path, request).map_err(CommandError::from)
+}
+
+fn ensure_public_safe_revision(
+    revision_text: &str,
+    preflight: &ConfidentialityTransformResult,
+) -> Result<(), WorkLoreError> {
+    if preflight.state != ConfidentialityState::Ready {
+        return Err(WorkLoreError::InvalidVault(
+            "Final approval is blocked until confidentiality review is resolved.".to_string(),
+        ));
+    }
+    if preflight.public_safe_text != revision_text {
+        return Err(WorkLoreError::InvalidVault(
+            "Final approval requires the exact saved Revision to match WorkLore's public-safe text. Load the public-safe text, save a new Revision, and challenge it again."
+                .to_string(),
+        ));
+    }
+    Ok(())
 }
 
 #[tauri::command]
@@ -96,4 +104,41 @@ pub fn link_post_supporting_material(
         &request.target_id,
     )
     .map_err(CommandError::from)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn preflight(state: ConfidentialityState, public_safe_text: &str) -> ConfidentialityTransformResult {
+        ConfidentialityTransformResult {
+            original_text: "Private draft".to_string(),
+            token_redacted_text: public_safe_text.to_string(),
+            public_safe_text: public_safe_text.to_string(),
+            state,
+            replacements: Vec::new(),
+            unresolved_risks: Vec::new(),
+            registry_revision: 1,
+            provider_used: false,
+        }
+    }
+
+    #[test]
+    fn final_approval_requires_ready_exact_public_safe_text() {
+        assert!(ensure_public_safe_revision(
+            "Private draft",
+            &preflight(ConfidentialityState::Blocked, "Private draft")
+        )
+        .is_err());
+        assert!(ensure_public_safe_revision(
+            "Private draft",
+            &preflight(ConfidentialityState::Ready, "a private employer draft")
+        )
+        .is_err());
+        assert!(ensure_public_safe_revision(
+            "Public-safe draft",
+            &preflight(ConfidentialityState::Ready, "Public-safe draft")
+        )
+        .is_ok());
+    }
 }
