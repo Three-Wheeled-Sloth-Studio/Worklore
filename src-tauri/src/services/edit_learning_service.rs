@@ -30,6 +30,8 @@ const DECISION_RECORD_TYPE: &str = "edit_learning_decision";
 const ACCEPTED_EVENT_TYPE: &str = "edit_learning_proposal_accepted";
 const REJECTED_EVENT_TYPE: &str = "edit_learning_proposal_rejected";
 
+type DecisionKey = (String, String);
+
 pub fn analyze_edit_learning(vault_path: &Path) -> ServiceResult<EditLearningAnalysisView> {
     canonical_store::initialize(vault_path)?;
     let connection = open_connection(vault_path)?;
@@ -401,7 +403,7 @@ fn load_decisions(connection: &Connection) -> ServiceResult<Vec<EditLearningDeci
         .collect()
 }
 
-fn load_decision_keys(connection: &Connection) -> ServiceResult<BTreeSet<(String, String)>> {
+fn load_decision_keys(connection: &Connection) -> ServiceResult<BTreeSet<DecisionKey>> {
     let mut statement = connection.prepare(
         "SELECT details_json
          FROM audit_events
