@@ -1,7 +1,7 @@
 ---
 type: Handoff Prompt
 title: Next WorkLore Development Slice
-description: Bounded prompt for provider-free edit-delta learning from real schema-v8 Post/Revision ancestry.
+description: Bounded prompt for explicit accept/reject of edit-learning proposals with durable revision-pair provenance.
 status: draft
 tags: [handoff, next-slice]
 ---
@@ -17,22 +17,22 @@ Draft PR #1 remains `dev -> qa`. Leave it draft.
 
 ## Accepted Starting Point
 
-Phase 1 Professional Memory is complete. Phase 2 Voice Intelligence now has validated foundations for governed Voice Evidence, Core Voice, provider-neutral review-only voice proposals, deterministic single-draft linting, provider-free confidentiality transformation, and real durable Post/Revision ancestry.
+Phase 1 Professional Memory is complete. Phase 2 Voice Intelligence now includes accepted foundations for governed Voice Evidence, Core Voice, provider-neutral review-only voice proposals, deterministic single-draft linting, provider-free confidentiality transformation, durable Post/Revision lineage, and deterministic edit-learning observations/proposals over real Revision ancestry.
 
-Accepted Post/Revision lineage implementation checkpoint:
+Accepted edit-learning implementation checkpoint:
 
-`28b6860212c9daf87ec925d1478a83d08f423092`
+`dec9ce74188d97a3d6b96669b6cffbb967be23ff`
 
-Implementation validation:
+Validation:
 
-- Actions `34797693185`
-- Job `103833884286`
+- Actions `34799693936`
+- Job `103839679015`
 - frontend: 8 passed / 0 failed across 3 files
-- Rust: 110 passed / 0 failed
+- Rust: 115 passed / 0 failed
 - production frontend build: green, 53 modules transformed
 - external build layout, case/path validation, refs/OKF, bounded agent context, warnings-denied Clippy, rustfmt, and repository/source-only checks: green
 
-The schema-v8 lineage foundation stores immutable exact Revision snapshots, deterministic parentage, explicit user/model origin and authorship state, optional provider/run/model provenance, typed supporting-material links, and exact final approval. Human edits of model-origin text retain `user_edited_model` provenance; raw model revisions do not automatically become Voice Evidence. Confidentiality remains derived and does not overwrite canonical Revision text.
+The accepted edit-learning service operates only on real persisted parent/child Post Revisions. It emits deterministic addition/removal/replacement observations with exact Post and Revision provenance, preserves model ancestors as model-origin context, and emits a recurring-preference proposal only when the same normalized correction appears across at least two distinct Posts. Proposals are transient and do not mutate governed voice state.
 
 Read `refs/handoffs/currentHandoff.md` before making changes.
 
@@ -43,7 +43,7 @@ Do not reread repository history.
 First run:
 
 ```powershell
-python refs/tools/generate_agent_context.py --focus "WorkLore task-032 edit delta learning real Post Revision ancestry recurring voice preference proposals explicit acceptance"
+python refs/tools/generate_agent_context.py --focus "WorkLore task-032 explicit accept reject edit learning proposal durable revision pair provenance existing voice governance"
 ```
 
 Treat generated context as derived orientation, not source of truth. Follow it into only the authoritative product, architecture, schema, and implementation files needed for this slice.
@@ -53,131 +53,114 @@ Read at minimum:
 - `refs/handoffs/currentHandoff.md`
 - `refs/product/prd.md`, especially edit-learning, voice provenance, explicit acceptance, and raw-model-output boundaries
 - `refs/architecture/vaultFormat.md`
-- the authoritative domain-model architecture material referenced by the generated context
+- authoritative domain-model architecture material referenced by the generated context
 - `refs/planning/roadmap.yaml`
 - `refs/planning/todos.yaml`
-- schema-v8 Post/Revision domain, service, and migration code
-- Voice Evidence eligibility/provenance code
-- Core Voice, Voice Direction, Tone Mode, Writing Rule, and review-only proposal contracts
-- deterministic linter contracts only where useful for explainable observation vocabulary
+- `src-tauri/src/domain/edit_learning.rs`
+- `src-tauri/src/services/edit_learning_service.rs`
+- schema-v8 Post/Revision storage/migration code
+- existing Voice Evidence, Core Voice, Voice Direction, Tone Mode, Writing Rule, audit, and review-only proposal contracts
+- current Tauri/API registration for edit-learning analysis
 
 Load deeper files only as needed.
 
-## Immediate Objective: task-032 edit-delta foundation
+## Immediate Objective: task-032 explicit decision bridge
 
-Implement the smallest provider-free deterministic edit-delta learning foundation that can answer:
+Implement the smallest provider-free durable path that can answer:
 
-`Can WorkLore inspect real persisted parent/child Revisions, identify explainable user editing behavior without treating model text as user voice, recognize genuinely recurring corrections across real history, and surface proposed voice-learning changes for explicit human acceptance without silently rewriting canonical voice?`
+`Can a user explicitly accept or reject a currently reproducible recurring edit proposal, preserve the exact real Revision pairs that justified the decision, and route an accepted preference into existing voice governance without silently activating it or inventing a second voice model?`
 
-This is an edit-observation and proposal slice, not broad Content Studio or portfolio analysis.
+This is a governance/provenance slice, not broad Content Studio or portfolio analysis.
 
-### 1. Use only real durable Revision ancestry
+### 1. Decisions must be explicit
 
-Operate on schema-v8 Post/Revision records and their actual parent relationships.
+No proposal may change canonical voice state merely because it exists.
 
-Do not create pseudo-history, synthetic historical usage, or transient fake Revision chains merely to produce learning signals.
+Provide explicit accept and reject behavior through a thin local service/API surface.
 
-A synthetic fixture may create real persisted Revisions inside a test vault. That is different from fabricating historical records in product behavior.
+### 2. Validate the proposal at decision time
 
-### 2. Keep model text out of user voice
+Do not trust arbitrary client-supplied proposal text or provenance.
 
-The change made by the user is the signal. The model ancestor is context for the delta, not Voice Evidence.
+A decision request should identify the deterministic proposal and its supporting evidence strongly enough that the service can re-derive or validate it from the current canonical Post/Revision history.
 
-Requirements:
+Reject stale or tampered decisions when the current reproducible proposal no longer matches the supplied identity/evidence set.
 
-- a `model_generated -> user_edited_model` pair may yield edit observations;
-- the model-origin text must not become eligible Voice Evidence or a Core Voice source merely because it has a human descendant;
-- user-authored Revision pairs may also yield edit observations when provenance permits;
-- preserve exact Post ID, child Revision ID, parent Revision ID, and relevant authorship/origin metadata with every observation;
-- never relabel a model ancestor as human-authored.
+### 3. Persist exact provenance
 
-### 3. Start deterministic and explainable
+Persist the human decision together with exact supporting:
 
-No provider is required for the bounded proof path.
+- Post IDs;
+- parent Revision IDs;
+- child Revision IDs;
+- deterministic proposal key;
+- decision state;
+- decision timestamp;
+- any resulting governed artifact identity.
 
-Use a deterministic comparison that exposes meaningful edits in an inspectable form. At minimum distinguish useful categories such as additions, removals, and replacements, but follow stronger existing repository terminology if it already exists.
+Do not copy whole private Revision text into audit metadata when IDs are sufficient.
 
-Prefer concise normalized observations over an opaque style score.
+### 4. Reuse existing voice governance
 
-Do not add an AI/human probability or overall slop/quality score.
+Do not create a parallel active-preference model.
 
-### 4. Do not overlearn from one edit
+Preferred behavior for an accepted recurring edit preference is to create or feed an existing reviewable governed artifact, most likely a proposed/inactive Writing Rule or another already-authoritative voice-governance type if the current domain contract fits better.
 
-One observed correction is evidence of one correction, not automatically a durable preference.
+Acceptance must not silently:
 
-The foundation should make it possible to detect recurring behavior across multiple real Revision pairs and should require a reasonable repeated pattern before producing a recurring-preference proposal.
+- activate a Writing Rule;
+- mutate active Core Voice;
+- activate or rewrite a Voice Direction;
+- change Tone Modes;
+- change Voice Evidence eligibility.
 
-Keep thresholds deterministic, modest, and explainable. Do not pretend statistical confidence the data does not support.
+If the existing domain does not safely support a reviewable target artifact without semantic distortion, persist the accepted decision and provenance only, rather than forcing it into the wrong voice type.
 
-### 5. Proposed learning requires explicit acceptance
+### 5. Rejection must be meaningful
 
-A recurring edit pattern may become a proposed voice-learning change, not an automatic mutation.
+A rejected proposal should not immediately resurface as if no decision happened when the exact same supporting evidence set is unchanged.
 
-Do not silently change:
+If additional real evidence later changes the support set, resurfacing for renewed review is acceptable and should remain explainable.
 
-- active Core Voice;
-- Voice Direction;
-- Tone Modes;
-- Writing Rules;
-- Voice Evidence eligibility.
+### 6. Preserve model provenance
 
-Reuse existing review/proposal/governance patterns where practical. If current persistence contracts do not safely support durable edit-learning proposals in this bounded slice, a transient proposal surface is acceptable. Do not create a second competing voice-governance model.
+For model-generated -> user-edited-model pairs, the user edit remains the learning signal and the model ancestor remains model-origin context.
 
-### 6. Preserve provenance through acceptance/rejection
+Acceptance or rejection must not relabel model text as user-authored or make raw model text Voice Evidence.
 
-Any surfaced proposal must remain traceable to the exact real Revision pairs that support it.
-
-If acceptance or rejection is persisted in this slice, retain the source Revision provenance and explicit human decision. If existing architecture makes persistence premature, stop at inspectable transient proposals rather than weakening provenance.
-
-### 7. Keep final-approved content semantics intact
-
-Do not automatically promote final-approved Post text into Voice Evidence merely because it is approved for publication. Existing Voice Evidence governance and authorship rules remain authoritative.
-
-Do not implement publication metadata, social APIs, or analytics association in order to prove edit learning.
-
-### 8. Keep task-033 analysis out of scope
-
-Do not implement in this slice:
-
-- cross-draft repetition scoring;
-- proof-point rotation;
-- portfolio opening/structure analysis;
-- mode-collapse analysis;
-- broad evidence/standing challenge scoring.
-
-The lineage substrate now exists, but those checks still need a meaningful real content corpus.
-
-### 9. Keep broad Content Studio out of scope
+### 7. Keep the slice narrow
 
 Do not begin:
 
-- angle generation;
-- Audience Lens;
+- broad Voice workspace redesign;
+- provider-assisted edit interpretation;
+- task-033 cross-draft portfolio analysis;
+- angle generation or Audience Lens;
 - provider-assisted post drafting;
-- comments or replies;
+- comments/replies;
 - publication/scheduling;
 - analytics;
-- discovery/news scanning;
-- broad Posts UI redesign.
+- discovery/news scanning.
 
-A thin local API/test surface is enough to prove the edit-learning contract.
+A thin local API and deterministic proof tests are enough.
 
 ## Proof Cases
 
 Cover at least:
 
 - works with no provider configured;
-- no real parent/child Revision pair produces no edit observation or proposal;
-- a persisted edit produces an inspectable deterministic delta with exact Post/Revision provenance;
-- additions, removals, and replacements are represented clearly enough for human review;
-- model draft -> human edit yields a user-change observation without treating the model text as Voice Evidence;
-- the model ancestor keeps model provenance after analysis;
-- one edit alone does not become an accepted recurring voice preference;
-- repeated real human corrections can produce an explainable recurring-preference proposal;
-- proposal provenance identifies the supporting Revision pairs;
-- proposal generation does not mutate active Core Voice, Voice Direction, Tone Modes, Writing Rules, or Voice Evidence eligibility;
-- any persisted acceptance/rejection is explicit and retains provenance, or proposals remain transient if safe persistence is not yet justified;
-- existing 110 Rust tests and 8 frontend tests remain green.
+- accepting a currently reproducible proposal requires an explicit request;
+- rejecting a currently reproducible proposal requires an explicit request;
+- arbitrary/tampered proposal keys or supporting revision pairs are rejected;
+- stale proposal evidence is rejected when current history no longer reproduces the same proposal identity/evidence set;
+- accepted decision persists across reopen with exact supporting Post/parent Revision/child Revision IDs;
+- rejected decision persists across reopen;
+- identical rejected evidence does not immediately resurface as undecided;
+- materially expanded real support can surface a renewed reviewable proposal if that is the chosen contract;
+- acceptance does not activate or mutate active Core Voice, Tone Modes, Voice Directions, active Writing Rules, or Voice Evidence eligibility;
+- if an accepted proposal creates a governed artifact, that artifact begins in an explicitly reviewable/inactive state and remains linked to the edit-learning decision;
+- model ancestors retain model provenance and raw model text does not become Voice Evidence;
+- existing 115 Rust tests and 8 frontend tests remain green.
 
 ## Locked Constraints
 
@@ -216,6 +199,6 @@ cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -
 
 ## Stop Point
 
-Stop when WorkLore can derive explainable edit observations from real persisted Revision ancestry, recognize a genuinely recurring user correction pattern without overlearning from one edit, and surface a traceable proposal for explicit human acceptance without automatically changing canonical voice state.
+Stop when a current recurring edit-learning proposal can be explicitly accepted or rejected, the human decision and exact supporting Revision pairs survive reopen, stale/tampered proposal decisions are blocked, and acceptance does not silently activate or overwrite canonical voice state.
 
-Do not implicitly begin broad task-035 Content Studio, provider-assisted drafting, publication automation, task-033 portfolio analysis, or analytics/discovery work.
+Do not implicitly begin broad task-035 Content Studio, task-033 portfolio analysis, publication automation, analytics, or discovery work.
