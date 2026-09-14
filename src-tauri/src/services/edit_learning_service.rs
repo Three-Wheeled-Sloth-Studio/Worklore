@@ -367,7 +367,7 @@ struct DecisionAuditDetails {
 
 fn load_decisions(connection: &Connection) -> ServiceResult<Vec<EditLearningDecisionView>> {
     let mut statement = connection.prepare(
-        "SELECT audit_id,details_json,occurred_at
+        "SELECT record_id,details_json,occurred_at
          FROM audit_events
          WHERE record_type=?1 AND event_type IN (?2,?3)
          ORDER BY occurred_at DESC,audit_id DESC",
