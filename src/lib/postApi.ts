@@ -5,6 +5,7 @@ import type {
   CreatePostRequest,
   LinkPostSupportingMaterialRequest,
   PostLineageView,
+  PostRecordView,
 } from "../domain/posts";
 
 export function createPost(
@@ -12,6 +13,10 @@ export function createPost(
   request: CreatePostRequest,
 ): Promise<PostLineageView> {
   return invoke<PostLineageView>("create_post", { vaultPath, request });
+}
+
+export function listPosts(vaultPath: string): Promise<PostRecordView[]> {
+  return invoke<PostRecordView[]>("list_posts", { vaultPath });
 }
 
 export function appendPostRevision(
