@@ -53,17 +53,19 @@ pub fn create_post(vault_path: &Path, request: CreatePostRequest) -> ServiceResu
 
     insert_revision(
         &tx,
-        &post_id,
-        &revision_id,
-        1,
-        None,
-        &request.text,
-        request.origin,
-        request.authorship_state,
-        request.provider_run_id.as_deref(),
-        request.provider_id.as_deref(),
-        request.model_id.as_deref(),
-        &now,
+        RevisionInsert {
+            post_id: &post_id,
+            revision_id: &revision_id,
+            sequence: 1,
+            parent_revision_id: None,
+            text: &request.text,
+            origin: request.origin,
+            authorship_state: request.authorship_state,
+            provider_run_id: request.provider_run_id.as_deref(),
+            provider_id: request.provider_id.as_deref(),
+            model_id: request.model_id.as_deref(),
+            created_at: &now,
+        },
     )?;
     tx.execute(
         "UPDATE posts SET current_revision_id=?1 WHERE post_id=?2",
@@ -125,17 +127,19 @@ pub fn append_revision(
     let now = Utc::now().to_rfc3339();
     insert_revision(
         &tx,
-        &request.post_id,
-        &revision_id,
-        sequence,
-        Some(&parent.revision_id),
-        &request.text,
-        request.origin,
-        request.authorship_state,
-        request.provider_run_id.as_deref(),
-        request.provider_id.as_deref(),
-        request.model_id.as_deref(),
-        &now,
+        RevisionInsert {
+            post_id: &request.post_id,
+            revision_id: &revision_id,
+            sequence,
+            parent_revision_id: Some(&parent.revision_id),
+            text: &request.text,
+            origin: request.origin,
+            authorship_state: request.authorship_state,
+            provider_run_id: request.provider_run_id.as_deref(),
+            provider_id: request.provider_id.as_deref(),
+            model_id: request.model_id.as_deref(),
+            created_at: &now,
+        },
     )?;
     tx.execute(
         "UPDATE posts SET current_revision_id=?1,updated_at=?2,revision=revision+1 WHERE post_id=?3",
@@ -268,43 +272,44 @@ pub fn get_post_lineage(vault_path: &Path, post_id: &str) -> ServiceResult<PostL
     })
 }
 
-fn insert_revision(
-    tx: &Transaction<'_>,
-    post_id: &str,
-    revision_id: &str,
+struct RevisionInsert<'a> {
+    post_id: &'a str,
+    revision_id: &'a str,
     sequence: u32,
-    parent_revision_id: Option<&str>,
-    text: &str,
+    parent_revision_id: Option<&'a str>,
+    text: &'a str,
     origin: PostRevisionOrigin,
     authorship_state: PostRevisionAuthorship,
-    provider_run_id: Option<&str>,
-    provider_id: Option<&str>,
-    model_id: Option<&str>,
-    created_at: &str,
-) -> ServiceResult<()> {
+    provider_run_id: Option<&'a str>,
+    provider_id: Option<&'a str>,
+    model_id: Option<&'a str>,
+    created_at: &'a str,
+}
+
+fn insert_revision(tx: &Transaction<'_>, revision: RevisionInsert<'_>) -> ServiceResult<()> {
     tx.execute(
         "INSERT INTO post_revisions(
          revision_id,post_id,sequence,parent_revision_id,text_snapshot,origin,authorship_state,
          provider_run_id,provider_id,model_id,provenance_json,created_at)
          VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12)",
         params![
-            revision_id,
-            post_id,
-            sequence,
-            parent_revision_id,
-            text,
-            origin.as_str(),
-            authorship_state.as_str(),
-            provider_run_id,
-            provider_id,
-            model_id,
+            revision.revision_id,
+            revision.post_id,
+            revision.sequence,
+            revision.parent_revision_id,
+            revision.text,
+            revision.origin.as_str(),
+            revision.authorship_state.as_str(),
+            revision.provider_run_id,
+            revision.provider_id,
+            revision.model_id,
             json!({
                 "recordedBy": "user",
-                "origin": origin.as_str(),
-                "authorshipState": authorship_state.as_str()
+                "origin": revision.origin.as_str(),
+                "authorshipState": revision.authorship_state.as_str()
             })
             .to_string(),
-            created_at
+            revision.created_at
         ],
     )?;
     Ok(())
@@ -356,9 +361,10 @@ fn validate_revision_metadata(
                 ));
             }
             let expected = match parent_authorship {
-                Some(PostRevisionAuthorship::ModelGenerated | PostRevisionAuthorship::UserEditedModel) => {
-                    PostRevisionAuthorship::UserEditedModel
-                }
+                Some(
+                    PostRevisionAuthorship::ModelGenerated
+                    | PostRevisionAuthorship::UserEditedModel,
+                ) => PostRevisionAuthorship::UserEditedModel,
                 _ => PostRevisionAuthorship::UserAuthored,
             };
             if authorship != expected {
@@ -384,6 +390,18 @@ fn normalized_title(value: &str) -> String {
         value.to_string()
     }
 }
+
+type PostRaw = (
+    String,
+    String,
+    String,
+    Option<String>,
+    Option<String>,
+    Option<String>,
+    String,
+    String,
+    u32,
+);
 
 fn load_post(connection: &Connection, post_id: &str) -> ServiceResult<PostRecordView> {
     connection
@@ -434,20 +452,7 @@ fn load_post_tx(tx: &Transaction<'_>, post_id: &str) -> ServiceResult<PostRecord
     .and_then(|raw| post_from_raw(raw, post_id))
 }
 
-fn post_from_raw(
-    raw: (
-        String,
-        String,
-        String,
-        Option<String>,
-        Option<String>,
-        Option<String>,
-        String,
-        String,
-        u32,
-    ),
-    post_id: &str,
-) -> ServiceResult<PostRecordView> {
+fn post_from_raw(raw: PostRaw, post_id: &str) -> ServiceResult<PostRecordView> {
     let current_revision_id = raw.3.ok_or_else(|| {
         WorkLoreError::InvalidVault(format!("Post {post_id} has no current revision."))
     })?;
@@ -669,7 +674,8 @@ mod tests {
     #[test]
     fn user_draft_edit_and_exact_final_approval_survive_reopen() {
         let path = vault();
-        let created = create_post(&path, user_post("Synthetic post", "First private draft.")).unwrap();
+        let created =
+            create_post(&path, user_post("Synthetic post", "First private draft.")).unwrap();
         let first = created.revisions[0].clone();
         assert_eq!(created.revisions.len(), 1);
         assert_eq!(first.sequence, 1);
@@ -690,7 +696,10 @@ mod tests {
         .unwrap();
         let second = edited.revisions[1].clone();
         assert_eq!(second.sequence, 2);
-        assert_eq!(second.parent_revision_id.as_deref(), Some(first.revision_id.as_str()));
+        assert_eq!(
+            second.parent_revision_id.as_deref(),
+            Some(first.revision_id.as_str())
+        );
         assert_eq!(edited.revisions[0].text, "First private draft.");
 
         let approved = approve_revision(
@@ -702,7 +711,10 @@ mod tests {
         )
         .unwrap();
         assert_eq!(approved.post.status, PostStatus::FinalApproved);
-        assert_eq!(approved.post.final_approved_revision_id.as_deref(), Some(second.revision_id.as_str()));
+        assert_eq!(
+            approved.post.final_approved_revision_id.as_deref(),
+            Some(second.revision_id.as_str())
+        );
         assert_eq!(approved.revisions[0].text, "First private draft.");
         assert_eq!(approved.revisions[1].text, "Second human-edited draft.");
 
@@ -758,8 +770,14 @@ mod tests {
         )
         .unwrap();
         assert_eq!(edited.revisions[0], model_revision);
-        assert_eq!(edited.revisions[1].authorship_state, PostRevisionAuthorship::UserEditedModel);
-        assert_eq!(edited.revisions[1].parent_revision_id.as_deref(), Some(model_revision.revision_id.as_str()));
+        assert_eq!(
+            edited.revisions[1].authorship_state,
+            PostRevisionAuthorship::UserEditedModel
+        );
+        assert_eq!(
+            edited.revisions[1].parent_revision_id.as_deref(),
+            Some(model_revision.revision_id.as_str())
+        );
 
         let connection = open_connection(&path).unwrap();
         let voice_count: i64 = connection
@@ -781,14 +799,48 @@ mod tests {
         )
         .unwrap();
         let evidence_id = canonical_store::create_evidence(&path, "Synthetic fact.").unwrap();
-        let inspiration_id = canonical_store::create_inspiration(&path, "Synthetic article").unwrap();
-        let target_id = canonical_store::create_target_context(&path, "job_description", "Synthetic role").unwrap();
+        let inspiration_id =
+            canonical_store::create_inspiration(&path, "Synthetic article").unwrap();
+        let target_id = canonical_store::create_target_context(
+            &path,
+            "job_description",
+            "Synthetic role",
+        )
+        .unwrap();
 
-        link_supporting_material(&path, &post.post.post_id, PostSupportRole::EvidenceSource, &source.source_id).unwrap();
-        link_supporting_material(&path, &post.post.post_id, PostSupportRole::Evidence, &evidence_id).unwrap();
-        link_supporting_material(&path, &post.post.post_id, PostSupportRole::Inspiration, &inspiration_id).unwrap();
-        let linked = link_supporting_material(&path, &post.post.post_id, PostSupportRole::TargetContext, &target_id).unwrap();
-        let roles = linked.supporting_material.iter().map(|item| item.role).collect::<Vec<_>>();
+        link_supporting_material(
+            &path,
+            &post.post.post_id,
+            PostSupportRole::EvidenceSource,
+            &source.source_id,
+        )
+        .unwrap();
+        link_supporting_material(
+            &path,
+            &post.post.post_id,
+            PostSupportRole::Evidence,
+            &evidence_id,
+        )
+        .unwrap();
+        link_supporting_material(
+            &path,
+            &post.post.post_id,
+            PostSupportRole::Inspiration,
+            &inspiration_id,
+        )
+        .unwrap();
+        let linked = link_supporting_material(
+            &path,
+            &post.post.post_id,
+            PostSupportRole::TargetContext,
+            &target_id,
+        )
+        .unwrap();
+        let roles = linked
+            .supporting_material
+            .iter()
+            .map(|item| item.role)
+            .collect::<Vec<_>>();
         assert!(roles.contains(&PostSupportRole::EvidenceSource));
         assert!(roles.contains(&PostSupportRole::Evidence));
         assert!(roles.contains(&PostSupportRole::Inspiration));
@@ -802,8 +854,12 @@ mod tests {
         canonical_store::create_story(&path, "Existing story", "Pre-lineage content").unwrap();
         canonical_store::initialize(&path).unwrap();
         let connection = open_connection(&path).unwrap();
-        let post_count: i64 = connection.query_row("SELECT COUNT(*) FROM posts", [], |row| row.get(0)).unwrap();
-        let revision_count: i64 = connection.query_row("SELECT COUNT(*) FROM post_revisions", [], |row| row.get(0)).unwrap();
+        let post_count: i64 = connection
+            .query_row("SELECT COUNT(*) FROM posts", [], |row| row.get(0))
+            .unwrap();
+        let revision_count: i64 = connection
+            .query_row("SELECT COUNT(*) FROM post_revisions", [], |row| row.get(0))
+            .unwrap();
         assert_eq!((post_count, revision_count), (0, 0));
         drop(connection);
         fs::remove_dir_all(path).unwrap();
