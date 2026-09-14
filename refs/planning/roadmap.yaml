@@ -109,6 +109,7 @@ phases:
       - Provider-neutral executable registry seam with Ollama as the first local adapter, machine-local non-secret provider preferences, explicit provider/model selection, normalized failures, loopback-only local configuration, and no silent fallback.
       - Versioned `analyze_voice_evidence` v1 workflow that uses only eligible Voice Evidence plus explicit guidance, validates attributable structured proposals locally, keeps results transient until human acceptance, and reuses schema-v7 provenance enforcement when a proposal is saved into a proposed Core Voice.
       - Provider-free deterministic single-draft Writing Pattern Linter with stable explainable findings, browser-compatible UTF-16 locations, bounded question-opening/engagement-bait/hashtag/list-dominance checks, and explicit machine-enforceable active Writing Rules without an AI probability, opaque quality score, provider call, or draft persistence.
+      - Provider-free confidentiality transformation that reuses the Private Entity Registry, stable token redaction, explicitly stored public descriptions, current review/risk policy, and transient sensitive-text scanning to return derived public-safe text plus explicit ready/needs-review/blocked state without mutating canonical private truth or inventing replacement facts.
     scope:
       - Introduce canonical Voice Evidence, Core Voice, Tone Modes, Voice Direction, and Writing Rules.
       - Ingest representative user-authored writing and approved final posts as voice evidence.
