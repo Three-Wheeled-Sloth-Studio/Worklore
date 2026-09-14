@@ -134,11 +134,11 @@ todos:
   - id: task-032
     status: in_progress
     area: voice
-    summary: Core Voice foundation and Ollama-backed provider-neutral review-only voice proposals are complete; edit-delta learning remains intentionally deferred until durable Post/Revision lineage exists.
+    summary: Core Voice foundation and Ollama-backed provider-neutral review-only voice proposals are complete; schema-v8 durable Post/Revision lineage now unblocks bounded edit-delta learning, which must surface recurring preferences for explicit human acceptance rather than silently mutating voice state.
   - id: task-033
     status: in_progress
     area: quality
-    summary: Deterministic provider-free single-draft Writing Pattern Linter foundation is complete with explainable built-in checks, browser-compatible locations, and explicit active Writing Rule enforcement; remaining cross-draft repetition, proof-point rotation, portfolio mode-collapse, and fuller evidence/standing review await durable Post/Revision content lineage.
+    summary: Deterministic provider-free single-draft Writing Pattern Linter foundation is complete and durable Post/Revision lineage is now available; remaining cross-draft repetition, proof-point rotation, portfolio mode-collapse, and fuller evidence/standing review remain deferred until a real content corpus exists.
   - id: task-034
     status: complete
     area: privacy
@@ -148,9 +148,9 @@ todos:
     area: content
     summary: Implement angle generation, Audience Lens, post drafting, comments/replies, and a human editorial approval workflow without social auto-publishing.
   - id: task-036
-    status: planned
+    status: in_progress
     area: audit
-    summary: Build the robust provenance and revision audit trail linking sources, model drafts, user edits, final approved text, publication metadata, and later analytics.
+    summary: Durable provider-free schema-v8 Post/Revision lineage is complete with immutable exact snapshots, deterministic ancestry, explicit user/model authorship and provider provenance, typed supporting-material links, and exact final approval; publication metadata and later analytics association remain deferred to Content Studio and Feedback Intelligence.
   - id: task-037
     status: planned
     area: analytics
