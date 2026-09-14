@@ -13,6 +13,7 @@ pub mod interview_service;
 pub mod manual_workspace_service;
 pub mod ollama_provider;
 pub mod performance_service;
+pub mod post_lineage_service;
 pub mod privacy_scan_migration;
 pub mod provider_registry;
 pub mod redaction_service;
