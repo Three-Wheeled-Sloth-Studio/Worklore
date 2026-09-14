@@ -50,6 +50,7 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
 
   const unsavedChanges = Boolean(currentRevision && editorText !== currentRevision.text);
   const challengeMatchesEditor = challenge?.text === editorText;
+  const publicSafeMatchesEditor = challenge?.confidentiality.publicSafeText === editorText;
   const standingLinks =
     lineage?.supportingMaterial.filter((item) =>
       ["evidence_source", "evidence", "story", "proof_point"].includes(item.role),
@@ -59,7 +60,8 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
       currentRevision &&
       !unsavedChanges &&
       challengeMatchesEditor &&
-      challenge?.confidentiality.state === "ready",
+      challenge?.confidentiality.state === "ready" &&
+      publicSafeMatchesEditor,
   );
 
   useEffect(() => {
@@ -222,11 +224,17 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
         transformConfidentialityForPublicUse(vaultPath, { text: editorText }),
       ]);
       setChallenge({ text: editorText, lint, confidentiality });
-      setNotice(
-        confidentiality.state === "ready"
-          ? "Challenge complete. Review advisory findings before approval."
-          : "Challenge found unresolved confidentiality work. Final approval remains blocked.",
-      );
+      if (confidentiality.state !== "ready") {
+        setNotice(
+          "Challenge found unresolved confidentiality work. Final approval remains blocked.",
+        );
+      } else if (confidentiality.publicSafeText !== editorText) {
+        setNotice(
+          "Challenge produced different public-safe text. Load it, save a new Revision, and challenge that exact Revision before approval.",
+        );
+      } else {
+        setNotice("Challenge complete. Review advisory findings before approval.");
+      }
     } catch (caught) {
       setError(errorMessage(caught));
     } finally {
@@ -249,7 +257,7 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
       setLineage(approved);
       await refreshCatalog(vaultPath, approved.post.postId);
       setNotice(
-        "Final text frozen. Publication remains a manual action outside WorkLore in this slice.",
+        "Final text frozen. Publish it manually outside WorkLore, then record that publication in Insights.",
       );
     } catch (caught) {
       setError(errorMessage(caught));
@@ -265,7 +273,7 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
     setEditorText(challenge.confidentiality.publicSafeText);
     setChallenge(null);
     setNotice(
-      "Public-safe text loaded as an unsaved edit. Save it as a new revision, then challenge it again.",
+      "Public-safe text loaded as an unsaved edit. Save it as a new Revision, then challenge it again.",
     );
   }
 
@@ -275,7 +283,9 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
     }
     try {
       await navigator.clipboard.writeText(currentRevision.text);
-      setNotice("Approved text copied. Publishing remains your explicit action outside WorkLore.");
+      setNotice(
+        "Approved text copied. Publish it manually, then record the publication in Insights.",
+      );
     } catch {
       setNotice("Clipboard access was unavailable. Select the approved text and copy it manually.");
     }
@@ -339,7 +349,7 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
               className="post-draft-input"
               value={newText}
               onChange={(event) => setNewText(event.target.value)}
-              placeholder="Write the first version here. Angle generation comes in the next bounded slice."
+              placeholder="Write the first version here. Angle generation comes in a later Content Studio slice."
               disabled={busy}
             />
             <button
@@ -389,10 +399,12 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
               <section className="workspace-panel">
                 <div className="panel-heading-row">
                   <div>
-                    <p className="eyebrow">{lineage.post.status === "final_approved" ? "Frozen final" : "Working revision"}</p>
+                    <p className="eyebrow">
+                      {lineage.post.status === "final_approved" ? "Frozen final" : "Working revision"}
+                    </p>
                     <h3>{lineage.post.title}</h3>
                     <p>
-                      Revision {currentRevision.sequence} · {humanize(currentRevision.authorshipState)}
+                      Revision {currentRevision.sequence} | {humanize(currentRevision.authorshipState)}
                     </p>
                   </div>
                   <span className={`status-pill ${lineage.post.status === "final_approved" ? "" : "attention"}`}>
@@ -454,8 +466,8 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
                   <div className="next-step-card">
                     <h4>Human publication boundary</h4>
                     <p>
-                      This exact revision is frozen as the approved final. Publish it manually outside
-                      WorkLore. Publication tracking and analytics association are not yet implemented.
+                      This exact Revision is frozen as the approved final. Publish it manually outside
+                      WorkLore, then record that publication and its outcomes in Insights.
                     </p>
                     <button className="secondary-button compact" onClick={() => void copyApprovedText()}>
                       Copy approved text
@@ -505,9 +517,11 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
                     <div className="next-step-card">
                       <h4>Confidentiality</h4>
                       <p>
-                        {challenge.confidentiality.state === "ready"
-                          ? "Public-use transformation is ready."
-                          : `${challenge.confidentiality.unresolvedRisks.length} unresolved privacy risk(s) require review.`}
+                        {challenge.confidentiality.state !== "ready"
+                          ? `${challenge.confidentiality.unresolvedRisks.length} unresolved privacy risk(s) require review.`
+                          : publicSafeMatchesEditor
+                            ? "The exact saved text is already public-safe."
+                            : "A different public-safe version is available and must become a saved Revision before approval."}
                       </p>
                     </div>
                   </div>
@@ -516,7 +530,7 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
                     <div className="challenge-findings">
                       {challenge.lint.findings.map((finding) => (
                         <article className="challenge-finding" key={`${finding.ruleId}-${finding.startOffset ?? "all"}`}>
-                          <strong>{humanize(finding.category)} · {finding.severity}</strong>
+                          <strong>{humanize(finding.category)} | {finding.severity}</strong>
                           <p>{finding.reason}</p>
                           {finding.remediation ? <small>{finding.remediation}</small> : null}
                         </article>
@@ -564,7 +578,10 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
                     </div>
                   ) : null}
 
-                  {challengeMatchesEditor && !unsavedChanges && challenge.confidentiality.state === "ready" ? (
+                  {challengeMatchesEditor &&
+                  !unsavedChanges &&
+                  challenge.confidentiality.state === "ready" &&
+                  publicSafeMatchesEditor ? (
                     <p className="challenge-ready">
                       The exact saved Revision has crossed the deterministic challenge and confidentiality gate.
                       Advisory findings remain yours to accept or override.
