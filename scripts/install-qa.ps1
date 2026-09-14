@@ -24,9 +24,9 @@ if (-not (Test-Path $builtExecutable)) {
     throw "The QA executable was not found at $builtExecutable. Run the QA build first."
 }
 
-if (Test-Path $layout.InstallRoot) {
-    Remove-Item -Recurse -Force $layout.InstallRoot
-}
+# The QA install folder is also the portable app location. WorkLore vaults may live beside
+# the executable by explicit product design, so never delete the install root during refresh.
+# Replace only files owned by the QA installer and preserve user-created folders and vaults.
 New-Item -ItemType Directory -Force -Path $layout.InstallRoot | Out-Null
 
 $installedExecutable = Join-Path $layout.InstallRoot "WorkLore-QA.exe"
@@ -64,6 +64,7 @@ $installManifest | ConvertTo-Json -Depth 5 | Set-Content -Encoding UTF8 (Join-Pa
 
 & (Join-Path $PSScriptRoot "assert-repo-clean.ps1")
 Write-Host "WorkLore QA installed outside the repository: $installedExecutable"
+Write-Host "Existing vaults and user-created folders under the QA install location were preserved."
 
 if ($Launch) {
     $env:WORKLORE_RUN_CHANNEL = "qa"
