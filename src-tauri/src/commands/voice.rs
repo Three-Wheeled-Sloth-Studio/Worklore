@@ -1,8 +1,10 @@
 use std::path::PathBuf;
 
 use crate::{
+    domain::edit_learning::EditLearningAnalysisView,
     error::{CommandError, CommandResult},
     services::{
+        edit_learning_service,
         voice_evidence_service::{
             self, CreateVoiceEvidenceResult, ReviewVoiceEvidenceRequest, VoiceEvidenceRecordView,
             VoiceSourceCandidateView,
@@ -15,6 +17,12 @@ use crate::{
         },
     },
 };
+
+#[tauri::command]
+pub fn analyze_edit_learning(vault_path: String) -> CommandResult<EditLearningAnalysisView> {
+    edit_learning_service::analyze_edit_learning(&PathBuf::from(vault_path))
+        .map_err(CommandError::from)
+}
 
 #[tauri::command]
 pub fn list_voice_source_candidates(
