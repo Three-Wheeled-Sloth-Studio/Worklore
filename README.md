@@ -4,6 +4,12 @@ Turn the work you did into stories you can actually use.
 
 WorkLore is a local-first career story bank. It helps uncover useful, evidence-backed stories from resumes and other career sources, then preserves those stories as user-owned records instead of trapping them in an opaque application database.
 
+## Quick Start
+
+See [`docs/quick-start.md`](docs/quick-start.md) for the current user guide, including the fastest bootstrap path from resume bullets to professional-memory Story Seeds and Proof Points.
+
+The same guide is available inside the desktop app from the shaded `?` help control in the upper-right corner.
+
 ## Current Development Slice
 
 The current desktop foundation can:
