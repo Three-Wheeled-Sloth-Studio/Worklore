@@ -108,11 +108,9 @@ mod tests {
     #[test]
     fn list_posts_reopens_current_status_and_revision_identity() {
         let path = vault();
-        let working = post_lineage_service::create_post(
-            &path,
-            user_post("Working post", "A working draft."),
-        )
-        .unwrap();
+        let working =
+            post_lineage_service::create_post(&path, user_post("Working post", "A working draft."))
+                .unwrap();
         let final_post = post_lineage_service::create_post(
             &path,
             user_post("Approved post", "An approved draft."),
