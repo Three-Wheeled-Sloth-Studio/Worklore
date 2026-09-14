@@ -1,7 +1,7 @@
 ---
 type: Handoff Prompt
 title: Next WorkLore Development Slice
-description: Bounded prompt for explicit accept/reject of edit-learning proposals with durable revision-pair provenance.
+description: Bounded real-world dogfood QA of the accepted thin Capture-to-Learn structural loop.
 status: draft
 tags: [handoff, next-slice]
 ---
@@ -17,22 +17,27 @@ Draft PR #1 remains `dev -> qa`. Leave it draft.
 
 ## Accepted Starting Point
 
-Phase 1 Professional Memory is complete. Phase 2 Voice Intelligence now includes accepted foundations for governed Voice Evidence, Core Voice, provider-neutral review-only voice proposals, deterministic single-draft linting, provider-free confidentiality transformation, durable Post/Revision lineage, and deterministic edit-learning observations/proposals over real Revision ancestry.
+WorkLore now has a thin user-traversable structural loop across Professional Memory, Voice/quality/privacy foundations, Posts, manual publication recording, and feedback:
 
-Accepted edit-learning implementation checkpoint:
+`Capture -> Understand -> Develop -> Connect -> Draft -> Challenge -> Publish manually -> Measure -> Learn`
 
-`dec9ce74188d97a3d6b96669b6cffbb967be23ff`
+Accepted implementation checkpoint:
+
+`85f33f1b7eb29f006ec26e283e166f4f350532ed`
 
 Validation:
 
-- Actions `34799693936`
-- Job `103839679015`
+- Actions `34857116434`
+- Job `104019423399`
 - frontend: 8 passed / 0 failed across 3 files
-- Rust: 115 passed / 0 failed
-- production frontend build: green, 53 modules transformed
-- external build layout, case/path validation, refs/OKF, bounded agent context, warnings-denied Clippy, rustfmt, and repository/source-only checks: green
+- Rust: 123 passed / 0 failed
+- production frontend build: green, 59 modules transformed
+- case-collision: green, 227 tracked paths
+- external build layout, refs/OKF/path validation, bounded agent context, warnings-denied Clippy, rustfmt, and repository/source-only checks: green
 
-The accepted edit-learning service operates only on real persisted parent/child Post Revisions. It emits deterministic addition/removal/replacement observations with exact Post and Revision provenance, preserves model ancestors as model-origin context, and emits a recurring-preference proposal only when the same normalized correction appears across at least two distinct Posts. Proposals are transient and do not mutate governed voice state.
+`task-032` is complete: recurring edit proposals now require explicit durable accept/reject decisions, exact supporting Revision-pair provenance is validated at decision time, stale/tampered evidence is rejected, decided evidence is suppressed until support materially changes, and accepted preferences create only a proposed Writing Rule without silently mutating active voice state.
+
+The thin content/feedback loop also now supports exact immutable Post Revisions, deterministic challenge checks, hard public-safe final approval, user-recorded manual publication of the exact approved Revision, append-only cumulative performance snapshots, and conservative Insights. WorkLore still performs no social publishing or scheduling.
 
 Read `refs/handoffs/currentHandoff.md` before making changes.
 
@@ -43,124 +48,82 @@ Do not reread repository history.
 First run:
 
 ```powershell
-python refs/tools/generate_agent_context.py --focus "WorkLore task-032 explicit accept reject edit learning proposal durable revision pair provenance existing voice governance"
+python refs/tools/generate_agent_context.py --focus "WorkLore real-world dogfood QA Capture Story Topic Post challenge confidentiality manual publication LinkedIn performance Insights reopen recoverability"
 ```
 
-Treat generated context as derived orientation, not source of truth. Follow it into only the authoritative product, architecture, schema, and implementation files needed for this slice.
+Treat generated context as derived orientation, not source of truth. Follow it into only the authoritative product, architecture, UI, service, and persistence files needed to reproduce a concrete dogfood defect.
 
-Read at minimum:
+At minimum, keep available:
 
 - `refs/handoffs/currentHandoff.md`
-- `refs/product/prd.md`, especially edit-learning, voice provenance, explicit acceptance, and raw-model-output boundaries
-- `refs/architecture/vaultFormat.md`
-- authoritative domain-model architecture material referenced by the generated context
+- `refs/product/prd.md`
 - `refs/planning/roadmap.yaml`
 - `refs/planning/todos.yaml`
-- `src-tauri/src/domain/edit_learning.rs`
-- `src-tauri/src/services/edit_learning_service.rs`
-- schema-v8 Post/Revision storage/migration code
-- existing Voice Evidence, Core Voice, Voice Direction, Tone Mode, Writing Rule, audit, and review-only proposal contracts
-- current Tauri/API registration for edit-learning analysis
+- current Capture/Story/Topic/Posts/Insights UI paths
+- Post/Revision, confidentiality, publication-feedback, and persistence services only as needed
 
-Load deeper files only as needed.
+Load deeper files only when a real observed problem requires them.
 
-## Immediate Objective: task-032 explicit decision bridge
+## Immediate Objective: bounded dogfood QA
 
-Implement the smallest provider-free durable path that can answer:
+Answer this question with real use rather than more speculative architecture:
 
-`Can a user explicitly accept or reject a currently reproducible recurring edit proposal, preserve the exact real Revision pairs that justified the decision, and route an accepted preference into existing voice governance without silently activating it or inventing a second voice model?`
+`Can a user take real professional material through the implemented structural loop, manually publish outside WorkLore, record the exact publication and LinkedIn measurements, reopen the vault around key transitions, and expose any correctness, friction, provenance, privacy, or recoverability defects before broader Content Studio work?`
 
-This is a governance/provenance slice, not broad Content Studio or portfolio analysis.
+Use the application as a user would. Prefer fixing concrete blockers or misleading UX over adding roadmap breadth.
 
-### 1. Decisions must be explicit
+## Dogfood Path
 
-No proposal may change canonical voice state merely because it exists.
+Exercise as much of this path as the available real material supports:
 
-Provide explicit accept and reject behavior through a thin local service/API surface.
+1. Capture a real memory, proof point, idea, writing sample, inspiration item, or target context.
+2. Classify and develop it into useful Story, Topic, Proof Point, Inspiration, or Target Context state as appropriate.
+3. Connect supporting/context material and verify semantic roles remain explicit.
+4. Create a Post.
+5. Save one or more user edits as immutable Revisions and verify ancestry/reopen behavior.
+6. Run deterministic challenge checks and confidentiality preflight.
+7. Exercise public-safe wording where private entities exist. Confirm that a `Ready` transform alone is not enough: the exact saved Revision must equal the derived public-safe text before final approval succeeds.
+8. Final-approve the exact safe Revision.
+9. Manually publish outside WorkLore. Do not add an automated publish path.
+10. Record that exact approved Revision as the manual publication in WorkLore.
+11. Add at least one cumulative LinkedIn performance snapshot when real metrics are available.
+12. Inspect Insights and confirm small samples remain clearly labeled as weak evidence rather than durable rules.
+13. Reopen or restart the vault around meaningful transitions and verify stable identity, ancestry, publication association, and measurements survive.
 
-### 2. Validate the proposal at decision time
+If an external manual publication or real performance data is not available during the session, stop at that real boundary. Do not fabricate publication or analytics history merely to exercise later screens.
 
-Do not trust arbitrary client-supplied proposal text or provenance.
+## What To Fix
 
-A decision request should identify the deterministic proposal and its supporting evidence strongly enough that the service can re-derive or validate it from the current canonical Post/Revision history.
+Fix concrete issues discovered through dogfood when they affect:
 
-Reject stale or tampered decisions when the current reproducible proposal no longer matches the supplied identity/evidence set.
+- correctness;
+- data loss or reopen/restart behavior;
+- provenance or authorship integrity;
+- Evidence/Inspiration/Target Context/Voice Evidence boundaries;
+- confidentiality/public-safe enforcement;
+- exact final-approved Revision identity;
+- publication/performance association;
+- misleading confidence or causality language;
+- obvious workflow friction that blocks realistic use.
 
-### 3. Persist exact provenance
+Keep fixes narrow and add deterministic tests where practical.
 
-Persist the human decision together with exact supporting:
+## What Not To Add Yet
 
-- Post IDs;
-- parent Revision IDs;
-- child Revision IDs;
-- deterministic proposal key;
-- decision state;
-- decision timestamp;
-- any resulting governed artifact identity.
+Do not broaden scope merely because a feature is planned. Unless dogfood reveals a blocker or the user explicitly reprioritizes, do not begin:
 
-Do not copy whole private Revision text into audit metadata when IDs are sufficient.
+- automatic social publishing or scheduling;
+- provider-assisted post generation as a prerequisite for QA;
+- broad angle-generation UX;
+- Audience Lens breadth;
+- comment/reply drafting;
+- LinkedIn-native analytics export import;
+- broad multidimensional analytics;
+- discovery/news scanning;
+- task-033 portfolio rules based on fake or trivial history;
+- a new cloud/backend/account/sync layer.
 
-### 4. Reuse existing voice governance
-
-Do not create a parallel active-preference model.
-
-Preferred behavior for an accepted recurring edit preference is to create or feed an existing reviewable governed artifact, most likely a proposed/inactive Writing Rule or another already-authoritative voice-governance type if the current domain contract fits better.
-
-Acceptance must not silently:
-
-- activate a Writing Rule;
-- mutate active Core Voice;
-- activate or rewrite a Voice Direction;
-- change Tone Modes;
-- change Voice Evidence eligibility.
-
-If the existing domain does not safely support a reviewable target artifact without semantic distortion, persist the accepted decision and provenance only, rather than forcing it into the wrong voice type.
-
-### 5. Rejection must be meaningful
-
-A rejected proposal should not immediately resurface as if no decision happened when the exact same supporting evidence set is unchanged.
-
-If additional real evidence later changes the support set, resurfacing for renewed review is acceptable and should remain explainable.
-
-### 6. Preserve model provenance
-
-For model-generated -> user-edited-model pairs, the user edit remains the learning signal and the model ancestor remains model-origin context.
-
-Acceptance or rejection must not relabel model text as user-authored or make raw model text Voice Evidence.
-
-### 7. Keep the slice narrow
-
-Do not begin:
-
-- broad Voice workspace redesign;
-- provider-assisted edit interpretation;
-- task-033 cross-draft portfolio analysis;
-- angle generation or Audience Lens;
-- provider-assisted post drafting;
-- comments/replies;
-- publication/scheduling;
-- analytics;
-- discovery/news scanning.
-
-A thin local API and deterministic proof tests are enough.
-
-## Proof Cases
-
-Cover at least:
-
-- works with no provider configured;
-- accepting a currently reproducible proposal requires an explicit request;
-- rejecting a currently reproducible proposal requires an explicit request;
-- arbitrary/tampered proposal keys or supporting revision pairs are rejected;
-- stale proposal evidence is rejected when current history no longer reproduces the same proposal identity/evidence set;
-- accepted decision persists across reopen with exact supporting Post/parent Revision/child Revision IDs;
-- rejected decision persists across reopen;
-- identical rejected evidence does not immediately resurface as undecided;
-- materially expanded real support can surface a renewed reviewable proposal if that is the chosen contract;
-- acceptance does not activate or mutate active Core Voice, Tone Modes, Voice Directions, active Writing Rules, or Voice Evidence eligibility;
-- if an accepted proposal creates a governed artifact, that artifact begins in an explicitly reviewable/inactive state and remains linked to the edit-learning decision;
-- model ancestors retain model provenance and raw model text does not become Voice Evidence;
-- existing 115 Rust tests and 8 frontend tests remain green.
+Real corpus evidence should now drive task-033 and broader Phase 3/4 refinement.
 
 ## Locked Constraints
 
@@ -171,17 +134,19 @@ Cover at least:
 - no silent provider fallback;
 - raw AI drafts never train canonical voice;
 - user edits are signals, not automatic identity changes;
+- accepted edit-learning preferences remain proposed until separately governed;
 - preserve immutable Revision authorship/provenance;
 - preserve Evidence/Inspiration/Target Context/Voice Evidence distinctions;
 - preserve Private Entity Registry as privacy source of truth;
-- public-safe wording remains derived output, not replacement canonical truth;
-- do not implement task-033 portfolio analysis using fake or trivial history;
+- public-safe wording remains derived output until explicitly saved as a Revision; private canonical truth is not overwritten;
+- publication records may reference only the exact final-approved Revision;
+- performance history is append-only;
 - public fixtures remain synthetic;
 - keep build/dev/QA output outside the repository;
 - do not hand-edit generated OKF indexes;
 - do not promote `qa` or `main`.
 
-## Validation
+## Validation After Any Fix
 
 Run at minimum:
 
@@ -197,8 +162,10 @@ cargo test --manifest-path src-tauri/Cargo.toml
 cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
 ```
 
+Keep the repository source-only validation green as well.
+
 ## Stop Point
 
-Stop when a current recurring edit-learning proposal can be explicitly accepted or rejected, the human decision and exact supporting Revision pairs survive reopen, stale/tampered proposal decisions are blocked, and acceptance does not silently activate or overwrite canonical voice state.
+Stop after completing a meaningful real-material traversal or after a concrete blocker has been reproduced, fixed, tested, and documented.
 
-Do not implicitly begin broad task-035 Content Studio, task-033 portfolio analysis, publication automation, analytics, or discovery work.
+Document what the dogfood session actually proved, where the user stopped because real external data was unavailable, and which next feature is justified by observed friction rather than roadmap speculation.
