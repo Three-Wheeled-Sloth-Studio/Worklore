@@ -6,6 +6,7 @@ import { HomeWorkspace } from "./components/HomeWorkspace";
 import { LibraryWorkspace } from "./components/LibraryWorkspace";
 import { GuidedInterviewPanel } from "./components/GuidedInterviewPanel";
 import { PerformancePanel } from "./components/PerformancePanel";
+import { PostWorkspace } from "./components/PostWorkspace";
 import { ProviderSettingsPanel } from "./components/ProviderSettingsPanel";
 import { PrivacyReviewPanel } from "./components/PrivacyReviewPanel";
 import { StoryBankPanel } from "./components/StoryBankPanel";
@@ -601,8 +602,9 @@ function App() {
       case "voice":
         return <VoiceWorkspace vaultPath={vault!.path} />;
       case "posts":
+        return <PostWorkspace vaultPath={vault!.path} />;
       case "insights":
-        return <FutureWorkspace view={activeView} />;
+        return <FutureWorkspace view="insights" />;
       case "sources":
         return (
           <LibraryWorkspace
