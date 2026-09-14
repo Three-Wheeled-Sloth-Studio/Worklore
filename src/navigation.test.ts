@@ -14,13 +14,13 @@ describe("task-oriented navigation contract", () => {
     ]);
   });
 
-  it("marks the bounded editorial Posts seam available without pretending Insights exists", () => {
+  it("exposes the bounded editorial and feedback seams for full-loop QA", () => {
     expect(
       PRIMARY_NAV_ITEMS.filter((item) => item.availability === "available").map((item) => item.id),
-    ).toEqual(["home", "capture", "stories", "topics", "voice", "posts"]);
+    ).toEqual(["home", "capture", "stories", "topics", "voice", "posts", "insights"]);
     expect(
       PRIMARY_NAV_ITEMS.filter((item) => item.availability === "planned").map((item) => item.id),
-    ).toEqual(["insights"]);
+    ).toEqual([]);
   });
 
   it("keeps infrastructure out of primary navigation", () => {
