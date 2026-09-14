@@ -9,8 +9,8 @@ use uuid::Uuid;
 
 use crate::{
     domain::models::{
-        CloudIdentifierMode, EntityReviewItem, EntitySensitivity, EntityType, PrivateEntityRegistry,
-        VaultDocument,
+        CloudIdentifierMode, EntityReviewItem, EntitySensitivity, EntityType,
+        PrivateEntityRegistry, VaultDocument,
     },
     error::ServiceResult,
     io_utils::{read_json, write_json_atomic},
@@ -108,11 +108,8 @@ pub fn transform_for_public_use(
         preflight,
     } = redaction_service::redact_for_external_use(&transient.path, &request.text)?;
 
-    let (public_safe_text, replacements) = build_public_safe_text(
-        &token_redacted_text,
-        &preflight.replacements,
-        &registry,
-    );
+    let (public_safe_text, replacements) =
+        build_public_safe_text(&token_redacted_text, &preflight.replacements, &registry);
 
     let mut unresolved_risks = persistent_reviews
         .into_iter()
@@ -139,8 +136,7 @@ pub fn transform_for_public_use(
                 && is_high_risk(&risk.risk)
         });
     let transient_block = unresolved_risks.iter().any(|risk| {
-        risk.source != ConfidentialityRiskSource::PendingRegistryReview
-            && is_high_risk(&risk.risk)
+        risk.source != ConfidentialityRiskSource::PendingRegistryReview && is_high_risk(&risk.risk)
     });
 
     let state = if persistent_block || transient_block {
@@ -362,16 +358,15 @@ struct TransientPrivacyVault {
 impl TransientPrivacyVault {
     fn create(vault: &VaultDocument, registry: &PrivateEntityRegistry) -> ServiceResult<Self> {
         let transient = Self {
-            path: std::env::temp_dir().join(format!(
-                "worklore-confidentiality-{}",
-                Uuid::now_v7()
-            )),
+            path: std::env::temp_dir().join(format!("worklore-confidentiality-{}", Uuid::now_v7())),
         };
         fs::create_dir_all(transient.path.join("privacy/review-items"))?;
 
         let mut transient_vault = vault.clone();
         transient_vault.privacy.cloud_identifier_mode = CloudIdentifierMode::Redact;
-        transient_vault.privacy.block_cloud_when_high_risk_review_pending = false;
+        transient_vault
+            .privacy
+            .block_cloud_when_high_risk_review_pending = false;
         write_json_atomic(&transient.path.join("vault.json"), &transient_vault)?;
         entity_scan::save_registry(&transient.path, registry)?;
         Ok(transient)
@@ -700,10 +695,7 @@ mod tests {
         )
         .expect("external redaction should succeed");
 
-        assert_eq!(
-            result.text,
-            "[CLIENT_1] and [CLIENT_1] remain protected."
-        );
+        assert_eq!(result.text, "[CLIENT_1] and [CLIENT_1] remain protected.");
         assert!(result.preflight.contains_never_send_entities);
         assert_eq!(result.preflight.replacement_count, 2);
     }
