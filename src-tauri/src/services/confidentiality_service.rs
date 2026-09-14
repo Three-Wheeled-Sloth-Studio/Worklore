@@ -21,6 +21,7 @@ use crate::{
 };
 
 const TRANSIENT_RECORD_ID: &str = "confidentiality_transform_transient";
+const KNOWN_ENTITY_WRAPPER_TOLERANCE: usize = 5;
 
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -85,6 +86,12 @@ pub struct ConfidentialityTransformResult {
     pub unresolved_risks: Vec<ConfidentialityRisk>,
     pub registry_revision: u32,
     pub provider_used: bool,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct TextRange {
+    start: usize,
+    end: usize,
 }
 
 pub fn transform_for_public_use(
@@ -218,7 +225,7 @@ fn scan_transient_risks(
     let known_ids = original_registry
         .entities
         .iter()
-        .map(|entity| entity.entity_id.as_str())
+        .map(|entity| entity.entity_id.clone())
         .collect::<HashSet<_>>();
 
     let outcome = entity_scan::scan_text(
@@ -228,17 +235,32 @@ fn scan_transient_risks(
         text,
     )?;
     let scanned_registry = entity_scan::load_registry(transient_vault_path)?;
+    let known_ranges = scanned_registry
+        .entities
+        .iter()
+        .filter(|entity| known_ids.contains(&entity.entity_id))
+        .flat_map(|entity| entity.occurrences.iter())
+        .filter(|occurrence| occurrence.record_id == TRANSIENT_RECORD_ID)
+        .filter_map(|occurrence| parse_char_locator(&occurrence.locator))
+        .collect::<Vec<_>>();
     let mut risks = Vec::new();
 
     for entity in scanned_registry
         .entities
         .iter()
-        .filter(|entity| !known_ids.contains(entity.entity_id.as_str()))
+        .filter(|entity| !known_ids.contains(&entity.entity_id))
     {
         let occurrences = entity
             .occurrences
             .iter()
             .filter(|occurrence| occurrence.record_id == TRANSIENT_RECORD_ID)
+            .filter(|occurrence| {
+                parse_char_locator(&occurrence.locator).is_none_or(|candidate| {
+                    !known_ranges
+                        .iter()
+                        .any(|known| is_known_entity_scanner_wrapper(candidate, *known))
+                })
+            })
             .collect::<Vec<_>>();
         if occurrences.is_empty() {
             continue;
@@ -273,6 +295,28 @@ fn scan_transient_risks(
     }
 
     Ok(risks)
+}
+
+fn parse_char_locator(locator: &str) -> Option<TextRange> {
+    let range = locator.strip_prefix("chars:")?;
+    let (start, end) = range.split_once('-')?;
+    let start = start.parse::<usize>().ok()?;
+    let end = end.parse::<usize>().ok()?;
+    (end >= start).then_some(TextRange { start, end })
+}
+
+fn is_known_entity_scanner_wrapper(candidate: TextRange, known: TextRange) -> bool {
+    if known.start <= candidate.start && candidate.end <= known.end {
+        return true;
+    }
+
+    if candidate.start <= known.start && known.end <= candidate.end {
+        let extra_prefix = known.start.saturating_sub(candidate.start);
+        let extra_suffix = candidate.end.saturating_sub(known.end);
+        return extra_prefix + extra_suffix <= KNOWN_ENTITY_WRAPPER_TOLERANCE;
+    }
+
+    false
 }
 
 fn transient_risk(entity_type: EntityType) -> &'static str {
