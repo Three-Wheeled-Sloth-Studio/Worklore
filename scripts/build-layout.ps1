@@ -123,9 +123,13 @@ function Get-WorkLoreTauriFrontendDist {
 
     $repoRoot = Get-WorkLoreRepoRoot
     $tauriProjectRoot = Get-NormalizedPath (Join-Path $repoRoot "src-tauri")
-    $relative = [System.IO.Path]::GetRelativePath(
-        $tauriProjectRoot,
-        (Get-NormalizedPath $Layout.FrontendDist)
+    # Windows PowerShell 5.1 runs on .NET Framework, which does not provide
+    # Path.GetRelativePath. Uri.MakeRelativeUri keeps this helper compatible with
+    # both Windows PowerShell and newer PowerShell releases.
+    $tauriProjectUri = [System.Uri]($tauriProjectRoot + [System.IO.Path]::DirectorySeparatorChar)
+    $frontendDistUri = [System.Uri](Get-NormalizedPath $Layout.FrontendDist)
+    $relative = [System.Uri]::UnescapeDataString(
+        $tauriProjectUri.MakeRelativeUri($frontendDistUri).ToString()
     ).Replace('\', '/')
 
     # Tauri currently treats a Windows absolute frontendDist such as D:\... as a URL,

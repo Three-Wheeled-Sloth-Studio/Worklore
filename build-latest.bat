@@ -18,6 +18,9 @@ if errorlevel 1 (
 for /f "delims=" %%I in ('git status --porcelain 2^>nul') do set "WORKLORE_DIRTY=1"
 if defined WORKLORE_DIRTY (
     echo ERROR: The WorkLore checkout has uncommitted changes.
+    echo.
+    git status --short --untracked-files=all
+    echo.
     echo Commit, stash, or discard them before building the latest dev branch.
     exit /b 1
 )

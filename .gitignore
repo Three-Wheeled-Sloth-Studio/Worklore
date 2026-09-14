@@ -16,6 +16,7 @@ pnpm-debug.log*
 # Rust and Tauri build output
 target/
 src-tauri/target/
+src-tauri/gen/schemas/
 
 # Python tooling output
 __pycache__/
