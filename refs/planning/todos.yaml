@@ -140,9 +140,9 @@ todos:
     area: quality
     summary: Deterministic provider-free single-draft Writing Pattern Linter foundation is complete with explainable built-in checks, browser-compatible locations, and explicit active Writing Rule enforcement; remaining cross-draft repetition, proof-point rotation, portfolio mode-collapse, and fuller evidence/standing review await durable Post/Revision content lineage.
   - id: task-034
-    status: planned
+    status: complete
     area: privacy
-    summary: Implement reliable confidentiality transformation from private canonical facts to public-safe descriptions as a hard pre-publication check.
+    summary: Provider-free confidentiality transformation now reuses the Private Entity Registry and external redaction path to return stable token redaction, explicitly stored public descriptions, unresolved privacy risk, replacement metadata, and ready/needs-review/blocked state without mutating private canonical truth or inventing replacement facts.
   - id: task-035
     status: planned
     area: content
