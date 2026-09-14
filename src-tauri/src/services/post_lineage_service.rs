@@ -15,7 +15,10 @@ use crate::{
     services::canonical_store,
 };
 
-pub fn create_post(vault_path: &Path, request: CreatePostRequest) -> ServiceResult<PostLineageView> {
+pub fn create_post(
+    vault_path: &Path,
+    request: CreatePostRequest,
+) -> ServiceResult<PostLineageView> {
     canonical_store::initialize(vault_path)?;
     validate_text(&request.text)?;
     validate_revision_metadata(
@@ -801,12 +804,9 @@ mod tests {
         let evidence_id = canonical_store::create_evidence(&path, "Synthetic fact.").unwrap();
         let inspiration_id =
             canonical_store::create_inspiration(&path, "Synthetic article").unwrap();
-        let target_id = canonical_store::create_target_context(
-            &path,
-            "job_description",
-            "Synthetic role",
-        )
-        .unwrap();
+        let target_id =
+            canonical_store::create_target_context(&path, "job_description", "Synthetic role")
+                .unwrap();
 
         link_supporting_material(
             &path,
