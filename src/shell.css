@@ -54,7 +54,7 @@
 .shell-settings-link.active .shell-settings-copy small { color: #475249; }
 
 .shell-content { min-width: 0; padding: 28px clamp(18px, 4vw, 54px) 48px; }
-.shell-topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 18px; color: #28322c; }
+.shell-topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 18px; padding-right: 3rem; color: #28322c; }
 .shell-topbar h2 { margin: 2px 0 4px; font-size: clamp(1.4rem, 2.5vw, 2rem); color: #263029; }
 .shell-topbar .vault-path { max-width: 72ch; color: #5c6861; }
 .shell-page { max-width: 1180px; }
