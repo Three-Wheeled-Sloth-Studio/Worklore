@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
+import { HelpLauncher } from "./components/HelpLauncher";
 import "./guided-interview.css";
 import "./legal-notice.css";
 import "./performance.css";
@@ -17,5 +18,6 @@ if (!root) {
 createRoot(root).render(
   <StrictMode>
     <App />
+    <HelpLauncher />
   </StrictMode>,
 );
