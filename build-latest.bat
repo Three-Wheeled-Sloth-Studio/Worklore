@@ -9,9 +9,9 @@ if errorlevel 1 (
     exit /b 1
 )
 
-where npm >nul 2>&1
+where powershell >nul 2>&1
 if errorlevel 1 (
-    echo ERROR: npm was not found on PATH.
+    echo ERROR: Windows PowerShell was not found on PATH.
     exit /b 1
 )
 
@@ -33,8 +33,8 @@ git pull --ff-only origin dev
 if errorlevel 1 goto :failed
 
 echo.
-echo [3/3] Building the WorkLore desktop application...
-call npm run desktop:build
+echo [3/3] Building the WorkLore desktop executable...
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build.ps1 -Channel qa -SkipTests
 if errorlevel 1 goto :failed
 
 echo.
@@ -43,5 +43,5 @@ exit /b 0
 
 :failed
 echo.
-echo ERROR: Update or build failed. Review the output above for details.
+echo ERROR: Update or build failed. Review the first error above for the actual cause.
 exit /b 1
