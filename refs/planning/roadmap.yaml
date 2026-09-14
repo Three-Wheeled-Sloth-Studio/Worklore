@@ -1,6 +1,6 @@
 version: 2
 schema: refs/schemas/schemaRegistry.yaml
-updated: 2026-09-13
+updated: 2026-09-14
 product_reference: refs/product/prd.md
 
 roadmap_principles:
@@ -111,6 +111,7 @@ phases:
       - Provider-free deterministic single-draft Writing Pattern Linter with stable explainable findings, browser-compatible UTF-16 locations, bounded question-opening/engagement-bait/hashtag/list-dominance checks, and explicit machine-enforceable active Writing Rules without an AI probability, opaque quality score, provider call, or draft persistence.
       - Provider-free confidentiality transformation that reuses the Private Entity Registry, stable token redaction, explicitly stored public descriptions, current review/risk policy, and transient sensitive-text scanning to return derived public-safe text plus explicit ready/needs-review/blocked state without mutating canonical private truth or inventing replacement facts.
       - Schema-v8 provider-free durable Post/Revision lineage with immutable exact revision snapshots, deterministic parentage, explicit user/model authorship provenance, exact final approval, typed supporting-material links, and a non-destructive confidentiality boundary.
+      - Provider-free deterministic edit-learning foundation over real persisted parent/child Revisions, with explainable additions/removals/replacements, exact Post/Revision provenance, model-ancestor preservation, and recurring-preference proposals only after the same normalized correction appears across at least two distinct Posts; proposals remain transient and do not mutate governed voice state.
     scope:
       - Introduce canonical Voice Evidence, Core Voice, Tone Modes, Voice Direction, and Writing Rules.
       - Ingest representative user-authored writing and approved final posts as voice evidence.
