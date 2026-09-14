@@ -1,7 +1,7 @@
 ---
 type: Handoff
 title: Current WorkLore Handoff
-description: Validated provider-free confidentiality transformation checkpoint and bounded handoff into real Post/Revision lineage.
+description: Validated schema-v8 Post/Revision lineage checkpoint and bounded handoff into real edit-delta learning.
 status: draft
 tags: [handoff, worklore]
 ---
@@ -11,7 +11,7 @@ Updated: 2026-09-13
 
 ## Accepted Baseline
 
-WorkLore is a local-first professional narrative and content intelligence application. The authoritative loop remains:
+WorkLore remains a local-first professional narrative and content intelligence application. The authoritative loop is:
 
 `Capture -> Understand -> Develop -> Connect -> Draft -> Challenge -> Publish manually -> Measure -> Learn`
 
@@ -23,9 +23,9 @@ Locked boundaries remain:
 - no automatic social publishing or scheduling;
 - explicit human review before publication;
 - raw AI drafts never train canonical voice;
-- confidentiality transformation is a hard pre-publication requirement;
+- confidentiality transformation remains derived and non-destructive;
 - Evidence, Inspiration, Target Context, and Voice Evidence remain semantically distinct;
-- resume import remains an optional `Seed from resume` path rather than the product center.
+- resume import remains optional bootstrap rather than the product center.
 
 ## Accepted Product Checkpoints
 
@@ -49,140 +49,132 @@ Deterministic Writing Pattern Linter:
 
 `f83c6b6b263c304464379e40b6a2f11f37051a94`
 
-Provider-free confidentiality transformation implementation:
+Provider-free confidentiality transformation:
 
 `33c081a30b982eafe542b8efa9beea9f3c4f242a`
 
-## task-034: Complete
+Provider-free Post/Revision lineage implementation:
 
-The confidentiality foundation now answers the bounded question: WorkLore can transform known private entities in supplied text into explicit public-safe representations, surface unresolved privacy risk for human review, and preserve private canonical truth without a provider or network dependency.
+`28b6860212c9daf87ec925d1478a83d08f423092`
+
+## task-036: Durable Lineage Foundation Accepted
+
+The bounded lineage slice now answers the intended question: WorkLore can record a real Post from an initial draft through immutable edits and explicit final approval, preserve exact ancestry and provenance after reopen, and keep model-origin text from silently becoming canonical voice material without requiring a provider or publication workflow.
 
 ### What landed
 
-- `transform_for_public_use` is provider-free and transient. It does not persist the supplied draft or overwrite Sources, Stories, Proof Points, or other private canonical records.
-- The transformation reuses the existing Private Entity Registry and `redact_for_external_use` path rather than creating a second confidentiality registry or matching model.
-- Results distinguish:
-  - original supplied private text;
-  - deterministic stable-token redaction;
-  - derived public-safe text;
-  - explicit replacement metadata;
-  - unresolved privacy risks;
-  - overall `ready`, `needs_review`, or `blocked` state.
-- Human-readable replacements come only from an explicitly stored nonblank `public_description`. Missing descriptions remain stable public tokens. No replacement prose is invented.
-- Repeated aliases for one entity resolve consistently through the existing registry/redaction behavior.
-- Public entities remain unchanged when the current privacy model does not require transformation.
-- Surrounding metrics and factual claims are preserved because the transformation changes matched entity representations only.
-- Replacement metadata exposes entity ID, entity type, sensitivity, representation kind, replacement value, and occurrence count without returning the matched private payload as metadata.
-- Persistent pending entity-review work remains visible in the result.
-- High/critical pending review blocks when the existing vault policy says high-risk pending review should block.
-- Lower-risk pending review produces `needs_review` rather than disappearing or being called safe.
-- A transient copy of the privacy state is used to scan supplied text for sensitive-looking material that is not represented by reviewed canonical entities. This does not mutate the real registry.
-- Unknown high-risk material such as an unregistered email address fails closed with `blocked`.
-- A narrow wrapper filter suppresses scanner artifacts only when a newly detected range is inside a known entity or encloses it by no more than five characters. Distinct unknown material remains review work.
-- Existing `never_send_to_cloud` behavior remains strict on the provider/external redaction path.
-- No Ollama, Gemini, BYOK, provider fallback, content generation, publication, or scheduling work was added.
+- Canonical SQLite schema v8 adds only `posts` and `post_revisions`; it does not create a parallel post store or audit database.
+- Each Post has a stable Post ID, current Revision reference, optional exact final-approved Revision reference, explicit working/final-approved state, timestamps, and canonical revision metadata.
+- Each Revision stores a stable Revision ID, deterministic sequence, parent Revision ID, exact text snapshot, explicit origin, explicit authorship state, optional provider/run/model provenance, and timestamp.
+- Editing creates a new immutable Revision instead of overwriting earlier text.
+- The foundation currently enforces a linear parent chain. Earlier revisions remain inspectable after later edits and after final approval.
+- Explicit final approval identifies the exact approved Revision. A final-approved Post is frozen until a future explicit reopen workflow is designed.
+- Model-origin Revisions retain `model_generated` authorship. A later human edit remains linked to that ancestor and must use `user_edited_model`; the ancestor is never relabeled as human-authored.
+- User-origin Revisions cannot claim provider provenance. Provider/run/model metadata is validated without adding credentials or private provider payload logs.
+- Raw model-origin Revisions do not automatically create Voice Evidence or update Core Voice.
+- Existing `record_relationships` are reused for typed Post support links, including Sources/Evidence, Stories, Proof Points, Topics, Themes, Inspiration, Target Context, and Voice Evidence. Their semantic roles remain distinct.
+- Existing `audit_events` are reused for Post creation, Revision creation, support linking, and final approval.
+- Schema migration does not invent Post/Revision history for pre-lineage content.
+- Task-034 confidentiality transformation remains a derived review/output layer; transforming a Revision does not overwrite its private canonical text.
+- No Ollama/Gemini/BYOK call, angle generation, Audience Lens, broad Posts UI, comment/reply generation, publication automation, scheduling, analytics, or discovery work was added.
 
 ### Proof coverage
 
-The Rust suite now includes task-034 cases for:
+The Rust suite includes task-036 cases proving:
 
-- provider-free execution;
-- known aliases replaced consistently;
-- public entities unchanged;
-- explicitly stored public descriptions used when present;
-- stable-token fallback when a public description is absent;
-- metrics and surrounding claims preserved;
-- canonical registry unchanged by transformation;
-- high-risk pending review blocking under current vault policy;
-- lower-risk pending review remaining visible;
-- unknown high-risk sensitive text failing closed without registry mutation;
-- `never_send_to_cloud` continuing to redact on the existing external/provider path.
+- user-authored initial draft -> durable Post + Revision;
+- edit -> new Revision with deterministic parentage;
+- exact ancestry and text survive reopen;
+- exact final-approved Revision is retained while earlier revisions remain inspectable;
+- synthetic model-origin Revision retains model provenance;
+- a human edit of model text becomes `user_edited_model` without false authorship;
+- model-origin content does not automatically create Voice Evidence;
+- typed supporting-material links keep semantic roles distinct;
+- schema upgrade creates no fabricated Post history;
+- confidentiality transformation is derived and leaves stored private revision truth unchanged;
+- final-approved Posts reject further edits until an explicit reopen workflow exists.
 
 ## Validation Evidence
 
-Accepted task-034 implementation validation:
+Accepted task-036 implementation validation:
 
-- Actions run: `34792809384`
-- Job: `103820125275`
-- validated implementation checkpoint: `33c081a30b982eafe542b8efa9beea9f3c4f242a`
+- Actions run: `34797693185`
+- Job: `103833884286`
+- validated implementation checkpoint: `28b6860212c9daf87ec925d1478a83d08f423092`
 - external build layout: green
 - case-collision and refs/OKF/path-safety validation: green
 - bounded agent-context check: green
 - frontend tests: 8 passed, 0 failed across 3 files
 - production frontend TypeScript/Vite build: green, 53 modules transformed
-- Rust tests: 104 passed, 0 failed
+- Rust tests: 110 passed, 0 failed
 - warnings-denied Clippy: green
 - rustfmt: green
 - repository/source-only check: green
 
-An earlier task-034 run, Actions `34791399737`, Job `103816187230`, had all behavioral tests and Clippy green but failed only on rustfmt line wrapping. Commit `33c081a30b982eafe542b8efa9beea9f3c4f242a` applies those mechanical formatter changes and is the accepted implementation checkpoint above.
+The implementation needed two small validation follow-ups before this accepted run: legacy Topic/Target Context tests were updated from schema version 7 to 8, and Clippy-driven structure cleanup replaced an over-parameterized Revision insert helper with a parameter object plus a Post row type alias. Neither changed lineage behavior. The final formatter-only commit produced the accepted implementation checkpoint above.
 
-The repository currently carries `.npmrc` with `legacy-peer-deps=true` as a narrow CI bootstrap workaround for an npm 10.9.8 Arborist `edgesOut` failure observed on the hosted Windows runner. It should be revisited when the runner/npm defect is no longer relevant; it is not part of the confidentiality product contract.
+The repository still carries `.npmrc` with `legacy-peer-deps=true` as a narrow hosted-CI workaround for the npm 10.9.8 Arborist `edgesOut` bootstrap failure. Revisit it when that runner/npm defect is no longer relevant; it is not part of the lineage product contract.
 
-## Remaining Phase 2 Work
+## Current Task State
 
-`task-032` remains `in_progress` only for edit-delta learning. That requires real durable model-draft -> human-edit -> final-approved lineage.
+`task-036` remains `in_progress`, but its durable lineage foundation is complete. Remaining task-036 scope belongs to later product phases rather than this foundation:
 
-`task-033` remains `in_progress` for work that likewise needs a real content corpus and revision history:
+- explicit publication metadata and user-marked published versions in Content Studio;
+- later analytics association in Feedback Intelligence.
 
-- cross-draft repetition detection;
-- proof-point rotation;
-- portfolio-level opening/structure repetition;
-- batch mode-collapse analysis;
-- fuller evidence/standing challenges tied to actual draft claims and supporting evidence.
+Do not pull those later-phase concerns forward merely to mark task-036 complete.
 
-Do not create pseudo-history, transient fake revisions, or synthetic usage history merely to close these items.
+`task-032` remains `in_progress`, and its edit-delta work is now unblocked by real durable Revision ancestry.
+
+`task-033` remains `in_progress`. Its cross-draft repetition, proof-point rotation, portfolio mode-collapse, and fuller evidence/standing checks now have the required lineage substrate, but should still wait for a real content corpus rather than synthetic usage history.
 
 ## Recommended Next Slice
 
-Begin `task-036` with the smallest durable Post/Revision lineage foundation before broad `task-035` Content Studio generation.
+Return to `task-032` with the smallest provider-free deterministic edit-delta learning foundation.
 
 Immediate objective:
 
-- create real durable lineage for a Post and its Revisions using the existing canonical SQLite/migration patterns;
-- preserve exact revision ancestry and explicit origin/provenance;
-- support manual draft -> edit -> explicit final approval as a provider-free proof path;
-- permit model-origin revisions to exist as audit records later without allowing raw model text to become canonical Voice Evidence automatically;
-- preserve typed links to Sources, Stories, Proof Points, Topics, Inspiration, and Target Context without collapsing their semantic roles;
-- make the lineage inspectable after reopen;
-- keep confidentiality transformation derived and non-destructive rather than rewriting private revision truth.
+- operate only on real persisted parent/child Post Revisions;
+- compute inspectable user edit observations without treating the model ancestor as user voice;
+- distinguish additions, removals, and replacements at a useful deterministic level;
+- preserve exact Post/Revision provenance for every observation;
+- aggregate only genuinely repeated user corrections into proposed recurring preferences;
+- do not infer a durable preference from a single edit;
+- surface proposed voice-learning changes for explicit human acceptance rather than silently mutating Core Voice, Voice Direction, Tone Modes, or Writing Rules;
+- remain provider-free for the bounded proof path;
+- do not begin task-033 portfolio analysis or broad task-035 Content Studio generation in this slice.
 
-This ordering is intentional. Real Post/Revision lineage is the dependency needed to implement task-032 edit-delta learning and task-033 portfolio checks honestly, and it gives task-035 an audit-safe editorial substrate instead of forcing those features to invent history later.
-
-Do not begin broad angle generation, Audience Lens, provider-assisted drafting, comment/reply generation, social publication, scheduling, analytics, edit-delta inference, or cross-draft scoring in the lineage slice.
+This is now the clean dependency order: real lineage exists, so edit-learning can use real history instead of pseudo-history.
 
 ## Relevant Files For Next Slice
 
 Start with bounded re-entry and follow authoritative refs into only the files needed. At minimum inspect:
 
-- `refs/product/prd.md`, especially Post/Revision, audit, voice provenance, privacy, and publication requirements;
-- `refs/architecture/vaultFormat.md`;
-- the authoritative domain-model architecture material referenced by the agent-context packet;
-- `refs/planning/roadmap.yaml`;
-- `refs/planning/todos.yaml`;
 - `refs/handoffs/currentHandoff.md`;
-- canonical SQLite schema/migration/store code;
-- existing domain types and persistence patterns for provenance and typed relationships;
-- Voice Evidence eligibility boundaries;
-- Writing Pattern Linter and confidentiality contracts only as downstream review boundaries, not as reasons to expand the slice.
+- `refs/product/prd.md`, especially the edit-learning, voice provenance, and human-acceptance requirements;
+- `refs/architecture/vaultFormat.md` and the authoritative domain-model architecture material referenced by the generated context;
+- `refs/planning/roadmap.yaml` and `refs/planning/todos.yaml`;
+- schema-v8 Post/Revision domain, service, and migration code;
+- existing Voice Evidence, Core Voice, Voice Direction, Tone Mode, Writing Rule, and review-only proposal contracts;
+- existing deterministic linter only where useful for vocabulary or explainable findings.
 
 ## Do Not Reopen
 
 Unless new runtime, test, legal, or user evidence materially changes the plan:
 
 - Do not recenter WorkLore on resume parsing.
-- Do not merge Evidence, Inspiration, Target Context, and Voice Evidence into one source class.
+- Do not merge Evidence, Inspiration, Target Context, and Voice Evidence.
 - Do not let raw model output train canonical voice.
-- Do not weaken immutable authorship provenance.
+- Do not weaken immutable authorship or Revision provenance.
+- Do not infer human authorship from a model draft merely because a user edited it.
 - Do not infer user standing from Target Context.
 - Do not represent Tone Modes as separate identities.
-- Do not silently turn observed edits into Core Voice traits or Writing Rules.
-- Do not automatically accept provider-proposed traits or directions.
-- Do not implement edit-delta learning before real durable revision lineage exists.
-- Do not invent cross-draft or proof-point history.
+- Do not silently turn one edit, or any unreviewed edit observation, into Core Voice traits or Writing Rules.
+- Do not automatically accept provider- or edit-derived voice proposals.
+- Do not invent revision or cross-draft history.
 - Do not add fake AI/human probability scores or opaque quality scores.
-- Do not create a second confidentiality/private-entity model beside the existing registry/redaction infrastructure.
-- Do not overwrite private canonical facts with public-safe substitutions.
+- Do not create a second confidentiality/private-entity model.
+- Do not overwrite private canonical facts or Revision text with public-safe substitutions.
 - Do not add WorkLore-hosted SaaS, account, sync, inference proxy, automatic publishing, scheduling, or autonomous engagement.
 - Do not hand-edit generated OKF indexes.
 - Do not promote `qa` or `main` without explicit approval.
