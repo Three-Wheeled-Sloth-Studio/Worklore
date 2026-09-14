@@ -1,6 +1,7 @@
 pub mod candidates;
 pub mod capture;
 pub mod development;
+pub mod feedback;
 pub mod inspirations;
 pub mod interviews;
 pub mod performance;
