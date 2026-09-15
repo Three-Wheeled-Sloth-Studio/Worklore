@@ -46,6 +46,19 @@ export interface LinkPostSupportingMaterialRequest {
   targetId: string;
 }
 
+export interface GeneratePostFromTopicRequest {
+  topicId: string;
+  providerId: string;
+  modelId: string;
+}
+
+export interface GeneratePostFromTopicResult {
+  lineage: PostLineageView;
+  providerRunId: string;
+  providerId: string;
+  modelId: string;
+}
+
 export interface PostRecordView {
   postId: string;
   title: string;
