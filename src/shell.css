@@ -47,20 +47,20 @@
   font-weight: 700;
 }
 .shell-nav-button .soon-badge { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; color: #656d68; }
-.shell-settings-link { margin-top: auto; align-items: flex-start; position: relative; }
-.shell-settings-link::after {
-  content: "0.1.2";
-  position: absolute;
-  left: 7px;
-  top: calc(100% + 2px);
+.shell-settings-link { margin-top: auto; align-items: flex-start; }
+.shell-settings-copy { display: grid; gap: 0; }
+.shell-settings-copy small { color: #66716a; font-size: 0.61rem; font-weight: 600; }
+.shell-settings-link.active .shell-settings-copy small { color: #475249; }
+.shell-version {
+  margin: -5px 0 0 7px;
   color: #7a827d;
   font-size: 0.62rem;
   font-weight: 650;
   letter-spacing: 0.02em;
+  line-height: 1.2;
+  user-select: text;
+  cursor: text;
 }
-.shell-settings-copy { display: grid; gap: 0; }
-.shell-settings-copy small { color: #66716a; font-size: 0.61rem; font-weight: 600; }
-.shell-settings-link.active .shell-settings-copy small { color: #475249; }
 
 .shell-content {
   min-width: 0;
@@ -135,7 +135,7 @@
   .shell-nav-section { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
   .shell-nav-label { grid-column: 1 / -1; }
   .shell-settings-link { margin-top: 0; }
-  .shell-settings-link::after { display: none; }
+  .shell-version { margin: -4px 0 0 7px; }
   .shell-topbar { padding-right: 5.2rem; }
   .record-row { align-items: flex-start; flex-direction: column; gap: 4px; }
   .vault-location-row { grid-template-columns: 1fr; }
