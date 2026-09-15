@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { TopicRecord } from "../domain/types";
 import { errorMessage } from "../domain/types";
 import { createTopic, listTopics } from "../lib/workloreApi";
+import { InfoButton } from "./InfoButton";
 import { TopicPanel } from "./TopicPanel";
 
 export function TopicsWorkspace({ vaultPath }: { vaultPath: string }) {
@@ -25,9 +26,7 @@ export function TopicsWorkspace({ vaultPath }: { vaultPath: string }) {
   }
 
   async function createNewTopic() {
-    if (!newTitle.trim()) {
-      return;
-    }
+    if (!newTitle.trim()) return;
     setBusy(true);
     setError(null);
     try {
@@ -60,13 +59,13 @@ export function TopicsWorkspace({ vaultPath }: { vaultPath: string }) {
   }
 
   return (
-    <section className="workspace-panel" aria-labelledby="topics-workspace-heading">
-      <div className="panel-heading-row">
-        <div>
-          <p className="eyebrow">Connect before drafting</p>
-          <h2 id="topics-workspace-heading">Topics</h2>
-          <p>Durable ideas can stay useful even when they never become a Post.</p>
-        </div>
+    <section className="workspace-panel compact-workspace-panel" aria-labelledby="topics-workspace-heading">
+      <div className="compact-section-heading">
+        <h2 id="topics-workspace-heading">Topics</h2>
+        <InfoButton label="About Topics">
+          Capture an idea, optionally connect Story or Proof Point standing and other context, then
+          generate the first Post draft from the Topic.
+        </InfoButton>
       </div>
       <div className="inline-create-row">
         <input
@@ -74,30 +73,41 @@ export function TopicsWorkspace({ vaultPath }: { vaultPath: string }) {
           onChange={(event) => setNewTitle(event.target.value)}
           placeholder="New topic"
           aria-label="New topic title"
+          onKeyDown={(event) => {
+            if (event.key === "Enter") void createNewTopic();
+          }}
         />
-        <button className="primary-button compact" disabled={busy || !newTitle.trim()} onClick={() => void createNewTopic()}>
-          Add topic
+        <button
+          className="shell-icon-button primary-icon"
+          type="button"
+          disabled={busy || !newTitle.trim()}
+          aria-label="Add Topic"
+          title="Add Topic"
+          onClick={() => void createNewTopic()}
+        >
+          <PlusIcon />
         </button>
       </div>
       {error ? <p className="inline-error" role="alert">{error}</p> : null}
       {topics.length === 0 ? (
-        <div className="empty-state">
-          <h3>No topics yet</h3>
-          <p>Capture an idea as a Topic Candidate or add one here, then connect standing and context.</p>
-        </div>
+        <div className="compact-empty-state">No Topics yet.</div>
       ) : (
         <div className="record-list">
           {topics.map((topic) => (
             <button className="record-row" key={topic.topicId} onClick={() => setSelectedTopicId(topic.topicId)}>
               <span>
                 <strong>{topic.title}</strong>
-                <small>{topic.summary || "No summary yet."}</small>
+                {topic.summary ? <small>{topic.summary}</small> : null}
               </span>
-              <span className="record-meta">{topic.lifecycle} · {topic.timingClass} · {topic.relationships.length} links</span>
+              <span className="record-meta">{topic.lifecycle} · {topic.relationships.length}</span>
             </button>
           ))}
         </div>
       )}
     </section>
   );
+}
+
+function PlusIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>;
 }
