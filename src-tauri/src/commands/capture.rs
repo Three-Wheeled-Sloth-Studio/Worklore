@@ -4,7 +4,7 @@ use crate::{
     domain::models::SourceType,
     error::{CommandError, CommandResult},
     services::{
-        capture_metadata_service,
+        capture_catalog_service, capture_metadata_service,
         capture_service::{self, CaptureClassificationResult, CaptureRole, CaptureSourceView},
     },
 };
@@ -42,6 +42,18 @@ pub fn update_capture_source_type(
         &PathBuf::from(vault_path),
         &source_id,
         source_type,
+    )
+    .map_err(CommandError::from)
+}
+
+#[tauri::command]
+pub fn list_captures(
+    vault_path: String,
+    limit: Option<u32>,
+) -> CommandResult<Vec<CaptureSourceView>> {
+    capture_catalog_service::list_captures(
+        &PathBuf::from(vault_path),
+        limit.unwrap_or(50) as usize,
     )
     .map_err(CommandError::from)
 }
