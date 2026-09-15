@@ -114,7 +114,8 @@ mod tests {
 
     #[test]
     fn catalog_keeps_classified_captures_visible() {
-        let path = std::env::temp_dir().join(format!("worklore-capture-catalog-{}", Uuid::now_v7()));
+        let path =
+            std::env::temp_dir().join(format!("worklore-capture-catalog-{}", Uuid::now_v7()));
         vault_service::create_vault(&path, "Capture Catalog Test").unwrap();
         let capture = capture_service::create_capture_source(
             &path,
@@ -124,8 +125,12 @@ mod tests {
         .unwrap();
         capture_service::classify_capture_source(&path, &capture.source_id, CaptureRole::StorySeed)
             .unwrap();
-        capture_service::classify_capture_source(&path, &capture.source_id, CaptureRole::ProofPoint)
-            .unwrap();
+        capture_service::classify_capture_source(
+            &path,
+            &capture.source_id,
+            CaptureRole::ProofPoint,
+        )
+        .unwrap();
 
         let rows = list_captures(&path, 20).unwrap();
         assert_eq!(rows.len(), 1);
