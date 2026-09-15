@@ -160,6 +160,23 @@ pub struct LinkPostSupportingMaterialRequest {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
+pub struct GeneratePostFromTopicRequest {
+    pub topic_id: String,
+    pub provider_id: String,
+    pub model_id: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct GeneratePostFromTopicResult {
+    pub lineage: PostLineageView,
+    pub provider_run_id: String,
+    pub provider_id: String,
+    pub model_id: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 pub struct PostRecordView {
     pub post_id: String,
     pub title: String,
