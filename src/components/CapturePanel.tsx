@@ -6,12 +6,12 @@ import { TopicPanel } from "./TopicPanel";
 import { TargetContextPanel } from "./TargetContextPanel";
 import type { CaptureRole, CaptureSource, SourceType } from "../domain/types";
 import { errorMessage } from "../domain/types";
-import { updateCaptureSourceType } from "../lib/captureApi";
+import { listCaptureSources, updateCaptureSourceType } from "../lib/captureApi";
 import {
   classifyCaptureSource,
   createCaptureSource,
+  createVoiceEvidenceFromSource,
   getCaptureSource,
-  listUnclassifiedCaptures,
 } from "../lib/workloreApi";
 import "../capture.css";
 
@@ -56,7 +56,7 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
 
   async function refreshRecent() {
     try {
-      setRecent(await listUnclassifiedCaptures(vaultPath, 8));
+      setRecent(await listCaptureSources(vaultPath, 12));
     } catch (caught) {
       setError(errorMessage(caught));
     }
@@ -86,11 +86,7 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
     setNotice(null);
     setError(null);
     try {
-      const updated = await updateCaptureSourceType(
-        vaultPath,
-        saved.sourceId,
-        nextType,
-      );
+      const updated = await updateCaptureSourceType(vaultPath, saved.sourceId, nextType);
       setSaved(updated);
       setNotice(`Source type changed to ${sourceTypeLabel(nextType)}.`);
       await refreshRecent();
@@ -109,8 +105,27 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
     try {
       const result = await classifyCaptureSource(vaultPath, saved.sourceId, role);
       setSaved(await getCaptureSource(vaultPath, saved.sourceId));
-      setNotice(result.created ? `Connected as ${roleLabel(role)}.` : `Already connected as ${roleLabel(role)}.`);
+      setNotice(
+        result.created
+          ? `Connected as ${roleLabel(role)}.`
+          : `Already connected as ${roleLabel(role)}.`,
+      );
       await refreshRecent();
+    } catch (caught) {
+      setError(errorMessage(caught));
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function handleUseForVoice() {
+    if (!saved || saved.sourceType !== "writing_sample") return;
+    setBusy("Preparing Voice Evidence");
+    setNotice(null);
+    setError(null);
+    try {
+      await createVoiceEvidenceFromSource(vaultPath, saved.sourceId);
+      setNotice("Ready in Voice. Confirm authorship there before this sample can shape your voice.");
     } catch (caught) {
       setError(errorMessage(caught));
     } finally {
@@ -152,7 +167,8 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
             Save source text unchanged first. A Story Seed is material worth unpacking into a fuller
             situation or decision. A Proof Point is a concrete fact, result, scale, or metric you may
             cite. A resume bullet can be both. For most substantial bullets, start with Story Seed and
-            also mark Proof Point when it carries a specific result or metric.
+            also mark Proof Point when it carries a specific result or metric. Writing samples use the
+            Voice path instead of needing one of these memory roles.
           </InfoButton>
           <select
             aria-label="Capture source type"
@@ -218,31 +234,45 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
           <p className="capture-preview">{saved.text}</p>
           <div className="capture-classify">
             <div className="topic-section-heading">
-              <h4>Connect</h4>
+              <h4>{saved.sourceType === "writing_sample" ? "Voice" : "Connect"}</h4>
               <InfoButton label="Capture connection guidance">
                 Story Seed means there is a situation worth developing. Proof Point means the capture
                 contains a concrete fact or result worth citing. The same resume bullet may be both.
-                Topic, Inspiration, and Target Context remain context rather than evidence.
+                A Writing Sample does not need one of those tags just to teach WorkLore how you write;
+                send it to Voice and explicitly confirm authorship there.
               </InfoButton>
             </div>
-            <div className="capture-classify-actions">
-              {CAPTURE_ROLES.map((option) => {
-                const linked = saved.classifications.some(
-                  (classification) => classification.role === option.value,
-                );
-                return (
-                  <button
-                    className={linked ? "quiet-button compact" : "secondary-button compact"}
-                    disabled={linked || busy !== null}
-                    key={option.value}
-                    title={linked ? `${option.label} already connected` : `Connect as ${option.label}`}
-                    onClick={() => void handleClassify(option.value)}
-                  >
-                    {linked ? `✓ ${option.label}` : option.label}
-                  </button>
-                );
-              })}
-            </div>
+            {saved.sourceType === "writing_sample" ? (
+              <div className="capture-classify-actions">
+                <button
+                  className="primary-button compact"
+                  disabled={busy !== null}
+                  title="Create a governed Voice Evidence review from this writing sample"
+                  onClick={() => void handleUseForVoice()}
+                >
+                  Use for voice
+                </button>
+              </div>
+            ) : (
+              <div className="capture-classify-actions">
+                {CAPTURE_ROLES.map((option) => {
+                  const linked = saved.classifications.some(
+                    (classification) => classification.role === option.value,
+                  );
+                  return (
+                    <button
+                      className={linked ? "quiet-button compact" : "secondary-button compact"}
+                      disabled={linked || busy !== null}
+                      key={option.value}
+                      title={linked ? `${option.label} already connected` : `Connect as ${option.label}`}
+                      onClick={() => void handleClassify(option.value)}
+                    >
+                      {linked ? `✓ ${option.label}` : option.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
             <div className="capture-next-actions">
               {storySeedClassification ? (
                 <button
@@ -306,12 +336,17 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
 
       {recent.length > 0 ? (
         <div className="capture-recent">
-          <div className="capture-recent-heading"><h3>Unclassified</h3></div>
+          <div className="capture-recent-heading"><h3>Recent</h3></div>
           <div className="capture-recent-list">
             {recent.map((capture) => (
               <button className="capture-recent-item" key={capture.sourceId} onClick={() => void handleSelectRecent(capture.sourceId)}>
                 <strong>{capture.displayName}</strong>
-                <span>{formatDate(capture.createdAt)}</span>
+                <span>
+                  {sourceTypeLabel(capture.sourceType)}
+                  {capture.classifications.length > 0
+                    ? ` · ${capture.classifications.map((item) => roleLabel(item.role)).join(" · ")}`
+                    : ""}
+                </span>
               </button>
             ))}
           </div>
@@ -327,12 +362,6 @@ function roleLabel(role: CaptureRole): string {
 
 function sourceTypeLabel(sourceType: SourceType): string {
   return CAPTURE_SOURCE_TYPES.find((option) => option.value === sourceType)?.label ?? sourceType;
-}
-
-function formatDate(value: string): string {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short" }).format(date);
 }
 
 function SaveIcon() {
