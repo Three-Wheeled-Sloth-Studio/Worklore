@@ -30,6 +30,8 @@ const CAPTURE_ROLES: Array<{ value: CaptureRole; label: string }> = [
   { value: "target_context", label: "Target context" },
 ];
 
+type DevelopmentRole = Exclude<CaptureRole, "proof_point">;
+
 export function CapturePanel({ vaultPath }: { vaultPath: string }) {
   const [text, setText] = useState("");
   const [sourceType, setSourceType] = useState<SourceType>("other");
@@ -47,12 +49,39 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
     setSaved(null);
     setNotice(null);
     setError(null);
+    clearDevelopmentPanels();
+    void refreshRecent();
+  }, [vaultPath]);
+
+  function clearDevelopmentPanels() {
     setDevelopmentSeedId(null);
     setDevelopmentTopicId(null);
     setDevelopmentInspirationId(null);
     setDevelopmentTargetContextId(null);
-    void refreshRecent();
-  }, [vaultPath]);
+  }
+
+  function openDevelopmentPanel(role: DevelopmentRole, targetId: string) {
+    clearDevelopmentPanels();
+    switch (role) {
+      case "story_seed":
+        setDevelopmentSeedId(targetId);
+        break;
+      case "topic_candidate":
+        setDevelopmentTopicId(targetId);
+        break;
+      case "inspiration":
+        setDevelopmentInspirationId(targetId);
+        break;
+      case "target_context":
+        setDevelopmentTargetContextId(targetId);
+        break;
+    }
+  }
+
+  function handleCloseSaved() {
+    setSaved(null);
+    clearDevelopmentPanels();
+  }
 
   async function refreshRecent() {
     try {
@@ -69,6 +98,7 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
     setError(null);
     try {
       const created = await createCaptureSource(vaultPath, text, sourceType);
+      clearDevelopmentPanels();
       setSaved(created);
       setText("");
       setNotice("Saved.");
@@ -87,6 +117,7 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
     setError(null);
     try {
       const updated = await updateCaptureSourceType(vaultPath, saved.sourceId, nextType);
+      clearDevelopmentPanels();
       setSaved(updated);
       setNotice(`Source type changed to ${sourceTypeLabel(nextType)}.`);
       await refreshRecent();
@@ -137,7 +168,9 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
     setBusy("Opening");
     setError(null);
     try {
-      setSaved(await getCaptureSource(vaultPath, sourceId));
+      const selected = await getCaptureSource(vaultPath, sourceId);
+      clearDevelopmentPanels();
+      setSaved(selected);
     } catch (caught) {
       setError(errorMessage(caught));
     } finally {
@@ -226,7 +259,7 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
               type="button"
               aria-label="Close saved capture"
               title="Done"
-              onClick={() => setSaved(null)}
+              onClick={handleCloseSaved}
             >
               <CloseIcon />
             </button>
@@ -278,7 +311,7 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
                 <button
                   className="primary-button compact"
                   disabled={busy !== null}
-                  onClick={() => setDevelopmentSeedId(storySeedClassification.targetId)}
+                  onClick={() => openDevelopmentPanel("story_seed", storySeedClassification.targetId)}
                 >
                   Develop story
                 </button>
@@ -287,7 +320,7 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
                 <button
                   className="primary-button compact"
                   disabled={busy !== null}
-                  onClick={() => setDevelopmentTopicId(topicClassification.targetId)}
+                  onClick={() => openDevelopmentPanel("topic_candidate", topicClassification.targetId)}
                 >
                   Open topic
                 </button>
@@ -296,7 +329,7 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
                 <button
                   className="primary-button compact"
                   disabled={busy !== null}
-                  onClick={() => setDevelopmentInspirationId(inspirationClassification.targetId)}
+                  onClick={() => openDevelopmentPanel("inspiration", inspirationClassification.targetId)}
                 >
                   Open inspiration
                 </button>
@@ -305,7 +338,7 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
                 <button
                   className="primary-button compact"
                   disabled={busy !== null}
-                  onClick={() => setDevelopmentTargetContextId(targetContextClassification.targetId)}
+                  onClick={() => openDevelopmentPanel("target_context", targetContextClassification.targetId)}
                 >
                   Open target context
                 </button>
