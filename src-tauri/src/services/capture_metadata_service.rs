@@ -146,6 +146,7 @@ mod tests {
             )
             .unwrap();
         assert_eq!(stored_type, "other");
+        drop(connection);
 
         std::fs::remove_dir_all(path).unwrap();
     }
