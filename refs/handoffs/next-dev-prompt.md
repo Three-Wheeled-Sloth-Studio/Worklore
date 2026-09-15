@@ -38,7 +38,7 @@ Validation for that checkpoint:
 - rustfmt green
 - refs/OKF/path-safety, build-layout, case-collision, bounded agent context, and source-only checks green
 
-The current newer `dev` head contains the observed structured-output routing remediation and must pass fresh full validation before becoming the next accepted checkpoint.
+The current newer `dev` head contains the observed structured-output routing remediation and must pass fresh full validation before becoming the next accepted checkpoint. QA build version is `0.1.4`.
 
 ## Current QA Defect
 
@@ -94,12 +94,13 @@ If validation fails, fix only the concrete failure and rerun the relevant checks
 
 After validation is green, ask the user to pull the exact accepted `dev` SHA and focus first on the defect just reported:
 
-1. Run `Analyze approved writing` with the existing configured Ollama model.
-2. If that model cannot produce valid structured JSON, confirm WorkLore retries another installed local text-generation model and completes without requiring Settings changes.
-3. Confirm suggestions remain separated into Core Voice traits and Writing Rules.
-4. Confirm the actual model used is retained in provenance/audit rather than falsely recording the configured model.
-5. Confirm a genuine provider failure, such as stopping Ollama, fails directly rather than retrying every model.
-6. Continue the accepted v0.1.3 QA path: sidebar version visibility, Story Seed readability, Voice action ordering, explicit trait/rule acceptance, discard behavior, and restart/reopen persistence.
+1. Confirm the sidebar reports `v0.1.4`.
+2. Run `Analyze approved writing` with the existing configured Ollama model.
+3. If that model cannot produce valid structured JSON, confirm WorkLore retries another installed local text-generation model and completes without requiring Settings changes.
+4. Confirm suggestions remain separated into Core Voice traits and Writing Rules.
+5. Confirm the actual model used is retained in provenance/audit rather than falsely recording the configured model.
+6. Confirm a genuine provider failure, such as stopping Ollama, fails directly rather than retrying every model.
+7. Continue the accepted QA path: Story Seed readability, Voice action ordering, explicit trait/rule acceptance, discard behavior, and restart/reopen persistence.
 
 Continue beyond this only when runtime QA exposes another concrete correctness, provenance, privacy, recoverability, or blocking UX defect.
 
