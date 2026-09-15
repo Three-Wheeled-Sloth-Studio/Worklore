@@ -1,6 +1,6 @@
 [package]
 name = "worklore"
-version = "0.1.0"
+version = "0.1.2"
 description = "A local-first professional narrative and content intelligence application"
 authors = ["Three-Wheeled Sloth Studio"]
 license = "AGPL-3.0-only"
