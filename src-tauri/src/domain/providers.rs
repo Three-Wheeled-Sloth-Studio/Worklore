@@ -51,7 +51,7 @@ pub struct RedactionReplacement {
 
 pub const OLLAMA_PROVIDER_ID: &str = "ollama";
 pub const ANALYZE_VOICE_EVIDENCE_OPERATION: &str = "analyze_voice_evidence";
-pub const ANALYZE_VOICE_EVIDENCE_VERSION: u32 = 2;
+pub const ANALYZE_VOICE_EVIDENCE_VERSION: u32 = 3;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
