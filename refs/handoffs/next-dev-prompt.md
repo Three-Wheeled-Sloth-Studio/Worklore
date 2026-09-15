@@ -27,7 +27,7 @@ Last fully green accepted implementation:
 
 `3615b21c5abd59c02791cd8b3bb2ffebfed51281`
 
-The current newer `dev` head contains observed runtime QA remediation and must pass fresh full validation before becoming the next accepted checkpoint.
+The current newer `dev` head contains observed runtime QA remediation and must pass fresh full validation before becoming the next accepted checkpoint. QA build version is `0.1.3`.
 
 The remediation covers:
 
@@ -76,7 +76,7 @@ If validation fails, fix only the concrete failure and rerun the relevant checks
 
 After validation is green, ask the user to pull the exact accepted `dev` SHA and focus on the defects just reported:
 
-1. Verify `v0.1.2` is fully visible and selectable in the sidebar.
+1. Verify `v0.1.3` is fully visible and selectable in the sidebar.
 2. Reopen Story Seed development and verify heading, summary, progress, question, answer field, evidence controls, actions, and helper copy remain readable.
 3. Open Voice and confirm `Needs your review` contains only unfinished work.
 4. Confirm approved/rejected/retired Voice Evidence remains accessible in the collapsed evidence library without dominating the top of the page.
