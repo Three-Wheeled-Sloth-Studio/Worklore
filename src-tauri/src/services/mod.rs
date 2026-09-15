@@ -1,6 +1,7 @@
 pub mod app_preferences_service;
 pub mod candidate_service;
 pub mod canonical_store;
+pub mod capture_catalog_service;
 pub mod capture_metadata_service;
 pub mod capture_service;
 pub mod confidentiality_service;
