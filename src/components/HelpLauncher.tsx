@@ -7,7 +7,7 @@ export function HelpLauncher() {
   return (
     <>
       <button
-        className="help-launcher"
+        className="shell-icon-button help-launcher"
         type="button"
         aria-label="Open quick-start help"
         title="Quick start and help"
