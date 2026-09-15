@@ -1,7 +1,7 @@
 ---
 type: Handoff
 title: Current WorkLore Handoff
-description: Runtime QA checkpoint covering Stories readability, Voice action ordering, and governed writing-sample analysis.
+description: Accepted v0.1.3 runtime QA checkpoint for Stories readability and action-first governed Voice learning.
 status: draft
 tags: [handoff, worklore]
 ---
@@ -29,58 +29,59 @@ Locked boundaries remain:
 - the Private Entity Registry remains the privacy source of truth;
 - no fake AI/human probability or opaque quality score.
 
-## Last Fully Green Accepted Checkpoint
+## Fully Green Accepted Checkpoint
 
-`3615b21c5abd59c02791cd8b3bb2ffebfed51281`
+Accepted implementation SHA:
+
+`ab1eeaea21bc31c4921279ff1e973b0e49e91465`
+
+QA build version: `0.1.3`.
 
 Validation:
 
-- Actions `35001127377`
-- Job `104489490082`
-- frontend: 10 passed / 0 failed across 4 files
-- production frontend build: green
+- Actions `35011151906` (`Validate WorkLore` run 329)
+- Job `104523135322`
+- frontend: 11 passed / 0 failed across 5 files
+- production frontend build: green, 72 modules transformed
 - Rust: 131 passed / 0 failed
 - warnings-denied Clippy: green
 - rustfmt: green
-- build-layout, refs/OKF/path-safety, bounded agent context, case-collision, and repository/source-only checks: green
+- external build layout: green
+- case-collision: green, 245 tracked paths
+- refs/OKF/path-safety validation: green
+- bounded agent context: green, 5090 / 8000 characters
+- repository/source-only check: green
 
-This remains the accepted checkpoint until the current QA remediation head passes fresh full validation.
+The handoff documentation commits above this SHA are documentation-only. Treat `ab1eeaea21bc31c4921279ff1e973b0e49e91465` as the exact accepted implementation checkpoint for runtime QA.
 
-## Current QA Remediation
-
-The current `dev` head contains the observed runtime QA fixes below. Treat it as pending until fresh full validation is green.
-
-QA build version is `0.1.3`. The package, Tauri manifest, and visible sidebar marker are aligned to that version.
-
-### Runtime QA defects addressed
+## What v0.1.3 Fixed
 
 1. **Sidebar version visibility**
-   - The version was CSS-generated pseudo-content positioned below Settings, making it easy to push off-screen and impossible to select.
-   - It is now real selectable DOM content inside sidebar flow.
+   - Version text is real selectable DOM content in sidebar flow rather than CSS-generated pseudo-content below Settings.
 
-2. **Stories readability regression**
-   - Story Seed development used a light surface while inheriting pale dark-theme typography.
-   - The development card now owns explicit readable foreground, helper, textarea, and placeholder colors.
+2. **Stories readability**
+   - Story Seed development owns explicit readable foreground, helper, textarea, placeholder, and control colors on its light surface.
 
 3. **Voice action ordering**
-   - New or pending writing-sample review is now the primary `Needs your review` queue.
-   - Already governed, approved, rejected, and retired material no longer clutters the primary action surface.
-   - Reviewed and blocked material remains accessible in a collapsed evidence library.
+   - New or pending writing-sample review is the primary `Needs your review` queue.
+   - Approved, rejected, retired, and otherwise governed material no longer crowds the primary action surface.
+   - Historical/reviewed evidence remains accessible in a collapsed evidence library.
    - Queue grouping has deterministic frontend coverage.
 
 4. **Voice analysis clarity**
-   - The low-level `Analyze Voice Evidence` picker is reframed as `Learn from approved writing`.
+   - The old low-level `Analyze Voice Evidence` picker is reframed as `Learn from approved writing`.
    - Eligible approved samples are selected by default.
-   - Sample selection and optional guidance are progressive-disclosure options rather than the primary task.
-   - The checkbox layout regression caused by global input width is explicitly corrected.
+   - Sample selection and optional guidance are progressive-disclosure controls rather than the main task.
+   - The checkbox layout regression caused by generic input width is corrected.
 
 5. **Writing-sample learning capability**
-   - The bounded local Ollama analysis operation is version 2.
-   - It now returns two separate review-only categories: evidence-backed Core Voice trait suggestions and evidence-backed Writing Rule suggestions.
+   - Local Ollama voice analysis contract v2 returns two separate review-only categories:
+     - evidence-backed Core Voice trait suggestions;
+     - evidence-backed Writing Rule suggestions.
    - Nothing is saved automatically.
-   - Accepted Core Voice traits use the existing governed trait path and retain evidence links.
-   - Accepted Writing Rule suggestions are saved only as `proposed`; activation is still a separate explicit user action.
-   - Weak or inconsistent support is allowed to yield zero suggestions.
+   - Accepted Core Voice traits use the governed trait path and preserve evidence links.
+   - Accepted Writing Rule suggestions are saved only as `proposed`; activation remains a separate explicit action.
+   - Weak or inconsistent evidence may yield zero suggestions.
    - Provider output remains non-authoritative and does not produce confidence percentages or human-vs-AI scores.
 
 ## Current Task State
@@ -88,41 +89,27 @@ QA build version is `0.1.3`. The package, Tauri manifest, and visible sidebar ma
 - `task-032`: complete. Explicit durable edit-learning accept/reject governance is accepted.
 - `task-033`: in progress. Broader cross-draft and portfolio rules still wait for meaningful real corpus evidence.
 - `task-034`: complete. Provider-free confidentiality transformation preserves private canonical truth.
-- `task-035`: in progress. Topic-to-Post generation exists; current work is bounded runtime UX/correctness dogfood.
+- `task-035`: in progress. Topic-to-Post generation exists; current work remains bounded runtime UX/correctness dogfood.
 - `task-036`: complete for exact lineage/publication/performance association.
 - `task-037`: in progress. Manual performance snapshots and conservative Insights exist.
 
-## Immediate Next Step
+## Immediate Next Step: Runtime QA
 
-Run full validation against current `dev` before asking the user to resume QA:
+Pull current `dev` and exercise the accepted v0.1.3 behavior with real local material:
 
-```powershell
-python scripts/check-case-collisions.py
-git diff --check
-python refs/tools/validate_refs.py --mode initialized
-python refs/tools/generate_agent_context.py --check
-npm run test
-npm run build:frontend
-cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
-cargo test --manifest-path src-tauri/Cargo.toml
-cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
-./scripts/assert-repo-clean.ps1
-```
+1. confirm `v0.1.3` is fully visible and selectable in the sidebar;
+2. reopen Story Seed development and verify all text and controls remain readable;
+3. open Voice and confirm `Needs your review` contains only unfinished work;
+4. confirm approved/rejected/retired Voice Evidence remains accessible without dominating the page;
+5. run `Learn from approved writing` through the explicitly selected local Ollama model;
+6. confirm eligible approved samples are selected by default and sample-selection options remain understandable when expanded;
+7. confirm suggestions are separated into Core Voice traits and Writing Rules;
+8. accept one trait and verify it requires a proposed Core Voice version and preserves evidence links;
+9. accept one Writing Rule and verify it lands as `proposed`, not active;
+10. discard other suggestions and verify no canonical mutation occurs;
+11. restart/reopen and verify accepted governed state persists while unaccepted provider suggestions do not become canonical history.
 
-If a check fails, fix only the concrete failure and rerun validation. Preserve draft PR #1 as `dev -> qa` and do not promote `qa` or `main`.
-
-## Runtime QA Focus After Validation
-
-1. Confirm `v0.1.3` is visible and selectable at the bottom of the sidebar.
-2. Reopen Story Seed development and verify all text remains readable.
-3. Open Voice and verify only unfinished sample-review work appears at the top.
-4. Confirm approved samples remain accessible but do not masquerade as next actions.
-5. Run `Learn from approved writing` and verify approved samples are selected by default.
-6. Confirm returned suggestions are clearly separated into Core Voice traits and Writing Rules.
-7. Accept one trait and verify it requires a proposed Core Voice version and preserves evidence links.
-8. Accept one Writing Rule and verify it lands as `proposed`, not active.
-9. Discard suggestions and confirm no canonical mutation occurs.
-10. Restart/reopen and verify canonical accepted state persists while transient provider suggestions do not become history.
+Fix only concrete correctness, provenance, privacy, recoverability, or blocking UX defects observed during that QA. Do not broaden scope merely because planned features exist.
 
 ## Do Not Reopen
 
