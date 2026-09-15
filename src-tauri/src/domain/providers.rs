@@ -51,7 +51,7 @@ pub struct RedactionReplacement {
 
 pub const OLLAMA_PROVIDER_ID: &str = "ollama";
 pub const ANALYZE_VOICE_EVIDENCE_OPERATION: &str = "analyze_voice_evidence";
-pub const ANALYZE_VOICE_EVIDENCE_VERSION: u32 = 1;
+pub const ANALYZE_VOICE_EVIDENCE_VERSION: u32 = 2;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -108,6 +108,16 @@ pub struct VoiceTraitProposal {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
+pub struct WritingRuleProposal {
+    pub proposal_id: String,
+    pub name: String,
+    pub instruction: String,
+    pub evidence_ids: Vec<String>,
+    pub rationale: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 pub struct VoiceAnalysisProposalSet {
     pub run_id: String,
     pub operation_id: String,
@@ -115,4 +125,5 @@ pub struct VoiceAnalysisProposalSet {
     pub provider_id: String,
     pub model_id: String,
     pub proposals: Vec<VoiceTraitProposal>,
+    pub rule_proposals: Vec<WritingRuleProposal>,
 }
