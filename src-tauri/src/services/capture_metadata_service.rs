@@ -123,7 +123,16 @@ mod tests {
         .unwrap();
 
         let sabotage = open_connection(&path).unwrap();
-        sabotage.execute("DROP TABLE audit_events", []).unwrap();
+        sabotage
+            .execute_batch(
+                "CREATE TRIGGER force_capture_audit_failure
+                 BEFORE INSERT ON audit_events
+                 WHEN NEW.event_type='capture_source_type_changed'
+                 BEGIN
+                   SELECT RAISE(ABORT,'forced capture audit failure');
+                 END;",
+            )
+            .unwrap();
         drop(sabotage);
 
         assert!(update_capture_source_type(&path, &created.source_id, SourceType::Resume).is_err());
