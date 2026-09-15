@@ -1,7 +1,7 @@
 ---
 type: Handoff Prompt
 title: Next WorkLore Development Slice
-description: Bounded real-world dogfood QA of the accepted thin Capture-to-Learn structural loop.
+description: Validate the current dogfood candidate, then continue bounded real-world traversal from Capture through Topic and Post.
 status: draft
 tags: [handoff, next-slice]
 ---
@@ -15,31 +15,35 @@ Work directly on `dev`. Do not promote `qa` or `main` unless explicitly requeste
 
 Draft PR #1 remains `dev -> qa`. Leave it draft.
 
-## Accepted Starting Point
+## Starting State
 
-WorkLore now has a thin user-traversable structural loop across Professional Memory, Voice/quality/privacy foundations, Posts, manual publication recording, and feedback:
+WorkLore's authoritative structural loop remains:
 
 `Capture -> Understand -> Develop -> Connect -> Draft -> Challenge -> Publish manually -> Measure -> Learn`
 
-Accepted implementation checkpoint:
+Read `refs/handoffs/currentHandoff.md` first. It distinguishes the last fully green accepted checkpoint from the newer dogfood implementation candidate.
+
+Last fully green accepted implementation:
 
 `85f33f1b7eb29f006ec26e283e166f4f350532ed`
 
-Validation:
+Current dogfood implementation candidate beneath the handoff-doc updates:
 
-- Actions `34857116434`
-- Job `104019423399`
-- frontend: 8 passed / 0 failed across 3 files
-- Rust: 123 passed / 0 failed
-- production frontend build: green, 59 modules transformed
-- case-collision: green, 227 tracked paths
-- external build layout, refs/OKF/path validation, bounded agent context, warnings-denied Clippy, rustfmt, and repository/source-only checks: green
+`7599cadaeae10b28ea876e5806c67a24db695ce5`
 
-`task-032` is complete: recurring edit proposals now require explicit durable accept/reject decisions, exact supporting Revision-pair provenance is validated at decision time, stale/tampered evidence is rejected, decided evidence is suppressed until support materially changes, and accepted preferences create only a proposed Writing Rule without silently mutating active voice state.
+Do not mark that newer candidate accepted until the normal full validation set is green.
 
-The thin content/feedback loop also now supports exact immutable Post Revisions, deterministic challenge checks, hard public-safe final approval, user-recorded manual publication of the exact approved Revision, append-only cumulative performance snapshots, and conservative Insights. WorkLore still performs no social publishing or scheduling.
+The latest dogfood tranche includes:
 
-Read `refs/handoffs/currentHandoff.md` before making changes.
+- recent captured-material catalog and classified-capture discoverability;
+- explicit Resume bullet source typing and source-type correction;
+- Story Seed discoverability after classification;
+- compact Capture, Stories, Topics, Voice, and Posts work surfaces;
+- Topic-to-Post generation through the explicitly selected provider path;
+- explicit writing-sample handoff into governed Voice Evidence review;
+- active-vault binding for memory seed state;
+- atomic capture-retag mutation plus audit event;
+- stale Capture development-context cleanup so the selected capture and active derived work surface cannot silently diverge.
 
 ## Start With Bounded Re-entry
 
@@ -48,10 +52,10 @@ Do not reread repository history.
 First run:
 
 ```powershell
-python refs/tools/generate_agent_context.py --focus "WorkLore real-world dogfood QA Capture Story Topic Post challenge confidentiality manual publication LinkedIn performance Insights reopen recoverability"
+python refs/tools/generate_agent_context.py --focus "WorkLore dogfood validation Capture classified discoverability source retag audit Story Topic Post provider generation challenge confidentiality reopen provenance"
 ```
 
-Treat generated context as derived orientation, not source of truth. Follow it into only the authoritative product, architecture, UI, service, and persistence files needed to reproduce a concrete dogfood defect.
+Treat the packet as derived orientation, not source of truth. Follow it only into files needed for a concrete observed defect.
 
 At minimum, keep available:
 
@@ -59,47 +63,74 @@ At minimum, keep available:
 - `refs/product/prd.md`
 - `refs/planning/roadmap.yaml`
 - `refs/planning/todos.yaml`
-- current Capture/Story/Topic/Posts/Insights UI paths
-- Post/Revision, confidentiality, publication-feedback, and persistence services only as needed
+- current Capture, Stories, Topics, Posts, Voice, and Insights UI paths as needed
+- capture catalog/metadata, Topic/Post generation, Post/Revision, confidentiality, publication-feedback, and persistence services only when needed
 
-Load deeper files only when a real observed problem requires them.
+## Immediate Objective 1: Validate Current Candidate
 
-## Immediate Objective: bounded dogfood QA
+Before implementing new behavior, run the full normal validation set against current `dev`:
 
-Answer this question with real use rather than more speculative architecture:
+```powershell
+python scripts/check-case-collisions.py
+git diff --check
+python refs/tools/validate_refs.py --mode initialized
+python refs/tools/generate_agent_context.py --check
+npm run test
+npm run build:frontend
+cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
+cargo test --manifest-path src-tauri/Cargo.toml
+cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
+./scripts/assert-repo-clean.ps1
+```
 
-`Can a user take real professional material through the implemented structural loop, manually publish outside WorkLore, record the exact publication and LinkedIn measurements, reopen the vault around key transitions, and expose any correctness, friction, provenance, privacy, or recoverability defects before broader Content Studio work?`
+If validation fails, fix only the concrete failure, rerun the relevant checks, and keep the scope bounded.
 
-Use the application as a user would. Prefer fixing concrete blockers or misleading UX over adding roadmap breadth.
+Validation context from the immediately preceding tranche:
 
-## Dogfood Path
+- Actions `34996921994`, Job `104475376007`, against `d73528c80ca53e1ee0caa2d73d65adf105fd6105`
+- frontend 10/10 across 4 files
+- frontend production build green, 71 modules transformed
+- Rust 130/130
+- warnings-denied Clippy green
+- build-layout, refs/OKF/path-safety, and repository/source-only checks green
+- only failure was rustfmt on three new Capture files; the exact formatting changes were subsequently committed
 
-Exercise as much of this path as the available real material supports:
+Later atomic-retag and Capture-context fixes still require the fresh full validation above.
 
-1. Capture a real memory, proof point, idea, writing sample, inspiration item, or target context.
-2. Classify and develop it into useful Story, Topic, Proof Point, Inspiration, or Target Context state as appropriate.
-3. Connect supporting/context material and verify semantic roles remain explicit.
-4. Create a Post.
-5. Save one or more user edits as immutable Revisions and verify ancestry/reopen behavior.
-6. Run deterministic challenge checks and confidentiality preflight.
-7. Exercise public-safe wording where private entities exist. Confirm that a `Ready` transform alone is not enough: the exact saved Revision must equal the derived public-safe text before final approval succeeds.
-8. Final-approve the exact safe Revision.
-9. Manually publish outside WorkLore. Do not add an automated publish path.
-10. Record that exact approved Revision as the manual publication in WorkLore.
-11. Add at least one cumulative LinkedIn performance snapshot when real metrics are available.
-12. Inspect Insights and confirm small samples remain clearly labeled as weak evidence rather than durable rules.
-13. Reopen or restart the vault around meaningful transitions and verify stable identity, ancestry, publication association, and measurements survive.
+## Immediate Objective 2: Continue Real Dogfood
 
-If an external manual publication or real performance data is not available during the session, stop at that real boundary. Do not fabricate publication or analytics history merely to exercise later screens.
+After validation is green, continue real-use traversal rather than speculative architecture.
+
+Exercise the repaired path with real local material:
+
+1. Capture a real memory, resume bullet, proof point, idea, writing sample, inspiration item, or target context.
+2. Classify it appropriately. A substantial resume bullet may legitimately be both Story Seed and Proof Point.
+3. Switch among recent captures and reopen the vault around useful transitions. Confirm the selected capture and the open development surface always agree.
+4. Develop a Story or Topic.
+5. Connect standing and context material. Preserve the semantic split: Story and Proof Point can establish standing; Theme, Inspiration, and Target Context shape context only.
+6. Generate a Post from a real Topic using the explicitly selected provider and model.
+7. Reopen the resulting Post and verify exact support-role provenance.
+8. Save user edits as immutable Revisions and verify ancestry survives reopen/restart.
+9. Run deterministic challenge checks and confidentiality preflight.
+10. Where private entities exist, verify that a `Ready` transform alone is insufficient: final approval succeeds only when the exact saved Revision equals the derived public-safe text.
+11. Manually publish outside WorkLore only when there is a genuine item ready to publish. Do not add an automated publishing path.
+12. Record the exact approved Revision as manually published and add real cumulative LinkedIn metrics only when those metrics actually exist.
+13. Inspect Insights and keep small samples descriptive and explicitly non-causal.
+
+If reality stops the path before publication or metrics, stop there. Do not fabricate history just to exercise downstream screens.
 
 ## What To Fix
 
-Fix concrete issues discovered through dogfood when they affect:
+Fix concrete dogfood defects when they affect:
 
-- correctness;
-- data loss or reopen/restart behavior;
+- correctness or data loss;
+- reopen/restart behavior;
 - provenance or authorship integrity;
+- Capture selection versus derived-work-surface identity;
 - Evidence/Inspiration/Target Context/Voice Evidence boundaries;
+- source-type correction auditability;
+- Topic standing/context separation;
+- Post support-role lineage;
 - confidentiality/public-safe enforcement;
 - exact final-approved Revision identity;
 - publication/performance association;
@@ -110,10 +141,9 @@ Keep fixes narrow and add deterministic tests where practical.
 
 ## What Not To Add Yet
 
-Do not broaden scope merely because a feature is planned. Unless dogfood reveals a blocker or the user explicitly reprioritizes, do not begin:
+Do not broaden scope merely because a feature is planned. Unless real dogfood exposes a blocker or the user explicitly reprioritizes, do not begin:
 
 - automatic social publishing or scheduling;
-- provider-assisted post generation as a prerequisite for QA;
 - broad angle-generation UX;
 - Audience Lens breadth;
 - comment/reply drafting;
@@ -121,9 +151,11 @@ Do not broaden scope merely because a feature is planned. Unless dogfood reveals
 - broad multidimensional analytics;
 - discovery/news scanning;
 - task-033 portfolio rules based on fake or trivial history;
-- a new cloud/backend/account/sync layer.
+- a new cloud/backend/account/sync layer;
+- silent provider fallback;
+- a second confidentiality/private-entity model.
 
-Real corpus evidence should now drive task-033 and broader Phase 3/4 refinement.
+Topic-to-Post generation now exists because dogfood justified that transition. Do not treat its existence as permission to broaden the entire Content Studio or provider architecture without new evidence.
 
 ## Locked Constraints
 
@@ -146,26 +178,11 @@ Real corpus evidence should now drive task-033 and broader Phase 3/4 refinement.
 - do not hand-edit generated OKF indexes;
 - do not promote `qa` or `main`.
 
-## Validation After Any Fix
-
-Run at minimum:
-
-```powershell
-python scripts/check-case-collisions.py
-git diff --check
-python refs/tools/validate_refs.py --mode initialized
-python refs/tools/generate_agent_context.py --check
-npm run test
-npm run build:frontend
-cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
-cargo test --manifest-path src-tauri/Cargo.toml
-cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
-```
-
-Keep the repository source-only validation green as well.
-
 ## Stop Point
 
-Stop after completing a meaningful real-material traversal or after a concrete blocker has been reproduced, fixed, tested, and documented.
+Stop after one of these meaningful boundaries:
 
-Document what the dogfood session actually proved, where the user stopped because real external data was unavailable, and which next feature is justified by observed friction rather than roadmap speculation.
+- current candidate is fully validated and a real-material traversal reaches a genuine external boundary; or
+- a concrete blocker is reproduced, fixed, tested, and documented.
+
+Update `refs/handoffs/currentHandoff.md` with what the session actually proved. Do not convert pending validation, synthetic data, or unobserved behavior into an accepted claim.
