@@ -1,18 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
+import { InfoButton } from "./InfoButton";
 import type { ConfidentialityTransformResult } from "../domain/confidentiality";
 import type { PostLineageView, PostRecordView } from "../domain/posts";
-import type { LintDraftResult, StorySummary, TopicRecord } from "../domain/types";
+import type { LintDraftResult, TopicRecord } from "../domain/types";
 import { errorMessage } from "../domain/types";
 import { transformConfidentialityForPublicUse } from "../lib/confidentialityApi";
 import {
   appendPostRevision,
   approvePostRevision,
-  createPost,
+  generatePostFromTopic,
   getPostLineage,
-  linkPostSupportingMaterial,
   listPosts,
 } from "../lib/postApi";
-import { lintDraft, listStories, listTopics } from "../lib/workloreApi";
+import { getProviderSettings, lintDraft, listTopics } from "../lib/workloreApi";
 import "../posts.css";
 
 interface ChallengeResult {
@@ -24,23 +24,17 @@ interface ChallengeResult {
 export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
   const [posts, setPosts] = useState<PostRecordView[]>([]);
   const [topics, setTopics] = useState<TopicRecord[]>([]);
-  const [stories, setStories] = useState<StorySummary[]>([]);
-  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+  const [selectedTopicId, setSelectedTopicId] = useState("");
+  const [selectedPostId, setSelectedPostId] = useState("");
   const [lineage, setLineage] = useState<PostLineageView | null>(null);
   const [editorText, setEditorText] = useState("");
-  const [newTitle, setNewTitle] = useState("");
-  const [newText, setNewText] = useState("");
-  const [newTopicId, setNewTopicId] = useState("");
-  const [newStoryId, setNewStoryId] = useState("");
   const [challenge, setChallenge] = useState<ChallengeResult | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const currentRevision = useMemo(() => {
-    if (!lineage) {
-      return null;
-    }
+    if (!lineage) return null;
     return (
       lineage.revisions.find(
         (revision) => revision.revisionId === lineage.post.currentRevisionId,
@@ -65,38 +59,33 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
   );
 
   useEffect(() => {
-    setSelectedPostId(null);
+    setSelectedTopicId("");
+    setSelectedPostId("");
     setLineage(null);
     setEditorText("");
     setChallenge(null);
     setNotice(null);
     setError(null);
-    void loadWorkspace(vaultPath);
+    void loadWorkspace();
   }, [vaultPath]);
 
-  async function loadWorkspace(path: string, preferredPostId?: string | null) {
+  async function loadWorkspace(preferredPostId?: string) {
     setBusy(true);
     setError(null);
     try {
-      const [postResult, topicResult, storyResult] = await Promise.all([
-        listPosts(path),
-        listTopics(path),
-        listStories(path),
+      const [topicResult, postResult] = await Promise.all([
+        listTopics(vaultPath),
+        listPosts(vaultPath),
       ]);
-      setPosts(postResult);
       setTopics(topicResult);
-      setStories(storyResult);
-      const nextId =
+      setPosts(postResult);
+      setSelectedTopicId((current) => current || topicResult[0]?.topicId || "");
+      const nextPostId =
         preferredPostId && postResult.some((post) => post.postId === preferredPostId)
           ? preferredPostId
-          : postResult[0]?.postId ?? null;
-      if (nextId) {
-        await openPost(path, nextId);
-      } else {
-        setSelectedPostId(null);
-        setLineage(null);
-        setEditorText("");
-        setChallenge(null);
+          : postResult[0]?.postId ?? "";
+      if (nextPostId) {
+        await openPost(nextPostId);
       }
     } catch (caught) {
       setError(errorMessage(caught));
@@ -105,18 +94,23 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
     }
   }
 
-  async function refreshCatalog(path: string, preferredPostId: string) {
-    const postResult = await listPosts(path);
+  async function refreshPosts(preferredPostId: string) {
+    const postResult = await listPosts(vaultPath);
     setPosts(postResult);
-    if (postResult.some((post) => post.postId === preferredPostId)) {
-      setSelectedPostId(preferredPostId);
-    }
+    setSelectedPostId(preferredPostId);
   }
 
-  async function openPost(path: string, postId: string) {
+  async function openPost(postId: string) {
+    if (!postId) {
+      setSelectedPostId("");
+      setLineage(null);
+      setEditorText("");
+      setChallenge(null);
+      return;
+    }
     setError(null);
     try {
-      const loaded = await getPostLineage(path, postId);
+      const loaded = await getPostLineage(vaultPath, postId);
       const current = loaded.revisions.find(
         (revision) => revision.revisionId === loaded.post.currentRevisionId,
       );
@@ -130,47 +124,33 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
     }
   }
 
-  async function createDraft() {
-    if (!newText.trim()) {
-      return;
-    }
+  async function generateFromTopic() {
+    if (!selectedTopicId) return;
     setBusy(true);
     setError(null);
     setNotice(null);
     try {
-      let created = await createPost(vaultPath, {
-        title: newTitle.trim() || "Untitled post",
-        text: newText,
-        origin: "user",
-        authorshipState: "user_authored",
-        providerRunId: null,
-        providerId: null,
-        modelId: null,
+      const settings = await getProviderSettings();
+      if (!settings.selectedProviderId || !settings.ollamaModelId) {
+        throw new Error(
+          "Choose an AI provider and model in Settings before generating a Post.",
+        );
+      }
+      const generated = await generatePostFromTopic(vaultPath, {
+        topicId: selectedTopicId,
+        providerId: settings.selectedProviderId,
+        modelId: settings.ollamaModelId,
       });
-      if (newTopicId) {
-        created = await linkPostSupportingMaterial(vaultPath, {
-          postId: created.post.postId,
-          role: "topic",
-          targetId: newTopicId,
-        });
-      }
-      if (newStoryId) {
-        created = await linkPostSupportingMaterial(vaultPath, {
-          postId: created.post.postId,
-          role: "story",
-          targetId: newStoryId,
-        });
-      }
-      setNewTitle("");
-      setNewText("");
-      setNewTopicId("");
-      setNewStoryId("");
-      setLineage(created);
-      setSelectedPostId(created.post.postId);
-      setEditorText(created.revisions.at(-1)?.text ?? "");
+      const current = generated.lineage.revisions.find(
+        (revision) =>
+          revision.revisionId === generated.lineage.post.currentRevisionId,
+      );
+      setLineage(generated.lineage);
+      setSelectedPostId(generated.lineage.post.postId);
+      setEditorText(current?.text ?? "");
       setChallenge(null);
-      await refreshCatalog(vaultPath, created.post.postId);
-      setNotice("Draft saved with immutable revision provenance.");
+      await refreshPosts(generated.lineage.post.postId);
+      setNotice("Generated from the selected Topic. Review and edit before approval.");
     } catch (caught) {
       setError(errorMessage(caught));
     } finally {
@@ -179,9 +159,7 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
   }
 
   async function saveRevision() {
-    if (!lineage || !currentRevision || !unsavedChanges) {
-      return;
-    }
+    if (!lineage || !currentRevision || !unsavedChanges) return;
     setBusy(true);
     setError(null);
     setNotice(null);
@@ -200,10 +178,14 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
         providerId: null,
         modelId: null,
       });
+      const current = updated.revisions.find(
+        (revision) => revision.revisionId === updated.post.currentRevisionId,
+      );
       setLineage(updated);
+      setEditorText(current?.text ?? editorText);
       setChallenge(null);
-      await refreshCatalog(vaultPath, updated.post.postId);
-      setNotice("Revision saved. Challenge the exact saved text before final approval.");
+      await refreshPosts(updated.post.postId);
+      setNotice("Revision saved.");
     } catch (caught) {
       setError(errorMessage(caught));
     } finally {
@@ -212,9 +194,7 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
   }
 
   async function challengeDraft() {
-    if (!editorText.trim()) {
-      return;
-    }
+    if (!editorText.trim()) return;
     setBusy(true);
     setError(null);
     setNotice(null);
@@ -225,15 +205,11 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
       ]);
       setChallenge({ text: editorText, lint, confidentiality });
       if (confidentiality.state !== "ready") {
-        setNotice(
-          "Challenge found unresolved confidentiality work. Final approval remains blocked.",
-        );
+        setNotice("Privacy review is still required before approval.");
       } else if (confidentiality.publicSafeText !== editorText) {
-        setNotice(
-          "Challenge produced different public-safe text. Load it, save a new Revision, and challenge that exact Revision before approval.",
-        );
+        setNotice("A different public-safe version is available below.");
       } else {
-        setNotice("Challenge complete. Review advisory findings before approval.");
+        setNotice("Challenge complete.");
       }
     } catch (caught) {
       setError(errorMessage(caught));
@@ -243,9 +219,7 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
   }
 
   async function approveFinal() {
-    if (!lineage || !currentRevision || !canApprove) {
-      return;
-    }
+    if (!lineage || !currentRevision || !canApprove) return;
     setBusy(true);
     setError(null);
     setNotice(null);
@@ -255,10 +229,8 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
         revisionId: currentRevision.revisionId,
       });
       setLineage(approved);
-      await refreshCatalog(vaultPath, approved.post.postId);
-      setNotice(
-        "Final text frozen. Publish it manually outside WorkLore, then record that publication in Insights.",
-      );
+      await refreshPosts(approved.post.postId);
+      setNotice("Final revision approved.");
     } catch (caught) {
       setError(errorMessage(caught));
     } finally {
@@ -267,332 +239,208 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
   }
 
   function loadPublicSafeText() {
-    if (!challenge || challenge.confidentiality.state !== "ready") {
-      return;
-    }
+    if (!challenge || challenge.confidentiality.state !== "ready") return;
     setEditorText(challenge.confidentiality.publicSafeText);
     setChallenge(null);
-    setNotice(
-      "Public-safe text loaded as an unsaved edit. Save it as a new Revision, then challenge it again.",
-    );
+    setNotice("Public-safe text loaded. Save it as a new revision, then challenge again.");
   }
 
   async function copyApprovedText() {
-    if (!currentRevision || lineage?.post.status !== "final_approved") {
-      return;
-    }
+    if (!currentRevision || lineage?.post.status !== "final_approved") return;
     try {
       await navigator.clipboard.writeText(currentRevision.text);
-      setNotice(
-        "Approved text copied. Publish it manually, then record the publication in Insights.",
-      );
+      setNotice("Approved text copied.");
     } catch {
-      setNotice("Clipboard access was unavailable. Select the approved text and copy it manually.");
+      setNotice("Clipboard access was unavailable. Copy the text manually.");
     }
   }
 
   return (
     <section className="posts-workspace" aria-labelledby="posts-heading">
-      <div className="workspace-panel posts-intro">
-        <p className="eyebrow">Phase 3 vertical loop</p>
-        <h2 id="posts-heading">Posts</h2>
-        <p>
-          Draft, preserve revisions, challenge the exact text, and explicitly approve a final
-          version. WorkLore does not publish or schedule social content.
-        </p>
-      </div>
-
-      <div className="posts-layout">
-        <div className="posts-sidebar shell-stack">
-          <section className="workspace-panel">
-            <div className="panel-heading-row">
-              <div>
-                <p className="eyebrow">Start from what you know</p>
-                <h3>New draft</h3>
-              </div>
-            </div>
-            <label className="field-label" htmlFor="post-title">Title</label>
-            <input
-              id="post-title"
-              value={newTitle}
-              onChange={(event) => setNewTitle(event.target.value)}
-              placeholder="Working title"
-              disabled={busy}
-            />
-            <label className="field-label" htmlFor="post-topic">Topic context</label>
+      <section className="workspace-panel post-workbench">
+        <div className="post-workbench-toolbar">
+          <div className="post-toolbar-group post-topic-control">
+            <label htmlFor="post-topic-source">Topic</label>
             <select
-              id="post-topic"
-              value={newTopicId}
-              onChange={(event) => setNewTopicId(event.target.value)}
+              id="post-topic-source"
+              value={selectedTopicId}
+              onChange={(event) => setSelectedTopicId(event.target.value)}
               disabled={busy}
             >
-              <option value="">No topic linked</option>
+              <option value="">Choose a Topic</option>
               {topics.map((topic) => (
                 <option key={topic.topicId} value={topic.topicId}>{topic.title}</option>
               ))}
             </select>
-            <label className="field-label" htmlFor="post-story">Standing / story</label>
-            <select
-              id="post-story"
-              value={newStoryId}
-              onChange={(event) => setNewStoryId(event.target.value)}
-              disabled={busy}
+            <button
+              className="post-icon-button primary"
+              type="button"
+              disabled={busy || !selectedTopicId}
+              aria-label="Generate Post from selected Topic"
+              title="Generate Post from selected Topic"
+              onClick={() => void generateFromTopic()}
             >
-              <option value="">No story linked</option>
-              {stories.map((story) => (
-                <option key={story.storyId} value={story.storyId}>{story.title}</option>
+              <SparkleIcon />
+            </button>
+            <InfoButton label="Post generation guidance">
+              Pick a Topic and use Generate. Linked Stories and Proof Points can support personal
+              claims. Without them, WorkLore tells the model to write the idea without inventing your
+              experience. Generated text is always a model-origin draft that requires your review.
+            </InfoButton>
+          </div>
+
+          <div className="post-toolbar-group post-picker-control">
+            <label htmlFor="saved-post">Post</label>
+            <select
+              id="saved-post"
+              value={selectedPostId}
+              onChange={(event) => void openPost(event.target.value)}
+              disabled={busy || posts.length === 0}
+            >
+              <option value="">{posts.length === 0 ? "No saved Posts" : "Choose a Post"}</option>
+              {posts.map((post) => (
+                <option key={post.postId} value={post.postId}>
+                  {post.title} · {post.status === "final_approved" ? "final" : `r${post.revision}`}
+                </option>
               ))}
             </select>
-            <label className="field-label" htmlFor="post-draft">Draft text</label>
-            <textarea
-              id="post-draft"
-              className="post-draft-input"
-              value={newText}
-              onChange={(event) => setNewText(event.target.value)}
-              placeholder="Write the first version here. Angle generation comes in a later Content Studio slice."
-              disabled={busy}
-            />
-            <button
-              className="primary-button compact"
-              disabled={busy || !newText.trim()}
-              onClick={() => void createDraft()}
-            >
-              Save draft
-            </button>
-          </section>
+          </div>
+        </div>
 
-          <section className="workspace-panel">
-            <p className="eyebrow">Durable lineage</p>
-            <h3>Saved posts</h3>
-            {posts.length === 0 ? (
-              <div className="empty-state compact-empty">
-                <p>No Posts yet.</p>
+        {!lineage || !currentRevision ? (
+          <div className="post-empty-state">
+            <strong id="posts-heading">Choose a Topic, then Generate.</strong>
+          </div>
+        ) : (
+          <div className="post-editor-surface">
+            <div className="post-editor-heading">
+              <div>
+                <h2 id="posts-heading">{lineage.post.title}</h2>
+                <span>
+                  r{currentRevision.sequence} · {humanize(currentRevision.authorshipState)}
+                  {standingLinks.length > 0 ? ` · ${standingLinks.length} standing link${standingLinks.length === 1 ? "" : "s"}` : ""}
+                </span>
               </div>
-            ) : (
-              <div className="record-list post-record-list">
-                {posts.map((post) => (
-                  <button
-                    key={post.postId}
-                    className={`record-row ${selectedPostId === post.postId ? "selected" : ""}`}
-                    onClick={() => void openPost(vaultPath, post.postId)}
-                  >
-                    <span>
-                      <strong>{post.title}</strong>
-                      <small>{post.status === "final_approved" ? "Final approved" : "Working"}</small>
-                    </span>
-                    <span className="record-meta">r{post.revision}</span>
-                  </button>
+              <span className={`post-state ${lineage.post.status === "final_approved" ? "final" : ""}`}>
+                {lineage.post.status === "final_approved" ? "Final" : "Working"}
+              </span>
+            </div>
+
+            {lineage.supportingMaterial.length > 0 ? (
+              <div className="post-support-list" aria-label="Post support">
+                {lineage.supportingMaterial.map((item) => (
+                  <span className="post-support-chip" key={item.relationshipId}>
+                    {humanize(item.role)}
+                  </span>
                 ))}
               </div>
-            )}
-          </section>
-        </div>
+            ) : null}
 
-        <div className="posts-main shell-stack">
-          {!lineage || !currentRevision ? (
-            <section className="workspace-panel empty-state">
-              <h3>Select or create a Post</h3>
-              <p>The editor uses canonical Post/Revision lineage, not temporary browser state.</p>
-            </section>
-          ) : (
-            <>
-              <section className="workspace-panel">
-                <div className="panel-heading-row">
-                  <div>
-                    <p className="eyebrow">
-                      {lineage.post.status === "final_approved" ? "Frozen final" : "Working revision"}
-                    </p>
-                    <h3>{lineage.post.title}</h3>
-                    <p>
-                      Revision {currentRevision.sequence} | {humanize(currentRevision.authorshipState)}
-                    </p>
-                  </div>
-                  <span className={`status-pill ${lineage.post.status === "final_approved" ? "" : "attention"}`}>
-                    {humanize(lineage.post.status)}
-                  </span>
-                </div>
+            {standingLinks.length === 0 ? (
+              <div className="post-compact-warning" title="No Story or Proof Point is linked to support personal-experience claims.">
+                No standing linked. Generation avoids personal-experience claims.
+              </div>
+            ) : null}
 
-                {lineage.supportingMaterial.length > 0 ? (
-                  <div className="post-support-list" aria-label="Post supporting material">
-                    {lineage.supportingMaterial.map((item) => (
-                      <span className="post-support-chip" key={item.relationshipId}>
-                        {humanize(item.role)}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="post-standing-warning">
-                    No supporting material is linked. WorkLore cannot infer standing from the topic alone.
-                  </p>
-                )}
+            <textarea
+              id="post-editor"
+              className="post-editor"
+              aria-label="Post text"
+              value={editorText}
+              onChange={(event) => {
+                setEditorText(event.target.value);
+                setChallenge(null);
+              }}
+              readOnly={lineage.post.status === "final_approved"}
+            />
 
-                <label className="field-label" htmlFor="post-editor">Post text</label>
-                <textarea
-                  id="post-editor"
-                  className="post-editor"
-                  value={editorText}
-                  onChange={(event) => {
-                    setEditorText(event.target.value);
-                    setChallenge(null);
-                  }}
-                  readOnly={lineage.post.status === "final_approved"}
-                />
+            <div className="post-action-bar">
+              {lineage.post.status === "working" ? (
+                <>
+                  <button
+                    className="post-icon-button"
+                    type="button"
+                    disabled={busy || !unsavedChanges || !editorText.trim()}
+                    aria-label="Save revision"
+                    title="Save revision"
+                    onClick={() => void saveRevision()}
+                  >
+                    <SaveIcon />
+                  </button>
+                  <button
+                    className="post-icon-button"
+                    type="button"
+                    disabled={busy || !editorText.trim() || unsavedChanges}
+                    aria-label="Challenge saved revision"
+                    title={unsavedChanges ? "Save edits before Challenge" : "Challenge saved revision"}
+                    onClick={() => void challengeDraft()}
+                  >
+                    <ShieldIcon />
+                  </button>
+                  <button
+                    className="post-icon-button primary"
+                    type="button"
+                    disabled={busy || !canApprove}
+                    aria-label="Approve final revision"
+                    title={canApprove ? "Approve final revision" : "Challenge the exact public-safe saved revision before approval"}
+                    onClick={() => void approveFinal()}
+                  >
+                    <CheckIcon />
+                  </button>
+                </>
+              ) : (
+                <button
+                  className="post-icon-button primary"
+                  type="button"
+                  aria-label="Copy approved Post"
+                  title="Copy approved Post"
+                  onClick={() => void copyApprovedText()}
+                >
+                  <CopyIcon />
+                </button>
+              )}
+              {unsavedChanges ? <span className="post-action-status">Unsaved</span> : null}
+            </div>
 
-                {lineage.post.status === "working" ? (
-                  <div className="support-actions">
-                    <button
-                      className="secondary-button compact"
-                      disabled={busy || !unsavedChanges || !editorText.trim()}
-                      onClick={() => void saveRevision()}
-                    >
-                      Save revision
-                    </button>
-                    <button
-                      className="secondary-button compact"
-                      disabled={busy || !editorText.trim()}
-                      onClick={() => void challengeDraft()}
-                    >
-                      Challenge draft
-                    </button>
-                    <button
-                      className="primary-button compact"
-                      disabled={busy || !canApprove}
-                      onClick={() => void approveFinal()}
-                    >
-                      Approve final
-                    </button>
-                  </div>
-                ) : (
-                  <div className="next-step-card">
-                    <h4>Human publication boundary</h4>
-                    <p>
-                      This exact Revision is frozen as the approved final. Publish it manually outside
-                      WorkLore, then record that publication and its outcomes in Insights.
-                    </p>
-                    <button className="secondary-button compact" onClick={() => void copyApprovedText()}>
-                      Copy approved text
-                    </button>
-                  </div>
-                )}
+            {challenge ? (
+              <div className="post-challenge-summary" aria-label="Challenge results">
+                <span title="First-party standing links">Standing {standingLinks.length}</span>
+                <span title="Deterministic writing-pattern findings">Writing {challenge.lint.findings.length}</span>
+                <span className={challenge.confidentiality.state === "ready" ? "ready" : "attention"}>
+                  Privacy {humanize(challenge.confidentiality.state)}
+                </span>
 
-                {unsavedChanges ? (
-                  <p className="post-standing-warning">
-                    Unsaved edits are not part of canonical revision history and cannot be final-approved.
-                  </p>
+                {challenge.confidentiality.publicSafeText !== challenge.confidentiality.originalText ? (
+                  <button
+                    className="secondary-button compact"
+                    type="button"
+                    disabled={challenge.confidentiality.state !== "ready"}
+                    onClick={loadPublicSafeText}
+                  >
+                    Load safe text
+                  </button>
                 ) : null}
-              </section>
 
-              {challenge ? (
-                <section className="workspace-panel challenge-panel" aria-labelledby="challenge-heading">
-                  <div className="panel-heading-row">
-                    <div>
-                      <p className="eyebrow">Explainable checks</p>
-                      <h3 id="challenge-heading">Challenge</h3>
-                    </div>
-                    <span className={`status-pill ${challenge.confidentiality.state === "ready" ? "" : "attention"}`}>
-                      privacy: {humanize(challenge.confidentiality.state)}
-                    </span>
-                  </div>
-
-                  <div className="challenge-grid">
-                    <div className="next-step-card">
-                      <h4>Standing and evidence</h4>
-                      {standingLinks.length > 0 ? (
-                        <p>{standingLinks.length} first-party evidence or Story link(s) support this Post.</p>
-                      ) : (
-                        <p>
-                          No Story, Proof Point, Evidence, or Evidence Source is linked. Treat claims of
-                          expertise or firsthand experience as unsupported until you connect standing.
-                        </p>
-                      )}
-                    </div>
-                    <div className="next-step-card">
-                      <h4>Writing patterns</h4>
-                      <p>
-                        {challenge.lint.findings.length === 0
-                          ? "No deterministic pattern findings."
-                          : `${challenge.lint.findings.length} deterministic finding(s) to review.`}
+                {challenge.lint.findings.length > 0 || challenge.confidentiality.unresolvedRisks.length > 0 ? (
+                  <details className="post-challenge-details">
+                    <summary>Review findings</summary>
+                    {challenge.lint.findings.map((finding) => (
+                      <p key={`${finding.ruleId}-${finding.startOffset ?? "all"}`}>
+                        <strong>{humanize(finding.category)}:</strong> {finding.reason}
                       </p>
-                    </div>
-                    <div className="next-step-card">
-                      <h4>Confidentiality</h4>
-                      <p>
-                        {challenge.confidentiality.state !== "ready"
-                          ? `${challenge.confidentiality.unresolvedRisks.length} unresolved privacy risk(s) require review.`
-                          : publicSafeMatchesEditor
-                            ? "The exact saved text is already public-safe."
-                            : "A different public-safe version is available and must become a saved Revision before approval."}
+                    ))}
+                    {challenge.confidentiality.unresolvedRisks.map((risk, index) => (
+                      <p key={`${risk.source}-${risk.reviewItemId ?? index}`}>
+                        <strong>{humanize(risk.source)}:</strong> {risk.reason}
                       </p>
-                    </div>
-                  </div>
-
-                  {challenge.lint.findings.length > 0 ? (
-                    <div className="challenge-findings">
-                      {challenge.lint.findings.map((finding) => (
-                        <article className="challenge-finding" key={`${finding.ruleId}-${finding.startOffset ?? "all"}`}>
-                          <strong>{humanize(finding.category)} | {finding.severity}</strong>
-                          <p>{finding.reason}</p>
-                          {finding.remediation ? <small>{finding.remediation}</small> : null}
-                        </article>
-                      ))}
-                    </div>
-                  ) : null}
-
-                  {challenge.lint.unsupportedWritingRules.length > 0 ? (
-                    <p className="post-standing-warning">
-                      {challenge.lint.unsupportedWritingRules.length} active Writing Rule(s) are advisory only
-                      and cannot yet be checked deterministically.
-                    </p>
-                  ) : null}
-
-                  {challenge.confidentiality.unresolvedRisks.length > 0 ? (
-                    <div className="challenge-findings">
-                      {challenge.confidentiality.unresolvedRisks.map((risk, index) => (
-                        <article className="challenge-finding" key={`${risk.source}-${risk.reviewItemId ?? index}`}>
-                          <strong>{humanize(risk.source)}</strong>
-                          <p>{risk.reason}</p>
-                        </article>
-                      ))}
-                    </div>
-                  ) : null}
-
-                  {challenge.confidentiality.publicSafeText !== challenge.confidentiality.originalText ? (
-                    <div className="public-safe-preview">
-                      <label className="field-label" htmlFor="public-safe-preview">Derived public-safe preview</label>
-                      <textarea
-                        id="public-safe-preview"
-                        value={challenge.confidentiality.publicSafeText}
-                        readOnly
-                      />
-                      <p>
-                        This preview never overwrites private Revision truth. Load it into the editor only
-                        if you want to create a new human-reviewed Revision.
-                      </p>
-                      <button
-                        className="secondary-button compact"
-                        disabled={challenge.confidentiality.state !== "ready"}
-                        onClick={loadPublicSafeText}
-                      >
-                        Load public-safe text into editor
-                      </button>
-                    </div>
-                  ) : null}
-
-                  {challengeMatchesEditor &&
-                  !unsavedChanges &&
-                  challenge.confidentiality.state === "ready" &&
-                  publicSafeMatchesEditor ? (
-                    <p className="challenge-ready">
-                      The exact saved Revision has crossed the deterministic challenge and confidentiality gate.
-                      Advisory findings remain yours to accept or override.
-                    </p>
-                  ) : null}
-                </section>
-              ) : null}
-            </>
-          )}
-        </div>
-      </div>
+                    ))}
+                  </details>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        )}
+      </section>
 
       {notice ? <p className="inline-notice" role="status">{notice}</p> : null}
       {error ? <p className="inline-error" role="alert">{error}</p> : null}
@@ -602,4 +450,24 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
 
 function humanize(value: string): string {
   return value.replaceAll("_", " ");
+}
+
+function SparkleIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.4 4.6L18 9l-4.6 1.4L12 15l-1.4-4.6L6 9l4.6-1.4zM18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z" /></svg>;
+}
+
+function SaveIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11l3 3v13H5zM8 4v6h8V4M8 17h8" /></svg>;
+}
+
+function ShieldIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-2.8 8-7 10-4.2-2-7-5.5-7-10V6zM9 12l2 2 4-5" /></svg>;
+}
+
+function CheckIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l4 4L19 6" /></svg>;
+}
+
+function CopyIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8h11v11H8zM5 16H4V5h11v1" /></svg>;
 }
