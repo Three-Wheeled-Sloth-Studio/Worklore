@@ -81,6 +81,19 @@
   background: #dec27f;
 }
 
+.post-topic-control .post-icon-button.primary {
+  width: auto;
+  grid-auto-flow: column;
+  gap: 5px;
+  padding: 0 11px;
+}
+
+.post-topic-control .post-icon-button.primary::after {
+  content: "Generate";
+  font-size: 0.75rem;
+  font-weight: 780;
+}
+
 .post-icon-button:disabled {
   opacity: 0.42;
   cursor: not-allowed;
