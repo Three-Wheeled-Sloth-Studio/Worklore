@@ -6,6 +6,7 @@ import { TopicPanel } from "./TopicPanel";
 import { TargetContextPanel } from "./TargetContextPanel";
 import type { CaptureRole, CaptureSource, SourceType } from "../domain/types";
 import { errorMessage } from "../domain/types";
+import { updateCaptureSourceType } from "../lib/captureApi";
 import {
   classifyCaptureSource,
   createCaptureSource,
@@ -79,6 +80,27 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
     }
   }
 
+  async function handleRetag(nextType: SourceType) {
+    if (!saved || saved.sourceType === nextType) return;
+    setBusy("Updating source type");
+    setNotice(null);
+    setError(null);
+    try {
+      const updated = await updateCaptureSourceType(
+        vaultPath,
+        saved.sourceId,
+        nextType,
+      );
+      setSaved(updated);
+      setNotice(`Source type changed to ${sourceTypeLabel(nextType)}.`);
+      await refreshRecent();
+    } catch (caught) {
+      setError(errorMessage(caught));
+    } finally {
+      setBusy(null);
+    }
+  }
+
   async function handleClassify(role: CaptureRole) {
     if (!saved) return;
     setBusy("Connecting");
@@ -127,9 +149,10 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
         <h2 id="capture-heading">Capture</h2>
         <div className="capture-header-actions">
           <InfoButton label="Capture guidance">
-            Save source text unchanged first. For resume bullets, choose Resume bullet, then explicitly
-            connect useful material as a Story Seed or Proof Point. Leaving it unclassified keeps it
-            as source-only material.
+            Save source text unchanged first. A Story Seed is material worth unpacking into a fuller
+            situation or decision. A Proof Point is a concrete fact, result, scale, or metric you may
+            cite. A resume bullet can be both. For most substantial bullets, start with Story Seed and
+            also mark Proof Point when it carries a specific result or metric.
           </InfoButton>
           <select
             aria-label="Capture source type"
@@ -168,7 +191,20 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
       {saved ? (
         <div className="capture-saved-card">
           <div className="capture-saved-heading">
-            <h3>{saved.displayName}</h3>
+            <div className="capture-saved-identity">
+              <h3>{saved.displayName}</h3>
+              <select
+                aria-label="Saved capture source type"
+                title="Change source type without changing the saved text"
+                value={saved.sourceType}
+                disabled={busy !== null}
+                onChange={(event) => void handleRetag(event.target.value as SourceType)}
+              >
+                {CAPTURE_SOURCE_TYPES.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </div>
             <button
               className="shell-icon-button"
               type="button"
@@ -184,7 +220,8 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
             <div className="topic-section-heading">
               <h4>Connect</h4>
               <InfoButton label="Capture connection guidance">
-                Story Seed starts guided memory development. Proof Point records a reusable claim.
+                Story Seed means there is a situation worth developing. Proof Point means the capture
+                contains a concrete fact or result worth citing. The same resume bullet may be both.
                 Topic, Inspiration, and Target Context remain context rather than evidence.
               </InfoButton>
             </div>
@@ -286,6 +323,10 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
 
 function roleLabel(role: CaptureRole): string {
   return CAPTURE_ROLES.find((option) => option.value === role)?.label.toLowerCase() ?? role;
+}
+
+function sourceTypeLabel(sourceType: SourceType): string {
+  return CAPTURE_SOURCE_TYPES.find((option) => option.value === sourceType)?.label ?? sourceType;
 }
 
 function formatDate(value: string): string {
