@@ -23,18 +23,17 @@ pub fn list_captures(vault_path: &Path, limit: usize) -> ServiceResult<Vec<Captu
              ORDER BY imported_at DESC,source_id
              LIMIT ?1",
         )?;
-        statement
-            .query_map([query_limit], |row| {
-                Ok((
-                    row.get::<_, String>(0)?,
-                    row.get::<_, String>(1)?,
-                    row.get::<_, String>(2)?,
-                    row.get::<_, String>(3)?,
-                    row.get::<_, String>(4)?,
-                    row.get::<_, String>(5)?,
-                ))
-            })?
-            .collect::<Result<Vec<_>, _>>()?
+        let mapped = statement.query_map([query_limit], |row| {
+            Ok((
+                row.get::<_, String>(0)?,
+                row.get::<_, String>(1)?,
+                row.get::<_, String>(2)?,
+                row.get::<_, String>(3)?,
+                row.get::<_, String>(4)?,
+                row.get::<_, String>(5)?,
+            ))
+        })?;
+        mapped.collect::<Result<Vec<_>, _>>()?
     };
 
     rows.into_iter()
