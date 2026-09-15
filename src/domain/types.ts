@@ -1,65 +1,59 @@
+export type CloudIdentifierMode = "redact" | "include";
+
 export type SourceType =
   | "resume"
   | "job_description"
   | "writing_sample"
   | "interview_transcript"
+  | "git_snapshot"
   | "other";
+
 
 export type CaptureRole =
   | "story_seed"
-  | "topic"
+  | "proof_point"
+  | "topic_candidate"
   | "inspiration"
-  | "target_context"
-  | "proof_point";
+  | "target_context";
+
+export interface CaptureClassification {
+  role: CaptureRole;
+  targetId: string;
+}
 
 export interface CaptureSource {
   sourceId: string;
   sourceType: SourceType;
-  text: string;
   displayName: string;
+  text: string;
   createdAt: string;
   updatedAt: string;
+  classifications: CaptureClassification[];
 }
 
 export interface CaptureClassificationResult {
   sourceId: string;
   role: CaptureRole;
-  recordId: string;
+  targetId: string;
   created: boolean;
-  message: string;
 }
 
-export type TopicTimingClass = "evergreen" | "timely" | "expiring";
-export type TopicStatus = "active" | "archived";
+export type TopicLifecycle =
+  | "captured"
+  | "exploring"
+  | "ready"
+  | "drafted"
+  | "parked"
+  | "retired";
+
+export type TopicTimingClass = "evergreen" | "timely";
+export type ThemeLifecycle = "emerging" | "active" | "retired";
 export type TopicRelationKind =
   | "story"
   | "proof_point"
   | "theme"
   | "inspiration"
   | "target_context";
-
-export interface TopicRelationship {
-  relationKind: TopicRelationKind;
-  targetId: string;
-  targetLabel: string;
-  targetDetail: string;
-  targetStatus: string;
-  category: "standing" | "context";
-}
-
-export interface TopicRecord {
-  topicId: string;
-  title: string;
-  summary: string;
-  timingClass: TopicTimingClass;
-  relevantUntil: string | null;
-  timelyNote: string | null;
-  status: TopicStatus;
-  sourceId: string | null;
-  relationships: TopicRelationship[];
-  createdAt: string;
-  updatedAt: string;
-}
 
 export interface CreateTopicRequest {
   title: string;
@@ -71,10 +65,55 @@ export interface CreateTopicRequest {
 
 export interface UpdateTopicRequest extends CreateTopicRequest {
   topicId: string;
-  status: TopicStatus;
+  lifecycle: TopicLifecycle;
+}
+
+export interface TopicRelationship {
+  relationshipId: string;
+  relationKind: TopicRelationKind;
+  targetId: string;
+  targetLabel: string;
+  targetDetail: string;
+  targetStatus: string;
+  category: "standing" | "organizing_context" | "creative_context" | "target_context" | string;
+}
+
+export interface TopicRecord {
+  topicId: string;
+  title: string;
+  summary: string;
+  lifecycle: TopicLifecycle;
+  timingClass: TopicTimingClass;
+  relevantUntil: string | null;
+  timelyNote: string | null;
+  createdAt: string;
+  updatedAt: string;
+  revision: number;
+  relationships: TopicRelationship[];
+}
+
+export interface CreateThemeRequest {
+  name: string;
+  description: string;
+}
+
+export interface UpdateThemeRequest extends CreateThemeRequest {
+  themeId: string;
+  lifecycle: ThemeLifecycle;
+}
+
+export interface ThemeRecord {
+  themeId: string;
+  name: string;
+  description: string;
+  lifecycle: ThemeLifecycle;
+  createdAt: string;
+  updatedAt: string;
+  revision: number;
 }
 
 export interface TopicLinkTarget {
+  relationKind: TopicRelationKind;
   targetId: string;
   label: string;
   detail: string;
@@ -85,190 +124,196 @@ export interface TopicRelationshipMutationResult {
   topicId: string;
   relationKind: TopicRelationKind;
   targetId: string;
-  created: boolean;
-  record: TopicRecord;
+  changed: boolean;
 }
 
-export type ThemeStatus = "active" | "archived";
 
-export interface ThemeRecord {
-  themeId: string;
-  name: string;
-  description: string;
-  status: ThemeStatus;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CreateThemeRequest {
-  name: string;
-  description: string;
-}
-
-export interface UpdateThemeRequest extends CreateThemeRequest {
-  themeId: string;
-  status: ThemeStatus;
-}
-
-export type InspirationStatus = "active" | "archived";
+export type InspirationLifecycle = "saved" | "processed" | "archived";
 export type InspirationRelationKind = "topic" | "theme";
-export type InspirationLinkTarget = TopicLinkTarget;
-export type InspirationRelationshipMutationResult = TopicRelationshipMutationResult;
+
+export interface InspirationExcerptInput {
+  text: string;
+  locator: string;
+}
+
+export interface InspirationExcerpt {
+  text: string;
+  locator: string;
+  sourceId: string;
+}
+
+export interface InspirationSource {
+  sourceId: string;
+  sourceType: string;
+  displayName: string;
+  sourceOrigin: string;
+  originalFileName: string;
+  storedPath: string;
+  sourceUrl: string | null;
+  capturedText: string;
+}
+
+export interface InspirationRelationship {
+  relationshipId: string;
+  relationKind: InspirationRelationKind;
+  targetId: string;
+  targetLabel: string;
+  targetDetail: string;
+  targetStatus: string;
+}
 
 export interface InspirationRecord {
   inspirationId: string;
-  sourceId: string;
-  sourceDisplayName: string;
+  source: InspirationSource | null;
   title: string;
+  lifecycle: InspirationLifecycle;
   sourceUrl: string | null;
-  author: string | null;
-  sourceDate: string | null;
-  excerpt: string;
+  sourceTitle: string | null;
+  sourceAuthor: string | null;
+  sourcePublishedAt: string | null;
+  summary: string;
   takeaways: string[];
-  status: InspirationStatus;
-  relationships: Array<{
-    relationKind: InspirationRelationKind;
-    targetId: string;
-    targetLabel: string;
-    targetDetail: string;
-    targetStatus: string;
-  }>;
+  excerpts: InspirationExcerpt[];
+  whyInteresting: string;
+  userReaction: string;
+  concepts: string[];
+  questions: string[];
+  counterpoints: string[];
+  notes: string;
   createdAt: string;
   updatedAt: string;
+  revision: number;
+  relationships: InspirationRelationship[];
 }
 
 export interface CreateInspirationResult {
+  inspiration: InspirationRecord;
   created: boolean;
-  record: InspirationRecord;
 }
 
 export interface UpdateInspirationRequest {
   inspirationId: string;
   title: string;
+  lifecycle: InspirationLifecycle;
   sourceUrl?: string | null;
-  author?: string | null;
-  sourceDate?: string | null;
-  excerpt: string;
+  sourceTitle?: string | null;
+  sourceAuthor?: string | null;
+  sourcePublishedAt?: string | null;
+  summary: string;
   takeaways: string[];
-  status: InspirationStatus;
+  excerpts: InspirationExcerptInput[];
+  whyInteresting: string;
+  userReaction: string;
+  concepts: string[];
+  questions: string[];
+  counterpoints: string[];
+  notes: string;
 }
 
-export type TargetContextStatus = "active" | "archived";
-export type TargetContextRelationKind = "topic" | "theme";
-export type TargetContextLinkTarget = TopicLinkTarget;
-export type TargetContextRelationshipMutationResult = TopicRelationshipMutationResult;
+export interface InspirationLinkTarget {
+  relationKind: InspirationRelationKind;
+  targetId: string;
+  label: string;
+  detail: string;
+  status: string;
+}
 
-export interface TargetContextSignal {
-  signalType: "responsibility" | "requirement" | "domain" | "language";
-  value: string;
+export interface InspirationRelationshipMutationResult {
+  inspirationId: string;
+  relationKind: InspirationRelationKind;
+  targetId: string;
+  changed: boolean;
+}
+
+
+export type TargetContextLifecycle = "active" | "stale" | "archived";
+export type TargetContextRelationKind = "topic" | "theme" | "story";
+
+export interface TargetContextSource {
+  sourceId: string;
+  sourceType: string;
+  displayName: string;
+  sourceOrigin: string;
+  originalFileName: string;
+  storedPath: string;
+  sourceUrl: string | null;
+}
+
+export interface TargetContextRelationship {
+  relationshipId: string;
+  relationKind: TargetContextRelationKind;
+  targetId: string;
+  targetLabel: string;
+  targetDetail: string;
+  targetStatus: string;
 }
 
 export interface TargetContextRecord {
-  targetContextId: string;
-  sourceId: string;
-  sourceDisplayName: string;
-  title: string;
-  organization: string | null;
+  targetId: string;
+  source: TargetContextSource | null;
   contextType: string;
+  title: string;
+  lifecycle: TargetContextLifecycle;
+  sourceUrl: string | null;
+  organizationName: string | null;
+  roleTitle: string | null;
+  location: string | null;
   summary: string;
   responsibilities: string[];
-  requirements: string[];
-  domainSignals: string[];
-  languageSignals: string[];
-  status: TargetContextStatus;
-  relationships: Array<{
-    relationKind: TargetContextRelationKind;
-    targetId: string;
-    targetLabel: string;
-    targetDetail: string;
-    targetStatus: string;
-  }>;
+  skills: string[];
+  concepts: string[];
+  language: string[];
+  tensions: string[];
+  notes: string;
   createdAt: string;
   updatedAt: string;
+  revision: number;
+  relationships: TargetContextRelationship[];
 }
 
 export interface CreateTargetContextResult {
+  targetContext: TargetContextRecord;
   created: boolean;
-  record: TargetContextRecord;
 }
 
 export interface UpdateTargetContextRequest {
-  targetContextId: string;
+  targetId: string;
   title: string;
-  organization?: string | null;
-  contextType: string;
+  lifecycle: TargetContextLifecycle;
+  sourceUrl?: string | null;
+  organizationName?: string | null;
+  roleTitle?: string | null;
+  location?: string | null;
   summary: string;
   responsibilities: string[];
-  requirements: string[];
-  domainSignals: string[];
-  languageSignals: string[];
-  status: TargetContextStatus;
+  skills: string[];
+  concepts: string[];
+  language: string[];
+  tensions: string[];
+  notes: string;
 }
 
 export interface TargetContextExtractionResult {
+  targetContext: TargetContextRecord;
+  changed: boolean;
+}
+
+export interface TargetContextLinkTarget {
+  relationKind: TargetContextRelationKind;
+  targetId: string;
+  label: string;
+  detail: string;
+  status: string;
+}
+
+export interface TargetContextRelationshipMutationResult {
   targetContextId: string;
-  signals: TargetContextSignal[];
-  record: TargetContextRecord;
+  relationKind: TargetContextRelationKind;
+  targetId: string;
+  changed: boolean;
 }
 
-export type PostStatus = "draft" | "review" | "final_approved" | "published" | "archived";
-export type PostRevisionOrigin = "user" | "model" | "imported";
-export type PostRevisionAuthorship = "user_authored" | "model_generated" | "user_edited_model";
-export type PostSupportRole =
-  | "topic"
-  | "story"
-  | "proof_point"
-  | "theme"
-  | "inspiration"
-  | "target_context";
 
-export interface PostRecord {
-  postId: string;
-  title: string;
-  status: PostStatus;
-  currentRevisionId: string;
-  currentRevisionNumber: number;
-  currentText: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface PostRevision {
-  revisionId: string;
-  postId: string;
-  revisionNumber: number;
-  text: string;
-  origin: PostRevisionOrigin;
-  authorshipState: PostRevisionAuthorship;
-  parentRevisionId: string | null;
-  providerRunId: string | null;
-  providerId: string | null;
-  modelId: string | null;
-  createdAt: string;
-}
-
-export interface PostLineage {
-  post: PostRecord;
-  revisions: PostRevision[];
-  supportingMaterial: Array<{
-    supportRole: PostSupportRole;
-    targetId: string;
-    targetLabel: string;
-  }>;
-}
-
-export interface GeneratePostFromTopicRequest {
-  topicId: string;
-  providerId: string;
-  modelId: string;
-}
-
-export interface GeneratePostFromTopicResult {
-  lineage: PostLineage;
-  providerRunId: string;
-  providerId: string;
-  modelId: string;
-}
 
 export type VoiceAuthorshipState =
   | "unknown"
@@ -277,31 +322,37 @@ export type VoiceAuthorshipState =
   | "model_generated"
   | "external_author";
 export type VoiceEvidenceStatus = "pending" | "eligible" | "rejected" | "retired";
+export type VoiceApprovalState = "unreviewed" | "approved" | "rejected" | "revoked";
 export type VoiceEvidenceDecision = "approve" | "reject" | "retire";
-
-export interface VoiceSourceCandidate {
-  sourceId: string;
-  displayName: string;
-  textPreview: string;
-  blockedReason: string | null;
-}
 
 export interface VoiceEvidenceRecord {
   voiceEvidenceId: string;
   sourceId: string;
   sourceDisplayName: string;
+  sourceOrigin: string;
   textPreview: string;
-  status: VoiceEvidenceStatus;
   authorshipState: VoiceAuthorshipState;
+  status: VoiceEvidenceStatus;
   eligibilityReason: string;
-  revision: number;
+  approvalState: VoiceApprovalState;
+  approvedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  revision: number;
+}
+
+export interface VoiceSourceCandidate {
+  sourceId: string;
+  displayName: string;
+  sourceOrigin: string;
+  textPreview: string;
+  voiceEvidenceId: string | null;
+  blockedReason: string | null;
 }
 
 export interface CreateVoiceEvidenceResult {
+  voiceEvidence: VoiceEvidenceRecord;
   created: boolean;
-  record: VoiceEvidenceRecord;
 }
 
 export interface ReviewVoiceEvidenceRequest {
@@ -310,12 +361,14 @@ export interface ReviewVoiceEvidenceRequest {
   decision: VoiceEvidenceDecision;
 }
 
-export type CoreVoiceStatus = "proposed" | "active" | "retired";
+export type CoreVoiceStatus = "proposed" | "active" | "superseded";
+export type ToneModeStatus = "active" | "disabled" | "retired";
+export type VoiceDirectionStatus = "proposed" | "accepted" | "completed" | "retired";
+export type WritingRuleStatus = "proposed" | "active" | "disabled" | "retired";
 
-export interface VoiceEvidenceLink {
+export interface CoreVoiceTraitEvidence {
   voiceEvidenceId: string;
-  currentStatus: VoiceEvidenceStatus;
-  sourceDisplayName: string;
+  currentStatus: string;
 }
 
 export interface CoreVoiceTrait {
@@ -323,10 +376,13 @@ export interface CoreVoiceTrait {
   name: string;
   value: string;
   userGuidance: string | null;
-  provenanceKind: string;
+  evidence: CoreVoiceTraitEvidence[];
+  provenanceKind: "voice_evidence" | "user_guidance" | "mixed" | "missing" | string;
   provenanceValid: boolean;
   invalidatedEvidenceIds: string[];
-  evidence: VoiceEvidenceLink[];
+  createdAt: string;
+  updatedAt: string;
+  revision: number;
 }
 
 export interface CoreVoiceRecord {
@@ -334,10 +390,12 @@ export interface CoreVoiceRecord {
   versionNumber: number;
   label: string;
   status: CoreVoiceStatus;
-  revision: number;
   traits: CoreVoiceTrait[];
+  activatedAt: string | null;
+  supersededAt: string | null;
   createdAt: string;
   updatedAt: string;
+  revision: number;
 }
 
 export interface CreateCoreVoiceRequest {
@@ -353,8 +411,6 @@ export interface SaveCoreVoiceTraitRequest {
   voiceEvidenceIds: string[];
 }
 
-export type ToneModeStatus = "active" | "disabled" | "retired";
-
 export interface ToneModeRecord {
   toneId: string;
   name: string;
@@ -363,6 +419,7 @@ export interface ToneModeRecord {
   status: ToneModeStatus;
   createdAt: string;
   updatedAt: string;
+  revision: number;
 }
 
 export interface CreateToneModeRequest {
@@ -376,16 +433,17 @@ export interface UpdateToneModeRequest extends CreateToneModeRequest {
   status: ToneModeStatus;
 }
 
-export type VoiceDirectionStatus = "proposed" | "accepted" | "completed" | "retired";
-
 export interface VoiceDirectionRecord {
   voiceDirectionId: string;
   statement: string;
   rationale: string;
   proposedBy: string;
   status: VoiceDirectionStatus;
+  acceptedAt: string | null;
+  completedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  revision: number;
 }
 
 export interface CreateVoiceDirectionRequest {
@@ -398,8 +456,6 @@ export interface SetVoiceDirectionStatusRequest {
   status: VoiceDirectionStatus;
 }
 
-export type WritingRuleStatus = "proposed" | "active" | "disabled" | "retired";
-
 export interface WritingRuleRecord {
   ruleId: string;
   name: string;
@@ -407,6 +463,7 @@ export interface WritingRuleRecord {
   status: WritingRuleStatus;
   createdAt: string;
   updatedAt: string;
+  revision: number;
 }
 
 export interface CreateWritingRuleRequest {
@@ -419,29 +476,45 @@ export interface UpdateWritingRuleRequest extends CreateWritingRuleRequest {
   status: WritingRuleStatus;
 }
 
+export type LintSeverity = "advisory" | "warning";
+export type LintCategory =
+  | "opening_pattern"
+  | "engagement_bait"
+  | "hashtags"
+  | "structure"
+  | "writing_rule";
+export type LintSourceKind = "built_in" | "writing_rule";
+
 export interface LintDraftRequest {
   text: string;
 }
 
 export interface LintFinding {
   ruleId: string;
-  category: string;
-  severity: "info" | "warning";
+  category: LintCategory;
+  severity: LintSeverity;
   reason: string;
   remediation: string | null;
   matchedText: string | null;
   startOffset: number | null;
   endOffset: number | null;
-  sourceKind: string;
+  sourceKind: LintSourceKind;
+  sourceId: string | null;
+}
+
+export interface UnsupportedWritingRule {
+  ruleId: string;
+  name: string;
+  instruction: string;
+  reason: string;
 }
 
 export interface LintDraftResult {
+  findings: LintFinding[];
   activeWritingRuleCount: number;
   enforceableWritingRuleCount: number;
-  findings: LintFinding[];
+  unsupportedWritingRules: UnsupportedWritingRule[];
 }
-
-export type CloudIdentifierMode = "redact" | "include";
 
 export interface ProviderSettings {
   selectedProviderId: string | null;
@@ -480,14 +553,6 @@ export interface VoiceTraitProposal {
   rationale: string;
 }
 
-export interface WritingRuleProposal {
-  proposalId: string;
-  name: string;
-  instruction: string;
-  evidenceIds: string[];
-  rationale: string;
-}
-
 export interface VoiceAnalysisProposalSet {
   runId: string;
   operationId: string;
@@ -495,7 +560,6 @@ export interface VoiceAnalysisProposalSet {
   providerId: string;
   modelId: string;
   proposals: VoiceTraitProposal[];
-  ruleProposals: WritingRuleProposal[];
 }
 
 export type PrivacyScanStatus =
@@ -521,6 +585,13 @@ export type EntityType =
   | "identifier"
   | "organization"
   | "user_defined";
+
+export type ReviewResolutionAction =
+  | "same_entity"
+  | "related_entity"
+  | "new_entity"
+  | "ignore_term"
+  | "dismiss";
 
 export type CandidateStatus =
   | "new"
@@ -688,83 +759,124 @@ export interface StorySummary {
   roleTitle: string | null;
   organizationName: string | null;
   metrics: string[];
-  tools: string[];
-  outcome: string | null;
-  evidenceLevel: string;
-  sourceIds: string[];
-  createdAt: string;
+  outcomes: string[];
+  privacyScanStatus: PrivacyScanStatus;
   updatedAt: string;
+  revision: number;
 }
 
-export interface SetStoryStatusRequest {
-  storyId: string;
-  status: StoryStatus;
+export interface ImportStoryResponseRequest {
+  interviewId: string;
+  responsePath: string;
 }
 
-export interface CreateThemeRequest {
-  name: string;
-  description: string;
+export interface ImportStoryResponseResult {
+  story: StorySummary;
+  created: boolean;
+  message: string;
 }
 
-export interface UpdateThemeRequest extends CreateThemeRequest {
-  themeId: string;
-  status: ThemeStatus;
+export interface EntityCandidateView {
+  entityId: string;
+  canonicalName: string;
+  publicToken: string;
+  entityType: EntityType;
+  sensitivity: string;
+  score: number;
+  reasons: string[];
+  provisional: boolean;
 }
 
 export interface EntityReviewView {
-  reviewId: string;
-  sourceId: string;
-  surfaceForm: string;
-  normalizedValue: string;
-  suggestedType: EntityType;
-  confidence: number | null;
-  contextSnippet: string;
+  reviewItemId: string;
+  recordType: string;
+  recordId: string;
+  locator: string;
+  contextExcerpt: string;
+  matchedText: string;
+  suggestedEntityType: string;
+  extractionConfidence: number;
+  typeConfidence: number;
+  identityMatchConfidence: number;
+  risk: string;
   status: string;
+  question: string;
+  provisionalEntityId: string | null;
+  candidates: EntityCandidateView[];
+  createdAt: string;
 }
 
 export interface ResolveEntityReviewRequest {
-  reviewId: string;
-  action: string;
-  entityType?: EntityType | null;
+  reviewItemId: string;
+  action: ReviewResolutionAction;
+  targetEntityId?: string | null;
   canonicalName?: string | null;
-  publicDescription?: string | null;
-  existingEntityId?: string | null;
+  entityType?: EntityType | null;
+  relationshipLabel?: string | null;
+  notes?: string | null;
 }
 
 export interface ResolveEntityReviewResult {
+  reviewItemId: string;
+  status: string;
+  affectedEntityId: string | null;
+  pendingReviewCount: number;
   message: string;
-  entityId: string | null;
+}
+
+export interface ActiveOperation {
+  schemaVersion: number;
+  runId: string;
+  operation: string;
+  phase: string;
+  startedAt: string;
+  updatedAt: string;
+  elapsedMs: number;
+  processId: number;
+  progressCurrent: number | null;
+  progressTotal: number | null;
+  metadata: Record<string, unknown>;
+}
+
+export interface OperationMetric {
+  schemaVersion: number;
+  runId: string;
+  parentRunId: string | null;
+  operation: string;
+  phase: string;
+  startedAt: string;
+  completedAt: string;
+  durationMs: number;
+  outcome: OperationOutcome;
+  errorCode: string | null;
+  metadata: Record<string, unknown>;
 }
 
 export interface PerformanceSnapshot {
   activeOperations: ActiveOperation[];
-  recentOperations: OperationRecord[];
-  metrics: PerformanceMetric[];
+  recentMetrics: OperationMetric[];
 }
 
-export interface ActiveOperation {
-  operationId: string;
-  operationType: string;
-  phase: string;
-  startedAt: string;
-  elapsedMs: number;
+export interface AppErrorShape {
+  code: string;
+  message: string;
+  detail?: string | null;
 }
 
-export interface OperationRecord {
-  operationId: string;
-  operationType: string;
-  outcome: OperationOutcome;
-  startedAt: string;
-  completedAt: string | null;
-  durationMs: number | null;
-  itemCount: number | null;
-  errorCode: string | null;
-}
+export function errorMessage(error: unknown): string {
+  if (typeof error === "string") {
+    return error;
+  }
 
-export interface PerformanceMetric {
-  metricName: string;
-  operationType: string;
-  sampleCount: number;
-  averageMs: number | null;
-  p95Ms: number | null;
+  if (error && typeof error === "object") {
+    const candidate = error as Partial<AppErrorShape> & { toString?: () => string };
+    if (typeof candidate.message === "string") {
+      return candidate.message;
+    }
+    if (typeof candidate.toString === "function") {
+      return candidate.toString();
+    }
+  }
+
+  return "WorkLore hit an unexpected error.";
 }
