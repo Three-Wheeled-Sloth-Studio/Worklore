@@ -2,21 +2,17 @@ import { useEffect, useMemo, useState } from "react";
 import type { CaptureSource, StoryStatus, StorySummary } from "../domain/types";
 import { errorMessage } from "../domain/types";
 import { listCaptureSources } from "../lib/captureApi";
-import {
-  classifyCaptureSource,
-  getLastVaultPath,
-  listStories,
-} from "../lib/workloreApi";
+import { classifyCaptureSource, listStories } from "../lib/workloreApi";
 import { InfoButton } from "./InfoButton";
 import { SeedDevelopmentPanel } from "./SeedDevelopmentPanel";
 
 interface StoryBankPanelProps {
+  vaultPath: string;
   stories: StorySummary[];
   onStatusChange: (storyId: string, status: StoryStatus) => Promise<void>;
 }
 
-export function StoryBankPanel({ stories, onStatusChange }: StoryBankPanelProps) {
-  const [vaultPath, setVaultPath] = useState<string | null>(null);
+export function StoryBankPanel({ vaultPath, stories, onStatusChange }: StoryBankPanelProps) {
   const [captures, setCaptures] = useState<CaptureSource[]>([]);
   const [localStories, setLocalStories] = useState<StorySummary[]>(stories);
   const [developmentSeedId, setDevelopmentSeedId] = useState<string | null>(null);
@@ -28,8 +24,9 @@ export function StoryBankPanel({ stories, onStatusChange }: StoryBankPanelProps)
   }, [stories]);
 
   useEffect(() => {
+    setDevelopmentSeedId(null);
     void refresh();
-  }, []);
+  }, [vaultPath]);
 
   const memorySeeds = useMemo(
     () =>
@@ -43,12 +40,9 @@ export function StoryBankPanel({ stories, onStatusChange }: StoryBankPanelProps)
 
   async function refresh() {
     try {
-      const path = await getLastVaultPath();
-      if (!path) return;
-      setVaultPath(path);
       const [captureRows, storyRows] = await Promise.all([
-        listCaptureSources(path, 250),
-        listStories(path),
+        listCaptureSources(vaultPath, 250),
+        listStories(vaultPath),
       ]);
       setCaptures(captureRows);
       setLocalStories(storyRows);
@@ -58,7 +52,6 @@ export function StoryBankPanel({ stories, onStatusChange }: StoryBankPanelProps)
   }
 
   async function develop(capture: CaptureSource) {
-    if (!vaultPath) return;
     setBusySourceId(capture.sourceId);
     setError(null);
     try {
@@ -80,7 +73,7 @@ export function StoryBankPanel({ stories, onStatusChange }: StoryBankPanelProps)
     await refresh();
   }
 
-  if (developmentSeedId && vaultPath) {
+  if (developmentSeedId) {
     return (
       <SeedDevelopmentPanel
         vaultPath={vaultPath}
