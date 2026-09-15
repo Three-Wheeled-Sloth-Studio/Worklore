@@ -50,7 +50,7 @@ This remains the accepted checkpoint until the current QA remediation head passe
 
 The current `dev` head contains the observed runtime QA fixes below. Treat it as pending until fresh full validation is green.
 
-Version remains `0.1.2`.
+QA build version is `0.1.3`.
 
 ### Runtime QA defects addressed
 
@@ -113,7 +113,7 @@ If a check fails, fix only the concrete failure and rerun validation. Preserve d
 
 ## Runtime QA Focus After Validation
 
-1. Confirm `v0.1.2` is visible and selectable at the bottom of the sidebar.
+1. Confirm `v0.1.3` is visible and selectable at the bottom of the sidebar.
 2. Reopen Story Seed development and verify all text remains readable.
 3. Open Voice and verify only unfinished sample-review work appears at the top.
 4. Confirm approved samples remain accessible but do not masquerade as next actions.
