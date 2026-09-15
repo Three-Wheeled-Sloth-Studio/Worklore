@@ -51,6 +51,8 @@ This remains the accepted checkpoint until the current structured-model-routing 
 
 The current `dev` head contains an additional observed runtime QA fix. Treat it as pending until fresh full validation is green.
 
+QA build version is `0.1.4`. The package, Tauri manifest, and visible sidebar marker are aligned to that version.
+
 ### Structured Ollama model routing
 
 Observed defect:
@@ -107,12 +109,13 @@ If a check fails, fix only the concrete failure and rerun validation. Preserve d
 
 ## Runtime QA Focus After Validation
 
-1. Re-run `Analyze approved writing` with the currently configured local model.
-2. If that model cannot satisfy structured JSON, confirm WorkLore transparently succeeds through another installed Ollama text-generation model rather than surfacing the first JSON failure.
-3. Confirm returned suggestions remain separated into Core Voice traits and Writing Rules.
-4. Confirm the actual successful model appears in returned provenance/audit state rather than the originally configured model.
-5. Confirm non-model failures such as an unreachable Ollama server still fail immediately.
-6. Continue the previously accepted v0.1.3 QA path for sidebar visibility, Stories readability, Voice action ordering, explicit trait/rule acceptance, discard behavior, and restart/reopen persistence.
+1. Confirm the sidebar reports `v0.1.4`.
+2. Re-run `Analyze approved writing` with the currently configured local model.
+3. If that model cannot satisfy structured JSON, confirm WorkLore transparently succeeds through another installed Ollama text-generation model rather than surfacing the first JSON failure.
+4. Confirm returned suggestions remain separated into Core Voice traits and Writing Rules.
+5. Confirm the actual successful model is preserved in returned provenance/audit state rather than the originally configured model.
+6. Confirm non-model failures such as an unreachable Ollama server still fail immediately.
+7. Continue the previously accepted QA path for Stories readability, Voice action ordering, explicit trait/rule acceptance, discard behavior, and restart/reopen persistence.
 
 ## Do Not Reopen
 
