@@ -68,10 +68,27 @@
   background: #1c201b;
 }
 
+.capture-saved-identity {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.capture-saved-identity select {
+  max-width: 180px;
+  min-height: 2rem;
+  padding-block: 0.35rem;
+}
+
 .capture-saved-heading h3 {
+  min-width: 0;
   margin: 0;
   color: #eef1ec;
   font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .capture-preview {
@@ -167,7 +184,8 @@
     flex-direction: column;
   }
 
-  .capture-header-actions {
+  .capture-header-actions,
+  .capture-saved-identity {
     justify-content: space-between;
   }
 }
