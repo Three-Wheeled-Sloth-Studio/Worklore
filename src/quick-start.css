@@ -1,18 +1,17 @@
-.help-launcher {
+.window-controls {
   position: fixed;
-  top: 0.7rem;
-  right: 0.7rem;
-  z-index: 18;
-  width: 2.35rem;
-  height: 2.35rem;
-  display: grid;
-  place-items: center;
-  border: 1px solid rgba(105, 78, 28, 0.42);
-  border-radius: 999px;
+  top: max(0.75rem, env(safe-area-inset-top));
+  right: max(0.75rem, env(safe-area-inset-right));
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.help-launcher {
   color: #584116;
+  border-color: rgba(105, 78, 28, 0.42);
   background: #e7d6af;
-  box-shadow: 0 2px 8px rgba(32, 29, 22, 0.16);
-  cursor: pointer;
 }
 
 .help-launcher:hover {
@@ -20,33 +19,35 @@
   background: #f0dfb8;
 }
 
-.help-launcher:focus-visible {
-  outline: 3px solid rgba(181, 132, 47, 0.48);
-  outline-offset: 2px;
-}
-
-.help-launcher span {
-  font-size: 1rem;
+.help-launcher span,
+.info-button span {
+  font-size: 0.9rem;
   font-weight: 800;
   line-height: 1;
 }
 
 .shell-icon-button {
-  width: 2.35rem;
-  height: 2.35rem;
+  width: 2.2rem;
+  height: 2.2rem;
   display: inline-grid;
+  flex: 0 0 auto;
   place-items: center;
-  border: 1px solid rgba(62, 72, 66, 0.28);
+  border: 1px solid rgba(62, 72, 66, 0.3);
   border-radius: 999px;
   color: #48504b;
   background: #e7e5df;
-  box-shadow: 0 1px 2px rgba(25, 31, 27, 0.08);
+  box-shadow: 0 1px 2px rgba(25, 31, 27, 0.1);
   cursor: pointer;
 }
 
-.shell-icon-button:hover {
-  border-color: rgba(144, 105, 38, 0.55);
+.shell-icon-button:hover:not(:disabled) {
+  border-color: rgba(144, 105, 38, 0.65);
   background: #f3efe6;
+}
+
+.shell-icon-button:disabled {
+  opacity: 0.42;
+  cursor: default;
 }
 
 .shell-icon-button:focus-visible {
@@ -55,13 +56,64 @@
 }
 
 .shell-icon-button svg {
-  width: 1.05rem;
-  height: 1.05rem;
+  width: 1rem;
+  height: 1rem;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.shell-icon-button.primary-icon {
+  color: #272116;
+  border-color: #b98d3c;
+  background: #dfbd76;
+}
+
+.shell-icon-button.primary-icon:hover:not(:disabled) {
+  background: #e9ca88;
+}
+
+.window-close-button {
+  color: #713d36;
+  border-color: rgba(119, 60, 53, 0.38);
+  background: #ead8d4;
+}
+
+.window-close-button:hover:not(:disabled) {
+  color: #562b26;
+  border-color: rgba(119, 60, 53, 0.65);
+  background: #f3e2de;
+}
+
+.info-control {
+  position: relative;
+  display: inline-flex;
+}
+
+.info-button {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: #5c584d;
+  background: #ece9e1;
+}
+
+.info-popover {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  z-index: 45;
+  width: min(310px, 70vw);
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #4c554e;
+  border-radius: 9px;
+  color: #e8ede6;
+  background: #242a23;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.32);
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.4;
 }
 
 .quick-start-dialog {
@@ -187,6 +239,11 @@
 }
 
 @media (max-width: 640px) {
+  .window-controls {
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+
   .quick-start-panel {
     padding: 0.75rem;
   }
