@@ -26,8 +26,8 @@ use commands::{
     },
     performance::get_performance_snapshot,
     posts::{
-        append_post_revision, approve_post_revision, create_post, get_post_lineage,
-        link_post_supporting_material, list_posts,
+        append_post_revision, approve_post_revision, create_post, generate_post_from_topic,
+        get_post_lineage, link_post_supporting_material, list_posts,
     },
     preferences::{
         clear_last_vault, get_default_vault_root, get_last_import_directory, get_last_vault_path,
@@ -133,6 +133,7 @@ pub fn run() {
             list_topic_link_targets,
             create_post,
             list_posts,
+            generate_post_from_topic,
             append_post_revision,
             approve_post_revision,
             get_post_lineage,
