@@ -10,15 +10,15 @@ export const QUICK_START_SECTIONS: QuickStartSection[] = [
   {
     id: "resume-seeds",
     title: "Resume bullets to memory seeds",
-    summary: "A strong bullet is often both a Story Seed and Proof Point.",
+    summary: "A strong bullet is often both a Story seed and Proof point.",
     steps: [
       "Open Capture and choose Resume bullet. Existing captured notes can be re-tagged without changing the saved text.",
       "Paste one resume bullet and save it unchanged. Keeping the original wording preserves useful provenance.",
-      "Mark Story Seed when there is a situation, decision, challenge, or result worth unpacking. Mark Proof Point when the bullet contains a concrete fact, metric, scale, or outcome worth citing. Many strong bullets should be both.",
-      "Open Stories. Classified bullets remain visible under Memory seeds. Use the develop icon to open the guided Story Seed flow.",
+      "Mark Story seed when there is a situation, decision, challenge, or result worth unpacking. Mark Proof point when the bullet contains a concrete fact, metric, scale, or outcome worth citing. Many strong bullets should be both.",
+      "Open Stories. Classified bullets remain visible under Memory seeds. Use the develop icon to open the guided Story seed flow.",
       "Answer only what you remember. Preserve uncertainty rather than filling gaps, then create the developing Story when the guided pass is ready.",
     ],
-    tip: "Proof Point is not a lesser Story Seed. It is reusable evidence. Add Story Seed when there is a story behind the fact.",
+    tip: "Proof point is not a lesser Story seed. It is reusable evidence. Add Story seed when there is a story behind the fact.",
   },
   {
     id: "writing-samples",
@@ -30,7 +30,7 @@ export const QUICK_START_SECTIONS: QuickStartSection[] = [
       "Open Voice, confirm the accurate authorship state, and approve the sample for voice. Only explicitly eligible Voice Evidence can shape Core Voice.",
       "After several samples are eligible, use Analyze Voice Evidence if you want the configured provider to propose attributable style observations for review.",
     ],
-    tip: "Do not tag a writing sample as Story Seed or Proof Point merely to say 'this is how I write.' Those roles mean something different.",
+    tip: "Do not tag a writing sample as Story seed or Proof point merely to say 'this is how I write.' Those roles mean something different.",
   },
   {
     id: "capture",
@@ -59,7 +59,7 @@ export const QUICK_START_SECTIONS: QuickStartSection[] = [
     steps: [
       "Open Settings in the lower-left navigation to configure the local Ollama provider and model.",
       "Provider use is explicit and WorkLore does not silently fall back to cloud execution.",
-      "Capture, classification, and Story Seed development remain local and provider-free.",
+      "Capture, classification, and Story seed development remain local and provider-free.",
     ],
   },
   {
