@@ -187,11 +187,11 @@ async fn run_structured_once(
         .json(&json!({
             "model": model_id,
             "messages": [
-                {"role": "system", "content": request.system_prompt},
-                {"role": "user", "content": request.user_prompt}
+                {"role": "system", "content": &request.system_prompt},
+                {"role": "user", "content": &request.user_prompt}
             ],
             "stream": false,
-            "format": request.response_schema,
+            "format": &request.response_schema,
             "options": {"temperature": 0}
         }))
         .send()
