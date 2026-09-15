@@ -1,3 +1,35 @@
+.compact-workspace-panel {
+  padding: 0.85rem;
+  color: #273129;
+  background: #f8f5ee;
+}
+
+.compact-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2rem;
+}
+
+.compact-section-heading h2 {
+  margin: 0;
+  color: #263029;
+  font-size: 1.1rem;
+}
+
+.compact-workspace-panel .inline-create-row input {
+  color: #263029;
+  border-color: #b2b5ae;
+  background: #fffdfa;
+}
+
+.compact-empty-state {
+  padding: 0.8rem 0.15rem;
+  color: #69736d;
+  font-size: 0.8rem;
+}
+
 .topic-panel {
   margin-top: 0;
   padding: 0.9rem;
