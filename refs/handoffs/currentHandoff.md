@@ -1,7 +1,7 @@
 ---
 type: Handoff
 title: Current WorkLore Handoff
-description: Accepted v0.1.3 runtime QA checkpoint for Stories readability and action-first governed Voice learning.
+description: Runtime QA checkpoint covering Stories readability, Voice action ordering, governed writing-sample analysis, and structured Ollama model routing.
 status: draft
 tags: [handoff, worklore]
 ---
@@ -25,91 +25,94 @@ Locked boundaries remain:
 - confidentiality transformation remains derived and non-destructive;
 - Evidence, Inspiration, Target Context, and Voice Evidence remain semantically distinct;
 - resume import remains optional bootstrap rather than the product center;
-- provider selection remains explicit, with local Ollama first-class and no silent fallback;
+- provider selection remains explicit, with local Ollama first-class and no silent provider fallback;
+- local structured-output operations may retry other installed Ollama text-generation models when the configured model cannot satisfy the JSON contract; the actual successful model must remain in provenance;
 - the Private Entity Registry remains the privacy source of truth;
 - no fake AI/human probability or opaque quality score.
 
-## Fully Green Accepted Checkpoint
-
-Accepted implementation SHA:
+## Last Fully Green Accepted Checkpoint
 
 `ab1eeaea21bc31c4921279ff1e973b0e49e91465`
 
-QA build version: `0.1.3`.
-
 Validation:
 
-- Actions `35011151906` (`Validate WorkLore` run 329)
+- Actions `35011151906`
 - Job `104523135322`
 - frontend: 11 passed / 0 failed across 5 files
-- production frontend build: green, 72 modules transformed
+- production frontend build: green
 - Rust: 131 passed / 0 failed
 - warnings-denied Clippy: green
 - rustfmt: green
-- external build layout: green
-- case-collision: green, 245 tracked paths
-- refs/OKF/path-safety validation: green
-- bounded agent context: green, 5090 / 8000 characters
-- repository/source-only check: green
+- build-layout, refs/OKF/path-safety, bounded agent context, case-collision, and repository/source-only checks: green
 
-The handoff documentation commits above this SHA are documentation-only. Treat `ab1eeaea21bc31c4921279ff1e973b0e49e91465` as the exact accepted implementation checkpoint for runtime QA.
+This remains the accepted checkpoint until the current structured-model-routing remediation head passes fresh full validation.
 
-## What v0.1.3 Fixed
+## Current QA Remediation
 
-1. **Sidebar version visibility**
-   - Version text is real selectable DOM content in sidebar flow rather than CSS-generated pseudo-content below Settings.
+The current `dev` head contains an additional observed runtime QA fix. Treat it as pending until fresh full validation is green.
 
-2. **Stories readability**
-   - Story Seed development owns explicit readable foreground, helper, textarea, placeholder, and control colors on its light surface.
+### Structured Ollama model routing
 
-3. **Voice action ordering**
-   - New or pending writing-sample review is the primary `Needs your review` queue.
-   - Approved, rejected, retired, and otherwise governed material no longer crowds the primary action surface.
-   - Historical/reviewed evidence remains accessible in a collapsed evidence library.
-   - Queue grouping has deterministic frontend coverage.
+Observed defect:
 
-4. **Voice analysis clarity**
-   - The old low-level `Analyze Voice Evidence` picker is reframed as `Learn from approved writing`.
-   - Eligible approved samples are selected by default.
-   - Sample selection and optional guidance are progressive-disclosure controls rather than the main task.
-   - The checkbox layout regression caused by generic input width is corrected.
+- `Analyze approved writing` failed because the configured Ollama model returned output that did not parse as the requested structured JSON contract even though multiple local models were installed.
 
-5. **Writing-sample learning capability**
-   - Local Ollama voice analysis contract v2 returns two separate review-only categories:
-     - evidence-backed Core Voice trait suggestions;
-     - evidence-backed Writing Rule suggestions.
-   - Nothing is saved automatically.
-   - Accepted Core Voice traits use the governed trait path and preserve evidence links.
-   - Accepted Writing Rule suggestions are saved only as `proposed`; activation remains a separate explicit action.
-   - Weak or inconsistent evidence may yield zero suggestions.
-   - Provider output remains non-authoritative and does not produce confidence percentages or human-vs-AI scores.
+Current remediation:
+
+- the configured Ollama model remains the preferred first attempt;
+- structured-output operations can retry a bounded set of other installed local text-generation models after `invalid_structured_output` or `model_unavailable` failures;
+- likely embedding-only models are excluded from fallback candidates;
+- alternatives are deterministically ranked, favoring model families that commonly follow structured-output instructions well;
+- retries remain inside the explicitly selected local Ollama provider and never cross to cloud or another provider;
+- provider/server/auth/request-size failures do not trigger model spraying;
+- the actual successful fallback model is preserved in Voice analysis results, Post lineage, and provider-run audit metadata;
+- Voice analysis operation contract version is now 3;
+- deterministic Rust coverage protects candidate ordering and retryable-error boundaries.
+
+The existing v0.1.3 runtime remediation remains in place:
+
+1. Sidebar version is real selectable DOM content inside sidebar flow.
+2. Story Seed development owns explicit readable light-surface colors.
+3. Voice unfinished review work is action-first; reviewed evidence is moved out of the primary queue.
+4. `Learn from approved writing` replaces the low-level evidence picker framing.
+5. Approved samples are selected by default and trait/rule suggestions remain review-only.
 
 ## Current Task State
 
 - `task-032`: complete. Explicit durable edit-learning accept/reject governance is accepted.
 - `task-033`: in progress. Broader cross-draft and portfolio rules still wait for meaningful real corpus evidence.
 - `task-034`: complete. Provider-free confidentiality transformation preserves private canonical truth.
-- `task-035`: in progress. Topic-to-Post generation exists; current work remains bounded runtime UX/correctness dogfood.
+- `task-035`: in progress. Topic-to-Post generation exists; current work is bounded runtime UX/correctness dogfood.
 - `task-036`: complete for exact lineage/publication/performance association.
 - `task-037`: in progress. Manual performance snapshots and conservative Insights exist.
 
-## Immediate Next Step: Runtime QA
+## Immediate Next Step
 
-Pull current `dev` and exercise the accepted v0.1.3 behavior with real local material:
+Run full validation against current `dev` before asking the user to resume QA:
 
-1. confirm `v0.1.3` is fully visible and selectable in the sidebar;
-2. reopen Story Seed development and verify all text and controls remain readable;
-3. open Voice and confirm `Needs your review` contains only unfinished work;
-4. confirm approved/rejected/retired Voice Evidence remains accessible without dominating the page;
-5. run `Learn from approved writing` through the explicitly selected local Ollama model;
-6. confirm eligible approved samples are selected by default and sample-selection options remain understandable when expanded;
-7. confirm suggestions are separated into Core Voice traits and Writing Rules;
-8. accept one trait and verify it requires a proposed Core Voice version and preserves evidence links;
-9. accept one Writing Rule and verify it lands as `proposed`, not active;
-10. discard other suggestions and verify no canonical mutation occurs;
-11. restart/reopen and verify accepted governed state persists while unaccepted provider suggestions do not become canonical history.
+```powershell
+python scripts/check-case-collisions.py
+git diff --check
+python refs/tools/validate_refs.py --mode initialized
+python refs/tools/generate_agent_context.py --check
+npm run test
+npm run build:frontend
+cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
+cargo test --manifest-path src-tauri/Cargo.toml
+cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
+./scripts/assert-repo-clean.ps1
+```
 
-Fix only concrete correctness, provenance, privacy, recoverability, or blocking UX defects observed during that QA. Do not broaden scope merely because planned features exist.
+If a check fails, fix only the concrete failure and rerun validation. Preserve draft PR #1 as `dev -> qa` and do not promote `qa` or `main`.
+
+## Runtime QA Focus After Validation
+
+1. Re-run `Analyze approved writing` with the currently configured local model.
+2. If that model cannot satisfy structured JSON, confirm WorkLore transparently succeeds through another installed Ollama text-generation model rather than surfacing the first JSON failure.
+3. Confirm returned suggestions remain separated into Core Voice traits and Writing Rules.
+4. Confirm the actual successful model appears in returned provenance/audit state rather than the originally configured model.
+5. Confirm non-model failures such as an unreachable Ollama server still fail immediately.
+6. Continue the previously accepted v0.1.3 QA path for sidebar visibility, Stories readability, Voice action ordering, explicit trait/rule acceptance, discard behavior, and restart/reopen persistence.
 
 ## Do Not Reopen
 
