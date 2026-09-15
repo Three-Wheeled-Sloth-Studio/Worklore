@@ -44,11 +44,7 @@ pub async fn generate_post_from_topic(
 
     let result = generate_inner(vault_path, &request, &run_id).await;
     let (outcome, error_code, post_id) = match &result {
-        Ok(value) => (
-            "succeeded",
-            None,
-            Some(value.lineage.post.post_id.as_str()),
-        ),
+        Ok(value) => ("succeeded", None, Some(value.lineage.post.post_id.as_str())),
         Err(WorkLoreError::ProviderOperation { code, .. }) => ("failed", Some(*code), None),
         Err(_) => ("failed", Some("input_validation_failed"), None),
     };
@@ -360,7 +356,8 @@ mod tests {
     use crate::services::{topic_service::CreateTopicRequest, vault_service};
 
     fn vault() -> std::path::PathBuf {
-        let path = std::env::temp_dir().join(format!("worklore-post-generation-{}", Uuid::now_v7()));
+        let path =
+            std::env::temp_dir().join(format!("worklore-post-generation-{}", Uuid::now_v7()));
         vault_service::create_vault(&path, "Post Generation Test").expect("create vault");
         path
     }
@@ -372,7 +369,8 @@ mod tests {
             &path,
             CreateTopicRequest {
                 title: "Trust on a new team".to_string(),
-                summary: "How product leaders establish credibility before changing process.".to_string(),
+                summary: "How product leaders establish credibility before changing process."
+                    .to_string(),
                 timing_class: topic_service::TopicTimingClass::Evergreen,
                 relevant_until: None,
                 timely_note: None,
@@ -387,12 +385,18 @@ mod tests {
 
     #[test]
     fn topic_relationships_map_to_distinct_post_support_roles() {
-        assert_eq!(support_role(TopicRelationKind::Story), PostSupportRole::Story);
+        assert_eq!(
+            support_role(TopicRelationKind::Story),
+            PostSupportRole::Story
+        );
         assert_eq!(
             support_role(TopicRelationKind::ProofPoint),
             PostSupportRole::ProofPoint
         );
-        assert_eq!(support_role(TopicRelationKind::Theme), PostSupportRole::Theme);
+        assert_eq!(
+            support_role(TopicRelationKind::Theme),
+            PostSupportRole::Theme
+        );
         assert_eq!(
             support_role(TopicRelationKind::Inspiration),
             PostSupportRole::Inspiration
