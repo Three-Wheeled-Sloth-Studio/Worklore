@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use crate::{
     domain::posts::{
         AppendPostRevisionRequest, ApprovePostRevisionRequest, CreatePostRequest,
+        GeneratePostFromTopicRequest, GeneratePostFromTopicResult,
         LinkPostSupportingMaterialRequest, PostLineageView, PostRecordView,
     },
     error::{CommandError, CommandResult, WorkLoreError},
@@ -11,7 +12,7 @@ use crate::{
             self, ConfidentialityState, ConfidentialityTransformRequest,
             ConfidentialityTransformResult,
         },
-        post_catalog_service, post_lineage_service,
+        post_catalog_service, post_generation_service, post_lineage_service,
     },
 };
 
@@ -27,6 +28,16 @@ pub fn create_post(
 #[tauri::command]
 pub fn list_posts(vault_path: String) -> CommandResult<Vec<PostRecordView>> {
     post_catalog_service::list_posts(&PathBuf::from(vault_path)).map_err(CommandError::from)
+}
+
+#[tauri::command]
+pub async fn generate_post_from_topic(
+    vault_path: String,
+    request: GeneratePostFromTopicRequest,
+) -> CommandResult<GeneratePostFromTopicResult> {
+    post_generation_service::generate_post_from_topic(&PathBuf::from(vault_path), request)
+        .await
+        .map_err(CommandError::from)
 }
 
 #[tauri::command]
