@@ -44,15 +44,11 @@ Validation:
 - rustfmt: green
 - build-layout, refs/OKF/path-safety, bounded agent context, case-collision, and repository/source-only checks: green
 
-This remains the accepted checkpoint until the current QA remediation candidate passes fresh full validation.
+This remains the accepted checkpoint until the current QA remediation head passes fresh full validation.
 
-## Current QA Remediation Candidate
+## Current QA Remediation
 
-The implementation candidate beneath these handoff docs is:
-
-`4ec5e0bd4558c6c0bb003818b4e9d8e389f767ed`
-
-Additional handoff-only commits follow it. Do not mark the newer head accepted until fresh validation is green.
+The current `dev` head contains the observed runtime QA fixes below. Treat it as pending until fresh full validation is green.
 
 Version remains `0.1.2`.
 
