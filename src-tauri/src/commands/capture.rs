@@ -3,8 +3,9 @@ use std::path::PathBuf;
 use crate::{
     domain::models::SourceType,
     error::{CommandError, CommandResult},
-    services::capture_service::{
-        self, CaptureClassificationResult, CaptureRole, CaptureSourceView,
+    services::{
+        capture_metadata_service,
+        capture_service::{self, CaptureClassificationResult, CaptureRole, CaptureSourceView},
     },
 };
 
@@ -29,6 +30,20 @@ pub fn get_capture_source(
 ) -> CommandResult<CaptureSourceView> {
     capture_service::get_capture_source(&PathBuf::from(vault_path), &source_id)
         .map_err(CommandError::from)
+}
+
+#[tauri::command]
+pub fn update_capture_source_type(
+    vault_path: String,
+    source_id: String,
+    source_type: SourceType,
+) -> CommandResult<CaptureSourceView> {
+    capture_metadata_service::update_capture_source_type(
+        &PathBuf::from(vault_path),
+        &source_id,
+        source_type,
+    )
+    .map_err(CommandError::from)
 }
 
 #[tauri::command]
