@@ -88,10 +88,7 @@ mod tests {
 
     #[test]
     fn captured_text_can_be_retagged_without_rewriting_the_source() {
-        let path = std::env::temp_dir().join(format!(
-            "worklore-capture-retag-{}",
-            Uuid::now_v7()
-        ));
+        let path = std::env::temp_dir().join(format!("worklore-capture-retag-{}", Uuid::now_v7()));
         vault_service::create_vault(&path, "Capture Retag Test").unwrap();
         let created = capture_service::create_capture_source(
             &path,
@@ -100,8 +97,8 @@ mod tests {
         )
         .unwrap();
 
-        let updated = update_capture_source_type(&path, &created.source_id, SourceType::Resume)
-            .unwrap();
+        let updated =
+            update_capture_source_type(&path, &created.source_id, SourceType::Resume).unwrap();
 
         assert_eq!(updated.source_type, SourceType::Resume);
         assert_eq!(updated.text, created.text);
