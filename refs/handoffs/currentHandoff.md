@@ -50,7 +50,7 @@ This remains the accepted checkpoint until the current QA remediation head passe
 
 The current `dev` head contains the observed runtime QA fixes below. Treat it as pending until fresh full validation is green.
 
-QA build version is `0.1.3`.
+QA build version is `0.1.3`. The package, Tauri manifest, and visible sidebar marker are aligned to that version.
 
 ### Runtime QA defects addressed
 
