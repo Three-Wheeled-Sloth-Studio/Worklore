@@ -51,11 +51,8 @@ pub fn list_captures(
     vault_path: String,
     limit: Option<u32>,
 ) -> CommandResult<Vec<CaptureSourceView>> {
-    capture_catalog_service::list_captures(
-        &PathBuf::from(vault_path),
-        limit.unwrap_or(50) as usize,
-    )
-    .map_err(CommandError::from)
+    capture_catalog_service::list_captures(&PathBuf::from(vault_path), limit.unwrap_or(50) as usize)
+        .map_err(CommandError::from)
 }
 
 #[tauri::command]
