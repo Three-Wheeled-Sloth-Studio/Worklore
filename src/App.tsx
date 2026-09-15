@@ -63,6 +63,8 @@ import { LIBRARY_NAV_ITEMS, PRIMARY_NAV_ITEMS, SETTINGS_NAV_ITEM } from "./navig
 import "./styles.css";
 import "./shell.css";
 
+const APP_VERSION = "0.1.2";
+
 const SOURCE_TYPES: Array<{ value: SourceType; label: string }> = [
   { value: "resume", label: "Resume" },
   { value: "job_description", label: "Job description" },
@@ -818,6 +820,7 @@ function App() {
               <small>AI providers</small>
             </span>
           </button>
+          <span className="shell-version" aria-label={`WorkLore version ${APP_VERSION}`}>v{APP_VERSION}</span>
         </aside>
 
         <section className="shell-content">
