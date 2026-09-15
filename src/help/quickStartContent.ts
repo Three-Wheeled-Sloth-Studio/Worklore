@@ -12,10 +12,10 @@ export const QUICK_START_SECTIONS: QuickStartSection[] = [
     title: "Resume bullets to memory seeds",
     summary: "Start with one resume bullet at a time.",
     steps: [
-      "Open Capture. Leave the source type as Note or pasted text.",
-      "Paste one resume bullet and save it unchanged. Keeping the original wording preserves useful provenance.",
-      "Link it as a Story seed when it points to a situation, decision, or result you can expand. Link it as a Proof point when it is compact evidence such as a metric, scale, or outcome. A capture may support both roles.",
-      "For a Story seed, choose Develop this story seed. Answer only what you remember, mark the evidence level honestly, and use I do not remember or Skip for now when appropriate.",
+      "Open Capture, choose Resume bullet, paste one bullet, and save it unchanged. Existing captured notes can be re-tagged as Resume bullet without rewriting the saved text.",
+      "Use Story seed when the bullet points to a situation, decision, challenge, or result worth unpacking. Use Proof point when it contains a concrete fact, metric, scale, or outcome worth citing. A bullet may be both.",
+      "For most substantial resume bullets, start with Story seed and also add Proof point when the bullet carries a specific result or metric.",
+      "For a Story seed, choose Develop story. Answer only what you remember, mark the evidence level honestly, and use I do not remember or Skip for now when appropriate.",
       "When the guided pass is complete, create the developing Story. The original bullet remains part of the lineage.",
     ],
     tip: "Do not polish the resume bullet before capture. Add context during development instead of rewriting the source evidence.",
@@ -55,7 +55,7 @@ export const QUICK_START_SECTIONS: QuickStartSection[] = [
     title: "AI is optional",
     summary: "WorkLore remains useful without a provider.",
     steps: [
-      "Open AI settings from the gear icon in the upper-right header.",
+      "Open AI settings from Settings in the lower-left navigation.",
       "Ollama is the current local provider path. Provider use is explicit and WorkLore does not silently fall back to cloud execution.",
       "Professional-memory capture, classification, and Story Seed development work without an AI provider.",
     ],
@@ -65,7 +65,8 @@ export const QUICK_START_SECTIONS: QuickStartSection[] = [
     title: "Draft, publish, learn",
     summary: "Keep the human approval boundary explicit.",
     steps: [
-      "Posts supports drafting, deterministic challenge checks, revision history, and explicit approval of one exact public-safe revision.",
+      "Open Posts, choose a Topic, and use Generate. The resulting first draft is model-origin and remains subject to your review.",
+      "Posts supports deterministic challenge checks, revision history, and explicit approval of one exact public-safe revision.",
       "Publish manually outside WorkLore, then record that publication in Insights.",
       "Add real performance metrics as they become available. WorkLore keeps early observations descriptive until there is enough evidence for stronger conclusions.",
     ],
