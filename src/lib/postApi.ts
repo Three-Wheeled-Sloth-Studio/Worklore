@@ -3,6 +3,8 @@ import type {
   AppendPostRevisionRequest,
   ApprovePostRevisionRequest,
   CreatePostRequest,
+  GeneratePostFromTopicRequest,
+  GeneratePostFromTopicResult,
   LinkPostSupportingMaterialRequest,
   PostLineageView,
   PostRecordView,
@@ -17,6 +19,16 @@ export function createPost(
 
 export function listPosts(vaultPath: string): Promise<PostRecordView[]> {
   return invoke<PostRecordView[]>("list_posts", { vaultPath });
+}
+
+export function generatePostFromTopic(
+  vaultPath: string,
+  request: GeneratePostFromTopicRequest,
+): Promise<GeneratePostFromTopicResult> {
+  return invoke<GeneratePostFromTopicResult>("generate_post_from_topic", {
+    vaultPath,
+    request,
+  });
 }
 
 export function appendPostRevision(
