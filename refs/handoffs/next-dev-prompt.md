@@ -1,7 +1,7 @@
 ---
 type: Handoff Prompt
 title: Next WorkLore Development Slice
-description: Validate the observed QA remediation slice, then resume bounded runtime QA on Stories and Voice.
+description: Resume bounded runtime QA from the fully green v0.1.3 Stories and Voice remediation checkpoint.
 status: draft
 tags: [handoff, next-slice]
 ---
@@ -23,19 +23,32 @@ The governing loop remains:
 
 Read `refs/handoffs/currentHandoff.md` first.
 
-Last fully green accepted implementation:
+Fully green accepted implementation:
 
-`3615b21c5abd59c02791cd8b3bb2ffebfed51281`
+`ab1eeaea21bc31c4921279ff1e973b0e49e91465`
 
-The current newer `dev` head contains observed runtime QA remediation and must pass fresh full validation before becoming the next accepted checkpoint. QA build version is `0.1.3`; package, Tauri manifest, and visible sidebar marker are aligned.
+QA build version: `0.1.3`.
 
-The remediation covers:
+Validation:
+
+- Actions `35011151906`
+- Job `104523135322`
+- frontend: 11/11 across 5 files
+- frontend production build: green, 72 modules transformed
+- Rust: 131/131
+- Clippy: green
+- rustfmt: green
+- build layout, case-collision, refs/OKF/path-safety, bounded agent context, and repository/source-only checks: green
+
+The documentation commits above the accepted implementation SHA are documentation-only.
+
+The accepted remediation covers:
 
 - selectable, in-flow sidebar version display;
 - readable Story Seed development colors;
 - action-first Voice review ordering;
 - approved/past Voice Evidence moved out of the primary action queue while remaining accessible;
-- a coherent `Learn from approved writing` flow with all eligible samples selected by default;
+- a coherent `Learn from approved writing` flow with eligible approved samples selected by default;
 - fixed Voice Evidence checkbox layout;
 - local provider analysis contract v2 returning separate review-only Core Voice trait and Writing Rule suggestions;
 - explicit acceptance only, with inferred Writing Rules landing as `proposed`, never auto-active;
@@ -48,14 +61,32 @@ Do not reread repository history.
 First run:
 
 ```powershell
-python refs/tools/generate_agent_context.py --focus "WorkLore runtime QA Stories readability Voice action queue approved writing analysis trait writing rule proposals explicit acceptance"
+python refs/tools/generate_agent_context.py --focus "WorkLore v0.1.3 runtime QA Stories readability Voice action queue approved writing analysis trait writing rule proposals explicit acceptance"
 ```
 
 Treat the packet as derived orientation, not source of truth. Follow it only into files needed for a concrete observed defect.
 
-## Immediate Objective 1: Validate Current Candidate
+## Immediate Objective: Resume Runtime QA
 
-Run the full normal validation set against current `dev`:
+Ask the user to pull current `dev` and exercise the accepted v0.1.3 behavior with real local material:
+
+1. Verify `v0.1.3` is fully visible and selectable in the sidebar.
+2. Reopen Story Seed development and verify heading, summary, progress, question, answer field, evidence controls, actions, and helper copy remain readable.
+3. Open Voice and confirm `Needs your review` contains only unfinished work.
+4. Confirm approved/rejected/retired Voice Evidence remains accessible in the collapsed evidence library without dominating the top of the page.
+5. Run `Learn from approved writing` through the explicitly selected local Ollama model.
+6. Confirm all eligible approved samples are selected by default and the sample-selection UI remains understandable when expanded.
+7. Confirm provider output is separated into Core Voice trait suggestions and Writing Rule suggestions.
+8. Accept one trait. It must require a proposed Core Voice version and preserve evidence links.
+9. Accept one Writing Rule. It must be saved as `proposed`, not active.
+10. Discard suggestions and confirm no canonical mutation occurs.
+11. Restart/reopen and verify accepted governed state persists while unaccepted provider suggestions do not become canonical history.
+
+Continue beyond this only when runtime QA exposes another concrete correctness, provenance, privacy, recoverability, or blocking UX defect.
+
+## When A Defect Is Found
+
+Fix the smallest reproducible defect. Add deterministic coverage where practical, then run the normal validation set before declaring a new accepted implementation checkpoint:
 
 ```powershell
 python scripts/check-case-collisions.py
@@ -69,26 +100,6 @@ cargo test --manifest-path src-tauri/Cargo.toml
 cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
 ./scripts/assert-repo-clean.ps1
 ```
-
-If validation fails, fix only the concrete failure and rerun the relevant checks. Do not widen scope while validation is red.
-
-## Immediate Objective 2: Resume Runtime QA
-
-After validation is green, ask the user to pull the exact accepted `dev` SHA and focus on the defects just reported:
-
-1. Verify `v0.1.3` is fully visible and selectable in the sidebar.
-2. Reopen Story Seed development and verify heading, summary, progress, question, answer field, evidence controls, actions, and helper copy remain readable.
-3. Open Voice and confirm `Needs your review` contains only unfinished work.
-4. Confirm approved/rejected/retired Voice Evidence remains accessible in the collapsed evidence library without dominating the top of the page.
-5. Run `Learn from approved writing` through the explicitly selected local Ollama model.
-6. Confirm all eligible samples are selected by default and the sample-selection UI is understandable when expanded.
-7. Confirm provider output is separated into Core Voice trait suggestions and Writing Rule suggestions.
-8. Accept one trait. It must require a proposed Core Voice version and preserve evidence links.
-9. Accept one Writing Rule. It must be saved as `proposed`, not active.
-10. Discard suggestions and confirm no canonical mutation occurs.
-11. Restart/reopen and verify accepted governed state persists while unaccepted provider suggestions do not become canonical history.
-
-Continue beyond this only when runtime QA exposes another concrete correctness, provenance, privacy, recoverability, or blocking UX defect.
 
 ## Locked Constraints
 
@@ -110,4 +121,4 @@ Continue beyond this only when runtime QA exposes another concrete correctness, 
 
 ## Stop Point
 
-Stop after the current candidate is fully validated and handed back for runtime QA, or after a newly observed blocker is reproduced, fixed, tested, and documented. Do not convert pending validation or unobserved behavior into an accepted claim.
+Stop after a newly observed blocker is reproduced, fixed, tested, and documented, or when runtime traversal reaches the next genuine external boundary. Do not invent history or broaden scope simply to keep moving.
