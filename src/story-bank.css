@@ -1,0 +1,153 @@
+.story-bank-panel {
+  grid-column: 1 / -1;
+  padding: 0.65rem;
+  border-color: #c8c1b4;
+  background: #f8f6f0;
+  color: #273129;
+}
+
+.story-bank-panel h2,
+.story-bank-panel h3,
+.story-bank-panel strong {
+  color: #202921;
+}
+
+.story-seed-section,
+.story-bank-section {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.55rem;
+}
+
+.compact-subheading {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.compact-subheading h3 {
+  margin: 0;
+  font-size: 0.86rem;
+}
+
+.story-seed-list,
+.story-bank-list {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.story-seed-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.55rem;
+  padding: 0.42rem 0.5rem;
+  border: 1px solid #d2ccc0;
+  border-radius: 8px;
+  background: #fffdf8;
+}
+
+.story-seed-copy {
+  min-width: 0;
+  display: grid;
+  gap: 0.05rem;
+}
+
+.story-seed-copy strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.82rem;
+}
+
+.story-seed-copy span {
+  color: #667169;
+  font-size: 0.68rem;
+}
+
+.story-card {
+  padding: 0.5rem 0.55rem;
+  border: 1px solid #d2ccc0;
+  border-radius: 8px;
+  background: #fffdf8;
+}
+
+.story-card.finalized {
+  border-color: #9da993;
+  background: #f7faf4;
+}
+
+.story-card.archived {
+  opacity: 0.68;
+}
+
+.story-card-heading,
+.story-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.story-card-heading h3 {
+  margin: 0;
+  font-size: 0.88rem;
+}
+
+.story-role {
+  margin: 0.08rem 0 0;
+  color: #746342;
+  font-size: 0.65rem;
+  font-weight: 680;
+}
+
+.story-card-badges,
+.story-actions,
+.story-metrics {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.story-card-badges {
+  justify-content: flex-end;
+}
+
+.story-summary {
+  margin: 0.3rem 0 0;
+  color: #56635c;
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+
+.story-card-footer {
+  margin-top: 0.35rem;
+  padding-top: 0.3rem;
+  border-top: 1px solid #e1ddd4;
+}
+
+.story-status {
+  color: #6c756f;
+  font-size: 0.66rem;
+}
+
+.story-bank-panel .status-pill {
+  border-color: #c9c4b9;
+  color: #4f5a53;
+  background: #efede7;
+}
+
+@media (max-width: 850px) {
+  .story-card-heading,
+  .story-card-footer,
+  .story-seed-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .story-card-badges,
+  .story-actions {
+    justify-content: flex-start;
+  }
+}

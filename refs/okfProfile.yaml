@@ -1,0 +1,63 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+updated: 2026-09-12
+okf:
+  version: "0.2"
+  canonical_repository: https://github.com/GoogleCloudPlatform/open-knowledge-format
+  baseline_commit: ad30107c31c06aec8a7d5636e0d1058118604e6f
+agent_academy:
+  baseline_commit: ec9e166470f749d890656f10031a3056a05ab729
+  profile: agent-academy-okf-v1
+bundle:
+  root: refs
+  title: WorkLore Knowledge Bundle
+  reserved_files:
+    - index.md
+    - log.md
+authority:
+  operating_instructions: refs/agents.yaml
+  deterministic_state:
+    - refs/project.yaml
+    - refs/planning
+    - refs/architecture
+    - refs/product
+    - refs/implementation
+    - refs/testing
+    - refs/UI
+    - refs/security
+    - refs/handoffs
+  okf_concepts: Markdown files under refs except reserved index.md and log.md files.
+compatibility:
+  preserve_yaml_state: true
+  unknown_okf_fields_tolerated: true
+  richer_project_relationships_remain_authoritative: true
+  migration_policy: additive_non_destructive
+  legacy_markdown_without_frontmatter:
+    - refs/UI/designPrinciples.md
+    - refs/architecture/buildSeparation.md
+    - refs/architecture/localVsHosted.md
+    - refs/architecture/operationInstrumentation.md
+    - refs/architecture/overview.md
+    - refs/architecture/privateEntityRegistry.md
+    - refs/architecture/providerArchitecture.md
+    - refs/architecture/standalone-deployment-contract.md
+    - refs/architecture/vaultFormat.md
+    - refs/product/prd.md
+    - refs/product/vision.md
+    - refs/security/encryptionPlan.md
+indexes:
+  generated: true
+  committed: true
+  generator: python refs/tools/generate_okf_indexes.py
+  check: python refs/tools/generate_okf_indexes.py --check
+  manual_edits_allowed: false
+provenance:
+  rules:
+    - Do not infer verified status from generation, Git history, tests, or refs validation.
+    - Add generated metadata only when producer identity and meaningful content-change time are known.
+    - Add verified only after an actor actually confirms the concept against its source or resource.
+    - Add sources only for materials the concept genuinely derives from.
+studio_catalog:
+  role: Derived discovery and navigation layer, never a source of project truth.
+  source_authority: Originating WorkLore repository and commit.
+  preserve_upstream_trust: true

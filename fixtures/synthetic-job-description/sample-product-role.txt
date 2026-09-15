@@ -1,0 +1,17 @@
+Senior Product Manager, Operational Intelligence
+
+The candidate will lead product strategy for data-informed workflow products used by distributed operational teams.
+
+Required experience:
+
+- Translating complex business problems into a clear product roadmap
+- Using analytics to expose broken workflow logic, not merely produce dashboards
+- Leading adoption of AI-assisted operational workflows
+- Working with engineering teams and coding agents through clear requirements and acceptance criteria
+- Communicating with senior stakeholders in regulated environments
+
+Preferred experience:
+
+- Local-first or privacy-sensitive applications
+- Complaint, case-management, health-care, or financial-services workflows
+- GitHub, SQL, data visualization, and modern product discovery methods

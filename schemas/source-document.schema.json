@@ -1,0 +1,230 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://worklore.local/schemas/source-document.schema.json",
+  "title": "WorkLore Source Document",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "sourceId",
+    "sourceType",
+    "displayName",
+    "storedPath",
+    "originalFileName",
+    "contentHash",
+    "importedAt",
+    "extraction",
+    "privacyScan",
+    "provenance"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "sourceId": {
+      "type": "string",
+      "pattern": "^source_[A-Za-z0-9_-]+$"
+    },
+    "sourceType": {
+      "type": "string",
+      "enum": [
+        "resume",
+        "job_description",
+        "writing_sample",
+        "interview_transcript",
+        "git_snapshot",
+        "other"
+      ]
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    },
+    "storedPath": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Vault-relative path to the copied source file."
+    },
+    "originalFileName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "originalPathHint": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Optional user-visible import location hint. Must not be required for portability."
+    },
+    "mediaType": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "byteSize": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "contentHash": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm",
+        "value"
+      ],
+      "properties": {
+        "algorithm": {
+          "type": "string",
+          "const": "sha256"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "importedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "extraction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "extractorVersion",
+        "textPath"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "complete",
+            "partial",
+            "unsupported",
+            "failed"
+          ]
+        },
+        "extractorVersion": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "textPath": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Vault-relative path to rebuildable extracted text."
+        },
+        "characterCount": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "error": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "privacyScan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "scanVersion",
+        "scannedAt",
+        "reviewItemIds"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "complete",
+            "needs_review",
+            "failed",
+            "unavailable"
+          ]
+        },
+        "scanVersion": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scannedAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "reviewItemIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^review_[A-Za-z0-9_-]+$"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "importMethod"
+      ],
+      "properties": {
+        "importMethod": {
+          "type": "string",
+          "enum": [
+            "file_copy",
+            "paste",
+            "generated_snapshot",
+            "manual_import"
+          ]
+        },
+        "parentSourceId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "notes": {
+          "type": "string",
+          "default": ""
+        }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "default": []
+    }
+  }
+}

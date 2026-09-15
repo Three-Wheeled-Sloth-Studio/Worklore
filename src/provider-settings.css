@@ -1,0 +1,16 @@
+.provider-settings {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.provider-config-grid {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 0.35rem;
+}
+
+.provider-note {
+  color: var(--text-muted, #666);
+  font-size: 0.9rem;
+  margin: 0;
+}
