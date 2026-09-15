@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{collections::HashSet, time::Duration};
 
 use reqwest::{Client, StatusCode, Url};
 use serde::Deserialize;
@@ -9,12 +9,20 @@ use crate::{
     error::{ServiceResult, WorkLoreError},
 };
 
+const MAX_STRUCTURED_MODEL_ATTEMPTS: usize = 6;
+
 #[derive(Debug, Clone)]
 pub struct StructuredProviderRequest {
     pub model_id: String,
     pub system_prompt: String,
     pub user_prompt: String,
     pub response_schema: Value,
+}
+
+#[derive(Debug)]
+pub struct StructuredProviderResponse {
+    pub model_id: String,
+    pub value: Value,
 }
 
 #[derive(Debug, Deserialize)]
@@ -127,12 +135,57 @@ pub async fn list_models(base_url: &str) -> ServiceResult<Vec<ProviderModelView>
 pub async fn run_structured(
     base_url: &str,
     request: StructuredProviderRequest,
-) -> ServiceResult<Value> {
+) -> ServiceResult<StructuredProviderResponse> {
     let base_url = normalize_base_url(base_url)?;
+    let installed_models = list_models(&base_url).await?;
+    let candidates = ordered_structured_model_ids(&request.model_id, &installed_models);
+    if candidates.is_empty() {
+        return Err(provider_error(
+            "model_unavailable",
+            "Ollama reports no installed local text-generation model for this structured operation.",
+        ));
+    }
+
+    let mut attempted = Vec::new();
+    let mut last_structured_error = None;
+    for model_id in candidates.into_iter().take(MAX_STRUCTURED_MODEL_ATTEMPTS) {
+        attempted.push(model_id.clone());
+        match run_structured_once(&base_url, &model_id, &request).await {
+            Ok(value) => return Ok(StructuredProviderResponse { model_id, value }),
+            Err(error) if retryable_structured_model_failure(&error) => {
+                last_structured_error = Some(error);
+            }
+            Err(error) => return Err(error),
+        }
+    }
+
+    if attempted.len() == 1 {
+        return Err(last_structured_error.unwrap_or_else(|| {
+            provider_error(
+                "invalid_structured_output",
+                "The selected Ollama model could not satisfy the requested structured-output contract.",
+            )
+        }));
+    }
+
+    Err(provider_error(
+        "invalid_structured_output",
+        format!(
+            "No installed local Ollama model tried by WorkLore could satisfy the structured-output contract. Tried: {}.",
+            attempted.join(", ")
+        ),
+    ))
+}
+
+async fn run_structured_once(
+    base_url: &str,
+    model_id: &str,
+    request: &StructuredProviderRequest,
+) -> ServiceResult<Value> {
     let response = client()?
         .post(format!("{base_url}/api/chat"))
         .json(&json!({
-            "model": request.model_id,
+            "model": model_id,
             "messages": [
                 {"role": "system", "content": request.system_prompt},
                 {"role": "user", "content": request.user_prompt}
@@ -159,6 +212,80 @@ pub async fn run_structured(
             "Ollama did not return JSON matching the requested structured-output contract.",
         )
     })
+}
+
+fn ordered_structured_model_ids(
+    preferred_model_id: &str,
+    installed_models: &[ProviderModelView],
+) -> Vec<String> {
+    let preferred = preferred_model_id.trim();
+    let mut ordered = Vec::new();
+    let mut seen = HashSet::new();
+
+    if !preferred.is_empty() {
+        ordered.push(preferred.to_string());
+        seen.insert(preferred.to_string());
+    }
+
+    let mut alternatives = installed_models
+        .iter()
+        .filter(|model| !seen.contains(&model.model_id))
+        .filter(|model| is_likely_text_generation_model(&model.model_id))
+        .map(|model| model.model_id.clone())
+        .collect::<Vec<_>>();
+    alternatives.sort_by(|left, right| {
+        structured_affinity_score(right)
+            .cmp(&structured_affinity_score(left))
+            .then_with(|| left.cmp(right))
+    });
+    ordered.extend(alternatives);
+    ordered
+}
+
+fn is_likely_text_generation_model(model_id: &str) -> bool {
+    let id = model_id.to_ascii_lowercase();
+    ![
+        "embed",
+        "embedding",
+        "nomic-embed",
+        "all-minilm",
+        "bge-",
+        "snowflake-arctic-embed",
+        "clip",
+    ]
+    .iter()
+    .any(|marker| id.contains(marker))
+}
+
+fn structured_affinity_score(model_id: &str) -> u8 {
+    let id = model_id.to_ascii_lowercase();
+    if id.contains("qwen3") {
+        100
+    } else if id.contains("qwen2.5") || id.contains("qwen2") {
+        95
+    } else if id.contains("llama3.3") || id.contains("llama3.2") || id.contains("llama3.1") {
+        90
+    } else if id.contains("mistral") || id.contains("ministral") {
+        85
+    } else if id.contains("gemma3") || id.contains("gemma2") {
+        80
+    } else if id.contains("phi4") {
+        75
+    } else if id.contains("deepseek-r1") || id.contains("reasoning") {
+        40
+    } else {
+        50
+    }
+}
+
+fn retryable_structured_model_failure(error: &WorkLoreError) -> bool {
+    matches!(
+        error,
+        WorkLoreError::ProviderOperation {
+            code: "invalid_structured_output" | "model_unavailable",
+            ..
+        }
+    )
 }
 
 fn client() -> ServiceResult<Client> {
@@ -224,6 +351,15 @@ pub fn provider_error(code: &'static str, message: impl Into<String>) -> WorkLor
 mod tests {
     use super::*;
 
+    fn model(id: &str) -> ProviderModelView {
+        ProviderModelView {
+            model_id: id.to_string(),
+            display_name: id.to_string(),
+            parameter_size: None,
+            quantization_level: None,
+        }
+    }
+
     #[test]
     fn local_ollama_urls_are_normalized_and_remote_hosts_are_rejected() {
         assert_eq!(
@@ -251,5 +387,48 @@ mod tests {
             WorkLoreError::ProviderOperation { code, .. } => assert_eq!(code, "rate_limited"),
             other => panic!("unexpected error: {other:?}"),
         }
+    }
+
+    #[test]
+    fn structured_candidates_keep_configured_model_first_then_rank_local_alternatives() {
+        let candidates = ordered_structured_model_ids(
+            "gemma3:latest",
+            &[
+                model("nomic-embed-text:latest"),
+                model("llama3.2:latest"),
+                model("qwen3:8b"),
+                model("gemma3:latest"),
+                model("custom:latest"),
+            ],
+        );
+        assert_eq!(
+            candidates,
+            vec![
+                "gemma3:latest",
+                "qwen3:8b",
+                "llama3.2:latest",
+                "custom:latest"
+            ]
+        );
+    }
+
+    #[test]
+    fn structured_retry_is_limited_to_model_specific_contract_failures() {
+        assert!(retryable_structured_model_failure(&provider_error(
+            "invalid_structured_output",
+            "bad json"
+        )));
+        assert!(retryable_structured_model_failure(&provider_error(
+            "model_unavailable",
+            "missing model"
+        )));
+        assert!(!retryable_structured_model_failure(&provider_error(
+            "provider_unavailable",
+            "server down"
+        )));
+        assert!(!retryable_structured_model_failure(&provider_error(
+            "request_too_large",
+            "too much input"
+        )));
     }
 }
