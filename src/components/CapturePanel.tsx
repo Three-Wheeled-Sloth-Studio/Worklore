@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { InfoButton } from "./InfoButton";
 import { InspirationPanel } from "./InspirationPanel";
 import { SeedDevelopmentPanel } from "./SeedDevelopmentPanel";
 import { TopicPanel } from "./TopicPanel";
@@ -14,7 +15,8 @@ import {
 import "../capture.css";
 
 const CAPTURE_SOURCE_TYPES: Array<{ value: SourceType; label: string }> = [
-  { value: "other", label: "Note or pasted text" },
+  { value: "other", label: "Note / pasted text" },
+  { value: "resume", label: "Resume bullet" },
   { value: "job_description", label: "Job description" },
   { value: "writing_sample", label: "Writing sample" },
 ];
@@ -60,17 +62,15 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
   }
 
   async function handleSave() {
-    if (!text.trim()) {
-      return;
-    }
-    setBusy("Saving capture");
+    if (!text.trim()) return;
+    setBusy("Saving");
     setNotice(null);
     setError(null);
     try {
       const created = await createCaptureSource(vaultPath, text, sourceType);
       setSaved(created);
       setText("");
-      setNotice("Saved locally. Classification is optional and happens after save.");
+      setNotice("Saved.");
       await refreshRecent();
     } catch (caught) {
       setError(errorMessage(caught));
@@ -80,20 +80,14 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
   }
 
   async function handleClassify(role: CaptureRole) {
-    if (!saved) {
-      return;
-    }
-    setBusy("Connecting capture");
+    if (!saved) return;
+    setBusy("Connecting");
     setNotice(null);
     setError(null);
     try {
       const result = await classifyCaptureSource(vaultPath, saved.sourceId, role);
       setSaved(await getCaptureSource(vaultPath, saved.sourceId));
-      setNotice(
-        result.created
-          ? `Connected as ${roleLabel(role)}.`
-          : `This capture is already connected as ${roleLabel(role)}.`,
-      );
+      setNotice(result.created ? `Connected as ${roleLabel(role)}.` : `Already connected as ${roleLabel(role)}.`);
       await refreshRecent();
     } catch (caught) {
       setError(errorMessage(caught));
@@ -103,7 +97,7 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
   }
 
   async function handleSelectRecent(sourceId: string) {
-    setBusy("Opening capture");
+    setBusy("Opening");
     setError(null);
     try {
       setSaved(await getCaptureSource(vaultPath, sourceId));
@@ -129,62 +123,71 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
 
   return (
     <section className="workspace-panel capture-panel" aria-labelledby="capture-heading">
-      <div className="panel-heading-row capture-heading-row">
-        <div>
-          <p className="eyebrow">Capture</p>
-          <h2 id="capture-heading">Save it before you sort it</h2>
-          <p className="capture-intro">
-            Paste a memory, result, idea, question, URL, excerpt, job description, writing sample,
-            or note. WorkLore saves the original text first. Classification is optional.
-          </p>
+      <div className="compact-section-heading capture-heading-row">
+        <h2 id="capture-heading">Capture</h2>
+        <div className="capture-header-actions">
+          <InfoButton label="Capture guidance">
+            Save source text unchanged first. For resume bullets, choose Resume bullet, then explicitly
+            connect useful material as a Story Seed or Proof Point. Leaving it unclassified keeps it
+            as source-only material.
+          </InfoButton>
+          <select
+            aria-label="Capture source type"
+            title="Source type"
+            value={sourceType}
+            onChange={(event) => setSourceType(event.target.value as SourceType)}
+          >
+            {CAPTURE_SOURCE_TYPES.map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
         </div>
-        <select
-          aria-label="Capture source type"
-          value={sourceType}
-          onChange={(event) => setSourceType(event.target.value as SourceType)}
-        >
-          {CAPTURE_SOURCE_TYPES.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
       </div>
 
       <textarea
         className="capture-input"
         aria-label="Capture text"
-        placeholder="What happened, what did you notice, or what should future-you remember? For a URL-only Inspiration, paste the URL here first."
+        placeholder="Paste a resume bullet, result, idea, excerpt, or note"
         value={text}
         onChange={(event) => setText(event.target.value)}
-        rows={6}
+        rows={5}
       />
-      <div className="capture-save-row">
+      <div className="capture-save-row compact-action-row">
         <button
-          className="primary-button"
+          className="shell-icon-button primary-icon"
+          type="button"
           disabled={!text.trim() || busy !== null}
+          aria-label="Save capture"
+          title="Save capture"
           onClick={() => void handleSave()}
         >
-          Save capture
+          <SaveIcon />
         </button>
-        <span className="capture-save-rule">No AI or classification is required to save.</span>
       </div>
 
       {saved ? (
         <div className="capture-saved-card">
           <div className="capture-saved-heading">
-            <div>
-              <span className="status-pill">Saved</span>
-              <h3>{saved.displayName}</h3>
-              <p>{saved.sourceId}</p>
-            </div>
-            <button className="quiet-button compact" onClick={() => setSaved(null)}>
-              Done
+            <h3>{saved.displayName}</h3>
+            <button
+              className="shell-icon-button"
+              type="button"
+              aria-label="Close saved capture"
+              title="Done"
+              onClick={() => setSaved(null)}
+            >
+              <CloseIcon />
             </button>
           </div>
           <p className="capture-preview">{saved.text}</p>
           <div className="capture-classify">
-            <strong>Optional connections</strong>
+            <div className="topic-section-heading">
+              <h4>Connect</h4>
+              <InfoButton label="Capture connection guidance">
+                Story Seed starts guided memory development. Proof Point records a reusable claim.
+                Topic, Inspiration, and Target Context remain context rather than evidence.
+              </InfoButton>
+            </div>
             <div className="capture-classify-actions">
               {CAPTURE_ROLES.map((option) => {
                 const linked = saved.classifications.some(
@@ -195,87 +198,67 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
                     className={linked ? "quiet-button compact" : "secondary-button compact"}
                     disabled={linked || busy !== null}
                     key={option.value}
+                    title={linked ? `${option.label} already connected` : `Connect as ${option.label}`}
                     onClick={() => void handleClassify(option.value)}
                   >
-                    {linked ? `${option.label} linked` : option.label}
+                    {linked ? `✓ ${option.label}` : option.label}
                   </button>
                 );
               })}
             </div>
-            <p className="capture-source-only">
-              Leave it alone to keep this as Source-only material. External Inspiration does not
-              become Evidence or Voice Evidence here.
-            </p>
-            {storySeedClassification ? (
-              <button
-                className="primary-button compact"
-                disabled={busy !== null}
-                onClick={() => setDevelopmentSeedId(storySeedClassification.targetId)}
-              >
-                Develop this story seed
-              </button>
-            ) : null}
-            {topicClassification ? (
-              <button
-                className="primary-button compact"
-                disabled={busy !== null}
-                onClick={() => setDevelopmentTopicId(topicClassification.targetId)}
-              >
-                Open this topic
-              </button>
-            ) : null}
-            {inspirationClassification ? (
-              <button
-                className="primary-button compact"
-                disabled={busy !== null}
-                onClick={() => setDevelopmentInspirationId(inspirationClassification.targetId)}
-              >
-                Work with this inspiration
-              </button>
-            ) : null}
-            {targetContextClassification ? (
-              <button
-                className="primary-button compact"
-                disabled={busy !== null}
-                onClick={() => setDevelopmentTargetContextId(targetContextClassification.targetId)}
-              >
-                Work with this target context
-              </button>
-            ) : null}
+            <div className="capture-next-actions">
+              {storySeedClassification ? (
+                <button
+                  className="primary-button compact"
+                  disabled={busy !== null}
+                  onClick={() => setDevelopmentSeedId(storySeedClassification.targetId)}
+                >
+                  Develop story
+                </button>
+              ) : null}
+              {topicClassification ? (
+                <button
+                  className="primary-button compact"
+                  disabled={busy !== null}
+                  onClick={() => setDevelopmentTopicId(topicClassification.targetId)}
+                >
+                  Open topic
+                </button>
+              ) : null}
+              {inspirationClassification ? (
+                <button
+                  className="primary-button compact"
+                  disabled={busy !== null}
+                  onClick={() => setDevelopmentInspirationId(inspirationClassification.targetId)}
+                >
+                  Open inspiration
+                </button>
+              ) : null}
+              {targetContextClassification ? (
+                <button
+                  className="primary-button compact"
+                  disabled={busy !== null}
+                  onClick={() => setDevelopmentTargetContextId(targetContextClassification.targetId)}
+                >
+                  Open target context
+                </button>
+              ) : null}
+            </div>
           </div>
         </div>
       ) : null}
 
       {developmentSeedId ? (
-        <SeedDevelopmentPanel
-          vaultPath={vaultPath}
-          seedId={developmentSeedId}
-          onClose={() => setDevelopmentSeedId(null)}
-        />
+        <SeedDevelopmentPanel vaultPath={vaultPath} seedId={developmentSeedId} onClose={() => setDevelopmentSeedId(null)} />
       ) : null}
-
       {developmentTopicId ? (
-        <TopicPanel
-          vaultPath={vaultPath}
-          topicId={developmentTopicId}
-          onClose={() => setDevelopmentTopicId(null)}
-        />
+        <TopicPanel vaultPath={vaultPath} topicId={developmentTopicId} onClose={() => setDevelopmentTopicId(null)} />
       ) : null}
-
       {developmentInspirationId ? (
-        <InspirationPanel
-          vaultPath={vaultPath}
-          inspirationId={developmentInspirationId}
-          onClose={() => setDevelopmentInspirationId(null)}
-        />
+        <InspirationPanel vaultPath={vaultPath} inspirationId={developmentInspirationId} onClose={() => setDevelopmentInspirationId(null)} />
       ) : null}
-
       {developmentTargetContextId ? (
-        <TargetContextPanel
-          vaultPath={vaultPath}
-          targetId={developmentTargetContextId}
-          onClose={() => setDevelopmentTargetContextId(null)}
-        />
+        <TargetContextPanel vaultPath={vaultPath} targetId={developmentTargetContextId} onClose={() => setDevelopmentTargetContextId(null)} />
       ) : null}
 
       <div className="capture-feedback" aria-live="polite">
@@ -286,17 +269,10 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
 
       {recent.length > 0 ? (
         <div className="capture-recent">
-          <div className="capture-recent-heading">
-            <h3>Recent unclassified captures</h3>
-            <span>{recent.length} shown</span>
-          </div>
+          <div className="capture-recent-heading"><h3>Unclassified</h3></div>
           <div className="capture-recent-list">
             {recent.map((capture) => (
-              <button
-                className="capture-recent-item"
-                key={capture.sourceId}
-                onClick={() => void handleSelectRecent(capture.sourceId)}
-              >
+              <button className="capture-recent-item" key={capture.sourceId} onClick={() => void handleSelectRecent(capture.sourceId)}>
                 <strong>{capture.displayName}</strong>
                 <span>{formatDate(capture.createdAt)}</span>
               </button>
@@ -314,11 +290,14 @@ function roleLabel(role: CaptureRole): string {
 
 function formatDate(value: string): string {
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-  return new Intl.DateTimeFormat("en-US", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(date);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short" }).format(date);
+}
+
+function SaveIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11l3 3v13H5zM8 4v6h8V4M8 17h8" /></svg>;
+}
+
+function CloseIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>;
 }
