@@ -1,15 +1,15 @@
 ---
 type: Handoff
 title: Current WorkLore Handoff
-description: Accepted thin Capture-to-Learn QA loop checkpoint and handoff into bounded real-world dogfood validation.
+description: Dogfood QA checkpoint covering Capture discoverability, retag audit integrity, and development-context alignment.
 status: draft
 tags: [handoff, worklore]
 ---
 # Current Handoff
 
-Updated: 2026-09-14
+Updated: 2026-09-15
 
-## Accepted Baseline
+## Product Baseline
 
 WorkLore remains a local-first professional narrative and content intelligence application. The authoritative loop is:
 
@@ -27,127 +27,124 @@ Locked boundaries remain:
 - resume import remains optional bootstrap rather than the product center;
 - provider selection remains explicit, with Ollama first-class local and no silent local-to-cloud fallback.
 
-## Accepted Product Checkpoints
+## Last Fully Green Accepted Checkpoint
 
-- Phase 1 Professional Memory: `e3393d7f95d5e060a23719b72b0ac9f051df5e92`
-- Voice Evidence: `faf702206eac854700b7d634ef40901afe898916`
-- Provider-free Core Voice foundation: `8344be9b3e25900d8eb59c1e6c35f97f25896bd5`
-- Provider-neutral review-only voice proposals: `34def4aca4e52eaa32d59546cbf174964c9eae66`
-- Deterministic Writing Pattern Linter: `f83c6b6b263c304464379e40b6a2f11f37051a94`
-- Provider-free confidentiality transformation: `33c081a30b982eafe542b8efa9beea9f3c4f242a`
-- Provider-free Post/Revision lineage: `28b6860212c9daf87ec925d1478a83d08f423092`
-- Provider-free edit-learning observation/proposal foundation: `dec9ce74188d97a3d6b96669b6cffbb967be23ff`
-- Accepted thin Capture-to-Learn QA loop implementation: `85f33f1b7eb29f006ec26e283e166f4f350532ed`
+The last fully green accepted implementation remains:
 
-## What Is Now Accepted
+`85f33f1b7eb29f006ec26e283e166f4f350532ed`
 
-### task-032: explicit edit-learning governance complete
+Validation for that checkpoint:
 
-The edit-learning path is now complete for the accepted bounded contract:
+- Actions `34857116434`
+- Job `104019423399`
+- frontend: 8 passed / 0 failed across 3 files
+- Rust: 123 passed / 0 failed
+- production frontend build: green
+- case-collision, refs/OKF/path safety, bounded agent context, warnings-denied Clippy, rustfmt, and repository/source-only checks: green
 
-- real persisted parent/child Post Revisions are the only learning source;
-- recurring corrections require the same normalized correction across at least two distinct Posts;
-- proposals preserve exact Post, parent Revision, and child Revision provenance;
-- accept/reject is explicit and provider-free;
-- decision time re-validates the currently reproducible proposal and exact support set;
-- stale or tampered evidence is rejected;
-- decisions are durable through the existing append-only audit ledger;
-- unchanged decided evidence is suppressed, while materially expanded real support can resurface;
-- accepted preferences create only a `proposed` Writing Rule and never silently activate it;
-- active Core Voice, Tone Modes, Voice Directions, active Writing Rules, and Voice Evidence eligibility are not silently mutated;
-- model ancestors remain model-origin context and raw model text never becomes Voice Evidence.
+Accepted foundations beneath it include Phase 1 Professional Memory, governed Voice Evidence/Core Voice, deterministic Writing Pattern Linter, provider-free confidentiality transformation, immutable Post/Revision lineage, explicit edit-learning governance, exact final approval, manual-publication recording, append-only performance snapshots, and conservative Insights.
 
-No new preference table or schema bump was introduced. The decision bridge reuses `audit_events` and existing `writing_rules` governance.
+## Current Dogfood Implementation Candidate
 
-### Thin Content Studio QA seam
+The current implementation candidate before these handoff-doc updates is:
 
-A first user-traversable content path now exists without pretending the broader Content Studio is complete:
+`7599cadaeae10b28ea876e5806c67a24db695ce5`
 
-- Posts catalog and reopen behavior;
-- manual Post creation;
-- immutable exact Revision snapshots and deterministic ancestry;
-- typed supporting-material links;
-- deterministic writing-pattern challenge checks;
-- confidentiality preflight;
-- user edits as new Revisions;
-- exact final approval;
-- final approval requires both confidentiality state `Ready` and the exact saved Revision text to equal the derived `public_safe_text`;
-- confidentiality transformation never overwrites private canonical Revision truth.
+Work directly on `dev`. Draft PR #1 remains `dev -> qa`; leave it draft. Do not promote `qa` or `main`.
 
-The hard approval gate fixes a real boundary issue: a transform may be safe while the saved private Revision is not. WorkLore now refuses to freeze that private Revision until the user saves the exact public-safe wording as a new Revision and challenges it again.
+Version remains `0.1.2`.
 
-### Thin manual-publication and feedback seam
+### What the dogfood pass changed
 
-The literal loop can now continue after external manual publication:
+The real-use pass exposed workflow friction that was fixed rather than opening new architecture breadth:
 
-- WorkLore itself does not publish or schedule anything;
-- the user can record that an exact final-approved Revision was manually published externally;
-- publication identity is idempotent for the same Post, Revision, and platform;
-- performance measurements are append-only cumulative snapshots linked to that exact publication;
-- the latest snapshot drives the current view without rewriting historical measurements;
-- thin Insights surfaces baseline/small-sample warnings;
-- after enough measured Posts, descriptive observed rates can be shown with an explicit non-causality boundary rather than turning small samples into rules.
+- Topic editing was compacted and a Topic can now generate a Post through the selected local provider path;
+- Capture was compacted and supports an explicit Resume bullet source type;
+- captured source type can be corrected without rewriting captured text;
+- recent captured material has a catalog and remains discoverable after classification;
+- Story Seeds remain discoverable in Stories after classification;
+- Stories, Voice, and Posts were compacted into more practical work surfaces;
+- writing samples can move explicitly into governed Voice Evidence review;
+- memory seed state is bound to the active vault;
+- quick-start guidance was aligned to the actual dogfood workflow.
 
-Publication and performance records reuse the append-only audit ledger rather than adding a remote service or publishing integration.
+### Concrete defects fixed at the latest candidate
 
-## Validation Evidence
+1. Capture source retagging originally updated the canonical source and then wrote its audit event as separate autocommit statements. An audit failure could therefore leave an unaudited canonical mutation. Retagging now wraps the source mutation and `capture_source_type_changed` audit event in one SQLite transaction. A deterministic rollback test installs a trigger that deliberately aborts that audit insert and verifies the source type remains unchanged.
 
-Accepted implementation checkpoint:
+2. Capture could show one saved capture while leaving a Story, Topic, Inspiration, or Target Context development panel open from a different capture. Capture now clears stale development context when the user saves a new capture, selects another recent capture, retags the selected capture, or closes it. Opening one development target also closes the other development target types so only one derived work surface is active at a time.
 
-- exact `dev` implementation head: `85f33f1b7eb29f006ec26e283e166f4f350532ed`
-- Actions run: `34857116434`
-- Job: `104019423399`
-- external build layout: green
-- case-collision check: green, 227 tracked paths
-- refs/OKF/path-safety validation: green
-- bounded agent-context check: green, 5665 / 8000 characters
-- frontend tests: 8 passed / 0 failed across 3 files
-- production frontend build: green, 59 modules transformed
-- Rust tests: 123 passed / 0 failed
+These are dogfood correctness/provenance fixes, not new roadmap breadth.
+
+## Current Validation State
+
+A PR validation run executed against dogfood head `d73528c80ca53e1ee0caa2d73d65adf105fd6105`:
+
+- Actions `34996921994`
+- Job `104475376007`
+- frontend tests: 10 passed / 0 failed across 4 files
+- production frontend build: green, 71 modules transformed
+- Rust tests: 130 passed / 0 failed
 - warnings-denied Clippy: green
-- rustfmt: green
+- external build layout: green
+- refs/OKF/path-safety validation: green
 - repository/source-only check: green
+- only failure: `cargo fmt --check` on the newly added Capture catalog/metadata command and service formatting
 
-The implementation was also validated as the PR merge test against the locked `qa` baseline; no promotion occurred.
+The exact rustfmt changes from that failure were then applied on `dev` in:
 
-The repository still carries `.npmrc` with `legacy-peer-deps=true` as a narrow hosted-CI workaround for the npm 10.9.8 Arborist `edgesOut` bootstrap failure. It is not part of the product contract.
+- `356410eebbf1af172f7ea414a5371c4244413ed7`
+- `a88c815b2749b849a7005936d7a70041493c8429`
+- `d80415161d747625a5598972c64d459b9ee0ad20`
+
+The later atomic-retag and Capture-context fixes are not yet fully validated by CI. This is an explicit pending-validation state, not an accepted green checkpoint.
+
+Why no fresh Actions run exists: `.github/workflows/ci.yml` intentionally runs the pull-request validation only for `ready_for_review` and `reopened`, not every `dev` synchronization. The connected GitHub capability available during this session exposes no workflow-dispatch action, and the execution container cannot resolve GitHub for a clean network clone. Do not mark `7599cada` accepted until the normal validation command set is run successfully.
 
 ## Current Task State
 
 - `task-032`: complete. Explicit durable edit-learning accept/reject governance is accepted.
-- `task-033`: in progress. Cross-draft repetition, proof-point rotation, portfolio mode-collapse, and broader evidence/standing review should wait for meaningful real corpus data rather than invented history.
-- `task-035`: in progress. The thin Posts/challenge/edit/approval QA seam exists; angle generation, Audience Lens, provider-assisted drafting, comments/replies, and broader editorial workflow remain.
-- `task-036`: complete for the accepted audit contract. Exact immutable lineage, final approval, exact user-marked manual-publication identity, and downstream performance association are durable. Automatic publication remains explicitly out of scope.
-- `task-037`: in progress. Manual performance snapshots and conservative Insights exist; LinkedIn-native export import and multidimensional analysis remain.
+- `task-033`: in progress. Cross-draft repetition, proof-point rotation, portfolio mode-collapse, and broader evidence/standing review should wait for meaningful real corpus data.
+- `task-034`: complete. Provider-free confidentiality transformation reuses the Private Entity Registry and preserves private canonical truth.
+- `task-035`: in progress. The thin Posts/challenge/edit/approval seam exists and dogfood now includes Topic-to-Post generation; broader Content Studio refinement remains.
+- `task-036`: complete for the accepted audit contract. Exact immutable lineage, final approval, manual-publication identity, and downstream performance association remain durable boundaries.
+- `task-037`: in progress. Manual performance snapshots and conservative Insights exist; LinkedIn-native import and broader multidimensional analysis remain.
 
-Phase 2, Phase 3, and Phase 4 remain broader work in progress even though the thin structural loop is now testable end to end.
+## Immediate Next Step
 
-## Recommended Next Mode: Dogfood QA
+First validate the current `dev` candidate with the normal full command set. If green, record the new accepted checkpoint before broadening anything.
 
-Stop expanding architecture breadth for the next slice. Use real local material to exercise the implemented loop and let observed failures drive the next changes.
+Then continue real runtime dogfood from the Capture seam that was just repaired:
 
-The next bounded question is:
+1. save real professional material;
+2. classify it into one or more appropriate roles;
+3. close/reopen or switch among recent captures and confirm the selected capture and active development surface always agree;
+4. develop a Story or Topic and restart/reopen around a meaningful transition;
+5. generate a Post from a real Topic using the explicitly selected provider;
+6. verify typed supporting material remains correctly separated between standing and context;
+7. edit through immutable Revisions;
+8. run deterministic challenge and confidentiality preflight;
+9. exercise the exact public-safe final-approval gate when private entities are present;
+10. stop at the first real external boundary if no genuine publication or LinkedIn metrics are available. Do not fabricate history.
 
-`Can a user take real professional material through the implemented structural loop, manually publish outside WorkLore, record the exact publication and LinkedIn measurements, reopen the vault around key transitions, and expose any correctness, friction, provenance, privacy, or recoverability defects before broader Content Studio work?`
+Prioritize concrete correctness, provenance, privacy, recoverability, and blocking UX defects. Do not pre-emptively implement planned features simply because they exist on the roadmap.
 
-Prioritize concrete defects that block or confuse the real loop. Do not pre-emptively broaden into planned features merely because they are on the roadmap.
+## Validation Commands
 
-## Dogfood Path To Exercise
+Run at minimum:
 
-Use real local user material and existing product surfaces:
-
-1. Capture a memory, proof point, idea, writing sample, inspiration item, or target context.
-2. Classify/develop it into useful Story, Topic, Proof Point, Inspiration, or Target Context state as appropriate.
-3. Connect explicit supporting/context material without collapsing semantic roles.
-4. Create a Post and preserve exact Revision ancestry through edits.
-5. Run deterministic challenge checks and confidentiality preflight.
-6. Exercise the public-safe-text mismatch/recovery path where appropriate.
-7. Final-approve only the exact saved public-safe Revision.
-8. Manually publish outside WorkLore.
-9. Record the exact approved Revision as published in WorkLore.
-10. Record one or more cumulative LinkedIn performance snapshots.
-11. Inspect Insights and verify that small samples remain conservative.
-12. Reopen/restart the vault around meaningful transitions and confirm identity/provenance survive.
+```powershell
+python scripts/check-case-collisions.py
+git diff --check
+python refs/tools/validate_refs.py --mode initialized
+python refs/tools/generate_agent_context.py --check
+npm run test
+npm run build:frontend
+cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
+cargo test --manifest-path src-tauri/Cargo.toml
+cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
+./scripts/assert-repo-clean.ps1
+```
 
 ## Do Not Reopen
 
