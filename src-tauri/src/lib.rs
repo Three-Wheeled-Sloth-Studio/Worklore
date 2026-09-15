@@ -7,7 +7,7 @@ mod services;
 use commands::{
     candidates::{extract_resume_candidates, list_story_candidates, set_story_candidate_status},
     capture::{
-        classify_capture_source, create_capture_source, get_capture_source,
+        classify_capture_source, create_capture_source, get_capture_source, list_captures,
         list_unclassified_captures, update_capture_source_type,
     },
     development::{
@@ -79,6 +79,7 @@ pub fn run() {
             create_capture_source,
             get_capture_source,
             update_capture_source_type,
+            list_captures,
             list_unclassified_captures,
             classify_capture_source,
             start_story_seed_development,
