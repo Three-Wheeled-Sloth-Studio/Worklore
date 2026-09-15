@@ -24,7 +24,7 @@ pub fn update_capture_source_type(
         ));
     }
 
-    let connection = open_connection(vault_path)?;
+    let mut connection = open_connection(vault_path)?;
     let current: Option<(String, String)> = connection
         .query_row(
             "SELECT source_type,source_origin FROM sources WHERE source_id=?1",
@@ -46,11 +46,12 @@ pub fn update_capture_source_type(
     }
 
     let now = Utc::now().to_rfc3339();
-    connection.execute(
+    let tx = connection.transaction()?;
+    tx.execute(
         "UPDATE sources SET source_type=?2,updated_at=?3,revision=revision+1 WHERE source_id=?1",
         params![source_id, after, &now],
     )?;
-    connection.execute(
+    tx.execute(
         "INSERT INTO audit_events(audit_id,event_type,record_type,record_id,actor,details_json,occurred_at)\n         VALUES (?1,'capture_source_type_changed','source',?2,'user',?3,?4)",
         params![
             format!("audit_{}", Uuid::now_v7()),
@@ -59,6 +60,7 @@ pub fn update_capture_source_type(
             &now
         ],
     )?;
+    tx.commit()?;
 
     capture_service::get_capture_source(vault_path, source_id)
 }
@@ -103,6 +105,39 @@ mod tests {
         assert_eq!(updated.source_type, SourceType::Resume);
         assert_eq!(updated.text, created.text);
         assert_eq!(updated.source_id, created.source_id);
+        std::fs::remove_dir_all(path).unwrap();
+    }
+
+    #[test]
+    fn retag_rolls_back_when_audit_write_fails() {
+        let path = std::env::temp_dir().join(format!(
+            "worklore-capture-retag-rollback-{}",
+            Uuid::now_v7()
+        ));
+        vault_service::create_vault(&path, "Capture Retag Rollback Test").unwrap();
+        let created = capture_service::create_capture_source(
+            &path,
+            "Kept the source mutation and audit record in one unit of work.",
+            SourceType::Other,
+        )
+        .unwrap();
+
+        let sabotage = open_connection(&path).unwrap();
+        sabotage.execute("DROP TABLE audit_events", []).unwrap();
+        drop(sabotage);
+
+        assert!(update_capture_source_type(&path, &created.source_id, SourceType::Resume).is_err());
+
+        let connection = open_connection(&path).unwrap();
+        let stored_type: String = connection
+            .query_row(
+                "SELECT source_type FROM sources WHERE source_id=?1",
+                [&created.source_id],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(stored_type, "other");
+
         std::fs::remove_dir_all(path).unwrap();
     }
 }
