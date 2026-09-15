@@ -1,7 +1,19 @@
 import { useEffect, useState } from "react";
-import type { InspirationRecord, SourceSummary, SourceType, TargetContextRecord } from "../domain/types";
+import type {
+  InspirationRecord,
+  SourceSummary,
+  SourceType,
+  TargetContextRecord,
+  VoiceSourceCandidate,
+} from "../domain/types";
 import { errorMessage } from "../domain/types";
-import { listInspirations, listTargetContexts } from "../lib/workloreApi";
+import {
+  createVoiceEvidenceFromSource,
+  listInspirations,
+  listTargetContexts,
+  listVoiceSourceCandidates,
+} from "../lib/workloreApi";
+import { InfoButton } from "./InfoButton";
 import { InspirationPanel } from "./InspirationPanel";
 import { TargetContextPanel } from "./TargetContextPanel";
 
@@ -24,26 +36,47 @@ export function LibraryWorkspace({
 }) {
   const [inspirations, setInspirations] = useState<InspirationRecord[]>([]);
   const [targets, setTargets] = useState<TargetContextRecord[]>([]);
+  const [voiceCandidates, setVoiceCandidates] = useState<VoiceSourceCandidate[]>([]);
   const [selectedInspirationId, setSelectedInspirationId] = useState<string | null>(null);
   const [selectedTargetId, setSelectedTargetId] = useState<string | null>(null);
+  const [busySourceId, setBusySourceId] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setSelectedInspirationId(null);
     setSelectedTargetId(null);
+    setNotice(null);
     void refreshContext();
   }, [vaultPath]);
 
   async function refreshContext() {
     try {
-      const [inspirationRows, targetRows] = await Promise.all([
+      const [inspirationRows, targetRows, voiceRows] = await Promise.all([
         listInspirations(vaultPath),
         listTargetContexts(vaultPath),
+        listVoiceSourceCandidates(vaultPath),
       ]);
       setInspirations(inspirationRows);
       setTargets(targetRows);
+      setVoiceCandidates(voiceRows);
     } catch (caught) {
       setError(errorMessage(caught));
+    }
+  }
+
+  async function useForVoice(sourceId: string) {
+    setBusySourceId(sourceId);
+    setError(null);
+    setNotice(null);
+    try {
+      await createVoiceEvidenceFromSource(vaultPath, sourceId);
+      setNotice("Voice Evidence review created. Open Voice and confirm authorship to make it eligible.");
+      await refreshContext();
+    } catch (caught) {
+      setError(errorMessage(caught));
+    } finally {
+      setBusySourceId(null);
     }
   }
 
@@ -76,11 +109,15 @@ export function LibraryWorkspace({
   return (
     <div className="shell-stack">
       <section className="workspace-panel source-panel" aria-labelledby="library-sources-heading">
-        <div className="panel-heading-row">
-          <div>
-            <p className="eyebrow">Provenance library</p>
+        <div className="compact-section-heading">
+          <div className="section-title-with-info">
             <h2 id="library-sources-heading">Sources</h2>
-            <p>Original material stays neutral. Semantic roles are explicit working records.</p>
+            <InfoButton label="Source guidance">
+              Source type describes what the material is. Writing Sample means your own writing that
+              may be reviewed for Voice. It still requires an explicit authorship confirmation before
+              it can influence Core Voice. Resume material remains source evidence until you explicitly
+              turn claims into Story Seeds or Proof Points.
+            </InfoButton>
           </div>
           <div className="import-controls">
             <select
@@ -92,47 +129,80 @@ export function LibraryWorkspace({
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </select>
-            <button className="primary-button compact" onClick={onImportSource}>Import file</button>
+            <button className="primary-button compact" onClick={onImportSource}>Import</button>
           </div>
         </div>
         {sources.length === 0 ? (
-          <div className="empty-state">
-            <h3>No imported files yet</h3>
-            <p>Capture pasted material directly, or import a supporting document when file provenance matters.</p>
-          </div>
+          <div className="empty-state compact-empty"><p>No sources yet.</p></div>
         ) : (
           <div className="source-list">
-            {sources.map((source) => (
-              <article className="source-row" key={source.sourceId}>
-                <div>
-                  <h3>{source.displayName}</h3>
-                  <p>{sourceTypeOptions.find((item) => item.value === source.sourceType)?.label ?? "Source"} · Imported {formatDate(source.importedAt)}</p>
-                </div>
-                <div className="source-statuses">
-                  <span className="status-pill">Text: {source.extractionStatus}</span>
-                  <span className={`status-pill ${source.privacyScanStatus === "needs_review" ? "attention" : ""}`}>Privacy: {source.privacyScanStatus}</span>
-                  {source.sourceType === "resume" && source.extractionStatus === "complete" ? (
-                    <button className="quiet-button compact" onClick={() => onExtractCandidates(source.sourceId)}>Seed from resume</button>
-                  ) : null}
-                </div>
-              </article>
-            ))}
+            {sources.map((source) => {
+              const voiceCandidate = voiceCandidates.find((item) => item.sourceId === source.sourceId);
+              return (
+                <article className="source-row" key={source.sourceId}>
+                  <div>
+                    <h3>{source.displayName}</h3>
+                    <p>
+                      {sourceTypeOptions.find((item) => item.value === source.sourceType)?.label ?? "Source"}
+                      {` · ${formatDate(source.importedAt)}`}
+                    </p>
+                  </div>
+                  <div className="source-statuses">
+                    {source.privacyScanStatus === "needs_review" ? (
+                      <span className="status-pill attention">Privacy review</span>
+                    ) : null}
+                    {source.sourceType === "resume" && source.extractionStatus === "complete" ? (
+                      <button
+                        className="quiet-button compact"
+                        title="Extract resume claims into story candidates"
+                        onClick={() => onExtractCandidates(source.sourceId)}
+                      >
+                        Seed stories
+                      </button>
+                    ) : null}
+                    {source.sourceType === "writing_sample" ? (
+                      voiceCandidate?.voiceEvidenceId ? (
+                        <span className="status-pill" title="This writing sample has a Voice Evidence review">
+                          Voice review ✓
+                        </span>
+                      ) : voiceCandidate?.blockedReason ? (
+                        <span className="status-pill attention" title={voiceCandidate.blockedReason.replaceAll("_", " ")}>
+                          Voice blocked
+                        </span>
+                      ) : (
+                        <button
+                          className="secondary-button compact"
+                          disabled={busySourceId === source.sourceId}
+                          title="Create a Voice Evidence review. You will confirm authorship in Voice before it can shape generated writing."
+                          onClick={() => void useForVoice(source.sourceId)}
+                        >
+                          Use for voice
+                        </button>
+                      )
+                    ) : null}
+                  </div>
+                </article>
+              );
+            })}
           </div>
         )}
       </section>
 
       <section className="workspace-panel" aria-labelledby="inspiration-library-heading">
-        <p className="eyebrow">External creative context</p>
-        <h2 id="inspiration-library-heading">Inspiration</h2>
-        <p>External material can influence thinking without becoming Evidence or Voice Evidence.</p>
+        <div className="compact-section-heading">
+          <h2 id="inspiration-library-heading">Inspiration</h2>
+          <InfoButton label="Inspiration guidance">
+            External creative material can influence thinking but is never evidence about you and never Voice Evidence.
+          </InfoButton>
+        </div>
         {inspirations.length === 0 ? (
-          <div className="empty-state compact-empty"><p>No Inspiration records yet. Capture a URL, excerpt, or source and classify it explicitly.</p></div>
+          <div className="empty-state compact-empty"><p>None yet.</p></div>
         ) : (
           <div className="record-list">
             {inspirations.map((item) => (
               <button className="record-row" key={item.inspirationId} onClick={() => setSelectedInspirationId(item.inspirationId)}>
                 <span><strong>{item.title}</strong><small>{item.summary || item.whyInteresting || "No summary yet."}</small></span>
-                <span className="record-meta">{item.lifecycle} · {item.relationships.length} links</span>
+                <span className="record-meta">{item.lifecycle} · {item.relationships.length}</span>
               </button>
             ))}
           </div>
@@ -140,22 +210,26 @@ export function LibraryWorkspace({
       </section>
 
       <section className="workspace-panel" aria-labelledby="target-library-heading">
-        <p className="eyebrow">External professional context</p>
-        <h2 id="target-library-heading">Target Context</h2>
-        <p>Requirements and audience signals describe the opportunity. They do not prove user standing.</p>
+        <div className="compact-section-heading">
+          <h2 id="target-library-heading">Target Context</h2>
+          <InfoButton label="Target Context guidance">
+            Requirements and audience signals describe the opportunity. They do not prove your standing or experience.
+          </InfoButton>
+        </div>
         {targets.length === 0 ? (
-          <div className="empty-state compact-empty"><p>No Target Context records yet. Capture a job description or other target material and classify it explicitly.</p></div>
+          <div className="empty-state compact-empty"><p>None yet.</p></div>
         ) : (
           <div className="record-list">
             {targets.map((item) => (
               <button className="record-row" key={item.targetId} onClick={() => setSelectedTargetId(item.targetId)}>
                 <span><strong>{item.title}</strong><small>{item.summary || item.organizationName || "No summary yet."}</small></span>
-                <span className="record-meta">{item.lifecycle} · {item.relationships.length} links</span>
+                <span className="record-meta">{item.lifecycle} · {item.relationships.length}</span>
               </button>
             ))}
           </div>
         )}
       </section>
+      {notice ? <p className="inline-notice" role="status">{notice}</p> : null}
       {error ? <p className="inline-error" role="alert">{error}</p> : null}
     </div>
   );
@@ -163,8 +237,6 @@ export function LibraryWorkspace({
 
 function formatDate(value: string): string {
   const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return value;
-  }
+  if (Number.isNaN(parsed.getTime())) return value;
   return new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(parsed);
 }
