@@ -27,7 +27,7 @@ Last fully green accepted implementation:
 
 `3615b21c5abd59c02791cd8b3bb2ffebfed51281`
 
-The current newer `dev` head contains observed runtime QA remediation and must pass fresh full validation before becoming the next accepted checkpoint. QA build version is `0.1.3`.
+The current newer `dev` head contains observed runtime QA remediation and must pass fresh full validation before becoming the next accepted checkpoint. QA build version is `0.1.3`; package, Tauri manifest, and visible sidebar marker are aligned.
 
 The remediation covers:
 
