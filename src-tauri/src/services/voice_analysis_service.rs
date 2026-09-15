@@ -269,11 +269,10 @@ fn validate_analysis_output(
         .into_iter()
         .map(|proposal| {
             let name = required_trimmed(proposal.name, "writing-rule proposal name")?;
-            let instruction = required_trimmed(
-                proposal.instruction,
-                "writing-rule proposal instruction",
-            )?;
-            let rationale = required_trimmed(proposal.rationale, "writing-rule proposal rationale")?;
+            let instruction =
+                required_trimmed(proposal.instruction, "writing-rule proposal instruction")?;
+            let rationale =
+                required_trimmed(proposal.rationale, "writing-rule proposal rationale")?;
             let normalized_name = name.to_ascii_lowercase();
             if !seen_rule_names.insert(normalized_name) {
                 return Err(provider_error(
