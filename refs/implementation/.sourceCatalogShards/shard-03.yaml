@@ -968,7 +968,7 @@ source_catalog:
   - path: src/components/CapturePanel.tsx
     analysis_version: 1
     language: typescript
-    content_hash: e890ce4f5df2c5eb5d6d325e3bbb659fe53c5a7a
+    content_hash: 9897ce440a8686c8c38426b156e401156e78facf
     dependencies:
     - ../domain/types
     - ../lib/captureApi
@@ -980,7 +980,6 @@ source_catalog:
     - ./TopicPanel
     - react
     provides:
-    - CapturePanel
     - clearDevelopmentPanels
     - openDevelopmentPanel
     - handleCloseSaved
@@ -995,21 +994,10 @@ source_catalog:
     - SaveIcon
     - CloseIcon
     symbols:
-    - name: CapturePanel
-      kind: function
-      line_start: 34
-      line_end: 35
-      signature: 'CapturePanel({ vaultPath }: { vaultPath: string })'
-      inputs:
-      - '{ vaultPath }: { vaultPath: string }'
-      output: unspecified
-      dependencies: []
-      parser: typescript-pattern
-      dependency_targets: []
     - name: clearDevelopmentPanels
       kind: function
-      line_start: 55
-      line_end: 61
+      line_start: 61
+      line_end: 67
       signature: clearDevelopmentPanels()
       inputs: []
       output: unspecified
@@ -1022,8 +1010,8 @@ source_catalog:
       dependency_targets: []
     - name: openDevelopmentPanel
       kind: function
-      line_start: 62
-      line_end: 79
+      line_start: 68
+      line_end: 85
       signature: 'openDevelopmentPanel(role: DevelopmentRole, targetId: string)'
       inputs:
       - 'role: DevelopmentRole'
@@ -1042,8 +1030,8 @@ source_catalog:
         symbol: clearDevelopmentPanels
     - name: handleCloseSaved
       kind: function
-      line_start: 80
-      line_end: 84
+      line_start: 86
+      line_end: 90
       signature: handleCloseSaved()
       inputs: []
       output: unspecified
@@ -1055,8 +1043,8 @@ source_catalog:
       - *id017
     - name: refreshRecent
       kind: function
-      line_start: 85
-      line_end: 92
+      line_start: 91
+      line_end: 98
       signature: refreshRecent()
       inputs: []
       output: unspecified
@@ -1074,8 +1062,8 @@ source_catalog:
         symbol: listCaptureSources
     - name: handleSave
       kind: function
-      line_start: 93
-      line_end: 111
+      line_start: 99
+      line_end: 117
       signature: handleSave()
       inputs: []
       output: unspecified
@@ -1101,8 +1089,8 @@ source_catalog:
         symbol: refreshRecent
     - name: handleRetag
       kind: function
-      line_start: 112
-      line_end: 129
+      line_start: 118
+      line_end: 135
       signature: 'handleRetag(nextType: SourceType)'
       inputs:
       - 'nextType: SourceType'
@@ -1130,8 +1118,8 @@ source_catalog:
         symbol: updateCaptureSourceType
     - name: handleClassify
       kind: function
-      line_start: 130
-      line_end: 150
+      line_start: 136
+      line_end: 156
       signature: 'handleClassify(role: CaptureRole)'
       inputs:
       - 'role: CaptureRole'
@@ -1159,8 +1147,8 @@ source_catalog:
         symbol: roleLabel
     - name: handleUseForVoice
       kind: function
-      line_start: 151
-      line_end: 165
+      line_start: 157
+      line_end: 171
       signature: handleUseForVoice()
       inputs: []
       output: unspecified
@@ -1178,8 +1166,8 @@ source_catalog:
       - *id018
     - name: handleSelectRecent
       kind: function
-      line_start: 166
-      line_end: 179
+      line_start: 172
+      line_end: 185
       signature: 'handleSelectRecent(sourceId: string)'
       inputs:
       - 'sourceId: string'
@@ -1198,8 +1186,8 @@ source_catalog:
       - *id020
     - name: roleLabel
       kind: function
-      line_start: 391
-      line_end: 394
+      line_start: 402
+      line_end: 405
       signature: 'roleLabel(role: CaptureRole) -> string'
       inputs:
       - 'role: CaptureRole'
@@ -1211,8 +1199,8 @@ source_catalog:
       dependency_targets: []
     - name: sourceTypeLabel
       kind: function
-      line_start: 395
-      line_end: 398
+      line_start: 406
+      line_end: 409
       signature: 'sourceTypeLabel(sourceType: SourceType) -> string'
       inputs:
       - 'sourceType: SourceType'
@@ -1223,8 +1211,8 @@ source_catalog:
       dependency_targets: []
     - name: SaveIcon
       kind: function
-      line_start: 399
-      line_end: 402
+      line_start: 410
+      line_end: 413
       signature: SaveIcon()
       inputs: []
       output: unspecified
@@ -1233,8 +1221,8 @@ source_catalog:
       dependency_targets: []
     - name: CloseIcon
       kind: function
-      line_start: 403
-      line_end: 406
+      line_start: 414
+      line_end: 417
       signature: CloseIcon()
       inputs: []
       output: unspecified

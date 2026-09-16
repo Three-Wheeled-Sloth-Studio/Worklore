@@ -599,7 +599,12 @@ function App() {
           />
         );
       case "capture":
-        return <CapturePanel vaultPath={vault!.path} />;
+        return (
+          <CapturePanel
+            vaultPath={vault!.path}
+            onPostGenerated={() => setActiveView("posts")}
+          />
+        );
       case "stories":
         return (
           <div className="workspace-grid shell-workspace-grid">

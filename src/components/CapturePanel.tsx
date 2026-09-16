@@ -32,7 +32,13 @@ const CAPTURE_ROLES: Array<{ value: CaptureRole; label: string }> = [
 
 type DevelopmentRole = Exclude<CaptureRole, "proof_point">;
 
-export function CapturePanel({ vaultPath }: { vaultPath: string }) {
+export function CapturePanel({
+  vaultPath,
+  onPostGenerated,
+}: {
+  vaultPath: string;
+  onPostGenerated: (postId: string) => void;
+}) {
   const [text, setText] = useState("");
   const [sourceType, setSourceType] = useState<SourceType>("other");
   const [saved, setSaved] = useState<CaptureSource | null>(null);
@@ -352,7 +358,12 @@ export function CapturePanel({ vaultPath }: { vaultPath: string }) {
         <SeedDevelopmentPanel vaultPath={vaultPath} seedId={developmentSeedId} onClose={() => setDevelopmentSeedId(null)} />
       ) : null}
       {developmentTopicId ? (
-        <TopicPanel vaultPath={vaultPath} topicId={developmentTopicId} onClose={() => setDevelopmentTopicId(null)} />
+        <TopicPanel
+          vaultPath={vaultPath}
+          topicId={developmentTopicId}
+          onClose={() => setDevelopmentTopicId(null)}
+          onPostGenerated={onPostGenerated}
+        />
       ) : null}
       {developmentInspirationId ? (
         <InspirationPanel vaultPath={vaultPath} inspirationId={developmentInspirationId} onClose={() => setDevelopmentInspirationId(null)} />
