@@ -61,7 +61,7 @@ source_catalog:
   - path: src-tauri/src/services/post_generation_service.rs
     analysis_version: 1
     language: rust
-    content_hash: 65d065ec935f93067ba13d8c0ea91ef037709d9e
+    content_hash: f1e38b53ea4d36e7e236dfa1f7d5a7d522e5f914
     dependencies:
     - chrono::Utc
     - crate::services::{topic_service::CreateTopicRequest, vault_service}
@@ -91,12 +91,12 @@ source_catalog:
     - topic_without_standing_explicitly_blocks_invented_personal_experience
     - topic_relationships_map_to_distinct_post_support_roles
     - provider_prose_cleanup_removes_markdown_and_nonstandard_punctuation
-    - structured_output_requires_nonempty_bounded_draft
+    - structured_output_requires_substantive_bounded_draft
     symbols:
     - name: generate_post_from_topic
       kind: function
-      line_start: 35
-      line_end: 67
+      line_start: 36
+      line_end: 68
       signature: 'generate_post_from_topic(vault_path: &Path, request: GeneratePostFromTopicRequest) -> ServiceResult<GeneratePostFromTopicResult>'
       inputs:
       - 'vault_path: &Path'
@@ -132,8 +132,8 @@ source_catalog:
         symbol: initialize
     - name: generate_inner
       kind: function
-      line_start: 68
-      line_end: 146
+      line_start: 69
+      line_end: 147
       signature: 'generate_inner(vault_path: &Path, request: &GeneratePostFromTopicRequest, run_id: &str) -> ServiceResult<GeneratePostFromTopicResult>'
       inputs:
       - 'vault_path: &Path'
@@ -205,8 +205,8 @@ source_catalog:
         symbol: validate_requested_model
     - name: build_user_prompt
       kind: function
-      line_start: 147
-      line_end: 220
+      line_start: 148
+      line_end: 221
       signature: 'build_user_prompt(vault_path: &Path, topic: &TopicRecordView) -> ServiceResult<String>'
       inputs:
       - 'vault_path: &Path'
@@ -239,8 +239,8 @@ source_catalog:
         symbol: relation_kind_name
     - name: response_schema
       kind: function
-      line_start: 221
-      line_end: 233
+      line_start: 222
+      line_end: 234
       signature: response_schema() -> Value
       inputs: []
       output: Value
@@ -249,8 +249,8 @@ source_catalog:
       dependency_targets: []
     - name: validate_generated_output
       kind: function
-      line_start: 234
-      line_end: 257
+      line_start: 235
+      line_end: 265
       signature: 'validate_generated_output(value: Value) -> ServiceResult<RawGeneratedPost>'
       inputs:
       - 'value: Value'
@@ -261,7 +261,6 @@ source_catalog:
       - cleanup_generated_text
       - count
       - draft_text.chars
-      - draft_text.is_empty
       - from_value
       - map_err
       - provider_error
@@ -277,8 +276,8 @@ source_catalog:
       - *id003
     - name: cleanup_generated_text
       kind: function
-      line_start: 258
-      line_end: 294
+      line_start: 266
+      line_end: 302
       signature: 'cleanup_generated_text(value: &str) -> String'
       inputs:
       - 'value: &str'
@@ -306,8 +305,8 @@ source_catalog:
       dependency_targets: []
     - name: support_role
       kind: function
-      line_start: 295
-      line_end: 304
+      line_start: 303
+      line_end: 312
       signature: 'support_role(kind: TopicRelationKind) -> PostSupportRole'
       inputs:
       - 'kind: TopicRelationKind'
@@ -317,8 +316,8 @@ source_catalog:
       dependency_targets: []
     - name: relation_kind_name
       kind: function
-      line_start: 305
-      line_end: 314
+      line_start: 313
+      line_end: 322
       signature: 'relation_kind_name(kind: TopicRelationKind) -> &''static str'
       inputs:
       - 'kind: TopicRelationKind'
@@ -328,8 +327,8 @@ source_catalog:
       dependency_targets: []
     - name: provider_error
       kind: function
-      line_start: 315
-      line_end: 321
+      line_start: 323
+      line_end: 329
       signature: 'provider_error(code: &''static str, message: impl Into<String>) -> WorkLoreError'
       inputs:
       - 'code: &''static str'
@@ -341,8 +340,8 @@ source_catalog:
       dependency_targets: []
     - name: audit_provider_run
       kind: function
-      line_start: 332
-      line_end: 356
+      line_start: 340
+      line_end: 364
       signature: 'audit_provider_run(vault_path: &Path, audit: ProviderRunAudit<''_>) -> ServiceResult<()>'
       inputs:
       - 'vault_path: &Path'
@@ -367,8 +366,8 @@ source_catalog:
         symbol: database_path
     - name: vault
       kind: function
-      line_start: 362
-      line_end: 368
+      line_start: 370
+      line_end: 376
       signature: vault() -> std::path::PathBuf
       inputs: []
       output: std::path::PathBuf
@@ -386,8 +385,8 @@ source_catalog:
         symbol: create_vault
     - name: topic_without_standing_explicitly_blocks_invented_personal_experience
       kind: function
-      line_start: 371
-      line_end: 389
+      line_start: 379
+      line_end: 399
       signature: topic_without_standing_explicitly_blocks_invented_personal_experience()
       inputs: []
       output: unspecified
@@ -408,8 +407,8 @@ source_catalog:
         symbol: create_topic
     - name: topic_relationships_map_to_distinct_post_support_roles
       kind: function
-      line_start: 392
-      line_end: 413
+      line_start: 402
+      line_end: 423
       signature: topic_relationships_map_to_distinct_post_support_roles()
       inputs: []
       output: unspecified
@@ -420,8 +419,8 @@ source_catalog:
       - *id005
     - name: provider_prose_cleanup_removes_markdown_and_nonstandard_punctuation
       kind: function
-      line_start: 416
-      line_end: 419
+      line_start: 426
+      line_end: 429
       signature: provider_prose_cleanup_removes_markdown_and_nonstandard_punctuation()
       inputs: []
       output: unspecified
@@ -430,16 +429,19 @@ source_catalog:
       parser: rust-pattern
       dependency_targets:
       - *id006
-    - name: structured_output_requires_nonempty_bounded_draft
+    - name: structured_output_requires_substantive_bounded_draft
       kind: function
-      line_start: 422
-      line_end: 430
-      signature: structured_output_requires_nonempty_bounded_draft()
+      line_start: 432
+      line_end: 446
+      signature: structured_output_requires_substantive_bounded_draft()
       inputs: []
       output: unspecified
       dependencies:
+      - count
       - is_err
+      - repeat
       - unwrap
+      - valid.draft_text.chars
       - validate_generated_output
       parser: rust-pattern
       dependency_targets:

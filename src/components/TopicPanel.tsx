@@ -32,10 +32,12 @@ export function TopicPanel({
   vaultPath,
   topicId,
   onClose,
+  onPostGenerated,
 }: {
   vaultPath: string;
   topicId: string;
   onClose: () => void;
+  onPostGenerated: (postId: string) => void;
 }) {
   const [topic, setTopic] = useState<TopicRecord | null>(null);
   const [title, setTitle] = useState("");
@@ -148,7 +150,7 @@ export function TopicPanel({
         providerId: settings.selectedProviderId,
         modelId: settings.ollamaModelId,
       });
-      setNotice(`Draft generated: ${result.lineage.post.title}. Review it in Posts.`);
+      onPostGenerated(result.lineage.post.postId);
     } catch (caught) {
       setError(errorMessage(caught));
     } finally {

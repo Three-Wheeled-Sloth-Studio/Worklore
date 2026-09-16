@@ -97,6 +97,7 @@ export function VoiceWorkspace({ vaultPath }: { vaultPath: string }) {
   const [analysisEvidenceIds, setAnalysisEvidenceIds] = useState<string[]>([]);
   const [analysisGuidance, setAnalysisGuidance] = useState("");
   const [analysisResult, setAnalysisResult] = useState<VoiceAnalysisResult | null>(null);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [proposalVoiceId, setProposalVoiceId] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -117,6 +118,7 @@ export function VoiceWorkspace({ vaultPath }: { vaultPath: string }) {
   useEffect(() => {
     setNotice(null);
     setError(null);
+    setAnalysisError(null);
     setAnalysisResult(null);
     setAnalysisEvidenceIds([]);
     void refresh();
@@ -290,6 +292,7 @@ export function VoiceWorkspace({ vaultPath }: { vaultPath: string }) {
     setBusy("Learning from approved writing locally");
     setNotice(null);
     setError(null);
+    setAnalysisError(null);
     try {
       const result = (await analyzeVoiceEvidence(vaultPath, {
         providerId: providerSettings.selectedProviderId,
@@ -310,7 +313,7 @@ export function VoiceWorkspace({ vaultPath }: { vaultPath: string }) {
           : "The approved samples did not support stable trait or rule suggestions. Nothing was changed.",
       );
     } catch (caught) {
-      setError(errorMessage(caught));
+      setAnalysisError(errorMessage(caught));
     } finally {
       setBusy(null);
     }
@@ -617,6 +620,7 @@ export function VoiceWorkspace({ vaultPath }: { vaultPath: string }) {
                 Analyze approved writing
               </button>
             </div>
+            {analysisError ? <div className="feedback error" role="alert">{analysisError}</div> : null}
             <p className="voice-meta">Using {providerSettings.selectedProviderId} | {providerSettings.ollamaModelId}</p>
             <details className="voice-analysis-options">
               <summary>Choose samples or add guidance</summary>

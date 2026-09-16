@@ -464,7 +464,7 @@ source_catalog:
   - path: src/App.tsx
     analysis_version: 1
     language: typescript
-    content_hash: 7579e8f78c6912ce309c40b2a52655621aa27ecb
+    content_hash: b950267205a08ced165fe347d78a78c4b86afa87
     dependencies:
     - ./components/CapturePanel
     - ./components/GuidedInterviewPanel
@@ -520,7 +520,7 @@ source_catalog:
     - name: App
       kind: function
       line_start: 75
-      line_end: 857
+      line_end: 862
       signature: App()
       inputs: []
       output: unspecified
@@ -1008,7 +1008,7 @@ source_catalog:
     - name: renderWorkspace
       kind: function
       line_start: 586
-      line_end: 703
+      line_end: 708
       signature: renderWorkspace()
       inputs: []
       output: unspecified
@@ -1032,8 +1032,8 @@ source_catalog:
       - *id021
     - name: StatusItem
       kind: function
-      line_start: 858
-      line_end: 863
+      line_start: 863
+      line_end: 868
       signature: StatusItem({ value, label, attention)
       inputs:
       - '{ value, label, attention'
@@ -1043,8 +1043,8 @@ source_catalog:
       dependency_targets: []
     - name: StatusPill
       kind: function
-      line_start: 875
-      line_end: 876
+      line_start: 880
+      line_end: 881
       signature: StatusPill({ label, attention)
       inputs:
       - '{ label, attention'
@@ -1054,8 +1054,8 @@ source_catalog:
       dependency_targets: []
     - name: Feedback
       kind: function
-      line_start: 879
-      line_end: 880
+      line_start: 884
+      line_end: 885
       signature: 'Feedback({ notice, error }: { notice: string | null; error: string | null })'
       inputs:
       - '{ notice, error }: { notice: string | null; error: string | null }'
@@ -1065,8 +1065,8 @@ source_catalog:
       dependency_targets: []
     - name: BusyLayer
       kind: function
-      line_start: 890
-      line_end: 894
+      line_start: 895
+      line_end: 899
       signature: 'BusyLayer({ message, activeOperation, }: { message: string | null; activeOperation: ActiveOperation | null;
         })'
       inputs:
@@ -1077,8 +1077,8 @@ source_catalog:
       dependency_targets: []
     - name: sourceTypeLabel
       kind: function
-      line_start: 917
-      line_end: 920
+      line_start: 922
+      line_end: 925
       signature: 'sourceTypeLabel(sourceType: SourceType) -> string'
       inputs:
       - 'sourceType: SourceType'
@@ -1089,8 +1089,8 @@ source_catalog:
       dependency_targets: []
     - name: candidateStatusMessage
       kind: function
-      line_start: 921
-      line_end: 933
+      line_start: 926
+      line_end: 938
       signature: 'candidateStatusMessage(status: CandidateStatus) -> string'
       inputs:
       - 'status: CandidateStatus'
@@ -1100,8 +1100,8 @@ source_catalog:
       dependency_targets: []
     - name: displayVaultPath
       kind: function
-      line_start: 934
-      line_end: 939
+      line_start: 939
+      line_end: 944
       signature: 'displayVaultPath(parentPath: string, name: string) -> string'
       inputs:
       - 'parentPath: string'
@@ -1115,8 +1115,8 @@ source_catalog:
       dependency_targets: []
     - name: formatDate
       kind: function
-      line_start: 940
-      line_end: 947
+      line_start: 945
+      line_end: 952
       signature: 'formatDate(value: string) -> string'
       inputs:
       - 'value: string'
@@ -1131,8 +1131,8 @@ source_catalog:
       dependency_targets: []
     - name: formatElapsed
       kind: function
-      line_start: 948
-      line_end: 955
+      line_start: 953
+      line_end: 960
       signature: 'formatElapsed(durationMs: number) -> string'
       inputs:
       - 'durationMs: number'
@@ -1145,8 +1145,8 @@ source_catalog:
       dependency_targets: []
     - name: humanize
       kind: function
-      line_start: 956
-      line_end: 959
+      line_start: 961
+      line_end: 964
       signature: 'humanize(value: string) -> string'
       inputs:
       - 'value: string'

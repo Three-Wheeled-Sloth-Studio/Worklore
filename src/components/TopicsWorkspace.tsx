@@ -5,7 +5,13 @@ import { createTopic, listTopics } from "../lib/workloreApi";
 import { InfoButton } from "./InfoButton";
 import { TopicPanel } from "./TopicPanel";
 
-export function TopicsWorkspace({ vaultPath }: { vaultPath: string }) {
+export function TopicsWorkspace({
+  vaultPath,
+  onPostGenerated,
+}: {
+  vaultPath: string;
+  onPostGenerated: (postId: string) => void;
+}) {
   const [topics, setTopics] = useState<TopicRecord[]>([]);
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const [newTitle, setNewTitle] = useState("");
@@ -54,6 +60,7 @@ export function TopicsWorkspace({ vaultPath }: { vaultPath: string }) {
           setSelectedTopicId(null);
           void refresh();
         }}
+        onPostGenerated={onPostGenerated}
       />
     );
   }

@@ -242,7 +242,7 @@ source_catalog:
   - path: src/components/TopicPanel.tsx
     analysis_version: 1
     language: typescript
-    content_hash: 1f896ad2e63114501e248bfc6909efc9881728b7
+    content_hash: 76c9c458b58d403175bf6cd14393018f459db2e4
     dependencies:
     - ../domain/types
     - ../lib/postApi
@@ -269,8 +269,8 @@ source_catalog:
     symbols:
     - name: loadTopic
       kind: function
-      line_start: 71
-      line_end: 82
+      line_start: 73
+      line_end: 84
       signature: loadTopic()
       inputs: []
       output: unspecified
@@ -293,8 +293,8 @@ source_catalog:
         symbol: getTopic
     - name: applyTopic
       kind: function
-      line_start: 83
-      line_end: 92
+      line_start: 85
+      line_end: 94
       signature: 'applyTopic(next: TopicRecord)'
       inputs:
       - 'next: TopicRecord'
@@ -311,8 +311,8 @@ source_catalog:
       dependency_targets: []
     - name: loadTargets
       kind: function
-      line_start: 93
-      line_end: 106
+      line_start: 95
+      line_end: 108
       signature: 'loadTargets(kind: TopicRelationKind)'
       inputs:
       - 'kind: TopicRelationKind'
@@ -331,8 +331,8 @@ source_catalog:
         symbol: listTopicLinkTargets
     - name: updateRequest
       kind: function
-      line_start: 107
-      line_end: 118
+      line_start: 109
+      line_end: 120
       signature: updateRequest()
       inputs: []
       output: unspecified
@@ -341,8 +341,8 @@ source_catalog:
       dependency_targets: []
     - name: handleSave
       kind: function
-      line_start: 119
-      line_end: 132
+      line_start: 121
+      line_end: 134
       signature: handleSave()
       inputs: []
       output: unspecified
@@ -366,8 +366,8 @@ source_catalog:
         symbol: updateTopic
     - name: handleGeneratePost
       kind: function
-      line_start: 133
-      line_end: 157
+      line_start: 135
+      line_end: 159
       signature: handleGeneratePost()
       inputs: []
       output: unspecified
@@ -376,6 +376,7 @@ source_catalog:
       - errorMessage
       - generatePostFromTopic
       - getProviderSettings
+      - onPostGenerated
       - setBusy
       - setError
       - setNotice
@@ -393,8 +394,8 @@ source_catalog:
       - *id007
     - name: handleAddRelationship
       kind: function
-      line_start: 158
-      line_end: 174
+      line_start: 160
+      line_end: 176
       signature: handleAddRelationship()
       inputs: []
       output: unspecified
@@ -420,8 +421,8 @@ source_catalog:
         symbol: loadTargets
     - name: handleRemoveRelationship
       kind: function
-      line_start: 175
-      line_end: 189
+      line_start: 177
+      line_end: 191
       signature: 'handleRemoveRelationship(kind: TopicRelationKind, targetId: string)'
       inputs:
       - 'kind: TopicRelationKind'
@@ -444,8 +445,8 @@ source_catalog:
         symbol: removeTopicRelationship
     - name: handleCreateTheme
       kind: function
-      line_start: 190
-      line_end: 212
+      line_start: 192
+      line_end: 214
       signature: handleCreateTheme()
       inputs: []
       output: unspecified
@@ -473,8 +474,8 @@ source_catalog:
       - *id010
     - name: humanize
       kind: function
-      line_start: 462
-      line_end: 465
+      line_start: 464
+      line_end: 467
       signature: 'humanize(value: string) -> string'
       inputs:
       - 'value: string'
@@ -485,8 +486,8 @@ source_catalog:
       dependency_targets: []
     - name: CloseIcon
       kind: function
-      line_start: 466
-      line_end: 469
+      line_start: 468
+      line_end: 471
       signature: CloseIcon()
       inputs: []
       output: unspecified
@@ -495,8 +496,8 @@ source_catalog:
       dependency_targets: []
     - name: SaveIcon
       kind: function
-      line_start: 470
-      line_end: 473
+      line_start: 472
+      line_end: 475
       signature: SaveIcon()
       inputs: []
       output: unspecified
@@ -505,8 +506,8 @@ source_catalog:
       dependency_targets: []
     - name: SparkIcon
       kind: function
-      line_start: 474
-      line_end: 477
+      line_start: 476
+      line_end: 479
       signature: SparkIcon()
       inputs: []
       output: unspecified
@@ -515,8 +516,8 @@ source_catalog:
       dependency_targets: []
     - name: LinkIcon
       kind: function
-      line_start: 478
-      line_end: 481
+      line_start: 480
+      line_end: 483
       signature: LinkIcon()
       inputs: []
       output: unspecified
@@ -525,8 +526,8 @@ source_catalog:
       dependency_targets: []
     - name: UnlinkIcon
       kind: function
-      line_start: 482
-      line_end: 485
+      line_start: 484
+      line_end: 487
       signature: UnlinkIcon()
       inputs: []
       output: unspecified
@@ -535,8 +536,8 @@ source_catalog:
       dependency_targets: []
     - name: PlusIcon
       kind: function
-      line_start: 486
-      line_end: 489
+      line_start: 488
+      line_end: 491
       signature: PlusIcon()
       inputs: []
       output: unspecified

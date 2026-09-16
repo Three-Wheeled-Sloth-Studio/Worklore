@@ -433,7 +433,7 @@ source_catalog:
   - path: src/components/TopicsWorkspace.tsx
     analysis_version: 1
     language: typescript
-    content_hash: 4912a46909a6160e097176938f6249ca9ab7ea03
+    content_hash: 9aa55c3e027385911634f8ad40b959c63dfbacef
     dependencies:
     - ../domain/types
     - ../lib/workloreApi
@@ -441,26 +441,14 @@ source_catalog:
     - ./TopicPanel
     - react
     provides:
-    - TopicsWorkspace
     - refresh
     - createNewTopic
     - PlusIcon
     symbols:
-    - name: TopicsWorkspace
-      kind: function
-      line_start: 7
-      line_end: 8
-      signature: 'TopicsWorkspace({ vaultPath }: { vaultPath: string })'
-      inputs:
-      - '{ vaultPath }: { vaultPath: string }'
-      output: unspecified
-      dependencies: []
-      parser: typescript-pattern
-      dependency_targets: []
     - name: refresh
       kind: function
-      line_start: 19
-      line_end: 26
+      line_start: 25
+      line_end: 32
       signature: refresh()
       inputs: []
       output: unspecified
@@ -476,8 +464,8 @@ source_catalog:
         symbol: listTopics
     - name: createNewTopic
       kind: function
-      line_start: 27
-      line_end: 46
+      line_start: 33
+      line_end: 52
       signature: createNewTopic()
       inputs: []
       output: unspecified
@@ -505,8 +493,8 @@ source_catalog:
         symbol: refresh
     - name: PlusIcon
       kind: function
-      line_start: 110
-      line_end: 113
+      line_start: 117
+      line_end: 120
       signature: PlusIcon()
       inputs: []
       output: unspecified

@@ -1318,7 +1318,7 @@ source_catalog:
   - path: src/components/VoiceWorkspace.tsx
     analysis_version: 1
     language: typescript
-    content_hash: f89e174251a7625f871308bdcd163280d9f4b2ec
+    content_hash: 59662b5357494b700f1d3e36fd69222171a697a2
     dependencies:
     - ../domain/types
     - ../lib/workloreApi
@@ -1364,8 +1364,8 @@ source_catalog:
       dependency_targets: []
     - name: refresh
       kind: function
-      line_start: 144
-      line_end: 172
+      line_start: 146
+      line_end: 174
       signature: refresh()
       inputs: []
       output: unspecified
@@ -1403,8 +1403,8 @@ source_catalog:
         symbol: listWritingRules
     - name: createCandidate
       kind: function
-      line_start: 188
-      line_end: 195
+      line_start: 190
+      line_end: 197
       signature: 'createCandidate(sourceId: string)'
       inputs:
       - 'sourceId: string'
@@ -1420,8 +1420,8 @@ source_catalog:
         symbol: run
     - name: review
       kind: function
-      line_start: 196
-      line_end: 211
+      line_start: 198
+      line_end: 213
       signature: 'review(item: VoiceEvidenceRecord, decision: VoiceEvidenceDecision)'
       inputs:
       - 'item: VoiceEvidenceRecord'
@@ -1437,8 +1437,8 @@ source_catalog:
       - *id022
     - name: addVoiceVersion
       kind: function
-      line_start: 212
-      line_end: 222
+      line_start: 214
+      line_end: 224
       signature: addVoiceVersion()
       inputs: []
       output: unspecified
@@ -1454,8 +1454,8 @@ source_catalog:
       - *id022
     - name: draftFor
       kind: function
-      line_start: 223
-      line_end: 226
+      line_start: 225
+      line_end: 228
       signature: 'draftFor(voiceId: string) -> TraitDraft'
       inputs:
       - 'voiceId: string'
@@ -1465,8 +1465,8 @@ source_catalog:
       dependency_targets: []
     - name: updateTraitDraft
       kind: function
-      line_start: 227
-      line_end: 233
+      line_start: 229
+      line_end: 235
       signature: 'updateTraitDraft(voiceId: string, patch: Partial<TraitDraft>)'
       inputs:
       - 'voiceId: string'
@@ -1478,8 +1478,8 @@ source_catalog:
       dependency_targets: []
     - name: editTrait
       kind: function
-      line_start: 234
-      line_end: 248
+      line_start: 236
+      line_end: 250
       signature: 'editTrait(voiceId: string, trait: CoreVoiceTrait)'
       inputs:
       - 'voiceId: string'
@@ -1493,8 +1493,8 @@ source_catalog:
       dependency_targets: []
     - name: saveTrait
       kind: function
-      line_start: 249
-      line_end: 266
+      line_start: 251
+      line_end: 268
       signature: 'saveTrait(voiceId: string)'
       inputs:
       - 'voiceId: string'
@@ -1514,8 +1514,8 @@ source_catalog:
         symbol: saveCoreVoiceTrait
     - name: removeTrait
       kind: function
-      line_start: 267
-      line_end: 274
+      line_start: 269
+      line_end: 276
       signature: 'removeTrait(voiceId: string, traitId: string)'
       inputs:
       - 'voiceId: string'
@@ -1531,8 +1531,8 @@ source_catalog:
       - *id022
     - name: activateVoice
       kind: function
-      line_start: 275
-      line_end: 282
+      line_start: 277
+      line_end: 284
       signature: 'activateVoice(voiceId: string)'
       inputs:
       - 'voiceId: string'
@@ -1547,14 +1547,15 @@ source_catalog:
       - *id022
     - name: runVoiceAnalysis
       kind: function
-      line_start: 283
-      line_end: 317
+      line_start: 285
+      line_end: 320
       signature: runVoiceAnalysis()
       inputs: []
       output: unspecified
       dependencies:
       - analyzeVoiceEvidence
       - errorMessage
+      - setAnalysisError
       - setAnalysisResult
       - setBusy
       - setError
@@ -1566,8 +1567,8 @@ source_catalog:
       - *id018
     - name: acceptVoiceProposal
       kind: function
-      line_start: 318
-      line_end: 347
+      line_start: 321
+      line_end: 350
       signature: 'acceptVoiceProposal(proposal: VoiceTraitProposal)'
       inputs:
       - 'proposal: VoiceTraitProposal'
@@ -1599,8 +1600,8 @@ source_catalog:
       - *id023
     - name: acceptWritingRuleProposal
       kind: function
-      line_start: 348
-      line_end: 375
+      line_start: 351
+      line_end: 378
       signature: 'acceptWritingRuleProposal(proposal: WritingRuleProposal)'
       inputs:
       - 'proposal: WritingRuleProposal'
@@ -1626,8 +1627,8 @@ source_catalog:
       - *id027
     - name: discardVoiceProposal
       kind: function
-      line_start: 376
-      line_end: 386
+      line_start: 379
+      line_end: 389
       signature: 'discardVoiceProposal(proposalId: string)'
       inputs:
       - 'proposalId: string'
@@ -1639,8 +1640,8 @@ source_catalog:
       dependency_targets: []
     - name: discardWritingRuleProposal
       kind: function
-      line_start: 387
-      line_end: 397
+      line_start: 390
+      line_end: 400
       signature: 'discardWritingRuleProposal(proposalId: string)'
       inputs:
       - 'proposalId: string'
@@ -1652,8 +1653,8 @@ source_catalog:
       dependency_targets: []
     - name: addTone
       kind: function
-      line_start: 398
-      line_end: 414
+      line_start: 401
+      line_end: 417
       signature: addTone()
       inputs: []
       output: unspecified
@@ -1672,8 +1673,8 @@ source_catalog:
       - *id022
     - name: setToneStatus
       kind: function
-      line_start: 415
-      line_end: 422
+      line_start: 418
+      line_end: 425
       signature: 'setToneStatus(tone: ToneModeRecord, status: ToneModeRecord["status"])'
       inputs:
       - 'tone: ToneModeRecord'
@@ -1689,8 +1690,8 @@ source_catalog:
         symbol: updateToneMode
     - name: addDirection
       kind: function
-      line_start: 423
-      line_end: 437
+      line_start: 426
+      line_end: 440
       signature: addDirection()
       inputs: []
       output: unspecified
@@ -1707,8 +1708,8 @@ source_catalog:
       - *id022
     - name: setDirectionStatus
       kind: function
-      line_start: 438
-      line_end: 445
+      line_start: 441
+      line_end: 448
       signature: 'setDirectionStatus(item: VoiceDirectionRecord, status: VoiceDirectionStatus)'
       inputs:
       - 'item: VoiceDirectionRecord'
@@ -1724,8 +1725,8 @@ source_catalog:
         symbol: setVoiceDirectionStatus
     - name: runDraftLint
       kind: function
-      line_start: 446
-      line_end: 465
+      line_start: 449
+      line_end: 468
       signature: runDraftLint()
       inputs: []
       output: unspecified
@@ -1744,8 +1745,8 @@ source_catalog:
         symbol: lintDraft
     - name: addRule
       kind: function
-      line_start: 466
-      line_end: 476
+      line_start: 469
+      line_end: 479
       signature: addRule()
       inputs: []
       output: unspecified
@@ -1762,8 +1763,8 @@ source_catalog:
       - *id022
     - name: setRuleStatus
       kind: function
-      line_start: 477
-      line_end: 484
+      line_start: 480
+      line_end: 487
       signature: 'setRuleStatus(item: WritingRuleRecord, status: WritingRuleStatus)'
       inputs:
       - 'item: WritingRuleRecord'
@@ -1779,8 +1780,8 @@ source_catalog:
         symbol: updateWritingRule
     - name: renderPendingEvidence
       kind: function
-      line_start: 485
-      line_end: 536
+      line_start: 488
+      line_end: 539
       signature: 'renderPendingEvidence(item: VoiceEvidenceRecord)'
       inputs:
       - 'item: VoiceEvidenceRecord'
