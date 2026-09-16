@@ -1,12 +1,12 @@
-version: 1
+version: 2
 schema: refs/schemas/schemaRegistry.yaml
-updated: 2026-09-12
+updated: 2026-09-16
 okf:
   version: "0.2"
   canonical_repository: https://github.com/GoogleCloudPlatform/open-knowledge-format
   baseline_commit: ad30107c31c06aec8a7d5636e0d1058118604e6f
 agent_academy:
-  baseline_commit: ec9e166470f749d890656f10031a3056a05ab729
+  baseline_commit: e4118f96cc0138490b950402ba711399580ee854
   profile: agent-academy-okf-v1
 bundle:
   root: refs
@@ -51,6 +51,16 @@ indexes:
   generator: python refs/tools/generate_okf_indexes.py
   check: python refs/tools/generate_okf_indexes.py --check
   manual_edits_allowed: false
+source_catalog:
+  generated: true
+  committed: true
+  index: refs/implementation/sourceCatalog/index.yaml
+  shards: refs/implementation/.sourceCatalogShards
+  generator: python refs/tools/generate_source_catalog.py
+  check: python refs/tools/generate_source_catalog.py --check
+  query: python refs/tools/generate_source_catalog.py --query "<task or symbol>"
+  manual_edits_allowed: false
+  authority: discovery_only
 provenance:
   rules:
     - Do not infer verified status from generation, Git history, tests, or refs validation.
