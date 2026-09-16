@@ -81,11 +81,17 @@ def validate_placeholders(policy: dict[str, Any], mode: str, errors: list[str]) 
         if mode == "initialized" and path in bootstrap and found: add_error(errors, path, "bootstrap file still contains template placeholders")
 
 def validate_secret_scan(policy: dict[str, Any], errors: list[str]) -> None:
-    regexes = [re.compile(pattern, re.IGNORECASE) for pattern in policy.get("validation", {}).get("disallowed_secret_patterns", [])]; assignment_re = re.compile(r"[:=]\s*['\"]?[A-Za-z0-9_/\-+=]{16,}")
+    patterns = policy.get("validation", {}).get("disallowed_secret_patterns", [])
+    if not patterns:
+        return
+    secret_assignment_re = re.compile(
+        rf"(?:{'|'.join(f'(?:{pattern})' for pattern in patterns)})\b['\"]?\s*[:=]\s*['\"]?[A-Za-z0-9_/\-+=]{{16,}}",
+        re.IGNORECASE,
+    )
     for path in all_ref_files():
         if rel(path).startswith("refs/examples/") or path.suffix.lower() not in {".md", ".yaml", ".yml", ".json", ".example"}: continue
         for lineno, line in enumerate(text(path).splitlines(), start=1):
-            if any(regex.search(line) for regex in regexes) and assignment_re.search(line): add_error(errors, path, f"possible secret-like value on line {lineno}")
+            if secret_assignment_re.search(line): add_error(errors, path, f"possible secret-like value on line {lineno}")
 
 def validate_portable_paths(errors: list[str]) -> None:
     absolute_windows = re.compile(r"[A-Za-z]:\\"); absolute_unix = re.compile(r"(?<!:)\s/[A-Za-z0-9_.-]")
