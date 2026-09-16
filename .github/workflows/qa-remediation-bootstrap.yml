@@ -1,0 +1,58 @@
+name: Apply bounded QA remediation
+
+on:
+  pull_request:
+    branches: [qa]
+    types: [reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'dev'
+    runs-on: windows-latest
+    steps:
+      - name: Check out dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install catalog dependency
+        shell: pwsh
+        run: python -m pip install pyyaml
+
+      - name: Apply exact QA patch
+        shell: pwsh
+        run: python refs/tools/qa_patch_20260916.py
+
+      - name: Regenerate bounded source catalog
+        shell: pwsh
+        run: python refs/tools/generate_source_catalog.py
+
+      - name: Verify generated discovery and refs
+        shell: pwsh
+        run: |
+          python -m compileall -q refs/tools
+          python refs/tools/generate_source_catalog.py --check
+          python refs/tools/validate_refs.py --mode initialized
+          python refs/tools/generate_agent_context.py --check
+
+      - name: Commit remediation
+        shell: pwsh
+        run: |
+          git config user.name "Three-Wheeled Sloth Automation"
+          git config user.email "36046890+SlothMD@users.noreply.github.com"
+          git add src src-tauri package.json refs/implementation/sourceCatalog refs/implementation/.sourceCatalogShards
+          if (git diff --cached --quiet) {
+            Write-Host "No remediation changes to commit."
+            exit 0
+          }
+          git commit -m "fix: keep QA actions and generated drafts moving"
+          git push origin HEAD:dev
