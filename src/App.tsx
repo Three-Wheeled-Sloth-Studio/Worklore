@@ -63,7 +63,7 @@ import { LIBRARY_NAV_ITEMS, PRIMARY_NAV_ITEMS, SETTINGS_NAV_ITEM } from "./navig
 import "./styles.css";
 import "./shell.css";
 
-const APP_VERSION = "0.1.5";
+const APP_VERSION = "0.1.6";
 
 const SOURCE_TYPES: Array<{ value: SourceType; label: string }> = [
   { value: "resume", label: "Resume" },

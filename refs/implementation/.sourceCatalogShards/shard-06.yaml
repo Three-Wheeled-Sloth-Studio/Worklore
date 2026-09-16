@@ -464,7 +464,7 @@ source_catalog:
   - path: src/App.tsx
     analysis_version: 1
     language: typescript
-    content_hash: 149e9cb29647d67126862cf09ae85ec76a24f3b8
+    content_hash: 0c564b8c958ee7ef5a06f36ffd5533efd4d45afa
     dependencies:
     - ./components/CapturePanel
     - ./components/GuidedInterviewPanel

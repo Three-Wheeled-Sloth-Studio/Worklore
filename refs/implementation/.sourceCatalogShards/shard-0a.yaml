@@ -297,7 +297,7 @@ source_catalog:
   - path: src/components/PostWorkspace.tsx
     analysis_version: 1
     language: typescript
-    content_hash: b7cbe3b82fc489525c7044c0b447b14ab4fb815d
+    content_hash: d2d4ad27d1fb90f1ee4f676ada9c90ca34579b8c
     dependencies:
     - ../domain/confidentiality
     - ../domain/posts
@@ -533,8 +533,8 @@ source_catalog:
       dependency_targets: []
     - name: humanize
       kind: function
-      line_start: 450
-      line_end: 453
+      line_start: 462
+      line_end: 465
       signature: 'humanize(value: string) -> string'
       inputs:
       - 'value: string'
@@ -545,8 +545,8 @@ source_catalog:
       dependency_targets: []
     - name: SparkleIcon
       kind: function
-      line_start: 454
-      line_end: 457
+      line_start: 466
+      line_end: 469
       signature: SparkleIcon()
       inputs: []
       output: unspecified
@@ -555,8 +555,8 @@ source_catalog:
       dependency_targets: []
     - name: SaveIcon
       kind: function
-      line_start: 458
-      line_end: 461
+      line_start: 470
+      line_end: 473
       signature: SaveIcon()
       inputs: []
       output: unspecified
@@ -565,8 +565,8 @@ source_catalog:
       dependency_targets: []
     - name: ShieldIcon
       kind: function
-      line_start: 462
-      line_end: 465
+      line_start: 474
+      line_end: 477
       signature: ShieldIcon()
       inputs: []
       output: unspecified
@@ -575,8 +575,8 @@ source_catalog:
       dependency_targets: []
     - name: CheckIcon
       kind: function
-      line_start: 466
-      line_end: 469
+      line_start: 478
+      line_end: 481
       signature: CheckIcon()
       inputs: []
       output: unspecified
@@ -585,8 +585,8 @@ source_catalog:
       dependency_targets: []
     - name: CopyIcon
       kind: function
-      line_start: 470
-      line_end: 473
+      line_start: 482
+      line_end: 485
       signature: CopyIcon()
       inputs: []
       output: unspecified

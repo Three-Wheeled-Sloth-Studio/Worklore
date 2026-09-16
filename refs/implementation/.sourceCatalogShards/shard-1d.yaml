@@ -61,7 +61,7 @@ source_catalog:
   - path: src-tauri/src/services/post_generation_service.rs
     analysis_version: 1
     language: rust
-    content_hash: f1e38b53ea4d36e7e236dfa1f7d5a7d522e5f914
+    content_hash: 4200b0c758f390f4fcd11c06e28c1e485f5d02ad
     dependencies:
     - chrono::Utc
     - crate::services::{topic_service::CreateTopicRequest, vault_service}
@@ -88,7 +88,7 @@ source_catalog:
     - provider_error
     - audit_provider_run
     - vault
-    - topic_without_standing_explicitly_blocks_invented_personal_experience
+    - topic_without_standing_preserves_explicit_author_framing_without_inventing_work_history
     - topic_relationships_map_to_distinct_post_support_roles
     - provider_prose_cleanup_removes_markdown_and_nonstandard_punctuation
     - structured_output_requires_substantive_bounded_draft
@@ -383,11 +383,11 @@ source_catalog:
         symbol: create_vault
       - path: src-tauri/src/services/vault_service.rs
         symbol: create_vault
-    - name: topic_without_standing_explicitly_blocks_invented_personal_experience
+    - name: topic_without_standing_preserves_explicit_author_framing_without_inventing_work_history
       kind: function
       line_start: 379
-      line_end: 399
-      signature: topic_without_standing_explicitly_blocks_invented_personal_experience()
+      line_end: 400
+      signature: topic_without_standing_preserves_explicit_author_framing_without_inventing_work_history()
       inputs: []
       output: unspecified
       dependencies:
@@ -407,8 +407,8 @@ source_catalog:
         symbol: create_topic
     - name: topic_relationships_map_to_distinct_post_support_roles
       kind: function
-      line_start: 402
-      line_end: 423
+      line_start: 403
+      line_end: 424
       signature: topic_relationships_map_to_distinct_post_support_roles()
       inputs: []
       output: unspecified
@@ -419,8 +419,8 @@ source_catalog:
       - *id005
     - name: provider_prose_cleanup_removes_markdown_and_nonstandard_punctuation
       kind: function
-      line_start: 426
-      line_end: 429
+      line_start: 427
+      line_end: 430
       signature: provider_prose_cleanup_removes_markdown_and_nonstandard_punctuation()
       inputs: []
       output: unspecified
@@ -431,8 +431,8 @@ source_catalog:
       - *id006
     - name: structured_output_requires_substantive_bounded_draft
       kind: function
-      line_start: 432
-      line_end: 446
+      line_start: 433
+      line_end: 448
       signature: structured_output_requires_substantive_bounded_draft()
       inputs: []
       output: unspecified

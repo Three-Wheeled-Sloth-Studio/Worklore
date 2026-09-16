@@ -272,20 +272,22 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
                 <option key={topic.topicId} value={topic.topicId}>{topic.title}</option>
               ))}
             </select>
-            <button
-              className="post-icon-button primary"
-              type="button"
-              disabled={busy || !selectedTopicId}
-              aria-label="Generate Post from selected Topic"
-              title="Generate Post from selected Topic"
-              onClick={() => void generateFromTopic()}
-            >
-              <SparkleIcon />
-            </button>
+            <span className="post-icon-tooltip" data-tooltip="Generate a draft from the selected Topic">
+              <button
+                className="post-icon-button primary"
+                type="button"
+                disabled={busy || !selectedTopicId}
+                aria-label="Generate a draft from the selected Topic"
+                onClick={() => void generateFromTopic()}
+              >
+                <SparkleIcon />
+              </button>
+            </span>
             <InfoButton label="Post generation guidance">
-              Pick a Topic and use Generate. Linked Stories and Proof Points can support personal
-              claims. Without them, WorkLore tells the model to write the idea without inventing your
-              experience. Generated text is always a model-origin draft that requires your review.
+              Pick a Topic and use Generate. The Topic title and summary define the intended point of
+              view and may include explicit first-person framing. Linked Stories and Proof Points can
+              support additional work-history claims. Generated text is always a model-origin draft
+              that requires your review.
             </InfoButton>
           </div>
 
@@ -357,47 +359,57 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
             <div className="post-action-bar">
               {lineage.post.status === "working" ? (
                 <>
-                  <button
-                    className="post-icon-button"
-                    type="button"
-                    disabled={busy || !unsavedChanges || !editorText.trim()}
-                    aria-label="Save revision"
-                    title="Save revision"
-                    onClick={() => void saveRevision()}
+                  <span className="post-icon-tooltip" data-tooltip="Save this edit as a new revision">
+                    <button
+                      className="post-icon-button"
+                      type="button"
+                      disabled={busy || !unsavedChanges || !editorText.trim()}
+                      aria-label="Save this edit as a new revision"
+                      onClick={() => void saveRevision()}
+                    >
+                      <SaveIcon />
+                    </button>
+                  </span>
+                  <span
+                    className="post-icon-tooltip"
+                    data-tooltip={unsavedChanges ? "Save edits before checking the draft" : "Check writing rules and privacy"}
                   >
-                    <SaveIcon />
-                  </button>
-                  <button
-                    className="post-icon-button"
-                    type="button"
-                    disabled={busy || !editorText.trim() || unsavedChanges}
-                    aria-label="Challenge saved revision"
-                    title={unsavedChanges ? "Save edits before Challenge" : "Challenge saved revision"}
-                    onClick={() => void challengeDraft()}
+                    <button
+                      className="post-icon-button"
+                      type="button"
+                      disabled={busy || !editorText.trim() || unsavedChanges}
+                      aria-label="Check writing rules and privacy"
+                      onClick={() => void challengeDraft()}
+                    >
+                      <ShieldIcon />
+                    </button>
+                  </span>
+                  <span
+                    className="post-icon-tooltip"
+                    data-tooltip={canApprove ? "Approve this as the final revision" : "Save and check the exact public-safe revision before approval"}
                   >
-                    <ShieldIcon />
-                  </button>
+                    <button
+                      className="post-icon-button primary"
+                      type="button"
+                      disabled={busy || !canApprove}
+                      aria-label="Approve this as the final revision"
+                      onClick={() => void approveFinal()}
+                    >
+                      <CheckIcon />
+                    </button>
+                  </span>
+                </>
+              ) : (
+                <span className="post-icon-tooltip" data-tooltip="Copy the approved Post">
                   <button
                     className="post-icon-button primary"
                     type="button"
-                    disabled={busy || !canApprove}
-                    aria-label="Approve final revision"
-                    title={canApprove ? "Approve final revision" : "Challenge the exact public-safe saved revision before approval"}
-                    onClick={() => void approveFinal()}
+                    aria-label="Copy the approved Post"
+                    onClick={() => void copyApprovedText()}
                   >
-                    <CheckIcon />
+                    <CopyIcon />
                   </button>
-                </>
-              ) : (
-                <button
-                  className="post-icon-button primary"
-                  type="button"
-                  aria-label="Copy approved Post"
-                  title="Copy approved Post"
-                  onClick={() => void copyApprovedText()}
-                >
-                  <CopyIcon />
-                </button>
+                </span>
               )}
               {unsavedChanges ? <span className="post-action-status">Unsaved</span> : null}
             </div>
