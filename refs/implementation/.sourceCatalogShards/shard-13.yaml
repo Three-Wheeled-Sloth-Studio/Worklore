@@ -166,11 +166,11 @@ source_catalog:
   - path: src-tauri/src/services/app_preferences_service.rs
     analysis_version: 1
     language: rust
-    content_hash: c2fde978295d3c3c0a2768ddb8aeb7feaf22bf15
+    content_hash: cfc6ce0279b2d39dc32b8987968e5d940eb93e1c
     dependencies:
     - chrono::Utc
-    - "crate::{\n    domain::providers::ProviderSettingsView,\n    error::{ServiceResult, WorkLoreError},\n    io_utils::{read_json,\
-      \ write_json_atomic},\n}"
+    - "crate::{\n    domain::providers::{ProviderSettingsView, GEMINI_PROVIDER_ID, OPENAI_PROVIDER_ID},\n    error::{ServiceResult,\
+      \ WorkLoreError},\n    io_utils::{read_json, write_json_atomic},\n    services::provider_secret_service,\n}"
     - serde::{Deserialize, Serialize}
     - "std::{\n    env, fs,\n    path::{Path, PathBuf},\n}"
     - super::*
@@ -185,6 +185,9 @@ source_catalog:
     - get_default_vault_root
     - get_provider_settings
     - save_provider_settings
+    - get_provider_api_key
+    - protect_optional_secret
+    - has_ciphertext
     - existing_directory_value
     - read_preferences_or_default
     - preferences_path
@@ -194,14 +197,14 @@ source_catalog:
     - local_config_root
     - local_config_root
     - default_ollama_base_url
-    - default_preferences_keep_vault_and_import_memory_separate
+    - default_preferences_keep_vault_import_and_provider_secrets_separate
     - missing_paths_are_not_returned_as_defaults
     - default_vault_root_is_the_executable_folder
     symbols:
     - name: default
       kind: function
-      line_start: 34
-      line_end: 44
+      line_start: 43
+      line_end: 57
       signature: default() -> Self
       inputs: []
       output: Self
@@ -216,8 +219,8 @@ source_catalog:
         symbol: default_ollama_base_url
     - name: get_last_vault_path
       kind: function
-      line_start: 46
-      line_end: 50
+      line_start: 66
+      line_end: 70
       signature: get_last_vault_path() -> ServiceResult<Option<String>>
       inputs: []
       output: ServiceResult<Option<String>>
@@ -239,8 +242,8 @@ source_catalog:
         symbol: read_preferences_or_default
     - name: remember_last_vault
       kind: function
-      line_start: 51
-      line_end: 60
+      line_start: 71
+      line_end: 80
       signature: 'remember_last_vault(path: &Path) -> ServiceResult<()>'
       inputs:
       - 'path: &Path'
@@ -257,8 +260,8 @@ source_catalog:
       dependency_targets: []
     - name: clear_last_vault
       kind: function
-      line_start: 61
-      line_end: 66
+      line_start: 81
+      line_end: 86
       signature: clear_last_vault() -> ServiceResult<()>
       inputs: []
       output: ServiceResult<()>
@@ -268,8 +271,8 @@ source_catalog:
       dependency_targets: []
     - name: get_last_import_directory
       kind: function
-      line_start: 67
-      line_end: 74
+      line_start: 87
+      line_end: 94
       signature: get_last_import_directory() -> ServiceResult<Option<String>>
       inputs: []
       output: ServiceResult<Option<String>>
@@ -285,8 +288,8 @@ source_catalog:
       - *id006
     - name: remember_last_import_file
       kind: function
-      line_start: 75
-      line_end: 87
+      line_start: 95
+      line_end: 107
       signature: 'remember_last_import_file(file_path: &Path) -> ServiceResult<String>'
       inputs:
       - 'file_path: &Path'
@@ -306,8 +309,8 @@ source_catalog:
       dependency_targets: []
     - name: default_vault_root
       kind: function
-      line_start: 88
-      line_end: 92
+      line_start: 108
+      line_end: 112
       signature: default_vault_root() -> ServiceResult<PathBuf>
       inputs: []
       output: ServiceResult<PathBuf>
@@ -322,8 +325,8 @@ source_catalog:
         symbol: default_vault_root_from_executable
     - name: get_default_vault_root
       kind: function
-      line_start: 93
-      line_end: 96
+      line_start: 113
+      line_end: 116
       signature: get_default_vault_root() -> ServiceResult<String>
       inputs: []
       output: ServiceResult<String>
@@ -338,39 +341,101 @@ source_catalog:
         symbol: default_vault_root
     - name: get_provider_settings
       kind: function
-      line_start: 97
-      line_end: 105
+      line_start: 117
+      line_end: 129
       signature: get_provider_settings() -> ServiceResult<ProviderSettingsView>
       inputs: []
       output: ServiceResult<ProviderSettingsView>
       dependencies:
       - Ok
+      - has_ciphertext
       - preferences_path
       - read_preferences_or_default
       parser: rust-pattern
       dependency_targets:
+      - path: src-tauri/src/services/app_preferences_service.rs
+        symbol: has_ciphertext
       - *id005
       - *id006
     - name: save_provider_settings
       kind: function
-      line_start: 106
-      line_end: 117
-      signature: 'save_provider_settings(settings: ProviderSettingsView) -> ServiceResult<ProviderSettingsView>'
+      line_start: 130
+      line_end: 155
+      signature: 'save_provider_settings(settings: ProviderSettingsView, secrets: ProviderSecretUpdate) -> ServiceResult<()>'
       inputs:
       - 'settings: ProviderSettingsView'
-      output: ServiceResult<ProviderSettingsView>
+      - 'secrets: ProviderSecretUpdate'
+      output: ServiceResult<()>
       dependencies:
-      - Ok
+      - Some
+      - ciphertext.clone
+      - protect_optional_secret
+      - secrets.gemini_api_key.as_deref
+      - secrets.openai_api_key.as_deref
+      - settings.gemini_model_id.clone
       - settings.ollama_base_url.clone
       - settings.ollama_model_id.clone
+      - settings.openai_model_id.clone
       - settings.selected_provider_id.clone
       - update_preferences
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/app_preferences_service.rs
+        symbol: protect_optional_secret
+    - name: get_provider_api_key
+      kind: function
+      line_start: 156
+      line_end: 167
+      signature: 'get_provider_api_key(provider_id: &str) -> ServiceResult<Option<String>>'
+      inputs:
+      - 'provider_id: &str'
+      output: ServiceResult<Option<String>>
+      dependencies:
+      - map
+      - preferences_path
+      - read_preferences_or_default
+      - transpose
+      - unprotect_secret
+      parser: rust-pattern
+      dependency_targets:
+      - *id005
+      - *id006
+      - path: src-tauri/src/services/provider_secret_service.rs
+        symbol: unprotect_secret
+    - name: protect_optional_secret
+      kind: function
+      line_start: 168
+      line_end: 175
+      signature: 'protect_optional_secret(secret: Option<&str>) -> ServiceResult<Option<String>>'
+      inputs:
+      - 'secret: Option<&str>'
+      output: ServiceResult<Option<String>>
+      dependencies:
+      - filter
+      - map
+      - transpose
+      - value.is_empty
+      parser: rust-pattern
+      dependency_targets: []
+    - name: has_ciphertext
+      kind: function
+      line_start: 176
+      line_end: 181
+      signature: 'has_ciphertext(value: &Option<String>) -> bool'
+      inputs:
+      - 'value: &Option<String>'
+      output: bool
+      dependencies:
+      - as_deref
+      - is_empty
+      - is_some_and
+      - value.trim
       parser: rust-pattern
       dependency_targets: []
     - name: existing_directory_value
       kind: function
-      line_start: 126
-      line_end: 132
+      line_start: 190
+      line_end: 196
       signature: 'existing_directory_value(value: Option<String>, require_vault: bool) -> Option<String>'
       inputs:
       - 'value: Option<String>'
@@ -386,8 +451,8 @@ source_catalog:
       dependency_targets: []
     - name: read_preferences_or_default
       kind: function
-      line_start: 133
-      line_end: 144
+      line_start: 197
+      line_end: 208
       signature: 'read_preferences_or_default(path: &Path) -> ServiceResult<AppPreferences>'
       inputs:
       - 'path: &Path'
@@ -409,8 +474,8 @@ source_catalog:
         symbol: read_json
     - name: preferences_path
       kind: function
-      line_start: 145
-      line_end: 148
+      line_start: 209
+      line_end: 212
       signature: preferences_path() -> ServiceResult<PathBuf>
       inputs: []
       output: ServiceResult<PathBuf>
@@ -424,8 +489,8 @@ source_catalog:
         symbol: application_root
     - name: application_root
       kind: function
-      line_start: 149
-      line_end: 155
+      line_start: 213
+      line_end: 219
       signature: application_root() -> ServiceResult<PathBuf>
       inputs: []
       output: ServiceResult<PathBuf>
@@ -441,8 +506,8 @@ source_catalog:
         symbol: local_config_root
     - name: default_vault_root_from_executable
       kind: function
-      line_start: 156
-      line_end: 162
+      line_start: 220
+      line_end: 226
       signature: 'default_vault_root_from_executable(executable: &Path) -> ServiceResult<PathBuf>'
       inputs:
       - 'executable: &Path'
@@ -455,8 +520,8 @@ source_catalog:
       dependency_targets: []
     - name: local_config_root
       kind: function
-      line_start: 165
-      line_end: 167
+      line_start: 229
+      line_end: 231
       signature: local_config_root() -> Option<PathBuf>
       inputs: []
       output: Option<PathBuf>
@@ -467,8 +532,8 @@ source_catalog:
       dependency_targets: []
     - name: local_config_root
       kind: function
-      line_start: 170
-      line_end: 174
+      line_start: 234
+      line_end: 238
       signature: local_config_root() -> Option<PathBuf>
       inputs: []
       output: Option<PathBuf>
@@ -481,8 +546,8 @@ source_catalog:
       dependency_targets: []
     - name: local_config_root
       kind: function
-      line_start: 177
-      line_end: 184
+      line_start: 241
+      line_end: 248
       signature: local_config_root() -> Option<PathBuf>
       inputs: []
       output: Option<PathBuf>
@@ -499,8 +564,8 @@ source_catalog:
       - *id003
     - name: default_ollama_base_url
       kind: function
-      line_start: 189
-      line_end: 192
+      line_start: 253
+      line_end: 256
       signature: default_ollama_base_url() -> String
       inputs: []
       output: String
@@ -508,26 +573,30 @@ source_catalog:
       - to_string
       parser: rust-pattern
       dependency_targets: []
-    - name: default_preferences_keep_vault_and_import_memory_separate
+    - name: default_preferences_keep_vault_import_and_provider_secrets_separate
       kind: function
-      line_start: 199
-      line_end: 207
-      signature: default_preferences_keep_vault_and_import_memory_separate()
+      line_start: 263
+      line_end: 275
+      signature: default_preferences_keep_vault_import_and_provider_secrets_separate()
       inputs: []
       output: unspecified
       dependencies:
       - default
+      - preferences.gemini_api_key_ciphertext.is_none
+      - preferences.gemini_model_id.is_none
       - preferences.last_import_directory.is_none
       - preferences.last_vault_path.is_none
       - preferences.ollama_model_id.is_none
+      - preferences.openai_api_key_ciphertext.is_none
+      - preferences.openai_model_id.is_none
       - preferences.selected_provider_id.is_none
       parser: rust-pattern
       dependency_targets:
       - *id007
     - name: missing_paths_are_not_returned_as_defaults
       kind: function
-      line_start: 210
-      line_end: 216
+      line_start: 278
+      line_end: 284
       signature: missing_paths_are_not_returned_as_defaults()
       inputs: []
       output: unspecified
@@ -547,8 +616,8 @@ source_catalog:
       - *id004
     - name: default_vault_root_is_the_executable_folder
       kind: function
-      line_start: 219
-      line_end: 225
+      line_start: 287
+      line_end: 293
       signature: default_vault_root_is_the_executable_folder()
       inputs: []
       output: unspecified
@@ -1301,6 +1370,14 @@ source_catalog:
       parser: rust-pattern
       dependency_targets:
       - *id023
+  - path: src-tauri/src/services/structured_provider.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 5c806dcf60fc1426bd505e46d4256a0565a23900
+    dependencies:
+    - serde_json::Value
+    provides: []
+    symbols: []
   - path: src/components/InfoButton.tsx
     analysis_version: 1
     language: typescript

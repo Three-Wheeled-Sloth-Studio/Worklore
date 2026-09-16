@@ -112,15 +112,21 @@ pub async fn run_structured(
 ) -> ServiceResult<StructuredProviderResponse> {
     let base_url = provider_base_url(provider_id)?;
     let api_key = require_api_key(api_key)?;
-    let response_schema = schema_for_provider(provider_id, request.response_schema);
+    let StructuredProviderRequest {
+        model_id,
+        system_prompt,
+        user_prompt,
+        response_schema,
+    } = request;
+    let response_schema = schema_for_provider(provider_id, response_schema);
     let response = client()?
         .post(format!("{base_url}/chat/completions"))
         .bearer_auth(api_key)
         .json(&json!({
-            "model": request.model_id,
+            "model": &model_id,
             "messages": [
-                {"role": "system", "content": request.system_prompt},
-                {"role": "user", "content": request.user_prompt}
+                {"role": "system", "content": &system_prompt},
+                {"role": "user", "content": &user_prompt}
             ],
             "response_format": {
                 "type": "json_schema",
@@ -170,10 +176,7 @@ pub async fn run_structured(
             ),
         )
     })?;
-    Ok(StructuredProviderResponse {
-        model_id: request.model_id,
-        value,
-    })
+    Ok(StructuredProviderResponse { model_id, value })
 }
 
 fn schema_for_provider(provider_id: &str, mut schema: Value) -> Value {
@@ -288,8 +291,14 @@ mod tests {
 
     #[test]
     fn official_byok_endpoints_are_fixed_and_explicit() {
-        assert_eq!(provider_base_url(OPENAI_PROVIDER_ID).unwrap(), OPENAI_BASE_URL);
-        assert_eq!(provider_base_url(GEMINI_PROVIDER_ID).unwrap(), GEMINI_BASE_URL);
+        assert_eq!(
+            provider_base_url(OPENAI_PROVIDER_ID).unwrap(),
+            OPENAI_BASE_URL
+        );
+        assert_eq!(
+            provider_base_url(GEMINI_PROVIDER_ID).unwrap(),
+            GEMINI_BASE_URL
+        );
         assert!(provider_base_url("custom").is_err());
     }
 

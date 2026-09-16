@@ -4,6 +4,34 @@ source_catalog:
   format_version: 1
   bucket: '04'
   files:
+  - path: scripts/tmp-finish-alpha-slice.py
+    analysis_version: 1
+    language: python
+    content_hash: 9d8ccc528e54046ff0797f90ca059dadaa8e61d3
+    dependencies:
+    - pathlib
+    - re
+    provides:
+    - replace_once
+    symbols:
+    - name: replace_once
+      kind: function
+      line_start: 7
+      line_end: 13
+      signature: replace_once(path, old, new)
+      inputs:
+      - path
+      - old
+      - new
+      output: unspecified
+      dependencies:
+      - RuntimeError
+      - p.read_text
+      - p.write_text
+      - text.count
+      - text.replace
+      parser: python-ast
+      dependency_targets: []
   - path: src-tauri/src/services/post_catalog_service.rs
     analysis_version: 1
     language: rust

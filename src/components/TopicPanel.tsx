@@ -141,14 +141,21 @@ export function TopicPanel({
       const saved = await updateTopic(vaultPath, updateRequest());
       applyTopic(saved);
       const settings = await getProviderSettings();
-      if (!settings.selectedProviderId || !settings.ollamaModelId) {
-        setError("Configure a local AI provider and model in Settings before generating.");
+      const modelId = settings.selectedProviderId === "ollama"
+        ? settings.ollamaModelId
+        : settings.selectedProviderId === "openai"
+          ? settings.openaiModelId
+          : settings.selectedProviderId === "gemini"
+            ? settings.geminiModelId
+            : null;
+      if (!settings.selectedProviderId || !modelId) {
+        setError("Configure an AI provider and model in Settings before generating.");
         return;
       }
       const result = await generatePostFromTopic(vaultPath, {
         topicId,
         providerId: settings.selectedProviderId,
-        modelId: settings.ollamaModelId,
+        modelId,
       });
       onPostGenerated(result.lineage.post.postId);
     } catch (caught) {

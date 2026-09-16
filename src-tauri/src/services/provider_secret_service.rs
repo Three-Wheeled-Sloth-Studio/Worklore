@@ -1,6 +1,4 @@
-use crate::{
-    error::{ServiceResult, WorkLoreError},
-};
+use crate::error::{ServiceResult, WorkLoreError};
 
 #[cfg(target_os = "windows")]
 mod platform {

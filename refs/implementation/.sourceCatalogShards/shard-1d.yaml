@@ -61,15 +61,15 @@ source_catalog:
   - path: src-tauri/src/services/post_generation_service.rs
     analysis_version: 1
     language: rust
-    content_hash: 4200b0c758f390f4fcd11c06e28c1e485f5d02ad
+    content_hash: 8e74f0410a2cd16816c2e7e111fe9c488e89bb56
     dependencies:
     - chrono::Utc
     - crate::services::{topic_service::CreateTopicRequest, vault_service}
     - "crate::{\n    domain::posts::{\n        CreatePostRequest, GeneratePostFromTopicRequest, GeneratePostFromTopicResult,\n\
       \        PostRevisionAuthorship, PostRevisionOrigin, PostSupportRole,\n    },\n    error::{ServiceResult, WorkLoreError},\n\
-      \    services::{\n        canonical_store,\n        ollama_provider::{self, StructuredProviderRequest},\n        post_lineage_service,\
-      \ provider_registry,\n        topic_service::{self, TopicRecordView, TopicRelationKind},\n        voice_profile_service::{self,\
-      \ CoreVoiceStatus, WritingRuleStatus},\n    },\n}"
+      \    services::{\n        canonical_store, post_lineage_service, provider_registry,\n        structured_provider::StructuredProviderRequest,\n\
+      \        topic_service::{self, TopicRecordView, TopicRelationKind},\n        voice_profile_service::{self, CoreVoiceStatus,\
+      \ WritingRuleStatus},\n    },\n}"
     - rusqlite::{params, Connection}
     - serde::Deserialize
     - serde_json::{json, Value}
@@ -95,8 +95,8 @@ source_catalog:
     symbols:
     - name: generate_post_from_topic
       kind: function
-      line_start: 36
-      line_end: 68
+      line_start: 35
+      line_end: 67
       signature: 'generate_post_from_topic(vault_path: &Path, request: GeneratePostFromTopicRequest) -> ServiceResult<GeneratePostFromTopicResult>'
       inputs:
       - 'vault_path: &Path'
@@ -132,8 +132,8 @@ source_catalog:
         symbol: initialize
     - name: generate_inner
       kind: function
-      line_start: 69
-      line_end: 147
+      line_start: 68
+      line_end: 141
       signature: 'generate_inner(vault_path: &Path, request: &GeneratePostFromTopicRequest, run_id: &str) -> ServiceResult<GeneratePostFromTopicResult>'
       inputs:
       - 'vault_path: &Path'
@@ -167,7 +167,7 @@ source_catalog:
       - validate_requested_model
       parser: rust-pattern
       dependency_targets:
-      - &id004
+      - &id005
         path: src-tauri/src/services/post_generation_service.rs
         symbol: build_user_prompt
       - path: src-tauri/src/commands/posts.rs
@@ -182,9 +182,12 @@ source_catalog:
         path: src-tauri/src/services/ollama_provider.rs
         symbol: provider_error
       - &id002
-        path: src-tauri/src/services/post_generation_service.rs
+        path: src-tauri/src/services/openai_compatible_provider.rs
         symbol: provider_error
       - &id003
+        path: src-tauri/src/services/post_generation_service.rs
+        symbol: provider_error
+      - &id004
         path: src-tauri/src/services/voice_analysis_service.rs
         symbol: provider_error
       - path: src-tauri/src/services/provider_registry.rs
@@ -195,18 +198,22 @@ source_catalog:
         symbol: response_schema
       - path: src-tauri/src/services/ollama_provider.rs
         symbol: run_structured
-      - &id005
+      - path: src-tauri/src/services/openai_compatible_provider.rs
+        symbol: run_structured
+      - path: src-tauri/src/services/provider_registry.rs
+        symbol: run_structured
+      - &id006
         path: src-tauri/src/services/post_generation_service.rs
         symbol: support_role
-      - &id007
+      - &id008
         path: src-tauri/src/services/post_generation_service.rs
         symbol: validate_generated_output
       - path: src-tauri/src/services/provider_registry.rs
         symbol: validate_requested_model
     - name: build_user_prompt
       kind: function
-      line_start: 148
-      line_end: 221
+      line_start: 142
+      line_end: 215
       signature: 'build_user_prompt(vault_path: &Path, topic: &TopicRecordView) -> ServiceResult<String>'
       inputs:
       - 'vault_path: &Path'
@@ -239,8 +246,8 @@ source_catalog:
         symbol: relation_kind_name
     - name: response_schema
       kind: function
-      line_start: 222
-      line_end: 234
+      line_start: 216
+      line_end: 228
       signature: response_schema() -> Value
       inputs: []
       output: Value
@@ -249,8 +256,8 @@ source_catalog:
       dependency_targets: []
     - name: validate_generated_output
       kind: function
-      line_start: 235
-      line_end: 265
+      line_start: 229
+      line_end: 259
       signature: 'validate_generated_output(value: Value) -> ServiceResult<RawGeneratedPost>'
       inputs:
       - 'value: Value'
@@ -268,16 +275,17 @@ source_catalog:
       - title.is_empty
       parser: rust-pattern
       dependency_targets:
-      - &id006
+      - &id007
         path: src-tauri/src/services/post_generation_service.rs
         symbol: cleanup_generated_text
       - *id001
       - *id002
       - *id003
+      - *id004
     - name: cleanup_generated_text
       kind: function
-      line_start: 266
-      line_end: 302
+      line_start: 260
+      line_end: 296
       signature: 'cleanup_generated_text(value: &str) -> String'
       inputs:
       - 'value: &str'
@@ -305,8 +313,8 @@ source_catalog:
       dependency_targets: []
     - name: support_role
       kind: function
-      line_start: 303
-      line_end: 312
+      line_start: 297
+      line_end: 306
       signature: 'support_role(kind: TopicRelationKind) -> PostSupportRole'
       inputs:
       - 'kind: TopicRelationKind'
@@ -316,8 +324,8 @@ source_catalog:
       dependency_targets: []
     - name: relation_kind_name
       kind: function
-      line_start: 313
-      line_end: 322
+      line_start: 307
+      line_end: 316
       signature: 'relation_kind_name(kind: TopicRelationKind) -> &''static str'
       inputs:
       - 'kind: TopicRelationKind'
@@ -327,8 +335,8 @@ source_catalog:
       dependency_targets: []
     - name: provider_error
       kind: function
-      line_start: 323
-      line_end: 329
+      line_start: 317
+      line_end: 323
       signature: 'provider_error(code: &''static str, message: impl Into<String>) -> WorkLoreError'
       inputs:
       - 'code: &''static str'
@@ -340,8 +348,8 @@ source_catalog:
       dependency_targets: []
     - name: audit_provider_run
       kind: function
-      line_start: 340
-      line_end: 364
+      line_start: 334
+      line_end: 358
       signature: 'audit_provider_run(vault_path: &Path, audit: ProviderRunAudit<''_>) -> ServiceResult<()>'
       inputs:
       - 'vault_path: &Path'
@@ -366,8 +374,8 @@ source_catalog:
         symbol: database_path
     - name: vault
       kind: function
-      line_start: 370
-      line_end: 376
+      line_start: 364
+      line_end: 370
       signature: vault() -> std::path::PathBuf
       inputs: []
       output: std::path::PathBuf
@@ -385,8 +393,8 @@ source_catalog:
         symbol: create_vault
     - name: topic_without_standing_preserves_explicit_author_framing_without_inventing_work_history
       kind: function
-      line_start: 379
-      line_end: 400
+      line_start: 373
+      line_end: 394
       signature: topic_without_standing_preserves_explicit_author_framing_without_inventing_work_history()
       inputs: []
       output: unspecified
@@ -400,15 +408,15 @@ source_catalog:
       - vault
       parser: rust-pattern
       dependency_targets:
-      - *id004
+      - *id005
       - path: src-tauri/src/commands/topics.rs
         symbol: create_topic
       - path: src-tauri/src/services/topic_service.rs
         symbol: create_topic
     - name: topic_relationships_map_to_distinct_post_support_roles
       kind: function
-      line_start: 403
-      line_end: 424
+      line_start: 397
+      line_end: 418
       signature: topic_relationships_map_to_distinct_post_support_roles()
       inputs: []
       output: unspecified
@@ -416,11 +424,11 @@ source_catalog:
       - support_role
       parser: rust-pattern
       dependency_targets:
-      - *id005
+      - *id006
     - name: provider_prose_cleanup_removes_markdown_and_nonstandard_punctuation
       kind: function
-      line_start: 427
-      line_end: 430
+      line_start: 421
+      line_end: 424
       signature: provider_prose_cleanup_removes_markdown_and_nonstandard_punctuation()
       inputs: []
       output: unspecified
@@ -428,11 +436,11 @@ source_catalog:
       - cleanup_generated_text
       parser: rust-pattern
       dependency_targets:
-      - *id006
+      - *id007
     - name: structured_output_requires_substantive_bounded_draft
       kind: function
-      line_start: 433
-      line_end: 448
+      line_start: 427
+      line_end: 442
       signature: structured_output_requires_substantive_bounded_draft()
       inputs: []
       output: unspecified
@@ -445,7 +453,159 @@ source_catalog:
       - validate_generated_output
       parser: rust-pattern
       dependency_targets:
-      - *id007
+      - *id008
+  - path: src-tauri/src/services/provider_secret_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: b0eb9c19660e496d94b2f658b6071e1821511713
+    dependencies:
+    - crate::error::{ServiceResult, WorkLoreError}
+    - std::{ffi::c_void, ptr, slice}
+    - super::*
+    provides:
+    - protect_secret
+    - unprotect_secret
+    - copy_and_free
+    - windows_user_secret_round_trips_without_plaintext_storage
+    - protect_secret
+    - unprotect_secret
+    - secret_error
+    symbols:
+    - name: protect_secret
+      kind: function
+      line_start: 47
+      line_end: 80
+      signature: 'protect_secret(secret: &str) -> ServiceResult<String>'
+      inputs:
+      - 'secret: &str'
+      output: ServiceResult<String>
+      dependencies:
+      - Err
+      - Ok
+      - copy_and_free
+      - crypt_protect_data
+      - encode
+      - input.as_mut_ptr
+      - input.len
+      - map_err
+      - 'null'
+      - null_mut
+      - secret.as_bytes
+      - secret.is_empty
+      - secret_error
+      - to_vec
+      - try_from
+      parser: rust-pattern
+      dependency_targets:
+      - &id009
+        path: src-tauri/src/services/provider_secret_service.rs
+        symbol: copy_and_free
+      - &id010
+        path: src-tauri/src/services/provider_secret_service.rs
+        symbol: secret_error
+    - name: unprotect_secret
+      kind: function
+      line_start: 81
+      line_end: 121
+      signature: 'unprotect_secret(ciphertext: &str) -> ServiceResult<String>'
+      inputs:
+      - 'ciphertext: &str'
+      output: ServiceResult<String>
+      dependencies:
+      - Err
+      - copy_and_free
+      - crypt_unprotect_data
+      - decode
+      - encrypted.as_mut_ptr
+      - encrypted.is_empty
+      - encrypted.len
+      - from_utf8
+      - map_err
+      - 'null'
+      - null_mut
+      - secret_error
+      - try_from
+      parser: rust-pattern
+      dependency_targets:
+      - *id009
+      - *id010
+    - name: copy_and_free
+      kind: function
+      line_start: 122
+      line_end: 132
+      signature: 'copy_and_free(blob: DataBlob) -> ServiceResult<Vec<u8>>'
+      inputs:
+      - 'blob: DataBlob'
+      output: ServiceResult<Vec<u8>>
+      dependencies:
+      - Err
+      - Ok
+      - blob.pb_data.is_null
+      - from_raw_parts
+      - local_free
+      - secret_error
+      - to_vec
+      parser: rust-pattern
+      dependency_targets:
+      - *id010
+    - name: windows_user_secret_round_trips_without_plaintext_storage
+      kind: function
+      line_start: 139
+      line_end: 145
+      signature: windows_user_secret_round_trips_without_plaintext_storage()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - protect_secret
+      - protected.contains
+      - unprotect_secret
+      - unwrap
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/provider_secret_service.rs
+        symbol: protect_secret
+      - path: src-tauri/src/services/provider_secret_service.rs
+        symbol: unprotect_secret
+    - name: protect_secret
+      kind: function
+      line_start: 152
+      line_end: 157
+      signature: 'protect_secret(_secret: &str) -> ServiceResult<String>'
+      inputs:
+      - '_secret: &str'
+      output: ServiceResult<String>
+      dependencies:
+      - Err
+      - secret_error
+      parser: rust-pattern
+      dependency_targets:
+      - *id010
+    - name: unprotect_secret
+      kind: function
+      line_start: 158
+      line_end: 163
+      signature: 'unprotect_secret(_ciphertext: &str) -> ServiceResult<String>'
+      inputs:
+      - '_ciphertext: &str'
+      output: ServiceResult<String>
+      dependencies:
+      - Err
+      - secret_error
+      parser: rust-pattern
+      dependency_targets:
+      - *id010
+    - name: secret_error
+      kind: function
+      line_start: 167
+      line_end: 173
+      signature: 'secret_error(message: impl Into<String>) -> WorkLoreError'
+      inputs:
+      - 'message: impl Into<String>'
+      output: WorkLoreError
+      dependencies:
+      - message.into
+      parser: rust-pattern
+      dependency_targets: []
   - path: src/components/InsightsWorkspace.tsx
     analysis_version: 1
     language: typescript
@@ -504,7 +664,7 @@ source_catalog:
       - setSnapshot
       parser: typescript-pattern
       dependency_targets:
-      - &id008
+      - &id011
         path: src/domain/types.ts
         symbol: errorMessage
       - path: src/lib/feedbackApi.ts
@@ -535,19 +695,19 @@ source_catalog:
       dependency_targets:
       - path: src/components/InsightsWorkspace.tsx
         symbol: defaultPublicationTime
-      - *id008
+      - *id011
       - path: src/lib/feedbackApi.ts
         symbol: markPostPublished
-      - &id009
+      - &id012
         path: src/components/InsightsWorkspace.tsx
         symbol: refresh
-      - &id010
+      - &id013
         path: src/components/StoryBankPanel.tsx
         symbol: refresh
-      - &id011
+      - &id014
         path: src/components/TopicsWorkspace.tsx
         symbol: refresh
-      - &id012
+      - &id015
         path: src/components/VoiceWorkspace.tsx
         symbol: refresh
     - name: savePerformance
@@ -567,15 +727,15 @@ source_catalog:
       - setNotice
       parser: typescript-pattern
       dependency_targets:
-      - *id008
+      - *id011
       - path: src/components/InsightsWorkspace.tsx
         symbol: formToMetrics
       - path: src/lib/feedbackApi.ts
         symbol: recordPostPerformance
-      - *id009
-      - *id010
-      - *id011
       - *id012
+      - *id013
+      - *id014
+      - *id015
     - name: MetricField
       kind: function
       line_start: 346

@@ -63,7 +63,8 @@ import { LIBRARY_NAV_ITEMS, PRIMARY_NAV_ITEMS, SETTINGS_NAV_ITEM } from "./navig
 import "./styles.css";
 import "./shell.css";
 
-const APP_VERSION = "0.1.6";
+const APP_VERSION = "0.1.7";
+const SUPPORT_URL = "https://buymeacoffee.com/SlothDC";
 
 const SOURCE_TYPES: Array<{ value: SourceType; label: string }> = [
   { value: "resume", label: "Resume" },
@@ -830,6 +831,19 @@ function App() {
               <small>AI providers</small>
             </span>
           </button>
+          <a
+            className="shell-support-pill"
+            href={SUPPORT_URL}
+            target="_blank"
+            rel="noreferrer"
+            title="Support WorkLore development on Buy Me a Coffee"
+            aria-label="Support WorkLore development on Buy Me a Coffee"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 2v2M10 2v2M14 2v2M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8Z" />
+            </svg>
+            <span>Buy me a coffee</span>
+          </a>
           <span className="shell-version" aria-label={`WorkLore version ${APP_VERSION}`}>v{APP_VERSION}</span>
         </aside>
 

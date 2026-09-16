@@ -474,7 +474,7 @@ source_catalog:
   - path: src/components/ProviderSettingsPanel.tsx
     analysis_version: 1
     language: typescript
-    content_hash: c819f8e5ba4547f35a409ab8f8461906d27b8f6d
+    content_hash: abffc8a140cec74ec6b655dedf9ebf94d9809a91
     dependencies:
     - ../domain/types
     - ../lib/workloreApi
@@ -484,33 +484,42 @@ source_catalog:
     - save
     - refreshModels
     - testConnection
+    - selectProvider
+    - providerLabel
+    - saveMessage
     symbols:
     - name: ProviderSettingsPanel
       kind: function
-      line_start: 13
-      line_end: 177
+      line_start: 25
+      line_end: 244
       signature: ProviderSettingsPanel()
       inputs: []
       output: unspecified
       dependencies:
       - async
       - errorMessage
+      - geminiApiKey.trim
       - getProviderSettings
       - listProviderModels
       - models.map
       - models.some
+      - openaiApiKey.trim
+      - providerLabel
       - refreshModels
       - save
+      - saveMessage
+      - selectProvider
       - setBusy
+      - setClearGeminiApiKey
+      - setClearOpenaiApiKey
       - setError
+      - setGeminiApiKey
       - setModels
       - setNotice
+      - setOpenaiApiKey
       - setSettings
       - testConnection
       - testProviderConnection
-      - updateProviderSettings
-      - useEffect
-      - void
       parser: typescript-pattern
       dependency_targets:
       - &id005
@@ -521,47 +530,62 @@ source_catalog:
       - &id007
         path: src/lib/workloreApi.ts
         symbol: listProviderModels
-      - path: src/components/ProviderSettingsPanel.tsx
-        symbol: refreshModels
       - &id008
         path: src/components/ProviderSettingsPanel.tsx
+        symbol: providerLabel
+      - path: src/components/ProviderSettingsPanel.tsx
+        symbol: refreshModels
+      - &id009
+        path: src/components/ProviderSettingsPanel.tsx
         symbol: save
+      - &id006
+        path: src/components/ProviderSettingsPanel.tsx
+        symbol: saveMessage
+      - path: src/components/ProviderSettingsPanel.tsx
+        symbol: selectProvider
       - path: src/components/ProviderSettingsPanel.tsx
         symbol: testConnection
-      - &id009
+      - &id010
         path: src/lib/workloreApi.ts
         symbol: testProviderConnection
-      - &id006
-        path: src/lib/workloreApi.ts
-        symbol: updateProviderSettings
     - name: save
       kind: function
-      line_start: 34
-      line_end: 54
+      line_start: 46
+      line_end: 77
       signature: save() -> Promise<ProviderSettings | null>
       inputs: []
       output: Promise<ProviderSettings | null>
       dependencies:
       - errorMessage
+      - geminiApiKey.trim
+      - openaiApiKey.trim
+      - saveMessage
       - setBusy
+      - setClearGeminiApiKey
+      - setClearOpenaiApiKey
       - setError
+      - setGeminiApiKey
       - setNotice
+      - setOpenaiApiKey
       - setSettings
       - updateProviderSettings
       parser: typescript-pattern
       dependency_targets:
       - *id005
       - *id006
+      - path: src/lib/workloreApi.ts
+        symbol: updateProviderSettings
     - name: refreshModels
       kind: function
-      line_start: 55
-      line_end: 76
+      line_start: 78
+      line_end: 99
       signature: refreshModels()
       inputs: []
       output: unspecified
       dependencies:
       - errorMessage
       - listProviderModels
+      - providerLabel
       - save
       - setBusy
       - setError
@@ -572,15 +596,17 @@ source_catalog:
       - *id005
       - *id007
       - *id008
+      - *id009
     - name: testConnection
       kind: function
-      line_start: 77
-      line_end: 92
+      line_start: 100
+      line_end: 115
       signature: testConnection()
       inputs: []
       output: unspecified
       dependencies:
       - errorMessage
+      - providerLabel
       - save
       - setBusy
       - setError
@@ -591,6 +617,42 @@ source_catalog:
       - *id005
       - *id008
       - *id009
+      - *id010
+    - name: selectProvider
+      kind: function
+      line_start: 116
+      line_end: 123
+      signature: 'selectProvider(providerId: string)'
+      inputs:
+      - 'providerId: string'
+      output: unspecified
+      dependencies:
+      - setModels
+      - setSettings
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: providerLabel
+      kind: function
+      line_start: 320
+      line_end: 328
+      signature: 'providerLabel(providerId: string) -> string'
+      inputs:
+      - 'providerId: string'
+      output: string
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: saveMessage
+      kind: function
+      line_start: 329
+      line_end: 345
+      signature: 'saveMessage(settings: ProviderSettings) -> string'
+      inputs:
+      - 'settings: ProviderSettings'
+      output: string
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
   - path: src/components/StoryBankPanel.tsx
     analysis_version: 1
     language: typescript
@@ -659,7 +721,7 @@ source_catalog:
         symbol: listCaptureSources
       - path: src/lib/workloreApi.ts
         symbol: listStories
-      - &id010
+      - &id011
         path: src/components/StoryBankPanel.tsx
         symbol: resolveVaultPath
     - name: develop
@@ -685,19 +747,19 @@ source_catalog:
       - path: src/lib/workloreApi.ts
         symbol: classifyCaptureSource
       - *id005
-      - &id011
+      - &id012
         path: src/components/InsightsWorkspace.tsx
         symbol: refresh
-      - &id012
+      - &id013
         path: src/components/StoryBankPanel.tsx
         symbol: refresh
-      - &id013
+      - &id014
         path: src/components/TopicsWorkspace.tsx
         symbol: refresh
-      - &id014
+      - &id015
         path: src/components/VoiceWorkspace.tsx
         symbol: refresh
-      - *id010
+      - *id011
     - name: handleStatusChange
       kind: function
       line_start: 82
@@ -712,10 +774,10 @@ source_catalog:
       - refresh
       parser: typescript-pattern
       dependency_targets:
-      - *id011
       - *id012
       - *id013
       - *id014
+      - *id015
     - name: DevelopIcon
       kind: function
       line_start: 219

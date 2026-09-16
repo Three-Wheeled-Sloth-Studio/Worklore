@@ -89,6 +89,8 @@ source_catalog:
       dependency_targets:
       - path: src-tauri/src/services/ollama_provider.rs
         symbol: list_models
+      - path: src-tauri/src/services/openai_compatible_provider.rs
+        symbol: list_models
       - path: src-tauri/src/services/provider_registry.rs
         symbol: list_models
     - name: test_provider_connection

@@ -19,10 +19,31 @@
   gap: 9px;
 }
 
+.shell-brand {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  column-gap: 7px;
+  align-items: center;
+}
+.shell-brand::before {
+  content: "";
+  grid-row: 1 / 3;
+  width: 34px;
+  height: 34px;
+  background: url("../branding/TWS Studio Logo - underlay.png") center / contain no-repeat;
+}
 .shell-brand .eyebrow { display: none; }
-.shell-brand h1 { margin: 0 0 1px; font-size: 1.28rem; color: #202923; }
+.shell-brand h1 { grid-column: 2; margin: 0 0 1px; font-size: 1.28rem; color: #202923; }
 .shell-brand p { margin: 0; }
-.shell-vault-name { color: #56625b; font-size: 0.72rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.shell-vault-name { grid-column: 2; color: #56625b; font-size: 0.72rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.landing-card::before {
+  content: "";
+  display: block;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 8px;
+  background: url("../branding/TWS Studio Logo - underlay.png") center / contain no-repeat;
+}
 .shell-nav-section { display: grid; gap: 1px; }
 .shell-nav-label { margin: 0 6px 1px; font-size: 0.61rem; font-weight: 750; letter-spacing: 0.08em; text-transform: uppercase; color: #606b65; }
 .shell-nav-button {
@@ -51,6 +72,23 @@
 .shell-settings-copy { display: grid; gap: 0; }
 .shell-settings-copy small { color: #66716a; font-size: 0.61rem; font-weight: 600; }
 .shell-settings-link.active .shell-settings-copy small { color: #475249; }
+.shell-support-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: -2px 3px 1px;
+  padding: 6px 9px;
+  border: 1px solid rgba(138, 90, 31, 0.42);
+  border-radius: 999px;
+  color: #8a5a1f;
+  background: rgba(255, 244, 224, 0.9);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.shell-support-pill:hover { background: #f7ead2; border-color: rgba(138, 90, 31, 0.62); }
+.shell-support-pill svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .shell-version {
   margin: -5px 0 0 7px;
   color: #7a827d;

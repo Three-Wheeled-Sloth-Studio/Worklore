@@ -4,29 +4,29 @@ source_catalog:
   format_version: 1
   generated_by: refs/tools/generate_source_catalog.py
   derived: true
-  tracked_source_files: 120
-  symbols: 1171
+  tracked_source_files: 124
+  symbols: 1204
   languages:
-    python: 1
-    rust: 72
+    python: 2
+    rust: 75
     typescript: 47
   parsers:
-    python-ast: 3
-    rust-pattern: 884
-    typescript-pattern: 284
+    python-ast: 4
+    rust-pattern: 912
+    typescript-pattern: 288
   shards:
   - path: refs/implementation/.sourceCatalogShards/shard-00.yaml
     files: 2
     symbols: 33
   - path: refs/implementation/.sourceCatalogShards/shard-01.yaml
-    files: 8
-    symbols: 78
+    files: 9
+    symbols: 92
   - path: refs/implementation/.sourceCatalogShards/shard-03.yaml
     files: 6
-    symbols: 85
+    symbols: 86
   - path: refs/implementation/.sourceCatalogShards/shard-04.yaml
-    files: 3
-    symbols: 6
+    files: 4
+    symbols: 7
   - path: refs/implementation/.sourceCatalogShards/shard-05.yaml
     files: 2
     symbols: 41
@@ -47,7 +47,7 @@ source_catalog:
     symbols: 32
   - path: refs/implementation/.sourceCatalogShards/shard-0b.yaml
     files: 7
-    symbols: 35
+    symbols: 38
   - path: refs/implementation/.sourceCatalogShards/shard-0c.yaml
     files: 7
     symbols: 20
@@ -70,14 +70,14 @@ source_catalog:
     files: 3
     symbols: 21
   - path: refs/implementation/.sourceCatalogShards/shard-13.yaml
-    files: 7
-    symbols: 70
+    files: 8
+    symbols: 73
   - path: refs/implementation/.sourceCatalogShards/shard-14.yaml
     files: 3
     symbols: 5
   - path: refs/implementation/.sourceCatalogShards/shard-15.yaml
     files: 5
-    symbols: 82
+    symbols: 86
   - path: refs/implementation/.sourceCatalogShards/shard-16.yaml
     files: 1
     symbols: 6
@@ -100,8 +100,8 @@ source_catalog:
     files: 4
     symbols: 7
   - path: refs/implementation/.sourceCatalogShards/shard-1d.yaml
-    files: 4
-    symbols: 28
+    files: 5
+    symbols: 35
   - path: refs/implementation/.sourceCatalogShards/shard-1e.yaml
     files: 1
     symbols: 9

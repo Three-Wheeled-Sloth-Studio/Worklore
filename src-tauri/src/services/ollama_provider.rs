@@ -7,23 +7,10 @@ use serde_json::{json, Value};
 use crate::{
     domain::providers::ProviderModelView,
     error::{ServiceResult, WorkLoreError},
+    services::structured_provider::{StructuredProviderRequest, StructuredProviderResponse},
 };
 
 const MAX_STRUCTURED_MODEL_ATTEMPTS: usize = 6;
-
-#[derive(Debug, Clone)]
-pub struct StructuredProviderRequest {
-    pub model_id: String,
-    pub system_prompt: String,
-    pub user_prompt: String,
-    pub response_schema: Value,
-}
-
-#[derive(Debug)]
-pub struct StructuredProviderResponse {
-    pub model_id: String,
-    pub value: Value,
-}
 
 #[derive(Debug, Deserialize)]
 struct TagsResponse {

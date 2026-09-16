@@ -25,7 +25,7 @@ The current desktop foundation can:
 - Ignore headline job titles, career summaries, skills, education, and other non-employment sections
 - Record local operation timings for import, extraction, and privacy-scan phases
 
-The application remains an early test build. Provider integrations, polished story synthesis, and broader career-source workflows are still under development.
+The application remains an early alpha build. Local Ollama and explicit user-keyed OpenAI/Gemini execution are available for bounded provider-assisted workflows; broader product polish and discovery workflows are still under development.
 
 ## Development
 

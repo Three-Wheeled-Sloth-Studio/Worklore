@@ -175,7 +175,9 @@ fn protect_optional_secret(secret: Option<&str>) -> ServiceResult<Option<String>
 }
 
 fn has_ciphertext(value: &Option<String>) -> bool {
-    value.as_deref().is_some_and(|value| !value.trim().is_empty())
+    value
+        .as_deref()
+        .is_some_and(|value| !value.trim().is_empty())
 }
 
 fn update_preferences(mut update: impl FnMut(&mut AppPreferences)) -> ServiceResult<()> {

@@ -7,14 +7,14 @@ source_catalog:
   - path: src-tauri/src/services/voice_analysis_service.rs
     analysis_version: 1
     language: rust
-    content_hash: d010d4e0eea26252da2d104de4aedaf3db134702
+    content_hash: 951b92dd68410a93361aaf5b9e95c87a7013ffea
     dependencies:
     - chrono::Utc
     - crate::services::{vault_service, voice_profile_service}
     - "crate::{\n    domain::providers::{\n        AnalyzeVoiceEvidenceRequest, VoiceAnalysisProposalSet, VoiceTraitProposal,\n\
-      \        WritingRuleProposal, ANALYZE_VOICE_EVIDENCE_OPERATION, ANALYZE_VOICE_EVIDENCE_VERSION,\n        OLLAMA_PROVIDER_ID,\n\
-      \    },\n    error::{ServiceResult, WorkLoreError},\n    services::{\n        canonical_store,\n        ollama_provider::{self,\
-      \ StructuredProviderRequest},\n        provider_registry, voice_evidence_service,\n    },\n}"
+      \        WritingRuleProposal, ANALYZE_VOICE_EVIDENCE_OPERATION, ANALYZE_VOICE_EVIDENCE_VERSION,\n    },\n    error::{ServiceResult,\
+      \ WorkLoreError},\n    services::{\n        canonical_store, provider_registry, structured_provider::StructuredProviderRequest,\n\
+      \        voice_evidence_service,\n    },\n}"
     - rusqlite::{params, Connection}
     - serde::Deserialize
     - serde_json::{json, Value}
@@ -39,8 +39,8 @@ source_catalog:
     symbols:
     - name: analyze_voice_evidence
       kind: function
-      line_start: 60
-      line_end: 103
+      line_start: 58
+      line_end: 101
       signature: 'analyze_voice_evidence(vault_path: &Path, request: AnalyzeVoiceEvidenceRequest) -> ServiceResult<VoiceAnalysisProposalSet>'
       inputs:
       - 'vault_path: &Path'
@@ -73,18 +73,18 @@ source_catalog:
       dependency_targets:
       - path: src-tauri/src/services/voice_analysis_service.rs
         symbol: analyze_inner
-      - &id006
+      - &id007
         path: src-tauri/src/services/post_generation_service.rs
         symbol: audit_provider_run
-      - &id007
+      - &id008
         path: src-tauri/src/services/voice_analysis_service.rs
         symbol: audit_provider_run
       - path: src-tauri/src/services/canonical_store.rs
         symbol: initialize
     - name: analyze_inner
       kind: function
-      line_start: 104
-      line_end: 176
+      line_start: 102
+      line_end: 169
       signature: 'analyze_inner(vault_path: &Path, request: &AnalyzeVoiceEvidenceRequest, selected_ids: &BTreeSet<String>,
         run_id: &str) -> ServiceResult<VoiceAnalysisProposalSet>'
       inputs:
@@ -96,7 +96,6 @@ source_catalog:
       dependencies:
       - ANALYZE_VOICE_EVIDENCE_OPERATION.to_string
       - Err
-      - OLLAMA_PROVIDER_ID.to_string
       - Ok
       - as_deref
       - count
@@ -126,9 +125,12 @@ source_catalog:
         path: src-tauri/src/services/ollama_provider.rs
         symbol: provider_error
       - &id002
-        path: src-tauri/src/services/post_generation_service.rs
+        path: src-tauri/src/services/openai_compatible_provider.rs
         symbol: provider_error
       - &id003
+        path: src-tauri/src/services/post_generation_service.rs
+        symbol: provider_error
+      - &id004
         path: src-tauri/src/services/voice_analysis_service.rs
         symbol: provider_error
       - path: src-tauri/src/services/provider_registry.rs
@@ -139,15 +141,19 @@ source_catalog:
         symbol: response_schema
       - path: src-tauri/src/services/ollama_provider.rs
         symbol: run_structured
-      - &id004
+      - path: src-tauri/src/services/openai_compatible_provider.rs
+        symbol: run_structured
+      - path: src-tauri/src/services/provider_registry.rs
+        symbol: run_structured
+      - &id005
         path: src-tauri/src/services/voice_analysis_service.rs
         symbol: validate_analysis_output
       - path: src-tauri/src/services/provider_registry.rs
         symbol: validate_requested_model
     - name: response_schema
       kind: function
-      line_start: 177
-      line_end: 227
+      line_start: 170
+      line_end: 220
       signature: response_schema() -> Value
       inputs: []
       output: Value
@@ -156,8 +162,8 @@ source_catalog:
       dependency_targets: []
     - name: validate_analysis_output
       kind: function
-      line_start: 228
-      line_end: 304
+      line_start: 221
+      line_end: 297
       signature: 'validate_analysis_output(selected_ids: &BTreeSet<String>, value: Value) -> ServiceResult<ValidatedVoiceAnalysis>'
       inputs:
       - 'selected_ids: &BTreeSet<String>'
@@ -185,14 +191,15 @@ source_catalog:
       - *id001
       - *id002
       - *id003
+      - *id004
       - path: src-tauri/src/services/voice_analysis_service.rs
         symbol: required_trimmed
       - path: src-tauri/src/services/voice_analysis_service.rs
         symbol: validate_evidence_ids
     - name: validate_evidence_ids
       kind: function
-      line_start: 305
-      line_end: 328
+      line_start: 298
+      line_end: 321
       signature: 'validate_evidence_ids(selected_ids: &BTreeSet<String>, values: Vec<String>) -> ServiceResult<Vec<String>>'
       inputs:
       - 'selected_ids: &BTreeSet<String>'
@@ -220,10 +227,11 @@ source_catalog:
       - *id001
       - *id002
       - *id003
+      - *id004
     - name: required_trimmed
       kind: function
-      line_start: 329
-      line_end: 339
+      line_start: 322
+      line_end: 332
       signature: 'required_trimmed(value: String, label: &str) -> ServiceResult<String>'
       inputs:
       - 'value: String'
@@ -241,10 +249,11 @@ source_catalog:
       - *id001
       - *id002
       - *id003
+      - *id004
     - name: provider_error
       kind: function
-      line_start: 340
-      line_end: 346
+      line_start: 333
+      line_end: 339
       signature: 'provider_error(code: &''static str, message: impl Into<String>) -> WorkLoreError'
       inputs:
       - 'code: &''static str'
@@ -256,8 +265,8 @@ source_catalog:
       dependency_targets: []
     - name: audit_provider_run
       kind: function
-      line_start: 357
-      line_end: 381
+      line_start: 350
+      line_end: 374
       signature: 'audit_provider_run(vault_path: &Path, audit: ProviderRunAudit<''_>) -> ServiceResult<()>'
       inputs:
       - 'vault_path: &Path'
@@ -280,8 +289,8 @@ source_catalog:
       dependency_targets: []
     - name: vault
       kind: function
-      line_start: 387
-      line_end: 392
+      line_start: 380
+      line_end: 385
       signature: vault() -> std::path::PathBuf
       inputs: []
       output: std::path::PathBuf
@@ -299,8 +308,8 @@ source_catalog:
         symbol: create_vault
     - name: selected
       kind: function
-      line_start: 393
-      line_end: 396
+      line_start: 386
+      line_end: 389
       signature: 'selected(ids: &[&str]) -> BTreeSet<String>'
       inputs:
       - 'ids: &[&str]'
@@ -314,8 +323,8 @@ source_catalog:
       dependency_targets: []
     - name: structured_output_rejects_unknown_evidence_ids
       kind: function
-      line_start: 399
-      line_end: 427
+      line_start: 392
+      line_end: 420
       signature: structured_output_rejects_unknown_evidence_ids()
       inputs: []
       output: unspecified
@@ -326,14 +335,14 @@ source_catalog:
       - validate_analysis_output
       parser: rust-pattern
       dependency_targets:
-      - &id005
+      - &id006
         path: src-tauri/src/services/voice_analysis_service.rs
         symbol: selected
-      - *id004
+      - *id005
     - name: structured_output_rejects_missing_evidence_and_duplicates
       kind: function
-      line_start: 430
-      line_end: 463
+      line_start: 423
+      line_end: 456
       signature: structured_output_rejects_missing_evidence_and_duplicates()
       inputs: []
       output: unspecified
@@ -343,12 +352,12 @@ source_catalog:
       - validate_analysis_output
       parser: rust-pattern
       dependency_targets:
+      - *id006
       - *id005
-      - *id004
     - name: valid_proposals_are_transient_and_do_not_mutate_core_voice
       kind: function
-      line_start: 466
-      line_end: 494
+      line_start: 459
+      line_end: 487
       signature: valid_proposals_are_transient_and_do_not_mutate_core_voice()
       inputs: []
       output: unspecified
@@ -369,12 +378,12 @@ source_catalog:
         symbol: list_core_voices
       - path: src-tauri/src/services/voice_profile_service.rs
         symbol: list_core_voices
+      - *id006
       - *id005
-      - *id004
     - name: provider_audit_metadata_excludes_prompt_and_response_bodies
       kind: function
-      line_start: 497
-      line_end: 527
+      line_start: 490
+      line_end: 520
       signature: provider_audit_metadata_excludes_prompt_and_response_bodies()
       inputs: []
       output: unspecified
@@ -391,8 +400,8 @@ source_catalog:
       - vault
       parser: rust-pattern
       dependency_targets:
-      - *id006
       - *id007
+      - *id008
       - path: src-tauri/src/services/confidentiality_service.rs
         symbol: drop
   - path: src/components/HomeWorkspace.tsx
@@ -427,7 +436,7 @@ source_catalog:
       dependency_targets:
       - path: src/lib/workloreApi.ts
         symbol: createCaptureSource
-      - &id008
+      - &id009
         path: src/domain/types.ts
         symbol: errorMessage
   - path: src/components/TopicsWorkspace.tsx
@@ -459,7 +468,7 @@ source_catalog:
       - setTopics
       parser: typescript-pattern
       dependency_targets:
-      - *id008
+      - *id009
       - path: src/lib/workloreApi.ts
         symbol: listTopics
     - name: createNewTopic
@@ -482,7 +491,7 @@ source_catalog:
       dependency_targets:
       - path: src/lib/workloreApi.ts
         symbol: createTopic
-      - *id008
+      - *id009
       - path: src/components/InsightsWorkspace.tsx
         symbol: refresh
       - path: src/components/StoryBankPanel.tsx

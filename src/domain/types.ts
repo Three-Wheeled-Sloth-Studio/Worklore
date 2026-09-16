@@ -520,9 +520,23 @@ export interface ProviderSettings {
   selectedProviderId: string | null;
   ollamaBaseUrl: string;
   ollamaModelId: string | null;
+  openaiModelId: string | null;
+  openaiApiKeyConfigured: boolean;
+  geminiModelId: string | null;
+  geminiApiKeyConfigured: boolean;
 }
 
-export interface UpdateProviderSettingsRequest extends ProviderSettings {}
+export interface UpdateProviderSettingsRequest {
+  selectedProviderId: string | null;
+  ollamaBaseUrl: string;
+  ollamaModelId: string | null;
+  openaiModelId: string | null;
+  openaiApiKey?: string | null;
+  clearOpenaiApiKey?: boolean;
+  geminiModelId: string | null;
+  geminiApiKey?: string | null;
+  clearGeminiApiKey?: boolean;
+}
 
 export interface ProviderModel {
   modelId: string;

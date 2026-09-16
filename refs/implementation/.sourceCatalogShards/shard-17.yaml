@@ -242,7 +242,7 @@ source_catalog:
   - path: src/components/TopicPanel.tsx
     analysis_version: 1
     language: typescript
-    content_hash: 76c9c458b58d403175bf6cd14393018f459db2e4
+    content_hash: c604b7631fecbbb8e7e9568ef6109dc3fe914d65
     dependencies:
     - ../domain/types
     - ../lib/postApi
@@ -367,7 +367,7 @@ source_catalog:
     - name: handleGeneratePost
       kind: function
       line_start: 135
-      line_end: 159
+      line_end: 166
       signature: handleGeneratePost()
       inputs: []
       output: unspecified
@@ -394,8 +394,8 @@ source_catalog:
       - *id007
     - name: handleAddRelationship
       kind: function
-      line_start: 160
-      line_end: 176
+      line_start: 167
+      line_end: 183
       signature: handleAddRelationship()
       inputs: []
       output: unspecified
@@ -421,8 +421,8 @@ source_catalog:
         symbol: loadTargets
     - name: handleRemoveRelationship
       kind: function
-      line_start: 177
-      line_end: 191
+      line_start: 184
+      line_end: 198
       signature: 'handleRemoveRelationship(kind: TopicRelationKind, targetId: string)'
       inputs:
       - 'kind: TopicRelationKind'
@@ -445,8 +445,8 @@ source_catalog:
         symbol: removeTopicRelationship
     - name: handleCreateTheme
       kind: function
-      line_start: 192
-      line_end: 214
+      line_start: 199
+      line_end: 221
       signature: handleCreateTheme()
       inputs: []
       output: unspecified
@@ -474,8 +474,8 @@ source_catalog:
       - *id010
     - name: humanize
       kind: function
-      line_start: 464
-      line_end: 467
+      line_start: 471
+      line_end: 474
       signature: 'humanize(value: string) -> string'
       inputs:
       - 'value: string'
@@ -486,8 +486,8 @@ source_catalog:
       dependency_targets: []
     - name: CloseIcon
       kind: function
-      line_start: 468
-      line_end: 471
+      line_start: 475
+      line_end: 478
       signature: CloseIcon()
       inputs: []
       output: unspecified
@@ -496,8 +496,8 @@ source_catalog:
       dependency_targets: []
     - name: SaveIcon
       kind: function
-      line_start: 472
-      line_end: 475
+      line_start: 479
+      line_end: 482
       signature: SaveIcon()
       inputs: []
       output: unspecified
@@ -506,8 +506,8 @@ source_catalog:
       dependency_targets: []
     - name: SparkIcon
       kind: function
-      line_start: 476
-      line_end: 479
+      line_start: 483
+      line_end: 486
       signature: SparkIcon()
       inputs: []
       output: unspecified
@@ -516,8 +516,8 @@ source_catalog:
       dependency_targets: []
     - name: LinkIcon
       kind: function
-      line_start: 480
-      line_end: 483
+      line_start: 487
+      line_end: 490
       signature: LinkIcon()
       inputs: []
       output: unspecified
@@ -526,8 +526,8 @@ source_catalog:
       dependency_targets: []
     - name: UnlinkIcon
       kind: function
-      line_start: 484
-      line_end: 487
+      line_start: 491
+      line_end: 494
       signature: UnlinkIcon()
       inputs: []
       output: unspecified
@@ -536,8 +536,8 @@ source_catalog:
       dependency_targets: []
     - name: PlusIcon
       kind: function
-      line_start: 488
-      line_end: 491
+      line_start: 495
+      line_end: 498
       signature: PlusIcon()
       inputs: []
       output: unspecified

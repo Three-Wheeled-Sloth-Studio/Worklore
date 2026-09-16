@@ -57,9 +57,9 @@ Use **Voice** separately for writing evidence and governed style preferences. Ex
 
 ## 6. AI is optional
 
-Open **AI settings** from the gear icon in the upper-right header. Ollama is the current local provider path.
+Open **AI settings** from Settings. You can use local Ollama, or bring your own OpenAI or Gemini API key. BYOK keys are protected for the current Windows user and are never returned to the UI after saving. External provider prompts pass through WorkLore privacy preflight before they leave the machine, and never-send entities remain redacted.
 
-Professional-memory capture, classification, Story Seed development, and the manual editorial workflow remain usable with no AI provider configured. Provider use is explicit; WorkLore does not silently fall back to cloud execution.
+Professional-memory capture, classification, Story Seed development, and the manual editorial workflow remain usable with no AI provider configured. Provider use is explicit; WorkLore does not silently fall back between local and cloud providers. API usage is billed separately by the selected provider and is not included with consumer ChatGPT or Gemini subscriptions.
 
 ## 7. Draft, challenge, publish, and learn
 
@@ -75,5 +75,5 @@ For a 20-30 minute first pass:
 2. Paste three to five strong resume bullets into Capture, one at a time.
 3. Mark each as Story seed, Proof point, or both.
 4. Fully develop one Story seed.
-5. Configure Ollama only if you want provider-assisted work; it is not required for the memory workflow.
+5. Configure Ollama or a BYOK provider only if you want provider-assisted work; AI is not required for the memory workflow.
 6. Stop there and reopen the vault later. The important first win is a small amount of trustworthy professional memory, not a large amount of generated text.

@@ -74,6 +74,16 @@ type VoiceAnalysisResult = VoiceAnalysisProposalSet & {
 
 const EMPTY_TRAIT: TraitDraft = { name: "", value: "", guidance: "", evidenceIds: [] };
 
+function configuredProviderModelId(settings: ProviderSettings | null): string | null {
+  if (!settings?.selectedProviderId) return null;
+  switch (settings.selectedProviderId) {
+    case "ollama": return settings.ollamaModelId;
+    case "openai": return settings.openaiModelId;
+    case "gemini": return settings.geminiModelId;
+    default: return null;
+  }
+}
+
 export function VoiceWorkspace({ vaultPath }: { vaultPath: string }) {
   const [candidates, setCandidates] = useState<VoiceSourceCandidate[]>([]);
   const [evidence, setEvidence] = useState<VoiceEvidenceRecord[]>([]);
@@ -114,6 +124,7 @@ export function VoiceWorkspace({ vaultPath }: { vaultPath: string }) {
     [voices],
   );
   const actionCount = queue.candidateReviewItems.length + queue.pendingEvidence.length;
+  const providerModelId = configuredProviderModelId(providerSettings);
 
   useEffect(() => {
     setNotice(null);
@@ -286,17 +297,17 @@ export function VoiceWorkspace({ vaultPath }: { vaultPath: string }) {
   async function runVoiceAnalysis() {
     if (
       !providerSettings?.selectedProviderId ||
-      !providerSettings.ollamaModelId ||
+      !providerModelId ||
       analysisEvidenceIds.length === 0
     ) return;
-    setBusy("Learning from approved writing locally");
+    setBusy("Learning from approved writing");
     setNotice(null);
     setError(null);
     setAnalysisError(null);
     try {
       const result = (await analyzeVoiceEvidence(vaultPath, {
         providerId: providerSettings.selectedProviderId,
-        modelId: providerSettings.ollamaModelId,
+        modelId: providerModelId,
         voiceEvidenceIds: analysisEvidenceIds,
         userGuidance: analysisGuidance || null,
       })) as VoiceAnalysisResult;
@@ -588,15 +599,15 @@ export function VoiceWorkspace({ vaultPath }: { vaultPath: string }) {
       <section className="workspace-panel voice-analysis-workspace" aria-labelledby="voice-analysis-heading">
         <div className="panel-heading-row">
           <div>
-            <p className="eyebrow">Local analysis, review-only</p>
+            <p className="eyebrow">Selected-provider analysis, review-only</p>
             <h2 id="voice-analysis-heading">Learn from approved writing</h2>
           </div>
           <span className="status-pill">{eligibleEvidence.length} approved</span>
         </div>
-        {!providerSettings?.selectedProviderId || !providerSettings.ollamaModelId ? (
+        {!providerSettings?.selectedProviderId || !providerModelId ? (
           <div className="empty-state compact-empty">
-            <h3>Configure a local model to analyze your writing</h3>
-            <p>Choose local Ollama and a model in Settings. Manual Voice management remains available without it.</p>
+            <h3>Configure an AI model to analyze your writing</h3>
+            <p>Choose local Ollama or a BYOK provider and model in Settings. Manual Voice management remains available without it.</p>
           </div>
         ) : eligibleEvidence.length === 0 ? (
           <div className="empty-state compact-empty">
@@ -609,7 +620,7 @@ export function VoiceWorkspace({ vaultPath }: { vaultPath: string }) {
               <div>
                 <h3>Find recurring traits and writing rules</h3>
                 <p>
-                  WorkLore will ask your selected local model to examine {analysisEvidenceIds.length} approved sample{analysisEvidenceIds.length === 1 ? "" : "s"}. It returns suggestions for you to accept or discard. Nothing is saved automatically.
+                  WorkLore will ask your selected model to examine {analysisEvidenceIds.length} approved sample{analysisEvidenceIds.length === 1 ? "" : "s"}. External BYOK providers receive locally privacy-preflighted text. It returns suggestions for you to accept or discard. Nothing is saved automatically.
                 </p>
               </div>
               <button
@@ -621,7 +632,7 @@ export function VoiceWorkspace({ vaultPath }: { vaultPath: string }) {
               </button>
             </div>
             {analysisError ? <div className="feedback error" role="alert">{analysisError}</div> : null}
-            <p className="voice-meta">Using {providerSettings.selectedProviderId} | {providerSettings.ollamaModelId}</p>
+            <p className="voice-meta">Using {providerSettings.selectedProviderId} | {providerModelId}</p>
             <details className="voice-analysis-options">
               <summary>Choose samples or add guidance</summary>
               <fieldset className="voice-evidence-picker">
@@ -661,7 +672,7 @@ export function VoiceWorkspace({ vaultPath }: { vaultPath: string }) {
             <div className="voice-card-heading">
               <div>
                 <h3>Review suggestions</h3>
-                <p className="voice-meta">Local run {analysisResult.runId}</p>
+                <p className="voice-meta">Run {analysisResult.runId} | {analysisResult.providerId} / {analysisResult.modelId}</p>
               </div>
               <span className="status-pill attention">Not saved</span>
             </div>
