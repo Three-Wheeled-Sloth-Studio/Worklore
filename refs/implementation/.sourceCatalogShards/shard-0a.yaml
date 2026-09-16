@@ -297,7 +297,7 @@ source_catalog:
   - path: src/components/PostWorkspace.tsx
     analysis_version: 1
     language: typescript
-    content_hash: d2d4ad27d1fb90f1ee4f676ada9c90ca34579b8c
+    content_hash: 2aa4958ea07b3db7a31537def552c5d7d238acb3
     dependencies:
     - ../domain/confidentiality
     - ../domain/posts

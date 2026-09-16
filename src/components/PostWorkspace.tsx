@@ -340,7 +340,7 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
 
             {standingLinks.length === 0 ? (
               <div className="post-compact-warning" title="No Story or Proof Point is linked to support personal-experience claims.">
-                No standing linked. Generation avoids personal-experience claims.
+                No standing linked. Generation may use explicit Topic assertions but will not invent additional personal-experience claims.
               </div>
             ) : null}
 
