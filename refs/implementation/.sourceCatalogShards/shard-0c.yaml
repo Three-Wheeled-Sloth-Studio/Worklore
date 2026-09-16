@@ -1,0 +1,612 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: 0c
+  files:
+  - path: scripts/check-case-collisions.py
+    analysis_version: 1
+    language: python
+    content_hash: f3c2ff226356715c76647ccb7101087b1d925c75
+    dependencies:
+    - __future__
+    - pathlib
+    - subprocess
+    - sys
+    provides:
+    - tracked_paths
+    - find_collisions
+    - main
+    symbols:
+    - name: tracked_paths
+      kind: function
+      line_start: 14
+      line_end: 34
+      signature: tracked_paths() -> list[str]
+      inputs: []
+      output: list[str]
+      dependencies:
+      - SystemExit
+      - item.decode
+      - item.decode('utf-8', errors='strict').replace
+      - result.stderr.decode
+      - result.stderr.decode('utf-8', errors='replace').strip
+      - result.stdout.split
+      - subprocess.run
+      parser: python-ast
+      dependency_targets:
+      - path: src-tauri/src/lib.rs
+        symbol: run
+    - name: find_collisions
+      kind: function
+      line_start: 37
+      line_end: 45
+      signature: 'find_collisions(paths: list[str]) -> dict[str, list[str]]'
+      inputs:
+      - 'paths: list[str]'
+      output: dict[str, list[str]]
+      dependencies:
+      - groups.items
+      - groups.setdefault
+      - groups.setdefault(path.casefold(), []).append
+      - len
+      - path.casefold
+      - set
+      - sorted
+      parser: python-ast
+      dependency_targets: []
+    - name: main
+      kind: function
+      line_start: 48
+      line_end: 58
+      signature: main() -> int
+      inputs: []
+      output: int
+      dependencies:
+      - ''' | ''.join'
+      - collisions.values
+      - find_collisions
+      - len
+      - print
+      - tracked_paths
+      parser: python-ast
+      dependency_targets:
+      - path: scripts/check-case-collisions.py
+        symbol: find_collisions
+      - path: scripts/check-case-collisions.py
+        symbol: tracked_paths
+  - path: src-tauri/src/commands/mod.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 8f39775ba94f0a22726cb006c8819c95a88449ea
+    dependencies:
+    - std::process::Command
+    - super::{validate_external_url, LICENSE_URL, SUPPORT_URL}
+    provides:
+    - validate_external_url
+    - open_with_system_browser
+    - open_with_system_browser
+    - open_with_system_browser
+    - open_external_url
+    - approved_external_links_are_allowed
+    - arbitrary_external_links_are_rejected
+    symbols:
+    - name: validate_external_url
+      kind: function
+      line_start: 26
+      line_end: 34
+      signature: 'validate_external_url(url: &str) -> Result<(), String>'
+      inputs:
+      - 'url: &str'
+      output: Result<(), String>
+      dependencies:
+      - Err
+      - Ok
+      - to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: open_with_system_browser
+      kind: function
+      line_start: 37
+      line_end: 42
+      signature: 'open_with_system_browser(url: &str) -> std::io::Result<std::process::ExitStatus>'
+      inputs:
+      - 'url: &str'
+      output: std::io::Result<std::process::ExitStatus>
+      dependencies:
+      - arg
+      - new
+      - status
+      parser: rust-pattern
+      dependency_targets: []
+    - name: open_with_system_browser
+      kind: function
+      line_start: 45
+      line_end: 47
+      signature: 'open_with_system_browser(url: &str) -> std::io::Result<std::process::ExitStatus>'
+      inputs:
+      - 'url: &str'
+      output: std::io::Result<std::process::ExitStatus>
+      dependencies:
+      - arg
+      - new
+      - status
+      parser: rust-pattern
+      dependency_targets: []
+    - name: open_with_system_browser
+      kind: function
+      line_start: 50
+      line_end: 52
+      signature: 'open_with_system_browser(url: &str) -> std::io::Result<std::process::ExitStatus>'
+      inputs:
+      - 'url: &str'
+      output: std::io::Result<std::process::ExitStatus>
+      dependencies:
+      - arg
+      - new
+      - status
+      parser: rust-pattern
+      dependency_targets: []
+    - name: open_external_url
+      kind: function
+      line_start: 55
+      line_end: 64
+      signature: 'open_external_url(url: String) -> Result<(), String>'
+      inputs:
+      - 'url: String'
+      output: Result<(), String>
+      dependencies:
+      - Err
+      - Ok
+      - map_err
+      - open_with_system_browser
+      - status.success
+      - to_string
+      - validate_external_url
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/commands/mod.rs
+        symbol: open_with_system_browser
+      - &id001
+        path: src-tauri/src/commands/mod.rs
+        symbol: validate_external_url
+    - name: approved_external_links_are_allowed
+      kind: function
+      line_start: 71
+      line_end: 74
+      signature: approved_external_links_are_allowed()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - is_ok
+      - validate_external_url
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+    - name: arbitrary_external_links_are_rejected
+      kind: function
+      line_start: 77
+      line_end: 80
+      signature: arbitrary_external_links_are_rejected()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - is_err
+      - validate_external_url
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+  - path: src-tauri/src/commands/stories.rs
+    analysis_version: 1
+    language: rust
+    content_hash: ea1d3c0cf7e75d7508ee10fef5c1f17697ea123a
+    dependencies:
+    - "crate::{\n    domain::stories::{\n        ImportStoryResponseRequest, ImportStoryResponseResult, StoryStatus, StorySummary,\n\
+      \    },\n    error::{CommandError, CommandResult},\n    services::{canonical_store, story_service},\n}"
+    - std::path::PathBuf
+    provides:
+    - import_story_response
+    - list_stories
+    - set_story_status
+    symbols:
+    - name: import_story_response
+      kind: function
+      line_start: 12
+      line_end: 25
+      signature: 'import_story_response(vault_path: String, request: ImportStoryResponseRequest) -> CommandResult<ImportStoryResponseResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: ImportStoryResponseRequest'
+      output: CommandResult<ImportStoryResponseResult>
+      dependencies:
+      - Ok
+      - from
+      - import_synthesis_response
+      - map_err
+      - migrate_prototype
+      parser: rust-pattern
+      dependency_targets:
+      - &id002
+        path: src-tauri/src/domain/candidates.rs
+        symbol: from
+      - &id003
+        path: src-tauri/src/domain/models.rs
+        symbol: from
+      - &id004
+        path: src-tauri/src/error.rs
+        symbol: from
+      - path: src-tauri/src/services/story_service.rs
+        symbol: import_synthesis_response
+      - &id005
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: migrate_prototype
+    - name: list_stories
+      kind: function
+      line_start: 28
+      line_end: 30
+      signature: 'list_stories(vault_path: String) -> CommandResult<Vec<StorySummary>>'
+      inputs:
+      - 'vault_path: String'
+      output: CommandResult<Vec<StorySummary>>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id002
+      - *id003
+      - *id004
+    - name: set_story_status
+      kind: function
+      line_start: 33
+      line_end: 43
+      signature: 'set_story_status(vault_path: String, story_id: String, status: StoryStatus) -> CommandResult<StorySummary>'
+      inputs:
+      - 'vault_path: String'
+      - 'story_id: String'
+      - 'status: StoryStatus'
+      output: CommandResult<StorySummary>
+      dependencies:
+      - Ok
+      - from
+      - map_err
+      - migrate_prototype
+      parser: rust-pattern
+      dependency_targets:
+      - *id002
+      - *id003
+      - *id004
+      - *id005
+  - path: src-tauri/src/commands/vault.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 0ab3da3795d9c474e66042deab315da04b995c1c
+    dependencies:
+    - "crate::{\n    domain::models::{\n        CloudIdentifierMode, ImportSourceResult, SourceSummary, SourceType, VaultSummary,\n\
+      \    },\n    error::{CommandError, CommandResult},\n    services::{app_preferences_service, canonical_store, source_service,\
+      \ vault_service},\n}"
+    - std::path::PathBuf
+    provides:
+    - create_vault
+    - create_vault_in_parent
+    - create_default_vault
+    - open_vault
+    - update_cloud_identifier_mode
+    - import_source
+    - list_sources
+    symbols:
+    - name: create_vault
+      kind: function
+      line_start: 12
+      line_end: 14
+      signature: 'create_vault(path: String, name: String) -> CommandResult<VaultSummary>'
+      inputs:
+      - 'path: String'
+      - 'name: String'
+      output: CommandResult<VaultSummary>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id002
+      - *id003
+      - *id004
+    - name: create_vault_in_parent
+      kind: function
+      line_start: 17
+      line_end: 20
+      signature: 'create_vault_in_parent(parent_path: String, name: String) -> CommandResult<VaultSummary>'
+      inputs:
+      - 'parent_path: String'
+      - 'name: String'
+      output: CommandResult<VaultSummary>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id002
+      - *id003
+      - *id004
+    - name: create_default_vault
+      kind: function
+      line_start: 23
+      line_end: 26
+      signature: 'create_default_vault(name: String) -> CommandResult<VaultSummary>'
+      inputs:
+      - 'name: String'
+      output: CommandResult<VaultSummary>
+      dependencies:
+      - create_vault_in_parent
+      - default_vault_root
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/commands/vault.rs
+        symbol: create_vault_in_parent
+      - path: src-tauri/src/services/vault_service.rs
+        symbol: create_vault_in_parent
+      - path: src-tauri/src/services/app_preferences_service.rs
+        symbol: default_vault_root
+    - name: open_vault
+      kind: function
+      line_start: 29
+      line_end: 31
+      signature: 'open_vault(path: String) -> CommandResult<VaultSummary>'
+      inputs:
+      - 'path: String'
+      output: CommandResult<VaultSummary>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id002
+      - *id003
+      - *id004
+    - name: update_cloud_identifier_mode
+      kind: function
+      line_start: 34
+      line_end: 40
+      signature: 'update_cloud_identifier_mode(vault_path: String, mode: CloudIdentifierMode) -> CommandResult<VaultSummary>'
+      inputs:
+      - 'vault_path: String'
+      - 'mode: CloudIdentifierMode'
+      output: CommandResult<VaultSummary>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id002
+      - *id003
+      - *id004
+    - name: import_source
+      kind: function
+      line_start: 43
+      line_end: 58
+      signature: 'import_source(vault_path: String, source_path: String, source_type: SourceType) -> CommandResult<ImportSourceResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'source_path: String'
+      - 'source_type: SourceType'
+      output: CommandResult<ImportSourceResult>
+      dependencies:
+      - Ok
+      - from
+      - map_err
+      - migrate_prototype
+      - spawn_blocking
+      parser: rust-pattern
+      dependency_targets:
+      - *id002
+      - *id003
+      - *id004
+      - *id005
+    - name: list_sources
+      kind: function
+      line_start: 61
+      line_end: 63
+      signature: 'list_sources(vault_path: String) -> CommandResult<Vec<SourceSummary>>'
+      inputs:
+      - 'vault_path: String'
+      output: CommandResult<Vec<SourceSummary>>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id002
+      - *id003
+      - *id004
+  - path: src-tauri/src/domain/mod.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 8121ad2c41bd4c997982c5a49976a22b9883d598
+    dependencies: []
+    provides: []
+    symbols: []
+  - path: src-tauri/src/services/capture_catalog_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 29a721f91c45a7ca7b025f8aaec734cf084ea708
+    dependencies:
+    - crate::services::{capture_service, vault_service}
+    - "crate::{\n    domain::models::SourceType,\n    error::{ServiceResult, WorkLoreError},\n    services::{\n        canonical_store,\n\
+      \        capture_service::{CaptureClassificationView, CaptureRole, CaptureSourceView},\n    },\n}"
+    - rusqlite::Connection
+    - std::{path::Path, time::Duration}
+    - super::*
+    - uuid::Uuid
+    provides:
+    - list_captures
+    - open_connection
+    - load_classifications
+    - source_type_from_text
+    - role_from_relationship
+    - catalog_keeps_classified_captures_visible
+    symbols:
+    - name: list_captures
+      kind: function
+      line_start: 13
+      line_end: 53
+      signature: 'list_captures(vault_path: &Path, limit: usize) -> ServiceResult<Vec<CaptureSourceView>>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'limit: usize'
+      output: ServiceResult<Vec<CaptureSourceView>>
+      dependencies:
+      - COALESCE
+      - Ok
+      - collect
+      - connection.prepare
+      - initialize
+      - limit.clamp
+      - load_classifications
+      - map
+      - open_connection
+      - rows.into_iter
+      - source_type_from_text
+      - statement.query_map
+      - try_from
+      - unwrap_or
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: initialize
+      - path: src-tauri/src/services/capture_catalog_service.rs
+        symbol: load_classifications
+      - path: src-tauri/src/services/capture_service.rs
+        symbol: load_classifications
+      - path: src-tauri/src/services/capture_catalog_service.rs
+        symbol: source_type_from_text
+      - path: src-tauri/src/services/capture_service.rs
+        symbol: source_type_from_text
+    - name: open_connection
+      kind: function
+      line_start: 54
+      line_end: 60
+      signature: 'open_connection(vault_path: &Path) -> ServiceResult<Connection>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Connection>
+      dependencies:
+      - Ok
+      - connection.busy_timeout
+      - connection.pragma_update
+      - database_path
+      - from_secs
+      - open
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: database_path
+    - name: load_classifications
+      kind: function
+      line_start: 61
+      line_end: 82
+      signature: 'load_classifications(connection: &Connection, source_id: &str) -> ServiceResult<Vec<CaptureClassificationView>>'
+      inputs:
+      - 'connection: &Connection'
+      - 'source_id: &str'
+      output: ServiceResult<Vec<CaptureClassificationView>>
+      dependencies:
+      - Ok
+      - Some
+      - classifications.push
+      - connection.prepare
+      - let
+      - new
+      - role_from_relationship
+      - statement.query_map
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/capture_catalog_service.rs
+        symbol: role_from_relationship
+      - path: src-tauri/src/services/capture_service.rs
+        symbol: role_from_relationship
+    - name: source_type_from_text
+      kind: function
+      line_start: 83
+      line_end: 96
+      signature: 'source_type_from_text(value: &str) -> ServiceResult<SourceType>'
+      inputs:
+      - 'value: &str'
+      output: ServiceResult<SourceType>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      parser: rust-pattern
+      dependency_targets: []
+    - name: role_from_relationship
+      kind: function
+      line_start: 97
+      line_end: 107
+      signature: 'role_from_relationship(value: &str) -> Option<CaptureRole>'
+      inputs:
+      - 'value: &str'
+      output: Option<CaptureRole>
+      dependencies:
+      - Some
+      parser: rust-pattern
+      dependency_targets: []
+    - name: catalog_keeps_classified_captures_visible
+      kind: function
+      line_start: 116
+      line_end: 148
+      signature: catalog_keeps_classified_captures_visible()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - any
+      - classify_capture_source
+      - create_capture_source
+      - create_vault
+      - iter
+      - join
+      - list_captures
+      - now_v7
+      - remove_dir_all
+      - rows.len
+      - temp_dir
+      - unwrap
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/commands/capture.rs
+        symbol: classify_capture_source
+      - path: src-tauri/src/services/capture_service.rs
+        symbol: classify_capture_source
+      - path: src-tauri/src/commands/capture.rs
+        symbol: create_capture_source
+      - path: src-tauri/src/services/capture_service.rs
+        symbol: create_capture_source
+      - path: src-tauri/src/commands/vault.rs
+        symbol: create_vault
+      - path: src-tauri/src/services/vault_service.rs
+        symbol: create_vault
+      - path: src-tauri/src/commands/capture.rs
+        symbol: list_captures
+      - path: src-tauri/src/services/capture_catalog_service.rs
+        symbol: list_captures
+  - path: src/domain/types.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: e4d45a4bb4dd5b5077dad666ebcc9e843abb2266
+    dependencies: []
+    provides:
+    - errorMessage
+    symbols:
+    - name: errorMessage
+      kind: function
+      line_start: 879
+      line_end: 896
+      signature: 'errorMessage(error: unknown) -> string'
+      inputs:
+      - 'error: unknown'
+      output: string
+      dependencies:
+      - candidate.toString
+      parser: typescript-pattern
+      dependency_targets: []

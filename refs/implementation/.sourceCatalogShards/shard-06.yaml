@@ -1,0 +1,1305 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: '06'
+  files:
+  - path: src-tauri/src/domain/feedback.rs
+    analysis_version: 1
+    language: rust
+    content_hash: b02b0fc7a1dc8fcfce6321f9207979de2932ec71
+    dependencies:
+    - serde::{Deserialize, Serialize}
+    provides: []
+    symbols: []
+  - path: src-tauri/src/services/publication_feedback_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: be6c9eb84c075ad3f527ae026d9c7217b67a9c43
+    dependencies:
+    - chrono::Utc
+    - "crate::{\n        domain::posts::{\n            ApprovePostRevisionRequest, CreatePostRequest, PostRevisionAuthorship,\n\
+      \            PostRevisionOrigin,\n        },\n        services::{post_lineage_service, vault_service},\n    }"
+    - "crate::{\n    domain::{\n        feedback::{\n            FeedbackInsightView, FeedbackSnapshotView, ManualPublicationView,\n\
+      \            MarkPostPublishedRequest, PerformanceMetrics, PerformanceRecordView,\n            RecordPostPerformanceRequest,\n\
+      \        },\n        posts::PostStatus,\n    },\n    error::{ServiceResult, WorkLoreError},\n    services::canonical_store,\n\
+      }"
+    - rusqlite::{params, Connection, OptionalExtension}
+    - serde::Deserialize
+    - serde_json::json
+    - std::fs
+    - std::{collections::BTreeMap, path::Path, time::Duration}
+    - super::*
+    - uuid::Uuid
+    provides:
+    - mark_post_published
+    - record_post_performance
+    - get_feedback_snapshot
+    - load_publishable_post
+    - publication_exists
+    - load_publications
+    - load_performance
+    - derive_insights
+    - rate_insight
+    - required
+    - optional_trimmed
+    - open_connection
+    - vault
+    - user_post
+    - publication_requires_exact_final_approved_revision_and_is_idempotent
+    - performance_snapshots_are_append_only_and_latest_value_drives_baseline
+    symbols:
+    - name: mark_post_published
+      kind: function
+      line_start: 42
+      line_end: 107
+      signature: 'mark_post_published(vault_path: &Path, request: MarkPostPublishedRequest) -> ServiceResult<ManualPublicationView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: MarkPostPublishedRequest'
+      output: ServiceResult<ManualPublicationView>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      - Some
+      - VALUES
+      - audit_events
+      - connection.execute
+      - existing.into_iter
+      - final_revision_id.as_deref
+      - find
+      - initialize
+      - let
+      - load_publications
+      - load_publishable_post
+      - now
+      - now_v7
+      - open_connection
+      - optional_trimmed
+      - publication.platform.eq_ignore_ascii_case
+      - request.publication_url.as_deref
+      - required
+      - revision_id.as_str
+      - to_rfc3339
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: initialize
+      - &id003
+        path: src-tauri/src/services/publication_feedback_service.rs
+        symbol: load_publications
+      - path: src-tauri/src/services/publication_feedback_service.rs
+        symbol: load_publishable_post
+      - path: src-tauri/src/services/inspiration_service.rs
+        symbol: optional_trimmed
+      - path: src-tauri/src/services/publication_feedback_service.rs
+        symbol: optional_trimmed
+      - path: src-tauri/src/services/target_context_service.rs
+        symbol: optional_trimmed
+      - &id002
+        path: src-tauri/src/services/publication_feedback_service.rs
+        symbol: required
+    - name: record_post_performance
+      kind: function
+      line_start: 108
+      line_end: 149
+      signature: 'record_post_performance(vault_path: &Path, request: RecordPostPerformanceRequest) -> ServiceResult<PerformanceRecordView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: RecordPostPerformanceRequest'
+      output: ServiceResult<PerformanceRecordView>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      - VALUES
+      - audit_events
+      - connection.execute
+      - initialize
+      - now
+      - now_v7
+      - open_connection
+      - publication_exists
+      - request.notes.trim
+      - required
+      - to_rfc3339
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - path: src-tauri/src/services/publication_feedback_service.rs
+        symbol: publication_exists
+      - *id002
+    - name: get_feedback_snapshot
+      kind: function
+      line_start: 150
+      line_end: 167
+      signature: 'get_feedback_snapshot(vault_path: &Path) -> ServiceResult<FeedbackSnapshotView>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<FeedbackSnapshotView>
+      dependencies:
+      - Ok
+      - derive_insights
+      - initialize
+      - latest_by_publication.insert
+      - latest_by_publication.into_values
+      - load_performance
+      - load_publications
+      - new
+      - open_connection
+      - record.publication_id.clone
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/publication_feedback_service.rs
+        symbol: derive_insights
+      - *id001
+      - path: src-tauri/src/services/publication_feedback_service.rs
+        symbol: load_performance
+      - *id003
+    - name: load_publishable_post
+      kind: function
+      line_start: 168
+      line_end: 192
+      signature: 'load_publishable_post(connection: &Connection, post_id: &str) -> ServiceResult<(String, PostStatus, Option<String>)>'
+      inputs:
+      - 'connection: &Connection'
+      - 'post_id: &str'
+      output: ServiceResult<(String, PostStatus, Option<String>)>
+      dependencies:
+      - InvalidVault
+      - Ok
+      - map_err
+      - ok_or_else
+      - optional
+      - parse
+      - query_row
+      parser: rust-pattern
+      dependency_targets: []
+    - name: publication_exists
+      kind: function
+      line_start: 193
+      line_end: 200
+      signature: 'publication_exists(connection: &Connection, publication_id: &str) -> ServiceResult<bool>'
+      inputs:
+      - 'connection: &Connection'
+      - 'publication_id: &str'
+      output: ServiceResult<bool>
+      dependencies:
+      - EXISTS
+      - Ok
+      - connection.query_row
+      - row.get
+      parser: rust-pattern
+      dependency_targets: []
+    - name: load_publications
+      kind: function
+      line_start: 201
+      line_end: 238
+      signature: 'load_publications(connection: &Connection) -> ServiceResult<Vec<ManualPublicationView>>'
+      inputs:
+      - 'connection: &Connection'
+      output: ServiceResult<Vec<ManualPublicationView>>
+      dependencies:
+      - Ok
+      - connection.prepare
+      - from_str
+      - let
+      - new
+      - optional
+      - publications.push
+      - query_row
+      - statement.query_map
+      - to_string
+      - unwrap_or_else
+      parser: rust-pattern
+      dependency_targets: []
+    - name: load_performance
+      kind: function
+      line_start: 239
+      line_end: 264
+      signature: 'load_performance(connection: &Connection) -> ServiceResult<Vec<PerformanceRecordView>>'
+      inputs:
+      - 'connection: &Connection'
+      output: ServiceResult<Vec<PerformanceRecordView>>
+      dependencies:
+      - Ok
+      - collect
+      - connection.prepare
+      - from_str
+      - let
+      - rows.map
+      - statement.query_map
+      parser: rust-pattern
+      dependency_targets: []
+    - name: derive_insights
+      kind: function
+      line_start: 265
+      line_end: 324
+      signature: 'derive_insights(publications: &[ManualPublicationView], performance: &[PerformanceRecordView]) -> Vec<FeedbackInsightView>'
+      inputs:
+      - 'publications: &[ManualPublicationView]'
+      - 'performance: &[PerformanceRecordView]'
+      output: Vec<FeedbackInsightView>
+      dependencies:
+      - Post
+      - Some
+      - best_rate
+      - insights.push
+      - new
+      - performance.is_empty
+      - performance.len
+      - publications.is_empty
+      - publications.len
+      - rate_insight
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/publication_feedback_service.rs
+        symbol: rate_insight
+    - name: rate_insight
+      kind: function
+      line_start: 341
+      line_end: 368
+      signature: 'rate_insight(kind: &str, label: &str, record: &PerformanceRecordView, publications: &[ManualPublicationView],
+        sample_size: usize) -> FeedbackInsightView'
+      inputs:
+      - 'kind: &str'
+      - 'label: &str'
+      - 'record: &PerformanceRecordView'
+      - 'publications: &[ManualPublicationView]'
+      - 'sample_size: usize'
+      output: FeedbackInsightView
+      dependencies:
+      - find
+      - iter
+      - kind.to_string
+      - map
+      - publication.post_title.as_str
+      - unwrap_or
+      parser: rust-pattern
+      dependency_targets: []
+    - name: required
+      kind: function
+      line_start: 369
+      line_end: 377
+      signature: 'required(value: &str, label: &str) -> ServiceResult<String>'
+      inputs:
+      - 'value: &str'
+      - 'label: &str'
+      output: ServiceResult<String>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      - value.is_empty
+      - value.to_string
+      - value.trim
+      parser: rust-pattern
+      dependency_targets: []
+    - name: optional_trimmed
+      kind: function
+      line_start: 378
+      line_end: 384
+      signature: 'optional_trimmed(value: Option<&str>) -> Option<String>'
+      inputs:
+      - 'value: Option<&str>'
+      output: Option<String>
+      dependencies:
+      - filter
+      - map
+      - value.is_empty
+      parser: rust-pattern
+      dependency_targets: []
+    - name: open_connection
+      kind: function
+      line_start: 385
+      line_end: 391
+      signature: 'open_connection(vault_path: &Path) -> ServiceResult<Connection>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Connection>
+      dependencies:
+      - Ok
+      - connection.busy_timeout
+      - connection.pragma_update
+      - database_path
+      - from_secs
+      - open
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: database_path
+    - name: vault
+      kind: function
+      line_start: 404
+      line_end: 409
+      signature: vault() -> std::path::PathBuf
+      inputs: []
+      output: std::path::PathBuf
+      dependencies:
+      - create_vault
+      - expect
+      - join
+      - now_v7
+      - temp_dir
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/commands/vault.rs
+        symbol: create_vault
+      - path: src-tauri/src/services/vault_service.rs
+        symbol: create_vault
+    - name: user_post
+      kind: function
+      line_start: 410
+      line_end: 421
+      signature: 'user_post(title: &str) -> CreatePostRequest'
+      inputs:
+      - 'title: &str'
+      output: CreatePostRequest
+      dependencies:
+      - title.to_string
+      - to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: publication_requires_exact_final_approved_revision_and_is_idempotent
+      kind: function
+      line_start: 424
+      line_end: 450
+      signature: publication_requires_exact_final_approved_revision_and_is_idempotent()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - approve_revision
+      - create_post
+      - get_feedback_snapshot
+      - is_err
+      - mark_post_published
+      - post.post.current_revision_id.clone
+      - post.post.post_id.clone
+      - remove_dir_all
+      - request.clone
+      - snapshot.publications.len
+      - to_string
+      - unwrap
+      - user_post
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - &id004
+        path: src-tauri/src/services/post_lineage_service.rs
+        symbol: approve_revision
+      - &id005
+        path: src-tauri/src/commands/posts.rs
+        symbol: create_post
+      - &id006
+        path: src-tauri/src/services/post_lineage_service.rs
+        symbol: create_post
+      - &id007
+        path: src-tauri/src/commands/feedback.rs
+        symbol: get_feedback_snapshot
+      - &id008
+        path: src-tauri/src/services/publication_feedback_service.rs
+        symbol: get_feedback_snapshot
+      - &id009
+        path: src-tauri/src/commands/feedback.rs
+        symbol: mark_post_published
+      - &id010
+        path: src-tauri/src/services/publication_feedback_service.rs
+        symbol: mark_post_published
+      - &id011
+        path: src-tauri/src/services/post_catalog_service.rs
+        symbol: user_post
+      - &id012
+        path: src-tauri/src/services/post_lineage_service.rs
+        symbol: user_post
+      - &id013
+        path: src-tauri/src/services/publication_feedback_service.rs
+        symbol: user_post
+    - name: performance_snapshots_are_append_only_and_latest_value_drives_baseline
+      kind: function
+      line_start: 453
+      line_end: 511
+      signature: performance_snapshots_are_append_only_and_latest_value_drives_baseline()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - approve_revision
+      - create_post
+      - default
+      - get_feedback_snapshot
+      - mark_post_published
+      - post.post.current_revision_id.clone
+      - post.post.post_id.clone
+      - publication.publication_id.clone
+      - record_post_performance
+      - remove_dir_all
+      - snapshot.latest_performance.len
+      - to_string
+      - unwrap
+      - user_post
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+      - *id005
+      - *id006
+      - path: src-tauri/src/services/app_preferences_service.rs
+        symbol: default
+      - *id007
+      - *id008
+      - *id009
+      - *id010
+      - path: src-tauri/src/commands/feedback.rs
+        symbol: record_post_performance
+      - path: src-tauri/src/services/publication_feedback_service.rs
+        symbol: record_post_performance
+      - *id011
+      - *id012
+      - *id013
+  - path: src/App.tsx
+    analysis_version: 1
+    language: typescript
+    content_hash: 97812f134817e6b526b6ed34383e7cc6153bd31d
+    dependencies:
+    - ./components/CapturePanel
+    - ./components/GuidedInterviewPanel
+    - ./components/HomeWorkspace
+    - ./components/InsightsWorkspace
+    - ./components/LibraryWorkspace
+    - ./components/PerformancePanel
+    - ./components/PostWorkspace
+    - ./components/PrivacyReviewPanel
+    - ./components/ProviderSettingsPanel
+    - ./components/StoryBankPanel
+    - ./components/StoryCandidatePanel
+    - ./components/TopicsWorkspace
+    - ./components/VoiceWorkspace
+    - ./domain/types
+    - ./lib/vaultApi
+    - ./lib/workloreApi
+    - ./navigation
+    - '@tauri-apps/plugin-dialog'
+    - react
+    provides:
+    - App
+    - refreshWorkspace
+    - refreshPerformance
+    - activateVault
+    - handleCreateVault
+    - handleChooseVaultLocation
+    - handleOpenVault
+    - handleCloseVault
+    - rememberFileLocation
+    - handleImportSource
+    - handleExtractCandidates
+    - handleStartInterview
+    - handleInterviewResponse
+    - handleExportWorkspace
+    - handleImportStoryResponse
+    - handleCandidateStatusChange
+    - handleStoryStatusChange
+    - handlePrivacyModeChange
+    - handleResolveReview
+    - renderWorkspace
+    - StatusItem
+    - StatusPill
+    - Feedback
+    - BusyLayer
+    - sourceTypeLabel
+    - candidateStatusMessage
+    - displayVaultPath
+    - formatDate
+    - formatElapsed
+    - humanize
+    symbols:
+    - name: App
+      kind: function
+      line_start: 76
+      line_end: 881
+      signature: App()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Array.isArray
+      - LIBRARY_NAV_ITEMS.map
+      - PRIMARY_NAV_ITEMS.concat
+      - PRIMARY_NAV_ITEMS.map
+      - Promise.all
+      - activateVault
+      - async
+      - candidateStatusMessage
+      - candidates.filter
+      - clearLastVault
+      - createManualWorkspace
+      - createVaultInParent
+      - displayVaultPath
+      - errorMessage
+      - extractResumeCandidates
+      - find
+      - getDefaultVaultRoot
+      - getLastImportDirectory
+      - getLastVaultPath
+      - getPerformanceSnapshot
+      - handleCandidateStatusChange
+      - handleChooseVaultLocation
+      - handleCloseVault
+      - handleCreateVault
+      parser: typescript-pattern
+      dependency_targets:
+      - &id016
+        path: src/App.tsx
+        symbol: activateVault
+      - &id024
+        path: src/App.tsx
+        symbol: candidateStatusMessage
+      - &id019
+        path: src/lib/workloreApi.ts
+        symbol: clearLastVault
+      - &id022
+        path: src/lib/workloreApi.ts
+        symbol: createManualWorkspace
+      - &id017
+        path: src/lib/vaultApi.ts
+        symbol: createVaultInParent
+      - path: src/App.tsx
+        symbol: displayVaultPath
+      - &id014
+        path: src/domain/types.ts
+        symbol: errorMessage
+      - &id020
+        path: src/lib/workloreApi.ts
+        symbol: extractResumeCandidates
+      - path: src/lib/workloreApi.ts
+        symbol: getDefaultVaultRoot
+      - path: src/lib/workloreApi.ts
+        symbol: getLastImportDirectory
+      - path: src/lib/workloreApi.ts
+        symbol: getLastVaultPath
+      - &id015
+        path: src/lib/workloreApi.ts
+        symbol: getPerformanceSnapshot
+      - path: src/App.tsx
+        symbol: handleCandidateStatusChange
+      - path: src/App.tsx
+        symbol: handleChooseVaultLocation
+      - path: src/App.tsx
+        symbol: handleCloseVault
+      - path: src/App.tsx
+        symbol: handleCreateVault
+    - name: refreshWorkspace
+      kind: function
+      line_start: 187
+      line_end: 229
+      signature: 'refreshWorkspace(vaultPath: string, refreshVault: boolean)'
+      inputs:
+      - 'vaultPath: string'
+      - 'refreshVault: boolean'
+      output: unspecified
+      dependencies:
+      - Promise.all
+      - errorMessage
+      - getPerformanceSnapshot
+      - interviewResult.find
+      - interviewResult.some
+      - listEntityReviews
+      - listGuidedInterviews
+      - listSources
+      - listStories
+      - listStoryCandidates
+      - openVault
+      - setCandidates
+      - setError
+      - setInterviews
+      - setPerformance
+      - setReviews
+      - setSelectedInterviewId
+      - setSources
+      - setStories
+      - setVault
+      parser: typescript-pattern
+      dependency_targets:
+      - *id014
+      - *id015
+      - path: src/lib/workloreApi.ts
+        symbol: listEntityReviews
+      - path: src/lib/workloreApi.ts
+        symbol: listGuidedInterviews
+      - path: src/lib/workloreApi.ts
+        symbol: listSources
+      - &id026
+        path: src/lib/workloreApi.ts
+        symbol: listStories
+      - &id025
+        path: src/lib/workloreApi.ts
+        symbol: listStoryCandidates
+      - &id018
+        path: src/lib/workloreApi.ts
+        symbol: openVault
+    - name: refreshPerformance
+      kind: function
+      line_start: 230
+      line_end: 239
+      signature: 'refreshPerformance(vaultPath: string, reportError)'
+      inputs:
+      - 'vaultPath: string'
+      - reportError
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - getPerformanceSnapshot
+      - setError
+      - setPerformance
+      parser: typescript-pattern
+      dependency_targets:
+      - *id014
+      - *id015
+    - name: activateVault
+      kind: function
+      line_start: 240
+      line_end: 250
+      signature: 'activateVault(nextVault: VaultSummary)'
+      inputs:
+      - 'nextVault: VaultSummary'
+      output: unspecified
+      dependencies:
+      - rememberLastVault
+      - setNotice
+      - setVault
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/lib/workloreApi.ts
+        symbol: rememberLastVault
+    - name: handleCreateVault
+      kind: function
+      line_start: 251
+      line_end: 274
+      signature: handleCreateVault()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - activateVault
+      - createVaultInParent
+      - errorMessage
+      - setBusyMessage
+      - setError
+      - setNotice
+      - vaultName.trim
+      parser: typescript-pattern
+      dependency_targets:
+      - *id016
+      - *id017
+      - *id014
+    - name: handleChooseVaultLocation
+      kind: function
+      line_start: 275
+      line_end: 288
+      signature: handleChooseVaultLocation()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Array.isArray
+      - open
+      - setError
+      - setVaultParentPath
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: handleOpenVault
+      kind: function
+      line_start: 289
+      line_end: 313
+      signature: handleOpenVault()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Array.isArray
+      - activateVault
+      - errorMessage
+      - open
+      - openVault
+      - setBusyMessage
+      - setError
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - *id016
+      - *id014
+      - *id018
+    - name: handleCloseVault
+      kind: function
+      line_start: 314
+      line_end: 327
+      signature: handleCloseVault()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - clearLastVault
+      - errorMessage
+      - setBusyMessage
+      - setError
+      - setNotice
+      - setVault
+      parser: typescript-pattern
+      dependency_targets:
+      - *id019
+      - *id014
+    - name: rememberFileLocation
+      kind: function
+      line_start: 328
+      line_end: 335
+      signature: 'rememberFileLocation(filePath: string)'
+      inputs:
+      - 'filePath: string'
+      output: unspecified
+      dependencies:
+      - rememberLastImportFile
+      - setLastImportDirectory
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/lib/workloreApi.ts
+        symbol: rememberLastImportFile
+    - name: handleImportSource
+      kind: function
+      line_start: 336
+      line_end: 370
+      signature: handleImportSource()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Array.isArray
+      - errorMessage
+      - importSource
+      - open
+      - refreshWorkspace
+      - rememberFileLocation
+      - setBusyMessage
+      - setError
+      - setNotice
+      - sourceTypeLabel
+      - toLowerCase
+      parser: typescript-pattern
+      dependency_targets:
+      - *id014
+      - path: src/lib/workloreApi.ts
+        symbol: importSource
+      - &id021
+        path: src/App.tsx
+        symbol: refreshWorkspace
+      - &id023
+        path: src/App.tsx
+        symbol: rememberFileLocation
+      - path: src/App.tsx
+        symbol: sourceTypeLabel
+      - path: src/components/CapturePanel.tsx
+        symbol: sourceTypeLabel
+    - name: handleExtractCandidates
+      kind: function
+      line_start: 371
+      line_end: 387
+      signature: 'handleExtractCandidates(sourceId: string)'
+      inputs:
+      - 'sourceId: string'
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - extractResumeCandidates
+      - refreshWorkspace
+      - setBusyMessage
+      - setError
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - *id014
+      - *id020
+      - *id021
+    - name: handleStartInterview
+      kind: function
+      line_start: 388
+      line_end: 408
+      signature: 'handleStartInterview(candidateId: string)'
+      inputs:
+      - 'candidateId: string'
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - refreshWorkspace
+      - setBusyMessage
+      - setError
+      - setNotice
+      - setSelectedInterviewId
+      - startGuidedInterview
+      parser: typescript-pattern
+      dependency_targets:
+      - *id014
+      - *id021
+      - path: src/lib/workloreApi.ts
+        symbol: startGuidedInterview
+    - name: handleInterviewResponse
+      kind: function
+      line_start: 409
+      line_end: 441
+      signature: 'handleInterviewResponse(interviewId: string, action: InterviewResponseAction, text: string, classification:
+        AnswerClassification | null)'
+      inputs:
+      - 'interviewId: string'
+      - 'action: InterviewResponseAction'
+      - 'text: string'
+      - 'classification: AnswerClassification | null'
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - refreshWorkspace
+      - setBusyMessage
+      - setError
+      - setNotice
+      - setSelectedInterviewId
+      - submitGuidedInterviewResponse
+      parser: typescript-pattern
+      dependency_targets:
+      - *id014
+      - *id021
+      - path: src/lib/workloreApi.ts
+        symbol: submitGuidedInterviewResponse
+    - name: handleExportWorkspace
+      kind: function
+      line_start: 442
+      line_end: 475
+      signature: 'handleExportWorkspace(interviewId: string, target: ManualWorkspaceTarget)'
+      inputs:
+      - 'interviewId: string'
+      - 'target: ManualWorkspaceTarget'
+      output: unspecified
+      dependencies:
+      - Array.isArray
+      - createManualWorkspace
+      - errorMessage
+      - open
+      - refreshPerformance
+      - setBusyMessage
+      - setError
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - *id022
+      - *id014
+      - &id027
+        path: src/App.tsx
+        symbol: refreshPerformance
+    - name: handleImportStoryResponse
+      kind: function
+      line_start: 476
+      line_end: 509
+      signature: 'handleImportStoryResponse(interviewId: string)'
+      inputs:
+      - 'interviewId: string'
+      output: unspecified
+      dependencies:
+      - Array.isArray
+      - errorMessage
+      - importStoryResponse
+      - open
+      - refreshWorkspace
+      - rememberFileLocation
+      - setBusyMessage
+      - setError
+      - setNotice
+      - setSelectedInterviewId
+      parser: typescript-pattern
+      dependency_targets:
+      - *id014
+      - path: src/lib/workloreApi.ts
+        symbol: importStoryResponse
+      - *id021
+      - *id023
+    - name: handleCandidateStatusChange
+      kind: function
+      line_start: 510
+      line_end: 530
+      signature: 'handleCandidateStatusChange(candidateId: string, status: CandidateStatus)'
+      inputs:
+      - 'candidateId: string'
+      - 'status: CandidateStatus'
+      output: unspecified
+      dependencies:
+      - candidateStatusMessage
+      - errorMessage
+      - listStoryCandidates
+      - setBusyMessage
+      - setCandidates
+      - setError
+      - setNotice
+      - setStoryCandidateStatus
+      parser: typescript-pattern
+      dependency_targets:
+      - *id024
+      - *id014
+      - *id025
+      - path: src/lib/workloreApi.ts
+        symbol: setStoryCandidateStatus
+    - name: handleStoryStatusChange
+      kind: function
+      line_start: 531
+      line_end: 548
+      signature: 'handleStoryStatusChange(storyId: string, status: StoryStatus)'
+      inputs:
+      - 'storyId: string'
+      - 'status: StoryStatus'
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - humanize
+      - listStories
+      - setBusyMessage
+      - setError
+      - setNotice
+      - setStories
+      - setStoryStatus
+      parser: typescript-pattern
+      dependency_targets:
+      - *id014
+      - *id026
+      - path: src/lib/workloreApi.ts
+        symbol: setStoryStatus
+    - name: handlePrivacyModeChange
+      kind: function
+      line_start: 549
+      line_end: 568
+      signature: 'handlePrivacyModeChange(mode: CloudIdentifierMode)'
+      inputs:
+      - 'mode: CloudIdentifierMode'
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - setBusyMessage
+      - setError
+      - setNotice
+      - setVault
+      - updateCloudIdentifierMode
+      parser: typescript-pattern
+      dependency_targets:
+      - *id014
+      - path: src/lib/workloreApi.ts
+        symbol: updateCloudIdentifierMode
+    - name: handleResolveReview
+      kind: function
+      line_start: 569
+      line_end: 586
+      signature: 'handleResolveReview(request: ResolveEntityReviewRequest)'
+      inputs:
+      - 'request: ResolveEntityReviewRequest'
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - refreshWorkspace
+      - resolveEntityReview
+      - setBusyMessage
+      - setError
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - *id014
+      - *id021
+      - path: src/lib/workloreApi.ts
+        symbol: resolveEntityReview
+    - name: renderWorkspace
+      kind: function
+      line_start: 587
+      line_end: 714
+      signature: renderWorkspace()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - candidates.filter
+      - handleExtractCandidates
+      - handleImportSource
+      - handlePrivacyModeChange
+      - refreshPerformance
+      - refreshWorkspace
+      - setActiveView
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/App.tsx
+        symbol: handleExtractCandidates
+      - path: src/App.tsx
+        symbol: handleImportSource
+      - path: src/App.tsx
+        symbol: handlePrivacyModeChange
+      - *id027
+      - *id021
+    - name: StatusItem
+      kind: function
+      line_start: 882
+      line_end: 887
+      signature: StatusItem({ value, label, attention)
+      inputs:
+      - '{ value, label, attention'
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: StatusPill
+      kind: function
+      line_start: 899
+      line_end: 900
+      signature: StatusPill({ label, attention)
+      inputs:
+      - '{ label, attention'
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: Feedback
+      kind: function
+      line_start: 903
+      line_end: 904
+      signature: 'Feedback({ notice, error }: { notice: string | null; error: string | null })'
+      inputs:
+      - '{ notice, error }: { notice: string | null; error: string | null }'
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: BusyLayer
+      kind: function
+      line_start: 914
+      line_end: 918
+      signature: 'BusyLayer({ message, activeOperation, }: { message: string | null; activeOperation: ActiveOperation | null;
+        })'
+      inputs:
+      - '{ message, activeOperation, }: { message: string | null; activeOperation: ActiveOperation | null; }'
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: sourceTypeLabel
+      kind: function
+      line_start: 941
+      line_end: 944
+      signature: 'sourceTypeLabel(sourceType: SourceType) -> string'
+      inputs:
+      - 'sourceType: SourceType'
+      output: string
+      dependencies:
+      - SOURCE_TYPES.find
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: candidateStatusMessage
+      kind: function
+      line_start: 945
+      line_end: 957
+      signature: 'candidateStatusMessage(status: CandidateStatus) -> string'
+      inputs:
+      - 'status: CandidateStatus'
+      output: string
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: displayVaultPath
+      kind: function
+      line_start: 958
+      line_end: 963
+      signature: 'displayVaultPath(parentPath: string, name: string) -> string'
+      inputs:
+      - 'parentPath: string'
+      - 'name: string'
+      output: string
+      dependencies:
+      - name.trim
+      - parentPath.replace
+      - trimmedParent.includes
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: formatDate
+      kind: function
+      line_start: 964
+      line_end: 971
+      signature: 'formatDate(value: string) -> string'
+      inputs:
+      - 'value: string'
+      output: string
+      dependencies:
+      - Date
+      - Intl.DateTimeFormat
+      - Number.isNaN
+      - format
+      - parsed.getTime
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: formatElapsed
+      kind: function
+      line_start: 972
+      line_end: 979
+      signature: 'formatElapsed(durationMs: number) -> string'
+      inputs:
+      - 'durationMs: number'
+      output: string
+      dependencies:
+      - Math.floor
+      - Math.max
+      - Math.round
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: humanize
+      kind: function
+      line_start: 980
+      line_end: 983
+      signature: 'humanize(value: string) -> string'
+      inputs:
+      - 'value: string'
+      output: string
+      dependencies:
+      - value.replaceAll
+      parser: typescript-pattern
+      dependency_targets: []
+  - path: src/components/WindowControls.tsx
+    analysis_version: 1
+    language: typescript
+    content_hash: e2b89965c3b6cbf29925cf7aef380f02297f085e
+    dependencies:
+    - ./HelpLauncher
+    - '@tauri-apps/api/window'
+    provides:
+    - WindowControls
+    - closeApplication
+    - CloseIcon
+    symbols:
+    - name: WindowControls
+      kind: function
+      line_start: 3
+      line_end: 23
+      signature: WindowControls()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - close
+      - closeApplication
+      - getCurrentWindow
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/components/WindowControls.tsx
+        symbol: closeApplication
+    - name: closeApplication
+      kind: function
+      line_start: 5
+      line_end: 7
+      signature: closeApplication()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - close
+      - getCurrentWindow
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: CloseIcon
+      kind: function
+      line_start: 24
+      line_end: 31
+      signature: CloseIcon()
+      inputs: []
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+  - path: src/lib/postApi.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: c8620d36c4f339eafb6400a316f7419364a63acf
+    dependencies:
+    - ../domain/posts
+    - '@tauri-apps/api/core'
+    provides:
+    - createPost
+    - listPosts
+    - generatePostFromTopic
+    - appendPostRevision
+    - approvePostRevision
+    - getPostLineage
+    - linkPostSupportingMaterial
+    symbols:
+    - name: createPost
+      kind: function
+      line_start: 12
+      line_end: 18
+      signature: 'createPost(vaultPath: string, request: CreatePostRequest) -> Promise<PostLineageView>'
+      inputs:
+      - 'vaultPath: string'
+      - 'request: CreatePostRequest'
+      output: Promise<PostLineageView>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: listPosts
+      kind: function
+      line_start: 19
+      line_end: 22
+      signature: 'listPosts(vaultPath: string) -> Promise<PostRecordView[]>'
+      inputs:
+      - 'vaultPath: string'
+      output: Promise<PostRecordView[]>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: generatePostFromTopic
+      kind: function
+      line_start: 23
+      line_end: 32
+      signature: 'generatePostFromTopic(vaultPath: string, request: GeneratePostFromTopicRequest) -> Promise<GeneratePostFromTopicResult>'
+      inputs:
+      - 'vaultPath: string'
+      - 'request: GeneratePostFromTopicRequest'
+      output: Promise<GeneratePostFromTopicResult>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: appendPostRevision
+      kind: function
+      line_start: 33
+      line_end: 39
+      signature: 'appendPostRevision(vaultPath: string, request: AppendPostRevisionRequest) -> Promise<PostLineageView>'
+      inputs:
+      - 'vaultPath: string'
+      - 'request: AppendPostRevisionRequest'
+      output: Promise<PostLineageView>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: approvePostRevision
+      kind: function
+      line_start: 40
+      line_end: 46
+      signature: 'approvePostRevision(vaultPath: string, request: ApprovePostRevisionRequest) -> Promise<PostLineageView>'
+      inputs:
+      - 'vaultPath: string'
+      - 'request: ApprovePostRevisionRequest'
+      output: Promise<PostLineageView>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: getPostLineage
+      kind: function
+      line_start: 47
+      line_end: 53
+      signature: 'getPostLineage(vaultPath: string, postId: string) -> Promise<PostLineageView>'
+      inputs:
+      - 'vaultPath: string'
+      - 'postId: string'
+      output: Promise<PostLineageView>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: linkPostSupportingMaterial
+      kind: function
+      line_start: 54
+      line_end: 63
+      signature: 'linkPostSupportingMaterial(vaultPath: string, request: LinkPostSupportingMaterialRequest) -> Promise<PostLineageView>'
+      inputs:
+      - 'vaultPath: string'
+      - 'request: LinkPostSupportingMaterialRequest'
+      output: Promise<PostLineageView>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []

@@ -1,0 +1,651 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: 0a
+  files:
+  - path: src-tauri/src/domain/edit_learning.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 2a173bf03f4c2720c615679fb11ef59ce6453b9e
+    dependencies:
+    - crate::domain::posts::{PostRevisionAuthorship, PostRevisionOrigin}
+    - serde::{Deserialize, Serialize}
+    provides:
+    - as_str
+    symbols:
+    - name: as_str
+      kind: function
+      line_start: 14
+      line_end: 20
+      signature: as_str(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+  - path: src-tauri/src/io_utils.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 10f29405d5e9d3cf0d96bdc0186c918ece76fe9a
+    dependencies:
+    - crate::error::{ServiceResult, WorkLoreError}
+    - serde::{de::DeserializeOwned, Serialize}
+    - sha2::{Digest, Sha256}
+    - "std::{\n    fs,\n    io::{Read, Write},\n    path::{Path, PathBuf},\n}"
+    - uuid::Uuid
+    provides:
+    - read_json
+    - write_json_atomic
+    - sha256_file
+    - sanitize_file_name
+    - unique_destination
+    - to_vault_relative
+    symbols:
+    - name: read_json
+      kind: function
+      line_start: 12
+      line_end: 16
+      signature: 'read_json(path: &Path) -> ServiceResult<T>'
+      inputs:
+      - 'path: &Path'
+      output: ServiceResult<T>
+      dependencies:
+      - Ok
+      - from_str
+      - read_to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: write_json_atomic
+      kind: function
+      line_start: 17
+      line_end: 55
+      signature: 'write_json_atomic(path: &Path, value: &T) -> ServiceResult<()>'
+      inputs:
+      - 'path: &Path'
+      - 'value: &T'
+      output: ServiceResult<()>
+      dependencies:
+      - Err
+      - Ok
+      - and_then
+      - backup.exists
+      - create
+      - create_dir_all
+      - error.into
+      - file.sync_all
+      - file.write_all
+      - file_name
+      - now_v7
+      - ok_or
+      - parent.join
+      - path.exists
+      - path.parent
+      - remove_file
+      - rename
+      - to_vec_pretty
+      - value.to_str
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/confidentiality_service.rs
+        symbol: create
+    - name: sha256_file
+      kind: function
+      line_start: 56
+      line_end: 71
+      signature: 'sha256_file(path: &Path) -> ServiceResult<String>'
+      inputs:
+      - 'path: &Path'
+      output: ServiceResult<String>
+      dependencies:
+      - Ok
+      - encode
+      - file.read
+      - hasher.finalize
+      - hasher.update
+      - new
+      - open
+      parser: rust-pattern
+      dependency_targets: []
+    - name: sanitize_file_name
+      kind: function
+      line_start: 72
+      line_end: 87
+      signature: 'sanitize_file_name(input: &str) -> String'
+      inputs:
+      - 'input: &str'
+      output: String
+      dependencies:
+      - character.is_ascii_alphanumeric
+      - input.chars
+      - input.len
+      - to_string
+      - trim
+      - trim_matches
+      - trimmed.is_empty
+      - trimmed.to_string
+      - value.push
+      - value.trim
+      - with_capacity
+      parser: rust-pattern
+      dependency_targets: []
+    - name: unique_destination
+      kind: function
+      line_start: 88
+      line_end: 114
+      signature: 'unique_destination(directory: &Path, file_name: &str) -> PathBuf'
+      inputs:
+      - 'directory: &Path'
+      - 'file_name: &str'
+      output: PathBuf
+      dependencies:
+      - Some
+      - and_then
+      - candidate.exists
+      - direct.exists
+      - directory.join
+      - file_stem
+      - new
+      - now_v7
+      - original.extension
+      - unwrap_or
+      - value.to_str
+      parser: rust-pattern
+      dependency_targets: []
+    - name: to_vault_relative
+      kind: function
+      line_start: 115
+      line_end: 121
+      signature: 'to_vault_relative(vault_path: &Path, path: &Path) -> ServiceResult<String>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'path: &Path'
+      output: ServiceResult<String>
+      dependencies:
+      - Ok
+      - map_err
+      - relative.to_string_lossy
+      - replace
+      - strip_prefix
+      parser: rust-pattern
+      dependency_targets: []
+  - path: src-tauri/src/lib.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 41e5d065470d0f0bf85a130faeafb995ce28900a
+    dependencies:
+    - "commands::{\n    candidates::{extract_resume_candidates, list_story_candidates, set_story_candidate_status},\n    capture::{\n\
+      \        classify_capture_source, create_capture_source, get_capture_source, list_captures,\n        list_unclassified_captures,\
+      \ update_capture_source_type,\n    },\n    development::{\n        create_story_from_seed_development, start_story_seed_development,\n\
+      \        submit_story_seed_development_response,\n    },\n    external::open_external_url,\n    feedback::{get_feedback_snapshot,\
+      \ mark_post_published, record_post_performance},\n    inspirations::{\n        add_inspiration_relationship, create_inspiration_from_source,\
+      \ get_inspiration,\n        list_inspiration_link_targets, list_inspirations, remove_inspiration_relationship,\n   \
+      \     update_inspiration,\n    },\n    interviews::{\n        list_guided_interviews, resume_guided_interview, start_guided_interview,\n\
+      \        submit_guided_interview_response,\n    },\n    performance::get_performance_snapshot,\n    posts::{\n     \
+      \   append_post_revision, approve_post_revision, create_post, generate_post_from_topic,\n        get_post_lineage, link_post_supporting_material,\
+      \ list_posts,\n    },\n    preferences::{\n        clear_last_vault, get_default_vault_root, get_last_import_directory,\
+      \ get_last_vault_path,\n        remember_last_import_file, remember_last_vault,\n    },\n    privacy::{\n        list_entity_reviews,\
+      \ resolve_entity_review, transform_confidentiality_for_public_use,\n    },\n    providers::{\n        analyze_voice_evidence,\
+      \ create_manual_workspace, get_provider_settings,\n        list_provider_models, test_provider_connection, update_provider_settings,\n\
+      \    },\n    quality::lint_draft,\n    roles::list_roles,\n    stories::{import_story_response, list_stories, set_story_status},\n\
+      \    target_contexts::{\n        add_target_context_relationship, create_target_context_from_source,\n        extract_target_context_signals,\
+      \ get_target_context, list_target_context_link_targets,\n        list_target_contexts, remove_target_context_relationship,\
+      \ update_target_context,\n    },\n    topics::{\n        add_topic_relationship, create_theme, create_topic, get_theme,\
+      \ get_topic, list_themes,\n        list_topic_link_targets, list_topics, remove_topic_relationship, update_theme,\n\
+      \        update_topic,\n    },\n    vault::{\n        create_default_vault, create_vault, create_vault_in_parent, import_source,\
+      \ list_sources,\n        open_vault, update_cloud_identifier_mode,\n    },\n    voice::{\n        activate_core_voice,\
+      \ analyze_edit_learning, create_core_voice, create_tone_mode,\n        create_voice_direction, create_voice_evidence_from_source,\
+      \ create_writing_rule,\n        decide_edit_learning_proposal, delete_core_voice_trait, get_voice_evidence,\n      \
+      \  list_core_voices, list_edit_learning_decisions, list_tone_modes, list_voice_directions,\n        list_voice_evidence,\
+      \ list_voice_source_candidates, list_writing_rules,\n        review_voice_evidence, save_core_voice_trait, set_voice_direction_status,\
+      \ update_tone_mode,\n        update_writing_rule,\n    },\n}"
+    provides:
+    - run
+    symbols:
+    - name: run
+      kind: function
+      line_start: 73
+      line_end: 183
+      signature: run()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - default
+      - expect
+      - init
+      - invoke_handler
+      - plugin
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/app_preferences_service.rs
+        symbol: default
+  - path: src/components/GuidedInterviewPanel.tsx
+    analysis_version: 1
+    language: typescript
+    content_hash: 70fae3691e0b233ccf0914129197062c4d881749
+    dependencies:
+    - ../domain/types
+    - react
+    provides:
+    - GuidedInterviewPanel
+    - submit
+    - exportWorkspace
+    - importResponse
+    - humanizeField
+    symbols:
+    - name: GuidedInterviewPanel
+      kind: function
+      line_start: 23
+      line_end: 29
+      signature: 'GuidedInterviewPanel({ interview, onSubmit, onExportWorkspace, onImportResponse, }: GuidedInterviewPanelProps)'
+      inputs:
+      - '{ interview, onSubmit, onExportWorkspace, onImportResponse, }: GuidedInterviewPanelProps'
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: submit
+      kind: function
+      line_start: 49
+      line_end: 62
+      signature: 'submit(action: InterviewResponseAction)'
+      inputs:
+      - 'action: InterviewResponseAction'
+      output: unspecified
+      dependencies:
+      - onSubmit
+      - setSubmitting
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: exportWorkspace
+      kind: function
+      line_start: 63
+      line_end: 71
+      signature: exportWorkspace()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - onExportWorkspace
+      - setSubmitting
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: importResponse
+      kind: function
+      line_start: 72
+      line_end: 80
+      signature: importResponse()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - onImportResponse
+      - setSubmitting
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: humanizeField
+      kind: function
+      line_start: 208
+      line_end: 211
+      signature: 'humanizeField(value: string) -> string'
+      inputs:
+      - 'value: string'
+      output: string
+      dependencies:
+      - value.replaceAll
+      parser: typescript-pattern
+      dependency_targets: []
+  - path: src/components/PostWorkspace.tsx
+    analysis_version: 1
+    language: typescript
+    content_hash: 2aa4958ea07b3db7a31537def552c5d7d238acb3
+    dependencies:
+    - ../domain/confidentiality
+    - ../domain/posts
+    - ../domain/types
+    - ../lib/confidentialityApi
+    - ../lib/postApi
+    - ../lib/workloreApi
+    - ./InfoButton
+    - react
+    provides:
+    - PostWorkspace
+    - loadWorkspace
+    - refreshPosts
+    - openPost
+    - generateFromTopic
+    - saveRevision
+    - challengeDraft
+    - approveFinal
+    - loadPublicSafeText
+    - copyApprovedText
+    - humanize
+    - SparkleIcon
+    - SaveIcon
+    - ShieldIcon
+    - CheckIcon
+    - CopyIcon
+    symbols:
+    - name: PostWorkspace
+      kind: function
+      line_start: 23
+      line_end: 24
+      signature: 'PostWorkspace({ vaultPath }: { vaultPath: string })'
+      inputs:
+      - '{ vaultPath }: { vaultPath: string }'
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: loadWorkspace
+      kind: function
+      line_start: 71
+      line_end: 95
+      signature: 'loadWorkspace(preferredPostId?: string)'
+      inputs:
+      - 'preferredPostId?: string'
+      output: unspecified
+      dependencies:
+      - Promise.all
+      - errorMessage
+      - listPosts
+      - listTopics
+      - openPost
+      - postResult.some
+      - setBusy
+      - setError
+      - setPosts
+      - setSelectedTopicId
+      - setTopics
+      parser: typescript-pattern
+      dependency_targets:
+      - &id002
+        path: src/domain/types.ts
+        symbol: errorMessage
+      - &id001
+        path: src/lib/postApi.ts
+        symbol: listPosts
+      - path: src/lib/workloreApi.ts
+        symbol: listTopics
+      - path: src/components/PostWorkspace.tsx
+        symbol: openPost
+    - name: refreshPosts
+      kind: function
+      line_start: 96
+      line_end: 101
+      signature: 'refreshPosts(preferredPostId: string)'
+      inputs:
+      - 'preferredPostId: string'
+      output: unspecified
+      dependencies:
+      - listPosts
+      - setPosts
+      - setSelectedPostId
+      parser: typescript-pattern
+      dependency_targets:
+      - *id001
+    - name: openPost
+      kind: function
+      line_start: 102
+      line_end: 125
+      signature: 'openPost(postId: string)'
+      inputs:
+      - 'postId: string'
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - getPostLineage
+      - loaded.revisions.find
+      - setChallenge
+      - setEditorText
+      - setError
+      - setLineage
+      - setNotice
+      - setSelectedPostId
+      parser: typescript-pattern
+      dependency_targets:
+      - *id002
+      - path: src/lib/postApi.ts
+        symbol: getPostLineage
+    - name: generateFromTopic
+      kind: function
+      line_start: 126
+      line_end: 159
+      signature: generateFromTopic()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Error
+      - errorMessage
+      - generatePostFromTopic
+      - generated.lineage.revisions.find
+      - getProviderSettings
+      - refreshPosts
+      - setBusy
+      - setChallenge
+      - setEditorText
+      - setError
+      - setLineage
+      - setNotice
+      - setSelectedPostId
+      parser: typescript-pattern
+      dependency_targets:
+      - *id002
+      - path: src/lib/postApi.ts
+        symbol: generatePostFromTopic
+      - path: src/lib/workloreApi.ts
+        symbol: getProviderSettings
+      - &id003
+        path: src/components/PostWorkspace.tsx
+        symbol: refreshPosts
+    - name: saveRevision
+      kind: function
+      line_start: 160
+      line_end: 194
+      signature: saveRevision()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - appendPostRevision
+      - errorMessage
+      - refreshPosts
+      - setBusy
+      - setChallenge
+      - setEditorText
+      - setError
+      - setLineage
+      - setNotice
+      - updated.revisions.find
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/lib/postApi.ts
+        symbol: appendPostRevision
+      - *id002
+      - *id003
+    - name: challengeDraft
+      kind: function
+      line_start: 195
+      line_end: 219
+      signature: challengeDraft()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Promise.all
+      - editorText.trim
+      - errorMessage
+      - lintDraft
+      - setBusy
+      - setChallenge
+      - setError
+      - setNotice
+      - transformConfidentialityForPublicUse
+      parser: typescript-pattern
+      dependency_targets:
+      - *id002
+      - path: src/lib/workloreApi.ts
+        symbol: lintDraft
+      - path: src/lib/confidentialityApi.ts
+        symbol: transformConfidentialityForPublicUse
+    - name: approveFinal
+      kind: function
+      line_start: 220
+      line_end: 239
+      signature: approveFinal()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - approvePostRevision
+      - errorMessage
+      - refreshPosts
+      - setBusy
+      - setError
+      - setLineage
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/lib/postApi.ts
+        symbol: approvePostRevision
+      - *id002
+      - *id003
+    - name: loadPublicSafeText
+      kind: function
+      line_start: 240
+      line_end: 246
+      signature: loadPublicSafeText()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - setChallenge
+      - setEditorText
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: copyApprovedText
+      kind: function
+      line_start: 247
+      line_end: 256
+      signature: copyApprovedText()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - navigator.clipboard.writeText
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: humanize
+      kind: function
+      line_start: 462
+      line_end: 465
+      signature: 'humanize(value: string) -> string'
+      inputs:
+      - 'value: string'
+      output: string
+      dependencies:
+      - value.replaceAll
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: SparkleIcon
+      kind: function
+      line_start: 466
+      line_end: 469
+      signature: SparkleIcon()
+      inputs: []
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: SaveIcon
+      kind: function
+      line_start: 470
+      line_end: 473
+      signature: SaveIcon()
+      inputs: []
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: ShieldIcon
+      kind: function
+      line_start: 474
+      line_end: 477
+      signature: ShieldIcon()
+      inputs: []
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: CheckIcon
+      kind: function
+      line_start: 478
+      line_end: 481
+      signature: CheckIcon()
+      inputs: []
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: CopyIcon
+      kind: function
+      line_start: 482
+      line_end: 485
+      signature: CopyIcon()
+      inputs: []
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+  - path: src/lib/feedbackApi.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: dae5aa7ca9d2a5f5a14ff38cdc056073a42545e5
+    dependencies:
+    - ../domain/feedback
+    - '@tauri-apps/api/core'
+    provides:
+    - markPostPublished
+    - recordPostPerformance
+    - getFeedbackSnapshot
+    symbols:
+    - name: markPostPublished
+      kind: function
+      line_start: 9
+      line_end: 15
+      signature: 'markPostPublished(vaultPath: string, request: MarkPostPublishedRequest) -> Promise<ManualPublicationView>'
+      inputs:
+      - 'vaultPath: string'
+      - 'request: MarkPostPublishedRequest'
+      output: Promise<ManualPublicationView>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: recordPostPerformance
+      kind: function
+      line_start: 16
+      line_end: 22
+      signature: 'recordPostPerformance(vaultPath: string, request: RecordPostPerformanceRequest) -> Promise<PerformanceRecordView>'
+      inputs:
+      - 'vaultPath: string'
+      - 'request: RecordPostPerformanceRequest'
+      output: Promise<PerformanceRecordView>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: getFeedbackSnapshot
+      kind: function
+      line_start: 23
+      line_end: 26
+      signature: 'getFeedbackSnapshot(vaultPath: string) -> Promise<FeedbackSnapshotView>'
+      inputs:
+      - 'vaultPath: string'
+      output: Promise<FeedbackSnapshotView>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+  - path: vite.config.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: 14824a23d0f814e6aae8ce522d748ec33ad456ca
+    dependencies:
+    - '@vitejs/plugin-react'
+    - vite
+    provides: []
+    symbols: []

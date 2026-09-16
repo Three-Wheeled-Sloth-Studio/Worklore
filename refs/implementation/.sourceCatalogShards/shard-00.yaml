@@ -1,0 +1,950 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: '00'
+  files:
+  - path: src-tauri/src/domain/providers.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 247b713f9d10c509c38baf06885a9418916c39fb
+    dependencies:
+    - serde::{Deserialize, Serialize}
+    provides: []
+    symbols: []
+  - path: src-tauri/src/services/edit_learning_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 2e8571d3455ab2e0be409135d01ae7aa8d9aea80
+    dependencies:
+    - chrono::Utc
+    - "crate::{\n        domain::posts::{AppendPostRevisionRequest, CreatePostRequest},\n        services::{\n           \
+      \ post_lineage_service, vault_service, voice_evidence_service, voice_profile_service,\n        },\n    }"
+    - "crate::{\n    domain::{\n        edit_learning::{\n            DecideEditLearningProposalRequest, EditChangeKind, EditChangeView,\n\
+      \            EditLearningAnalysisView, EditLearningDecisionKind, EditLearningDecisionView,\n            EditObservationView,\
+      \ EditPairProvenanceView, RecurringEditPreferenceProposalView,\n        },\n        posts::{PostRevisionAuthorship,\
+      \ PostRevisionOrigin},\n    },\n    error::{ServiceResult, WorkLoreError},\n    services::canonical_store,\n}"
+    - rusqlite::{params, Connection, Transaction}
+    - serde::{Deserialize, Serialize}
+    - serde_json::json
+    - sha2::{Digest, Sha256}
+    - std::fs
+    - "std::{\n    collections::{BTreeMap, BTreeSet},\n    path::Path,\n    time::Duration,\n}"
+    - super::*
+    - uuid::Uuid
+    provides:
+    - analyze_edit_learning
+    - decide_edit_learning_proposal
+    - list_edit_learning_decisions
+    - derive_raw_analysis
+    - load_user_edit_pairs
+    - diff_text
+    - build_proposals
+    - proposal_key
+    - normalize_fragment
+    - proposal_statement
+    - load_decisions
+    - load_decision_keys
+    - normalize_pairs
+    - pair_signature
+    - pair_key
+    - fingerprint
+    - create_proposed_writing_rule_tx
+    - audit_tx
+    - parse_origin
+    - open_connection
+    - vault
+    - create_user_edit_pair
+    - create_model_edit_pair
+    - recurring_proposal
+    - empty_history_yields_no_observations_or_proposals
+    - persisted_edits_expose_addition_removal_and_replacement
+    - model_text_is_context_not_voice_evidence
+    - repeated_correction_across_distinct_posts_proposes_review_only_preference
+    - analysis_does_not_mutate_governed_voice_state
+    - accepted_decision_is_explicit_durable_and_creates_only_a_proposed_rule
+    - rejected_evidence_is_suppressed_until_real_support_expands
+    - tampered_or_stale_decision_evidence_is_rejected
+    - accepting_recurring_model_edits_preserves_model_ancestry_and_voice_boundary
+    symbols:
+    - name: analyze_edit_learning
+      kind: function
+      line_start: 34
+      line_end: 46
+      signature: 'analyze_edit_learning(vault_path: &Path) -> ServiceResult<EditLearningAnalysisView>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<EditLearningAnalysisView>
+      dependencies:
+      - Ok
+      - analysis.proposals.retain
+      - decided_keys.contains
+      - derive_raw_analysis
+      - fingerprint
+      - initialize
+      - load_decision_keys
+      - open_connection
+      - pair_signature
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/services/edit_learning_service.rs
+        symbol: derive_raw_analysis
+      - &id002
+        path: src-tauri/src/services/edit_learning_service.rs
+        symbol: fingerprint
+      - &id003
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: initialize
+      - &id004
+        path: src-tauri/src/services/edit_learning_service.rs
+        symbol: load_decision_keys
+      - &id005
+        path: src-tauri/src/services/edit_learning_service.rs
+        symbol: pair_signature
+    - name: decide_edit_learning_proposal
+      kind: function
+      line_start: 47
+      line_end: 135
+      signature: 'decide_edit_learning_proposal(vault_path: &Path, request: DecideEditLearningProposalRequest) -> ServiceResult<EditLearningDecisionView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: DecideEditLearningProposalRequest'
+      output: ServiceResult<EditLearningDecisionView>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      - Some
+      - audit_tx
+      - connection.transaction
+      - contains
+      - create_proposed_writing_rule_tx
+      - derive_raw_analysis
+      - find
+      - fingerprint
+      - initialize
+      - into_iter
+      - let
+      - load_decision_keys
+      - normalize_pairs
+      - now
+      - now_v7
+      - ok_or_else
+      - open_connection
+      - pair_signature
+      - proposal_fingerprint.clone
+      - requested_pairs.clone
+      - requested_pairs.is_empty
+      parser: rust-pattern
+      dependency_targets:
+      - &id006
+        path: src-tauri/src/services/edit_learning_service.rs
+        symbol: audit_tx
+      - &id007
+        path: src-tauri/src/services/post_lineage_service.rs
+        symbol: audit_tx
+      - &id008
+        path: src-tauri/src/services/voice_evidence_service.rs
+        symbol: audit_tx
+      - &id009
+        path: src-tauri/src/services/voice_profile_service.rs
+        symbol: audit_tx
+      - path: src-tauri/src/services/edit_learning_service.rs
+        symbol: create_proposed_writing_rule_tx
+      - *id001
+      - *id002
+      - *id003
+      - *id004
+      - path: src-tauri/src/services/edit_learning_service.rs
+        symbol: normalize_pairs
+      - *id005
+    - name: list_edit_learning_decisions
+      kind: function
+      line_start: 136
+      line_end: 143
+      signature: 'list_edit_learning_decisions(vault_path: &Path) -> ServiceResult<Vec<EditLearningDecisionView>>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Vec<EditLearningDecisionView>>
+      dependencies:
+      - initialize
+      - load_decisions
+      - open_connection
+      parser: rust-pattern
+      dependency_targets:
+      - *id003
+      - path: src-tauri/src/services/edit_learning_service.rs
+        symbol: load_decisions
+    - name: derive_raw_analysis
+      kind: function
+      line_start: 144
+      line_end: 172
+      signature: 'derive_raw_analysis(connection: &Connection) -> ServiceResult<EditLearningAnalysisView>'
+      inputs:
+      - 'connection: &Connection'
+      output: ServiceResult<EditLearningAnalysisView>
+      dependencies:
+      - Ok
+      - Some
+      - build_proposals
+      - diff_text
+      - load_user_edit_pairs
+      - map_err
+      - new
+      - observations.push
+      - parse
+      - parse_origin
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/edit_learning_service.rs
+        symbol: build_proposals
+      - path: src-tauri/src/services/edit_learning_service.rs
+        symbol: diff_text
+      - path: src-tauri/src/services/edit_learning_service.rs
+        symbol: load_user_edit_pairs
+      - path: src-tauri/src/services/edit_learning_service.rs
+        symbol: parse_origin
+    - name: load_user_edit_pairs
+      kind: function
+      line_start: 185
+      line_end: 212
+      signature: 'load_user_edit_pairs(connection: &Connection) -> ServiceResult<Vec<RevisionPairRaw>>'
+      inputs:
+      - 'connection: &Connection'
+      output: ServiceResult<Vec<RevisionPairRaw>>
+      dependencies:
+      - IN
+      - Ok
+      - connection.prepare
+      - row.get
+      - statement.query_map
+      parser: rust-pattern
+      dependency_targets: []
+    - name: diff_text
+      kind: function
+      line_start: 213
+      line_end: 258
+      signature: 'diff_text(parent: &str, child: &str) -> Option<EditChangeView>'
+      inputs:
+      - 'parent: &str'
+      - 'child: &str'
+      output: Option<EditChangeView>
+      dependencies:
+      - Some
+      - added.is_empty
+      - child.split_whitespace
+      - child_tokens.len
+      - join
+      - match
+      - parent.split_whitespace
+      - parent_tokens.len
+      - removed.is_empty
+      - saturating_sub
+      parser: rust-pattern
+      dependency_targets: []
+    - name: build_proposals
+      kind: function
+      line_start: 267
+      line_end: 316
+      signature: 'build_proposals(observations: &[EditObservationView]) -> Vec<RecurringEditPreferenceProposalView>'
+      inputs:
+      - 'observations: &[EditObservationView]'
+      output: Vec<RecurringEditPreferenceProposalView>
+      dependencies:
+      - Some
+      - change.added_text.clone
+      - change.removed_text.clone
+      - collect
+      - entry
+      - entry.post_ids.insert
+      - entry.supporting_pairs.push
+      - filter_map
+      - into_iter
+      - new
+      - observation.child_revision_id.clone
+      - observation.parent_revision_id.clone
+      - observation.post_id.clone
+      - or_insert_with
+      - pattern.added_text.as_deref
+      - pattern.post_ids.len
+      - pattern.removed_text.as_deref
+      - pattern.supporting_pairs.len
+      - proposal_key
+      - proposal_statement
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/edit_learning_service.rs
+        symbol: proposal_key
+      - path: src-tauri/src/services/edit_learning_service.rs
+        symbol: proposal_statement
+    - name: proposal_key
+      kind: function
+      line_start: 317
+      line_end: 327
+      signature: 'proposal_key(change: &EditChangeView) -> Option<String>'
+      inputs:
+      - 'change: &EditChangeView'
+      output: Option<String>
+      dependencies:
+      - Some
+      - added.chars
+      - change.added_text.as_deref
+      - change.kind.as_str
+      - change.removed_text.as_deref
+      - count
+      - normalize_fragment
+      - removed.chars
+      - unwrap_or
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/edit_learning_service.rs
+        symbol: normalize_fragment
+    - name: normalize_fragment
+      kind: function
+      line_start: 328
+      line_end: 335
+      signature: 'normalize_fragment(value: &str) -> String'
+      inputs:
+      - 'value: &str'
+      output: String
+      dependencies:
+      - join
+      - map
+      - split_whitespace
+      parser: rust-pattern
+      dependency_targets: []
+    - name: proposal_statement
+      kind: function
+      line_start: 336
+      line_end: 357
+      signature: 'proposal_statement(kind: EditChangeKind, removed_text: Option<&str>, added_text: Option<&str>) -> String'
+      inputs:
+      - 'kind: EditChangeKind'
+      - 'removed_text: Option<&str>'
+      - 'added_text: Option<&str>'
+      output: String
+      dependencies:
+      - added_text.unwrap_or_default
+      - removed_text.unwrap_or_default
+      parser: rust-pattern
+      dependency_targets: []
+    - name: load_decisions
+      kind: function
+      line_start: 369
+      line_end: 408
+      signature: 'load_decisions(connection: &Connection) -> ServiceResult<Vec<EditLearningDecisionView>>'
+      inputs:
+      - 'connection: &Connection'
+      output: ServiceResult<Vec<EditLearningDecisionView>>
+      dependencies:
+      - IN
+      - Ok
+      - collect
+      - connection.prepare
+      - from_str
+      - map
+      - query_map
+      - rows.into_iter
+      parser: rust-pattern
+      dependency_targets: []
+    - name: load_decision_keys
+      kind: function
+      line_start: 409
+      line_end: 432
+      signature: 'load_decision_keys(connection: &Connection) -> ServiceResult<BTreeSet<DecisionKey>>'
+      inputs:
+      - 'connection: &Connection'
+      output: ServiceResult<BTreeSet<DecisionKey>>
+      dependencies:
+      - IN
+      - Ok
+      - collect
+      - connection.prepare
+      - from_str
+      - map
+      - query_map
+      - rows.into_iter
+      parser: rust-pattern
+      dependency_targets: []
+    - name: normalize_pairs
+      kind: function
+      line_start: 433
+      line_end: 445
+      signature: 'normalize_pairs(pairs: &[EditPairProvenanceView]) -> ServiceResult<Vec<EditPairProvenanceView>>'
+      inputs:
+      - 'pairs: &[EditPairProvenanceView]'
+      output: ServiceResult<Vec<EditPairProvenanceView>>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      - collect
+      - is_some
+      - new
+      - normalized.insert
+      - normalized.into_values
+      - pair.clone
+      - pair_key
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/edit_learning_service.rs
+        symbol: pair_key
+    - name: pair_signature
+      kind: function
+      line_start: 446
+      line_end: 451
+      signature: 'pair_signature(pairs: &[EditPairProvenanceView]) -> String'
+      inputs:
+      - 'pairs: &[EditPairProvenanceView]'
+      output: String
+      dependencies:
+      - keys.join
+      - keys.sort
+      - map
+      - pairs.iter
+      parser: rust-pattern
+      dependency_targets: []
+    - name: pair_key
+      kind: function
+      line_start: 452
+      line_end: 458
+      signature: 'pair_key(pair: &EditPairProvenanceView) -> String'
+      inputs:
+      - 'pair: &EditPairProvenanceView'
+      output: String
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: fingerprint
+      kind: function
+      line_start: 459
+      line_end: 464
+      signature: 'fingerprint(value: &str) -> String'
+      inputs:
+      - 'value: &str'
+      output: String
+      dependencies:
+      - encode
+      - hasher.finalize
+      - hasher.update
+      - new
+      - value.as_bytes
+      parser: rust-pattern
+      dependency_targets: []
+    - name: create_proposed_writing_rule_tx
+      kind: function
+      line_start: 465
+      line_end: 505
+      signature: 'create_proposed_writing_rule_tx(tx: &Transaction<''_>, decision_id: &str, proposal: &RecurringEditPreferenceProposalView,
+        proposal_fingerprint: &str, now: &str) -> ServiceResult<String>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'decision_id: &str'
+      - 'proposal: &RecurringEditPreferenceProposalView'
+      - 'proposal_fingerprint: &str'
+      - 'now: &str'
+      output: ServiceResult<String>
+      dependencies:
+      - Ok
+      - VALUES
+      - audit_tx
+      - now_v7
+      - proposal.supporting_pairs.len
+      - to_string
+      - tx.execute
+      - writing_rules
+      parser: rust-pattern
+      dependency_targets:
+      - *id006
+      - *id007
+      - *id008
+      - *id009
+    - name: audit_tx
+      kind: function
+      line_start: 506
+      line_end: 528
+      signature: 'audit_tx(tx: &Transaction<''_>, event_type: &str, record_type: &str, record_id: &str, details: serde_json::Value,
+        occurred_at: &str) -> ServiceResult<()>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'event_type: &str'
+      - 'record_type: &str'
+      - 'record_id: &str'
+      - 'details: serde_json::Value'
+      - 'occurred_at: &str'
+      output: ServiceResult<()>
+      dependencies:
+      - Ok
+      - VALUES
+      - audit_events
+      - details.to_string
+      - now_v7
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets: []
+    - name: parse_origin
+      kind: function
+      line_start: 529
+      line_end: 538
+      signature: 'parse_origin(value: &str) -> ServiceResult<PostRevisionOrigin>'
+      inputs:
+      - 'value: &str'
+      output: ServiceResult<PostRevisionOrigin>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      parser: rust-pattern
+      dependency_targets: []
+    - name: open_connection
+      kind: function
+      line_start: 539
+      line_end: 544
+      signature: 'open_connection(vault_path: &Path) -> ServiceResult<Connection>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Connection>
+      dependencies:
+      - Ok
+      - connection.busy_timeout
+      - database_path
+      - from_secs
+      - open
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: database_path
+    - name: vault
+      kind: function
+      line_start: 556
+      line_end: 561
+      signature: vault() -> std::path::PathBuf
+      inputs: []
+      output: std::path::PathBuf
+      dependencies:
+      - create_vault
+      - expect
+      - join
+      - now_v7
+      - temp_dir
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/commands/vault.rs
+        symbol: create_vault
+      - path: src-tauri/src/services/vault_service.rs
+        symbol: create_vault
+    - name: create_user_edit_pair
+      kind: function
+      line_start: 562
+      line_end: 596
+      signature: 'create_user_edit_pair(path: &Path, title: &str, parent_text: &str, child_text: &str) -> String'
+      inputs:
+      - 'path: &Path'
+      - 'title: &str'
+      - 'parent_text: &str'
+      - 'child_text: &str'
+      output: String
+      dependencies:
+      - append_revision
+      - child_text.to_string
+      - create_post
+      - created.post.post_id.clone
+      - parent_text.to_string
+      - title.to_string
+      - unwrap
+      parser: rust-pattern
+      dependency_targets:
+      - &id010
+        path: src-tauri/src/services/post_lineage_service.rs
+        symbol: append_revision
+      - &id011
+        path: src-tauri/src/commands/posts.rs
+        symbol: create_post
+      - &id012
+        path: src-tauri/src/services/post_lineage_service.rs
+        symbol: create_post
+    - name: create_model_edit_pair
+      kind: function
+      line_start: 597
+      line_end: 631
+      signature: 'create_model_edit_pair(path: &Path, title: &str, parent_text: &str, child_text: &str) -> String'
+      inputs:
+      - 'path: &Path'
+      - 'title: &str'
+      - 'parent_text: &str'
+      - 'child_text: &str'
+      output: String
+      dependencies:
+      - Some
+      - append_revision
+      - child_text.to_string
+      - create_post
+      - created.post.post_id.clone
+      - now_v7
+      - parent_text.to_string
+      - title.to_string
+      - to_string
+      - unwrap
+      parser: rust-pattern
+      dependency_targets:
+      - *id010
+      - *id011
+      - *id012
+    - name: recurring_proposal
+      kind: function
+      line_start: 632
+      line_end: 635
+      signature: 'recurring_proposal(path: &Path) -> RecurringEditPreferenceProposalView'
+      inputs:
+      - 'path: &Path'
+      output: RecurringEditPreferenceProposalView
+      dependencies:
+      - analyze_edit_learning
+      - proposals.remove
+      - unwrap
+      parser: rust-pattern
+      dependency_targets:
+      - &id013
+        path: src-tauri/src/commands/voice.rs
+        symbol: analyze_edit_learning
+      - &id014
+        path: src-tauri/src/services/edit_learning_service.rs
+        symbol: analyze_edit_learning
+    - name: empty_history_yields_no_observations_or_proposals
+      kind: function
+      line_start: 638
+      line_end: 644
+      signature: empty_history_yields_no_observations_or_proposals()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - analysis.observations.is_empty
+      - analysis.proposals.is_empty
+      - analyze_edit_learning
+      - remove_dir_all
+      - unwrap
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - *id013
+      - *id014
+    - name: persisted_edits_expose_addition_removal_and_replacement
+      kind: function
+      line_start: 647
+      line_end: 700
+      signature: persisted_edits_expose_addition_removal_and_replacement()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - added_text.as_deref
+      - analysis.observations.len
+      - analysis.proposals.is_empty
+      - analyze_edit_learning
+      - create_user_edit_pair
+      - find
+      - iter
+      - remove_dir_all
+      - removed_text.as_deref
+      - unwrap
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - *id013
+      - *id014
+      - &id015
+        path: src-tauri/src/services/edit_learning_service.rs
+        symbol: create_user_edit_pair
+    - name: model_text_is_context_not_voice_evidence
+      kind: function
+      line_start: 703
+      line_end: 764
+      signature: model_text_is_context_not_voice_evidence()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - analyze_edit_learning
+      - append_revision
+      - create_post
+      - created.post.post_id.clone
+      - find
+      - get_post_lineage
+      - is_empty
+      - iter
+      - list_voice_evidence
+      - remove_dir_all
+      - revision_id.clone
+      - to_string
+      - unwrap
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - *id013
+      - *id014
+      - *id010
+      - *id011
+      - *id012
+      - &id027
+        path: src-tauri/src/commands/posts.rs
+        symbol: get_post_lineage
+      - &id028
+        path: src-tauri/src/services/post_lineage_service.rs
+        symbol: get_post_lineage
+      - &id016
+        path: src-tauri/src/commands/voice.rs
+        symbol: list_voice_evidence
+      - &id017
+        path: src-tauri/src/services/voice_evidence_service.rs
+        symbol: list_voice_evidence
+    - name: repeated_correction_across_distinct_posts_proposes_review_only_preference
+      kind: function
+      line_start: 767
+      line_end: 799
+      signature: repeated_correction_across_distinct_posts_proposes_review_only_preference()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - analysis.proposals.len
+      - analyze_edit_learning
+      - create_user_edit_pair
+      - first_post.as_str
+      - iter
+      - map
+      - pair.post_id.as_str
+      - proposal.statement.contains
+      - remove_dir_all
+      - second_post.as_str
+      - supporting_posts.contains
+      - supporting_posts.len
+      - unwrap
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - *id013
+      - *id014
+      - *id015
+    - name: analysis_does_not_mutate_governed_voice_state
+      kind: function
+      line_start: 802
+      line_end: 896
+      signature: analysis_does_not_mutate_governed_voice_state()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - activate_core_voice
+      - analysis.proposals.len
+      - analyze_edit_learning
+      - core_voice.voice_id.clone
+      - create_core_voice
+      - create_tone_mode
+      - create_user_edit_pair
+      - create_voice_direction
+      - create_writing_rule
+      - len
+      - list_core_voices
+      - list_tone_modes
+      - list_voice_directions
+      - list_voice_evidence
+      - list_writing_rules
+      - new
+      - remove_dir_all
+      - save_core_voice_trait
+      - to_string
+      - unwrap
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/commands/voice.rs
+        symbol: activate_core_voice
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: activate_core_voice
+      - *id013
+      - *id014
+      - path: src-tauri/src/commands/voice.rs
+        symbol: create_core_voice
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: create_core_voice
+      - path: src-tauri/src/commands/voice.rs
+        symbol: create_tone_mode
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: create_tone_mode
+      - *id015
+      - path: src-tauri/src/commands/voice.rs
+        symbol: create_voice_direction
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: create_voice_direction
+      - path: src-tauri/src/commands/voice.rs
+        symbol: create_writing_rule
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: create_writing_rule
+      - &id018
+        path: src-tauri/src/commands/voice.rs
+        symbol: list_core_voices
+      - &id019
+        path: src-tauri/src/services/voice_profile_service.rs
+        symbol: list_core_voices
+      - path: src-tauri/src/commands/voice.rs
+        symbol: list_tone_modes
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: list_tone_modes
+      - path: src-tauri/src/commands/voice.rs
+        symbol: list_voice_directions
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: list_voice_directions
+      - *id016
+      - *id017
+      - &id020
+        path: src-tauri/src/commands/voice.rs
+        symbol: list_writing_rules
+      - &id021
+        path: src-tauri/src/services/voice_profile_service.rs
+        symbol: list_writing_rules
+      - path: src-tauri/src/commands/voice.rs
+        symbol: save_core_voice_trait
+    - name: accepted_decision_is_explicit_durable_and_creates_only_a_proposed_rule
+      kind: function
+      line_start: 899
+      line_end: 957
+      signature: accepted_decision_is_explicit_durable_and_creates_only_a_proposed_rule()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - analyze_edit_learning
+      - create_user_edit_pair
+      - decide_edit_learning_proposal
+      - decision.resulting_artifact_id.as_deref
+      - decision.resulting_artifact_id.is_some
+      - decision.resulting_artifact_type.as_deref
+      - decisions.len
+      - is_empty
+      - list_core_voices
+      - list_edit_learning_decisions
+      - list_voice_evidence
+      - list_writing_rules
+      - proposal.proposal_key.clone
+      - proposal.supporting_pairs.clone
+      - proposals.is_empty
+      - recurring_proposal
+      - remove_dir_all
+      - rule_id.as_str
+      - rules.len
+      - supporting_pairs.len
+      - unwrap
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - *id013
+      - *id014
+      - *id015
+      - &id022
+        path: src-tauri/src/commands/voice.rs
+        symbol: decide_edit_learning_proposal
+      - &id023
+        path: src-tauri/src/services/edit_learning_service.rs
+        symbol: decide_edit_learning_proposal
+      - *id018
+      - *id019
+      - &id025
+        path: src-tauri/src/commands/voice.rs
+        symbol: list_edit_learning_decisions
+      - &id026
+        path: src-tauri/src/services/edit_learning_service.rs
+        symbol: list_edit_learning_decisions
+      - *id016
+      - *id017
+      - *id020
+      - *id021
+      - &id024
+        path: src-tauri/src/services/edit_learning_service.rs
+        symbol: recurring_proposal
+    - name: rejected_evidence_is_suppressed_until_real_support_expands
+      kind: function
+      line_start: 960
+      line_end: 1002
+      signature: rejected_evidence_is_suppressed_until_real_support_expands()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - analyze_edit_learning
+      - create_user_edit_pair
+      - decide_edit_learning_proposal
+      - decision.resulting_artifact_id.is_none
+      - is_empty
+      - list_writing_rules
+      - proposals.is_empty
+      - recurring_proposal
+      - remove_dir_all
+      - renewed.proposals.len
+      - unwrap
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - *id013
+      - *id014
+      - *id015
+      - *id022
+      - *id023
+      - *id020
+      - *id021
+      - *id024
+    - name: tampered_or_stale_decision_evidence_is_rejected
+      kind: function
+      line_start: 1005
+      line_end: 1051
+      signature: tampered_or_stale_decision_evidence_is_rejected()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - create_user_edit_pair
+      - decide_edit_learning_proposal
+      - is_empty
+      - is_err
+      - list_edit_learning_decisions
+      - proposal.proposal_key.clone
+      - proposal.supporting_pairs.clone
+      - recurring_proposal
+      - remove_dir_all
+      - to_string
+      - unwrap
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - *id015
+      - *id022
+      - *id023
+      - *id025
+      - *id026
+      - *id024
+    - name: accepting_recurring_model_edits_preserves_model_ancestry_and_voice_boundary
+      kind: function
+      line_start: 1054
+      line_end: 1095
+      signature: accepting_recurring_model_edits_preserves_model_ancestry_and_voice_boundary()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - create_model_edit_pair
+      - decide_edit_learning_proposal
+      - get_post_lineage
+      - is_empty
+      - list_voice_evidence
+      - recurring_proposal
+      - remove_dir_all
+      - unwrap
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/edit_learning_service.rs
+        symbol: create_model_edit_pair
+      - *id022
+      - *id023
+      - *id027
+      - *id028
+      - *id016
+      - *id017
+      - *id024

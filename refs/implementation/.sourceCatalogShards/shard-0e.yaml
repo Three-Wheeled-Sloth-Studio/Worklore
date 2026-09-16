@@ -1,0 +1,936 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: 0e
+  files:
+  - path: src-tauri/src/services/writing_lint_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: c793c7162700e2dc525b2e5f77dd12b3f7b4a2ee
+    dependencies:
+    - crate::services::{canonical_store, vault_service, voice_profile_service}
+    - "crate::{\n    error::ServiceResult,\n    services::voice_profile_service::{self, WritingRuleRecordView, WritingRuleStatus},\n\
+      }"
+    - serde::{Deserialize, Serialize}
+    - std::path::Path
+    - super::*
+    - uuid::Uuid
+    provides:
+    - label
+    - patterns
+    - lint_draft
+    - lint_text_with_rules
+    - lint_question_opening
+    - lint_engagement_bait_closing
+    - lint_engagement_bait_phrase
+    - lint_excessive_hashtags
+    - lint_list_dominance
+    - lint_writing_rule
+    - parse_deterministic_rule
+    - parse_punctuation_kind
+    - strip_prefix_ascii_case
+    - hashtag_ranges
+    - is_list_line
+    - find_case_insensitive
+    - find_word_case_insensitive
+    - is_word_boundary
+    - earliest_pattern
+    - make_finding
+    - utf16_offset
+    - rule
+    - clean_ordinary_prose_can_return_zero_findings
+    - rhetorical_question_opening_is_deterministic_and_located
+    - bait_style_closing_is_detected_but_other_questions_are_not
+    - hashtag_threshold_is_boundary_tested
+    - list_dominance_uses_transparent_thresholds
+    - only_active_explicit_writing_rules_are_enforced
+    - unsupported_active_rule_is_reported_without_hidden_inference
+    - punctuation_rule_is_enforced_with_browser_compatible_offsets
+    - lint_command_reads_rules_without_mutating_canonical_voice_state
+    symbols:
+    - name: label
+      kind: function
+      line_start: 106
+      line_end: 114
+      signature: label(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: patterns
+      kind: function
+      line_start: 115
+      line_end: 124
+      signature: patterns(self) -> &'static [&'static str]
+      inputs:
+      - self
+      output: '&''static [&''static str]'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: lint_draft
+      kind: function
+      line_start: 126
+      line_end: 130
+      signature: 'lint_draft(vault_path: &Path, request: LintDraftRequest) -> ServiceResult<LintDraftResult>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: LintDraftRequest'
+      output: ServiceResult<LintDraftResult>
+      dependencies:
+      - Ok
+      - lint_text_with_rules
+      - list_writing_rules
+      parser: rust-pattern
+      dependency_targets:
+      - &id003
+        path: src-tauri/src/services/writing_lint_service.rs
+        symbol: lint_text_with_rules
+      - &id005
+        path: src-tauri/src/commands/voice.rs
+        symbol: list_writing_rules
+      - &id006
+        path: src-tauri/src/services/voice_profile_service.rs
+        symbol: list_writing_rules
+    - name: lint_text_with_rules
+      kind: function
+      line_start: 131
+      line_end: 182
+      signature: 'lint_text_with_rules(text: &str, rules: &[WritingRuleRecordView]) -> LintDraftResult'
+      inputs:
+      - 'text: &str'
+      - 'rules: &[WritingRuleRecordView]'
+      output: LintDraftResult
+      dependencies:
+      - Err
+      - Ok
+      - Some
+      - active_rules.len
+      - filter
+      - findings.push
+      - iter
+      - lint_engagement_bait_closing
+      - lint_engagement_bait_phrase
+      - lint_excessive_hashtags
+      - lint_list_dominance
+      - lint_question_opening
+      - lint_writing_rule
+      - new
+      - parse_deterministic_rule
+      - rule.instruction.clone
+      - rule.name.clone
+      - rule.rule_id.clone
+      - unsupported_writing_rules.push
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/writing_lint_service.rs
+        symbol: lint_engagement_bait_closing
+      - path: src-tauri/src/services/writing_lint_service.rs
+        symbol: lint_engagement_bait_phrase
+      - path: src-tauri/src/services/writing_lint_service.rs
+        symbol: lint_excessive_hashtags
+      - path: src-tauri/src/services/writing_lint_service.rs
+        symbol: lint_list_dominance
+      - path: src-tauri/src/services/writing_lint_service.rs
+        symbol: lint_question_opening
+      - path: src-tauri/src/services/writing_lint_service.rs
+        symbol: lint_writing_rule
+      - path: src-tauri/src/services/writing_lint_service.rs
+        symbol: parse_deterministic_rule
+    - name: lint_question_opening
+      kind: function
+      line_start: 183
+      line_end: 210
+      signature: 'lint_question_opening(text: &str) -> Option<LintFinding>'
+      inputs:
+      - 'text: &str'
+      output: Option<LintFinding>
+      dependencies:
+      - Some
+      - ch.is_whitespace
+      - ch.len_utf8
+      - char_indices
+      - find
+      - make_finding
+      - text.char_indices
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/services/writing_lint_service.rs
+        symbol: make_finding
+    - name: lint_engagement_bait_closing
+      kind: function
+      line_start: 211
+      line_end: 256
+      signature: 'lint_engagement_bait_closing(text: &str) -> Option<LintFinding>'
+      inputs:
+      - 'text: &str'
+      output: Option<LintFinding>
+      dependencies:
+      - STEMS.iter
+      - Some
+      - any
+      - ch.len_utf8
+      - char_indices
+      - find
+      - len
+      - make_finding
+      - map_or
+      - normalized.contains
+      - rev
+      - sentence.len
+      - sentence.to_ascii_lowercase
+      - sentence.trim_start
+      - text.trim_end
+      - to_string
+      - trimmed.ends_with
+      - trimmed.len
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+    - name: lint_engagement_bait_phrase
+      kind: function
+      line_start: 257
+      line_end: 288
+      signature: 'lint_engagement_bait_phrase(text: &str) -> Option<LintFinding>'
+      inputs:
+      - 'text: &str'
+      output: Option<LintFinding>
+      dependencies:
+      - Some
+      - earliest.is_none_or
+      - find_case_insensitive
+      - let
+      - make_finding
+      - phrase.len
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - &id002
+        path: src-tauri/src/services/writing_lint_service.rs
+        symbol: find_case_insensitive
+      - *id001
+    - name: lint_excessive_hashtags
+      kind: function
+      line_start: 289
+      line_end: 315
+      signature: 'lint_excessive_hashtags(text: &str) -> Option<LintFinding>'
+      inputs:
+      - 'text: &str'
+      output: Option<LintFinding>
+      dependencies:
+      - Some
+      - hashtag_ranges
+      - hashtags.len
+      - make_finding
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/writing_lint_service.rs
+        symbol: hashtag_ranges
+      - *id001
+    - name: lint_list_dominance
+      kind: function
+      line_start: 316
+      line_end: 362
+      signature: 'lint_list_dominance(text: &str) -> Option<LintFinding>'
+      inputs:
+      - 'text: &str'
+      output: Option<LintFinding>
+      dependencies:
+      - Some
+      - copied
+      - is_list_line
+      - len
+      - line.len
+      - line.trim
+      - line.trim_start
+      - line_with_cr.strip_suffix
+      - list_lines.first
+      - list_lines.len
+      - list_lines.push
+      - make_finding
+      - new
+      - segment.len
+      - segment.strip_suffix
+      - text.split_inclusive
+      - to_string
+      - trimmed.is_empty
+      - unwrap_or
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/writing_lint_service.rs
+        symbol: is_list_line
+      - *id001
+    - name: lint_writing_rule
+      kind: function
+      line_start: 363
+      line_end: 429
+      signature: 'lint_writing_rule(text: &str, rule: &WritingRuleRecordView, matcher: DeterministicWritingRule) -> Option<LintFinding>'
+      inputs:
+      - 'text: &str'
+      - 'rule: &WritingRuleRecordView'
+      - 'matcher: DeterministicWritingRule'
+      output: Option<LintFinding>
+      dependencies:
+      - BanPhrase
+      - BanWord
+      - ForbidPunctuation
+      - Some
+      - earliest_pattern
+      - find_case_insensitive
+      - find_word_case_insensitive
+      - kind.label
+      - kind.patterns
+      - let
+      - make_finding
+      - matched.len
+      - phrase.len
+      - rule.rule_id.clone
+      - word.len
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/writing_lint_service.rs
+        symbol: earliest_pattern
+      - *id002
+      - path: src-tauri/src/services/writing_lint_service.rs
+        symbol: find_word_case_insensitive
+      - path: src-tauri/src/services/capture_service.rs
+        symbol: label
+      - path: src-tauri/src/services/writing_lint_service.rs
+        symbol: label
+      - path: src-tauri/src/services/writing_lint_service.rs
+        symbol: patterns
+      - *id001
+    - name: parse_deterministic_rule
+      kind: function
+      line_start: 430
+      line_end: 452
+      signature: 'parse_deterministic_rule(instruction: &str) -> Result<DeterministicWritingRule, String>'
+      inputs:
+      - 'instruction: &str'
+      output: Result<DeterministicWritingRule, String>
+      dependencies:
+      - BanPhrase
+      - BanWord
+      - Err
+      - ForbidPunctuation
+      - Ok
+      - Some
+      - any
+      - instruction.trim
+      - parse_punctuation_kind
+      - strip_prefix_ascii_case
+      - to_string
+      - value.chars
+      - value.is_empty
+      - value.to_string
+      - value.trim
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/writing_lint_service.rs
+        symbol: parse_punctuation_kind
+      - path: src-tauri/src/services/writing_lint_service.rs
+        symbol: strip_prefix_ascii_case
+    - name: parse_punctuation_kind
+      kind: function
+      line_start: 453
+      line_end: 463
+      signature: 'parse_punctuation_kind(value: &str) -> Option<PunctuationKind>'
+      inputs:
+      - 'value: &str'
+      output: Option<PunctuationKind>
+      dependencies:
+      - Some
+      - as_str
+      - value.to_ascii_lowercase
+      parser: rust-pattern
+      dependency_targets: []
+    - name: strip_prefix_ascii_case
+      kind: function
+      line_start: 464
+      line_end: 472
+      signature: 'strip_prefix_ascii_case(value: &''a str, prefix: &str) -> Option<&''a str>'
+      inputs:
+      - 'value: &''a str'
+      - 'prefix: &str'
+      output: Option<&'a str>
+      dependencies:
+      - candidate.eq_ignore_ascii_case
+      - prefix.len
+      - value.get
+      parser: rust-pattern
+      dependency_targets: []
+    - name: hashtag_ranges
+      kind: function
+      line_start: 473
+      line_end: 500
+      signature: 'hashtag_ranges(text: &str) -> Vec<(usize, usize)>'
+      inputs:
+      - 'text: &str'
+      output: Vec<(usize, usize)>
+      dependencies:
+      - ch.len_utf8
+      - char_indices
+      - chars
+      - new
+      - next_back
+      - previous.is_some_and
+      - ranges.push
+      - text.char_indices
+      - value.is_alphanumeric
+      - value.len_utf8
+      parser: rust-pattern
+      dependency_targets: []
+    - name: is_list_line
+      kind: function
+      line_start: 501
+      line_end: 516
+      signature: 'is_list_line(value: &str) -> bool'
+      inputs:
+      - 'value: &str'
+      output: bool
+      dependencies:
+      - Some
+      - ch.is_ascii_digit
+      - chars.next
+      - chars.peek
+      - is_some_and
+      - peekable
+      - value.chars
+      - value.starts_with
+      parser: rust-pattern
+      dependency_targets: []
+    - name: find_case_insensitive
+      kind: function
+      line_start: 517
+      line_end: 526
+      signature: 'find_case_insensitive(haystack: &str, needle: &str) -> Option<usize>'
+      inputs:
+      - 'haystack: &str'
+      - 'needle: &str'
+      output: Option<usize>
+      dependencies:
+      - find
+      - haystack.find
+      - needle.is_ascii
+      - needle.to_ascii_lowercase
+      - to_ascii_lowercase
+      parser: rust-pattern
+      dependency_targets: []
+    - name: find_word_case_insensitive
+      kind: function
+      line_start: 527
+      line_end: 541
+      signature: 'find_word_case_insensitive(text: &str, word: &str) -> Option<usize>'
+      inputs:
+      - 'text: &str'
+      - 'word: &str'
+      output: Option<usize>
+      dependencies:
+      - Some
+      - chars
+      - find_case_insensitive
+      - is_word_boundary
+      - len_utf8
+      - next
+      - text.len
+      - word.len
+      parser: rust-pattern
+      dependency_targets:
+      - *id002
+      - path: src-tauri/src/services/writing_lint_service.rs
+        symbol: is_word_boundary
+    - name: is_word_boundary
+      kind: function
+      line_start: 542
+      line_end: 553
+      signature: 'is_word_boundary(text: &str, start: usize, end: usize) -> bool'
+      inputs:
+      - 'text: &str'
+      - 'start: usize'
+      - 'end: usize'
+      output: bool
+      dependencies:
+      - ch.is_alphanumeric
+      - chars
+      - is_none_or
+      - next
+      - next_back
+      parser: rust-pattern
+      dependency_targets: []
+    - name: earliest_pattern
+      kind: function
+      line_start: 554
+      line_end: 560
+      signature: 'earliest_pattern(text: &str, patterns: &''a [&''a str]) -> Option<(usize, &''a str)>'
+      inputs:
+      - 'text: &str'
+      - 'patterns: &''a [&''a str]'
+      output: Option<(usize, &'a str)>
+      dependencies:
+      - filter_map
+      - iter
+      - map
+      - min_by_key
+      - text.find
+      parser: rust-pattern
+      dependency_targets: []
+    - name: make_finding
+      kind: function
+      line_start: 561
+      line_end: 583
+      signature: 'make_finding(text: &str, spec: FindingSpec<''_>) -> LintFinding'
+      inputs:
+      - 'text: &str'
+      - 'spec: FindingSpec<''_>'
+      output: LintFinding
+      dependencies:
+      - Some
+      - let
+      - spec.rule_id.to_string
+      - to_string
+      - utf16_offset
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/writing_lint_service.rs
+        symbol: utf16_offset
+    - name: utf16_offset
+      kind: function
+      line_start: 584
+      line_end: 587
+      signature: 'utf16_offset(text: &str, byte_index: usize) -> usize'
+      inputs:
+      - 'text: &str'
+      - 'byte_index: usize'
+      output: usize
+      dependencies:
+      - count
+      - encode_utf16
+      parser: rust-pattern
+      dependency_targets: []
+    - name: rule
+      kind: function
+      line_start: 594
+      line_end: 605
+      signature: 'rule(id: &str, instruction: &str, status: WritingRuleStatus) -> WritingRuleRecordView'
+      inputs:
+      - 'id: &str'
+      - 'instruction: &str'
+      - 'status: WritingRuleStatus'
+      output: WritingRuleRecordView
+      dependencies:
+      - id.to_string
+      - instruction.to_string
+      - to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: clean_ordinary_prose_can_return_zero_findings
+      kind: function
+      line_start: 608
+      line_end: 615
+      signature: clean_ordinary_prose_can_return_zero_findings()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - lint_text_with_rules
+      - result.findings.is_empty
+      parser: rust-pattern
+      dependency_targets:
+      - *id003
+    - name: rhetorical_question_opening_is_deterministic_and_located
+      kind: function
+      line_start: 618
+      line_end: 633
+      signature: rhetorical_question_opening_is_deterministic_and_located()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - expect
+      - find
+      - finding.matched_text.as_deref
+      - iter
+      - lint_text_with_rules
+      parser: rust-pattern
+      dependency_targets:
+      - *id003
+    - name: bait_style_closing_is_detected_but_other_questions_are_not
+      kind: function
+      line_start: 636
+      line_end: 654
+      signature: bait_style_closing_is_detected_but_other_questions_are_not()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - any
+      - iter
+      - lint_text_with_rules
+      parser: rust-pattern
+      dependency_targets:
+      - *id003
+    - name: hashtag_threshold_is_boundary_tested
+      kind: function
+      line_start: 657
+      line_end: 671
+      signature: hashtag_threshold_is_boundary_tested()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - any
+      - expect
+      - find
+      - finding.matched_text.as_deref
+      - iter
+      - lint_text_with_rules
+      parser: rust-pattern
+      dependency_targets:
+      - *id003
+    - name: list_dominance_uses_transparent_thresholds
+      kind: function
+      line_start: 674
+      line_end: 681
+      signature: list_dominance_uses_transparent_thresholds()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - any
+      - iter
+      - lint_text_with_rules
+      parser: rust-pattern
+      dependency_targets:
+      - *id003
+    - name: only_active_explicit_writing_rules_are_enforced
+      kind: function
+      line_start: 684
+      line_end: 720
+      signature: only_active_explicit_writing_rules_are_enforced()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - filter
+      - iter
+      - lint_text_with_rules
+      - matched_text.as_deref
+      - rule
+      - writing_findings.len
+      parser: rust-pattern
+      dependency_targets:
+      - *id003
+      - &id004
+        path: src-tauri/src/services/writing_lint_service.rs
+        symbol: rule
+    - name: unsupported_active_rule_is_reported_without_hidden_inference
+      kind: function
+      line_start: 723
+      line_end: 734
+      signature: unsupported_active_rule_is_reported_without_hidden_inference()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - lint_text_with_rules
+      - result.findings.is_empty
+      - result.unsupported_writing_rules.len
+      - rule
+      parser: rust-pattern
+      dependency_targets:
+      - *id003
+      - *id004
+    - name: punctuation_rule_is_enforced_with_browser_compatible_offsets
+      kind: function
+      line_start: 737
+      line_end: 752
+      signature: punctuation_rule_is_enforced_with_browser_compatible_offsets()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - expect
+      - find
+      - finding.matched_text.as_deref
+      - iter
+      - lint_text_with_rules
+      - rule
+      parser: rust-pattern
+      dependency_targets:
+      - *id003
+      - *id004
+    - name: lint_command_reads_rules_without_mutating_canonical_voice_state
+      kind: function
+      line_start: 755
+      line_end: 812
+      signature: lint_command_reads_rules_without_mutating_canonical_voice_state()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - any
+      - create_vault
+      - create_writing_rule
+      - created.rule_id.clone
+      - expect
+      - initialize
+      - iter
+      - join
+      - lint_draft
+      - list_core_voices
+      - list_tone_modes
+      - list_voice_directions
+      - list_writing_rules
+      - now_v7
+      - remove_dir_all
+      - temp_dir
+      - to_string
+      - unwrap
+      - update_writing_rule
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/commands/vault.rs
+        symbol: create_vault
+      - path: src-tauri/src/services/vault_service.rs
+        symbol: create_vault
+      - path: src-tauri/src/commands/voice.rs
+        symbol: create_writing_rule
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: create_writing_rule
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: initialize
+      - path: src-tauri/src/commands/quality.rs
+        symbol: lint_draft
+      - path: src-tauri/src/services/writing_lint_service.rs
+        symbol: lint_draft
+      - path: src-tauri/src/commands/voice.rs
+        symbol: list_core_voices
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: list_core_voices
+      - path: src-tauri/src/commands/voice.rs
+        symbol: list_tone_modes
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: list_tone_modes
+      - path: src-tauri/src/commands/voice.rs
+        symbol: list_voice_directions
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: list_voice_directions
+      - *id005
+      - *id006
+      - path: src-tauri/src/commands/voice.rs
+        symbol: update_writing_rule
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: update_writing_rule
+  - path: src/components/InspirationPanel.tsx
+    analysis_version: 1
+    language: typescript
+    content_hash: 478b6b619c83fd255d656676bd0cb4e4aeeac1d1
+    dependencies:
+    - ../domain/types
+    - ../lib/workloreApi
+    - react
+    provides:
+    - refreshAll
+    - applyRecord
+    - handleSave
+    - handleAddRelationship
+    - handleRemoveRelationship
+    - linesFrom
+    - listFrom
+    - excerptInputsFrom
+    - kindLabel
+    symbols:
+    - name: refreshAll
+      kind: function
+      line_start: 67
+      line_end: 85
+      signature: refreshAll()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Promise.all
+      - applyRecord
+      - errorMessage
+      - getInspiration
+      - listInspirationLinkTargets
+      - setBusy
+      - setError
+      - setTargetId
+      - setTargets
+      parser: typescript-pattern
+      dependency_targets:
+      - &id007
+        path: src/components/InspirationPanel.tsx
+        symbol: applyRecord
+      - &id008
+        path: src/components/TargetContextPanel.tsx
+        symbol: applyRecord
+      - &id009
+        path: src/domain/types.ts
+        symbol: errorMessage
+      - path: src/lib/workloreApi.ts
+        symbol: getInspiration
+      - path: src/lib/workloreApi.ts
+        symbol: listInspirationLinkTargets
+    - name: applyRecord
+      kind: function
+      line_start: 86
+      line_end: 108
+      signature: 'applyRecord(loaded: InspirationRecord)'
+      inputs:
+      - 'loaded: InspirationRecord'
+      output: unspecified
+      dependencies:
+      - join
+      - linesFrom
+      - map
+      - setConcepts
+      - setCounterpoints
+      - setExcerpts
+      - setLifecycle
+      - setNotes
+      - setQuestions
+      - setRecord
+      - setSourceAuthor
+      - setSourcePublishedAt
+      - setSourceTitle
+      - setSourceUrl
+      - setSummary
+      - setTakeaways
+      - setTitle
+      - setUserReaction
+      - setWhyInteresting
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/components/InspirationPanel.tsx
+        symbol: linesFrom
+      - path: src/components/TargetContextPanel.tsx
+        symbol: linesFrom
+    - name: handleSave
+      kind: function
+      line_start: 109
+      line_end: 143
+      signature: handleSave()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - applyRecord
+      - errorMessage
+      - excerptInputsFrom
+      - listFrom
+      - setBusy
+      - setError
+      - setNotice
+      - title.trim
+      - updateInspiration
+      parser: typescript-pattern
+      dependency_targets:
+      - *id007
+      - *id008
+      - *id009
+      - path: src/components/InspirationPanel.tsx
+        symbol: excerptInputsFrom
+      - path: src/components/InspirationPanel.tsx
+        symbol: listFrom
+      - path: src/components/TargetContextPanel.tsx
+        symbol: listFrom
+      - path: src/lib/workloreApi.ts
+        symbol: updateInspiration
+    - name: handleAddRelationship
+      kind: function
+      line_start: 144
+      line_end: 166
+      signature: handleAddRelationship()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - addInspirationRelationship
+      - errorMessage
+      - refreshAll
+      - setBusy
+      - setError
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/lib/workloreApi.ts
+        symbol: addInspirationRelationship
+      - *id009
+      - &id010
+        path: src/components/InspirationPanel.tsx
+        symbol: refreshAll
+      - &id011
+        path: src/components/TargetContextPanel.tsx
+        symbol: refreshAll
+    - name: handleRemoveRelationship
+      kind: function
+      line_start: 167
+      line_end: 184
+      signature: 'handleRemoveRelationship(kind: InspirationRelationKind, relatedId: string)'
+      inputs:
+      - 'kind: InspirationRelationKind'
+      - 'relatedId: string'
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - refreshAll
+      - removeInspirationRelationship
+      - setBusy
+      - setError
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - *id009
+      - *id010
+      - *id011
+      - path: src/lib/workloreApi.ts
+        symbol: removeInspirationRelationship
+    - name: linesFrom
+      kind: function
+      line_start: 414
+      line_end: 417
+      signature: 'linesFrom(values: string[]) -> string'
+      inputs:
+      - 'values: string[]'
+      output: string
+      dependencies:
+      - values.join
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: listFrom
+      kind: function
+      line_start: 418
+      line_end: 424
+      signature: 'listFrom(value: string) -> string[]'
+      inputs:
+      - 'value: string'
+      output: string[]
+      dependencies:
+      - filter
+      - line.trim
+      - map
+      - split
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: excerptInputsFrom
+      kind: function
+      line_start: 425
+      line_end: 426
+      signature: 'excerptInputsFrom(value: string) -> Array<'
+      inputs:
+      - 'value: string'
+      output: Array<
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: kindLabel
+      kind: function
+      line_start: 443
+      line_end: 446
+      signature: 'kindLabel(kind: InspirationRelationKind) -> string'
+      inputs:
+      - 'kind: InspirationRelationKind'
+      output: string
+      dependencies:
+      - RELATION_KINDS.find
+      parser: typescript-pattern
+      dependency_targets: []

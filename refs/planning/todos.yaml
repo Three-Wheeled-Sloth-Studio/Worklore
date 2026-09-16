@@ -1,6 +1,7 @@
-version: 1
+version: 2
 schema: refs/schemas/schemaRegistry.yaml
-updated: 2026-07-25
+updated: 2026-09-14
+
 todos:
   - id: task-001
     status: complete
@@ -11,26 +12,158 @@ todos:
     area: repository
     summary: Add a user-facing README, defensive gitignore, security policy, and durable refs structure.
   - id: task-003
-    status: open
+    status: superseded_by_refocus
     area: product
-    summary: Write the MVP product requirements and acceptance criteria for the story bank core.
+    summary: Original resume/story-bank MVP requirements. Superseded by refs/product/prd.md.
   - id: task-004
-    status: open
+    status: superseded_in_part
     area: data
-    summary: Define canonical schemas for vault metadata, sources, roles, stories, interviews, jobs, voice profiles, and private entities.
+    summary: Original schemas for vault, sources, roles, stories, interviews, jobs, voice profiles, and private entities. Reuse selectively after the refocused domain model is defined.
   - id: task-005
-    status: open
+    status: preserve
     area: privacy
-    summary: Specify entity extraction, durable identity matching, confidence thresholds, review workflows, stable tokens, merge, split, and rehydration behavior.
+    summary: Durable entity extraction, stable tokens, and user-assisted entity resolution remain useful infrastructure.
   - id: task-006
-    status: open
+    status: implemented_pending_validation
     area: architecture
-    summary: Scaffold the Tauri 2, React, TypeScript, and Rust application.
+    summary: Tauri 2, React, TypeScript, and Rust application shell with vault and source import commands.
   - id: task-007
-    status: open
+    status: replan_under_phase_2
     area: providers
-    summary: Define the provider contract for Ollama, Gemini bring-your-own-key, and manual workspace packages.
+    summary: Implement a provider registry with Ollama as a first-class local provider, manual workspace packages, and explicit BYOK remote adapters beginning with Gemini; keep credentials in the operating-system credential store with configure/validate/clear behavior and no WorkLore-hosted proxy.
   - id: task-008
-    status: open
+    status: complete
     area: testing
-    summary: Create synthetic fixtures for resumes, job descriptions, writing samples, entity ambiguity, and Git history.
+    summary: Synthetic fixtures for original resume/job/writing/entity/Git workflows. Add refocused fixtures rather than discarding these.
+  - id: task-009
+    status: ongoing
+    area: validation
+    summary: Keep Windows validation healthy while avoiding unnecessary CI churn.
+  - id: task-010
+    status: implemented_pending_validation
+    area: parsing
+    summary: Local PDF and DOCX extraction exists and is now a supporting ingestion utility rather than a core product focus.
+  - id: task-011
+    status: preserve
+    area: privacy
+    summary: Private entity review and scan-status reconciliation remain useful supporting infrastructure.
+  - id: task-012
+    status: implemented_pending_validation
+    area: stories
+    summary: Resume work-history candidate extraction exists as optional Seed from resume foundation.
+  - id: task-013
+    status: generalized_for_direct_seeds
+    area: stories
+    summary: Guided interview and evidence-labeling rules now support canonical Story Seed development while the legacy candidate path remains compatible.
+  - id: task-014
+    status: preserve
+    area: observability
+    summary: Local operation timing without private payload logging remains desirable.
+  - id: task-015
+    status: preserve
+    area: distribution
+    summary: Keep development/build/QA output outside the repository and on the checkout drive by default.
+  - id: task-016
+    status: complete
+    area: licensing
+    summary: AGPL-3.0-only licensing applied.
+  - id: task-017
+    status: planned_before_broad_distribution
+    area: security
+    summary: Add vault-level encryption before broad public distribution; OS disk encryption is acceptable for early testing.
+  - id: task-018
+    status: preserve_and_adapt
+    area: stories
+    summary: Privacy-safe manual AI workspace export and strict structured response import remain useful provider-neutral foundations; direct canonical seed/story export still requires explicit preflight generalization.
+  - id: task-019
+    status: preserve
+    area: roles
+    summary: Existing employment-role inference may remain for imported career material but should not drive the new domain.
+  - id: task-020
+    status: absorbed_by_phase_3
+    area: stories
+    summary: Story editing, evidence inspection, undo, and version history become part of the broader content audit trail.
+  - id: task-021
+    status: absorbed_by_phase_2
+    area: providers
+    summary: Introduce provider-neutral workflow contracts and adapters after canonical voice provenance is stable; preserve explicit Ollama selection, BYOK remote-provider credentials outside canonical state, privacy preflight, and no silent local-to-cloud fallback.
+  - id: task-022
+    status: complete
+    area: product
+    summary: Lock the refocused PRD around professional memory, topics, voice intelligence, anti-slop behavior, Audience Lens, analytics learning, and manual publication.
+  - id: task-023
+    status: complete
+    area: architecture
+    summary: Lock the standalone local deployment contract with no hosted backend, proprietary sync, or automatic social publishing in the accepted roadmap.
+  - id: task-024
+    status: complete
+    area: data
+    summary: Define the refocused domain model and migration mapping for Story, Story Seed, Proof Point, Topic Candidate, Theme, Inspiration, Target Context, Voice Evidence, Core Voice, Tone Mode, Voice Direction, Writing Rule, Audience Model, Post, Revision, Experiment, Performance Record, and Source/Evidence.
+  - id: task-025
+    status: complete
+    area: ux
+    summary: Design the task-oriented navigation and home flow around Capture, Stories, Topics, Voice, Posts, and Insights while demoting Sources and Privacy to supporting infrastructure.
+  - id: task-040
+    status: complete
+    area: data
+    summary: Introduce the canonical SQLite persistence boundary, schema/migration framework, Phase 1 relational tables, and non-destructive migration seam from prototype vault records without beginning a broad UI rewrite.
+  - id: task-026
+    status: complete
+    area: capture
+    summary: Implement save-first capture that persists ambiguous memories, ideas, proof points, URLs, excerpts, job descriptions, writing samples, and notes before classification.
+  - id: task-027
+    status: complete
+    area: stories
+    summary: Generalize guided story development so a directly captured canonical Story Seed can be interviewed, reopened, and converted into a developing Story without a resume candidate or Role.
+  - id: task-028
+    status: complete
+    area: topics
+    summary: Implement durable Topic Candidates and Themes, explicit evergreen/timely metadata, lifecycle management, and idempotent typed relationships to Stories, Proof Points, Themes, Inspiration, and Target Context while preserving standing/context boundaries.
+  - id: task-029
+    status: complete
+    area: inspiration
+    summary: Implement Source-backed Inspiration ingestion with stable provenance, structured source metadata, takeaways, attributed excerpts, user reaction, concepts/questions/counterpoints, lifecycle, and idempotent Topic/Theme connections while preventing semantic collapse into Evidence or Voice Evidence.
+  - id: task-030
+    status: complete
+    area: targeting
+    summary: Implement durable Source-backed Target Context beginning with job descriptions, structured responsibilities/skills/concepts/language/tensions, deterministic provider-free signal extraction, and explicit Topic/Theme/Story links without ATS scoring, fabricated standing, or single-JD overfitting.
+  - id: task-031
+    status: complete
+    area: voice
+    summary: Define and implement governed Voice Evidence provenance so writing samples begin pending, explicit authorship and approval control eligibility, raw AI/external-author material remains prohibited, and eligibility changes retain Source lineage, revisions, and audit events.
+  - id: task-032
+    status: complete
+    area: voice
+    summary: Governed Voice Evidence/Core Voice foundations, provider-neutral review-only voice analysis, deterministic edit-delta learning over real Revision ancestry, recurring-preference proposals across distinct Posts, and explicit durable accept/reject governance are complete. Decisions preserve exact Post/Revision-pair provenance, reject stale or tampered evidence, suppress unchanged decided evidence, allow materially expanded support to resurface, and route acceptance only into a proposed Writing Rule without silently activating or mutating canonical voice state.
+  - id: task-033
+    status: in_progress
+    area: quality
+    summary: Deterministic provider-free single-draft Writing Pattern Linter foundation is complete and durable Post/Revision lineage is now available; remaining cross-draft repetition, proof-point rotation, portfolio mode-collapse, and fuller evidence/standing review remain deferred until a real content corpus exists.
+  - id: task-034
+    status: complete
+    area: privacy
+    summary: Provider-free confidentiality transformation now reuses the Private Entity Registry and external redaction path to return stable token redaction, explicitly stored public descriptions, unresolved privacy risk, replacement metadata, and ready/needs-review/blocked state without mutating private canonical truth or inventing replacement facts.
+  - id: task-035
+    status: in_progress
+    area: content
+    summary: A thin QA-able Content Studio seam now supports a Posts catalog/editor, immutable Revision creation, typed supporting material, deterministic challenge checks, human editing, and exact public-safe final approval. Remaining scope includes angle generation, Audience Lens, provider-assisted drafting, comments/replies, portfolio-level checks, and broader editorial workflow refinement; social publication remains manual and external.
+  - id: task-036
+    status: complete
+    area: audit
+    summary: Durable provider-free schema-v8 Post/Revision lineage is complete with immutable exact snapshots, deterministic ancestry, explicit user/model authorship and provider provenance, typed supporting-material links, exact final approval, and exact user-marked manual-publication association to the approved Revision. Publication remains external to WorkLore, and downstream performance records retain that exact publication lineage.
+  - id: task-037
+    status: in_progress
+    area: analytics
+    summary: A minimum Feedback Intelligence seam now records exact manual publications, append-only cumulative LinkedIn performance snapshots, and conservative small-sample observations with explicit non-causality boundaries. Remaining scope includes LinkedIn-native export import and broader analysis by topic, tone, structure, proof point, timing, audience intent, and experiment.
+  - id: task-038
+    status: future
+    area: discovery
+    summary: Add qualified news/topic discovery tied to themes, evidence, audience, freshness, novelty, saturation, and risk rather than a generic trending feed.
+  - id: task-039
+    status: future
+    area: targeting
+    summary: Add own-profile and selected public-profile ingestion as supplemental positioning and audience context.
+  - id: task-041
+    status: complete
+    area: ux
+    summary: Replace the prototype resume-centric top-level workflow with the accepted task-oriented application shell, make Home/Capture/Stories/Topics first-class, demote resume/storage/privacy utilities to supporting access, reopen durable Inspiration and Target Context through the Library, and represent future Voice/Posts/Insights honestly without beginning later phases.

@@ -1,22 +1,83 @@
-version: 1
+version: 2
 schema: refs/schemas/schemaRegistry.yaml
-updated: 2026-07-25
-files:
-  - path: README.md
-    purpose: User-facing product purpose, implemented major features, and installation instructions.
-    status: active
-  - path: refs
-    purpose: Durable project planning, architecture, implementation, testing, UI, and handoff context.
-    status: active
-  - path: src
-    purpose: Planned React and TypeScript application source.
-    status: not_created
-  - path: src-tauri
-    purpose: Planned Tauri and Rust desktop shell and local system integration.
-    status: not_created
-  - path: schemas
-    purpose: Planned canonical WorkLore vault and agent-operation schemas.
-    status: not_created
-  - path: fixtures
-    purpose: Planned synthetic test documents, repositories, and entity-resolution cases.
-    status: not_created
+updated: 2026-09-12
+areas:
+  product_contracts:
+    guidance:
+      - refs/product/prd.md
+      - refs/planning/roadmap.yaml
+      - refs/planning/decisions.yaml
+    source_roots:
+      - refs/product
+      - refs/planning
+    notes: Product truth and accepted sequencing. Read only the relevant records for the current slice.
+  frontend:
+    guidance:
+      - refs/UI/designPrinciples.md
+      - refs/product/prd.md
+    source_roots:
+      - src
+    notes: React and TypeScript desktop workspace.
+  desktop_backend:
+    guidance:
+      - refs/architecture/overview.md
+      - refs/architecture/standalone-deployment-contract.md
+      - refs/architecture/vaultFormat.md
+    source_roots:
+      - src-tauri/src
+    notes: Rust services, Tauri commands, local persistence, source processing, and provider boundaries.
+  privacy:
+    guidance:
+      - refs/architecture/privateEntityRegistry.md
+      - refs/security/encryptionPlan.md
+    source_roots:
+      - src-tauri/src/services
+    notes: Private entity scanning, stable tokens, privacy preflight, and future vault encryption.
+  providers:
+    guidance:
+      - refs/architecture/providerArchitecture.md
+    source_roots:
+      - src-tauri/src/services
+      - src
+    notes: Manual workspace bridge exists; direct provider adapters remain future work.
+  build_and_validation:
+    guidance:
+      - refs/architecture/buildSeparation.md
+      - refs/testing/validationCommands.yaml
+      - refs/implementation/codingStandards.md
+    source_roots:
+      - scripts
+      - .github/workflows
+      - package.json
+    notes: Build output remains external to the repository and should default to the checkout drive.
+  project_memory:
+    guidance:
+      - refs/README.md
+      - refs/agents.yaml
+      - refs/implementation/okfCompatibility.md
+    source_roots:
+      - refs
+    notes: Agent Academy-compatible durable memory and bounded re-entry tooling.
+common_tasks:
+  - task: Continue the refocused product slice
+    look_in:
+      - refs/handoffs/currentHandoff.md
+      - refs/handoffs/next-dev-prompt.md
+      - refs/product/prd.md
+      - refs/planning/roadmap.yaml
+  - task: Change local persistence or vault behavior
+    look_in:
+      - refs/architecture/standalone-deployment-contract.md
+      - refs/architecture/vaultFormat.md
+      - src-tauri/src
+  - task: Change privacy or cloud-bound content handling
+    look_in:
+      - refs/architecture/privateEntityRegistry.md
+      - refs/architecture/providerArchitecture.md
+      - src-tauri/src/services
+  - task: Change build, QA, or validation behavior
+    look_in:
+      - refs/architecture/buildSeparation.md
+      - scripts
+      - .github/workflows
+      - package.json

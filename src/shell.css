@@ -1,0 +1,180 @@
+.product-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(168px, 194px) minmax(0, 1fr);
+  background: var(--page-bg, #f4f1ea);
+}
+
+.shell-sidebar {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  min-height: 100vh;
+  padding: max(12px, env(safe-area-inset-top)) 9px 10px;
+  border-right: 1px solid rgba(36, 42, 48, 0.14);
+  background: rgba(250, 248, 242, 0.98);
+  color: #28322c;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.shell-brand {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  column-gap: 7px;
+  align-items: center;
+}
+.shell-brand::before {
+  content: "";
+  grid-row: 1 / 3;
+  width: 34px;
+  height: 34px;
+  background: url("../branding/TWS Studio Logo - underlay.png") center / contain no-repeat;
+}
+.shell-brand .eyebrow { display: none; }
+.shell-brand h1 { grid-column: 2; margin: 0 0 1px; font-size: 1.28rem; color: #202923; }
+.shell-brand p { margin: 0; }
+.shell-vault-name { grid-column: 2; color: #56625b; font-size: 0.72rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.landing-card::before {
+  content: "";
+  display: block;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 8px;
+  background: url("../branding/TWS Studio Logo - underlay.png") center / contain no-repeat;
+}
+.shell-nav-section { display: grid; gap: 1px; }
+.shell-nav-label { margin: 0 6px 1px; font-size: 0.61rem; font-weight: 750; letter-spacing: 0.08em; text-transform: uppercase; color: #606b65; }
+.shell-nav-button {
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 5px 7px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  color: #2d3831;
+  text-align: left;
+  cursor: pointer;
+}
+.shell-nav-button:hover { background: #ece8de; color: #1f2822; }
+.shell-nav-button.active {
+  border-color: rgba(177, 132, 48, 0.45);
+  background: #e5dcc8;
+  color: #1c251f;
+  font-weight: 700;
+}
+.shell-nav-button .soon-badge { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; color: #656d68; }
+.shell-settings-link { margin-top: auto; align-items: flex-start; }
+.shell-settings-copy { display: grid; gap: 0; }
+.shell-settings-copy small { color: #66716a; font-size: 0.61rem; font-weight: 600; }
+.shell-settings-link.active .shell-settings-copy small { color: #475249; }
+.shell-support-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: -2px 3px 1px;
+  padding: 6px 9px;
+  border: 1px solid rgba(138, 90, 31, 0.42);
+  border-radius: 999px;
+  color: #8a5a1f;
+  background: rgba(255, 244, 224, 0.9);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.shell-support-pill:hover { background: #f7ead2; border-color: rgba(138, 90, 31, 0.62); }
+.shell-support-pill svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.shell-version {
+  margin: -5px 0 0 7px;
+  color: #7a827d;
+  font-size: 0.62rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  user-select: text;
+  cursor: text;
+}
+
+.shell-content {
+  min-width: 0;
+  padding: max(10px, env(safe-area-inset-top)) clamp(10px, 1.5vw, 20px) 16px;
+}
+.shell-topbar {
+  min-height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 5px;
+  padding-right: 5.4rem;
+  color: #28322c;
+}
+.shell-topbar .eyebrow,
+.shell-topbar .vault-path,
+.shell-topbar .header-actions,
+.status-strip {
+  display: none;
+}
+.shell-topbar h2 { margin: 0; font-size: clamp(1.15rem, 1.8vw, 1.45rem); color: #263029; }
+.shell-page { width: 100%; max-width: none; }
+.shell-stack { display: grid; gap: 8px; }
+.shell-workspace-grid { align-items: start; }
+.quick-action-grid, .continue-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 7px; }
+.quick-capture-input { width: 100%; resize: vertical; margin-bottom: 6px; }
+.continue-card, .record-row {
+  border: 1px solid #a9ada7;
+  border-radius: 9px;
+  background: #f1eee7;
+  padding: 8px 9px;
+  color: #273129;
+  text-align: left;
+  cursor: pointer;
+}
+.continue-card { display: grid; gap: 2px; }
+.continue-card strong, .record-row strong { color: #202921; }
+.continue-card span, .record-row small { color: #56635c; line-height: 1.3; }
+.continue-card:hover, .record-row:hover { border-color: #c19c58; background: #f8f5ee; }
+.record-list { display: grid; gap: 4px; }
+.record-row { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.record-row > span:first-child { min-width: 0; display: grid; gap: 1px; }
+.record-row small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.record-meta { flex: 0 0 auto; color: #68737b; font-size: 0.7rem; text-transform: capitalize; }
+.inline-create-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; margin: 6px 0; }
+.inline-notice { color: #476950; }
+.inline-error { color: #9b3e37; }
+.compact-empty { padding: 6px 0; }
+.home-hero { padding-block: 14px; }
+.future-workspace { max-width: 760px; }
+.support-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.vault-location-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px;
+  align-items: stretch;
+  margin-bottom: 0.4rem;
+}
+.vault-location-row input[readonly] { color: #dfe5dd; cursor: default; }
+.vault-location-preview {
+  margin: 0.25rem 0 0;
+  color: #6d776f;
+  font-size: 0.7rem;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 840px) {
+  .product-shell { grid-template-columns: 1fr; }
+  .shell-sidebar { position: static; min-height: auto; border-right: 0; border-bottom: 1px solid rgba(36, 42, 48, 0.12); }
+  .shell-nav-section { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
+  .shell-nav-label { grid-column: 1 / -1; }
+  .shell-settings-link { margin-top: 0; }
+  .shell-version { margin: -4px 0 0 7px; }
+  .shell-topbar { padding-right: 5.2rem; }
+  .record-row { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .vault-location-row { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,1652 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: 09
+  files:
+  - path: src-tauri/src/commands/voice.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 7cc59f42d59dc944dd9e458fb5e1424344e32c66
+    dependencies:
+    - "crate::{\n    domain::edit_learning::{\n        DecideEditLearningProposalRequest, EditLearningAnalysisView, EditLearningDecisionView,\n\
+      \    },\n    error::{CommandError, CommandResult},\n    services::{\n        edit_learning_service,\n        voice_evidence_service::{\n\
+      \            self, CreateVoiceEvidenceResult, ReviewVoiceEvidenceRequest, VoiceEvidenceRecordView,\n            VoiceSourceCandidateView,\n\
+      \        },\n        voice_profile_service::{\n            self, CoreVoiceRecordView, CreateCoreVoiceRequest, CreateToneModeRequest,\n\
+      \            CreateVoiceDirectionRequest, CreateWritingRuleRequest, SaveCoreVoiceTraitRequest,\n            SetVoiceDirectionStatusRequest,\
+      \ ToneModeRecordView, UpdateToneModeRequest,\n            UpdateWritingRuleRequest, VoiceDirectionRecordView, WritingRuleRecordView,\n\
+      \        },\n    },\n}"
+    - std::path::PathBuf
+    provides:
+    - analyze_edit_learning
+    - decide_edit_learning_proposal
+    - list_edit_learning_decisions
+    - list_voice_source_candidates
+    - create_voice_evidence_from_source
+    - get_voice_evidence
+    - list_voice_evidence
+    - review_voice_evidence
+    - list_core_voices
+    - create_core_voice
+    - save_core_voice_trait
+    - delete_core_voice_trait
+    - activate_core_voice
+    - list_tone_modes
+    - create_tone_mode
+    - update_tone_mode
+    - list_voice_directions
+    - create_voice_direction
+    - set_voice_direction_status
+    - list_writing_rules
+    - create_writing_rule
+    - update_writing_rule
+    symbols:
+    - name: analyze_edit_learning
+      kind: function
+      line_start: 24
+      line_end: 27
+      signature: 'analyze_edit_learning(vault_path: String) -> CommandResult<EditLearningAnalysisView>'
+      inputs:
+      - 'vault_path: String'
+      output: CommandResult<EditLearningAnalysisView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/domain/candidates.rs
+        symbol: from
+      - &id002
+        path: src-tauri/src/domain/models.rs
+        symbol: from
+      - &id003
+        path: src-tauri/src/error.rs
+        symbol: from
+    - name: decide_edit_learning_proposal
+      kind: function
+      line_start: 30
+      line_end: 36
+      signature: 'decide_edit_learning_proposal(vault_path: String, request: DecideEditLearningProposalRequest) -> CommandResult<EditLearningDecisionView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: DecideEditLearningProposalRequest'
+      output: CommandResult<EditLearningDecisionView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: list_edit_learning_decisions
+      kind: function
+      line_start: 39
+      line_end: 44
+      signature: 'list_edit_learning_decisions(vault_path: String) -> CommandResult<Vec<EditLearningDecisionView>>'
+      inputs:
+      - 'vault_path: String'
+      output: CommandResult<Vec<EditLearningDecisionView>>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: list_voice_source_candidates
+      kind: function
+      line_start: 47
+      line_end: 52
+      signature: 'list_voice_source_candidates(vault_path: String) -> CommandResult<Vec<VoiceSourceCandidateView>>'
+      inputs:
+      - 'vault_path: String'
+      output: CommandResult<Vec<VoiceSourceCandidateView>>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: create_voice_evidence_from_source
+      kind: function
+      line_start: 55
+      line_end: 64
+      signature: 'create_voice_evidence_from_source(vault_path: String, source_id: String) -> CommandResult<CreateVoiceEvidenceResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'source_id: String'
+      output: CommandResult<CreateVoiceEvidenceResult>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: get_voice_evidence
+      kind: function
+      line_start: 67
+      line_end: 73
+      signature: 'get_voice_evidence(vault_path: String, voice_evidence_id: String) -> CommandResult<VoiceEvidenceRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'voice_evidence_id: String'
+      output: CommandResult<VoiceEvidenceRecordView>
+      dependencies:
+      - from
+      - load_voice_evidence
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - path: src-tauri/src/services/voice_evidence_service.rs
+        symbol: load_voice_evidence
+    - name: list_voice_evidence
+      kind: function
+      line_start: 76
+      line_end: 79
+      signature: 'list_voice_evidence(vault_path: String) -> CommandResult<Vec<VoiceEvidenceRecordView>>'
+      inputs:
+      - 'vault_path: String'
+      output: CommandResult<Vec<VoiceEvidenceRecordView>>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: review_voice_evidence
+      kind: function
+      line_start: 82
+      line_end: 88
+      signature: 'review_voice_evidence(vault_path: String, request: ReviewVoiceEvidenceRequest) -> CommandResult<VoiceEvidenceRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: ReviewVoiceEvidenceRequest'
+      output: CommandResult<VoiceEvidenceRecordView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: list_core_voices
+      kind: function
+      line_start: 91
+      line_end: 93
+      signature: 'list_core_voices(vault_path: String) -> CommandResult<Vec<CoreVoiceRecordView>>'
+      inputs:
+      - 'vault_path: String'
+      output: CommandResult<Vec<CoreVoiceRecordView>>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: create_core_voice
+      kind: function
+      line_start: 96
+      line_end: 102
+      signature: 'create_core_voice(vault_path: String, request: CreateCoreVoiceRequest) -> CommandResult<CoreVoiceRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: CreateCoreVoiceRequest'
+      output: CommandResult<CoreVoiceRecordView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: save_core_voice_trait
+      kind: function
+      line_start: 105
+      line_end: 111
+      signature: 'save_core_voice_trait(vault_path: String, request: SaveCoreVoiceTraitRequest) -> CommandResult<CoreVoiceRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: SaveCoreVoiceTraitRequest'
+      output: CommandResult<CoreVoiceRecordView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: delete_core_voice_trait
+      kind: function
+      line_start: 114
+      line_end: 121
+      signature: 'delete_core_voice_trait(vault_path: String, voice_id: String, trait_id: String) -> CommandResult<CoreVoiceRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'voice_id: String'
+      - 'trait_id: String'
+      output: CommandResult<CoreVoiceRecordView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: activate_core_voice
+      kind: function
+      line_start: 124
+      line_end: 130
+      signature: 'activate_core_voice(vault_path: String, voice_id: String) -> CommandResult<CoreVoiceRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'voice_id: String'
+      output: CommandResult<CoreVoiceRecordView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: list_tone_modes
+      kind: function
+      line_start: 133
+      line_end: 135
+      signature: 'list_tone_modes(vault_path: String) -> CommandResult<Vec<ToneModeRecordView>>'
+      inputs:
+      - 'vault_path: String'
+      output: CommandResult<Vec<ToneModeRecordView>>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: create_tone_mode
+      kind: function
+      line_start: 138
+      line_end: 144
+      signature: 'create_tone_mode(vault_path: String, request: CreateToneModeRequest) -> CommandResult<ToneModeRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: CreateToneModeRequest'
+      output: CommandResult<ToneModeRecordView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: update_tone_mode
+      kind: function
+      line_start: 147
+      line_end: 153
+      signature: 'update_tone_mode(vault_path: String, request: UpdateToneModeRequest) -> CommandResult<ToneModeRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: UpdateToneModeRequest'
+      output: CommandResult<ToneModeRecordView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: list_voice_directions
+      kind: function
+      line_start: 156
+      line_end: 159
+      signature: 'list_voice_directions(vault_path: String) -> CommandResult<Vec<VoiceDirectionRecordView>>'
+      inputs:
+      - 'vault_path: String'
+      output: CommandResult<Vec<VoiceDirectionRecordView>>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: create_voice_direction
+      kind: function
+      line_start: 162
+      line_end: 168
+      signature: 'create_voice_direction(vault_path: String, request: CreateVoiceDirectionRequest) -> CommandResult<VoiceDirectionRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: CreateVoiceDirectionRequest'
+      output: CommandResult<VoiceDirectionRecordView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: set_voice_direction_status
+      kind: function
+      line_start: 171
+      line_end: 177
+      signature: 'set_voice_direction_status(vault_path: String, request: SetVoiceDirectionStatusRequest) -> CommandResult<VoiceDirectionRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: SetVoiceDirectionStatusRequest'
+      output: CommandResult<VoiceDirectionRecordView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: list_writing_rules
+      kind: function
+      line_start: 180
+      line_end: 183
+      signature: 'list_writing_rules(vault_path: String) -> CommandResult<Vec<WritingRuleRecordView>>'
+      inputs:
+      - 'vault_path: String'
+      output: CommandResult<Vec<WritingRuleRecordView>>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: create_writing_rule
+      kind: function
+      line_start: 186
+      line_end: 192
+      signature: 'create_writing_rule(vault_path: String, request: CreateWritingRuleRequest) -> CommandResult<WritingRuleRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: CreateWritingRuleRequest'
+      output: CommandResult<WritingRuleRecordView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: update_writing_rule
+      kind: function
+      line_start: 195
+      line_end: 201
+      signature: 'update_writing_rule(vault_path: String, request: UpdateWritingRuleRequest) -> CommandResult<WritingRuleRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: UpdateWritingRuleRequest'
+      output: CommandResult<WritingRuleRecordView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+  - path: src-tauri/src/services/document_extraction.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 3ed3e59de2a1f784204f09c2e7af406d0a8eb79a
+    dependencies:
+    - crate::error::{ServiceResult, WorkLoreError}
+    - quick_xml::{events::Event, reader::Reader}
+    - std::{fs, fs::File, io::Read, path::Path}
+    - super::*
+    provides:
+    - extract
+    - extract_utf8
+    - extract_pdf
+    - extract_docx
+    - extract_wordprocessing_xml
+    - numbering_is_active
+    - append_paragraph
+    - append_general_reference
+    - append_numeric_reference
+    - has_local_name
+    - clean_extracted_text
+    - extracts_paragraphs_tabs_and_escaped_text_from_docx_xml
+    - preserves_numbered_word_paragraphs_as_explicit_list_items
+    - ignores_disabled_numbering
+    - extracts_numeric_character_references
+    - collapses_repeated_blank_lines
+    symbols:
+    - name: extract
+      kind: function
+      line_start: 13
+      line_end: 21
+      signature: 'extract(path: &Path, extension: &str) -> ServiceResult<ExtractedText>'
+      inputs:
+      - 'path: &Path'
+      - 'extension: &str'
+      output: ServiceResult<ExtractedText>
+      dependencies:
+      - Err
+      - extract_docx
+      - extract_pdf
+      - extract_utf8
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/document_extraction.rs
+        symbol: extract_docx
+      - path: src-tauri/src/services/document_extraction.rs
+        symbol: extract_pdf
+      - path: src-tauri/src/services/document_extraction.rs
+        symbol: extract_utf8
+    - name: extract_utf8
+      kind: function
+      line_start: 22
+      line_end: 36
+      signature: 'extract_utf8(path: &Path) -> ServiceResult<ExtractedText>'
+      inputs:
+      - 'path: &Path'
+      output: ServiceResult<ExtractedText>
+      dependencies:
+      - DocumentExtraction
+      - Ok
+      - error.into
+      - error.kind
+      - map_err
+      - new
+      - read_to_string
+      - to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: extract_pdf
+      kind: function
+      line_start: 37
+      line_end: 56
+      signature: 'extract_pdf(path: &Path) -> ServiceResult<ExtractedText>'
+      inputs:
+      - 'path: &Path'
+      output: ServiceResult<ExtractedText>
+      dependencies:
+      - DocumentExtraction
+      - Ok
+      - clean_extracted_text
+      - cleaned.trim
+      - error.to_string
+      - extract_text
+      - is_empty
+      - map_err
+      - new
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - &id004
+        path: src-tauri/src/services/document_extraction.rs
+        symbol: clean_extracted_text
+    - name: extract_docx
+      kind: function
+      line_start: 57
+      line_end: 83
+      signature: 'extract_docx(path: &Path) -> ServiceResult<ExtractedText>'
+      inputs:
+      - 'path: &Path'
+      output: ServiceResult<ExtractedText>
+      dependencies:
+      - DocumentExtraction
+      - Ok
+      - by_name
+      - clean_extracted_text
+      - cleaned.trim
+      - error.to_string
+      - extract_wordprocessing_xml
+      - is_empty
+      - map_err
+      - new
+      - open
+      - read_to_string
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+      - &id006
+        path: src-tauri/src/services/document_extraction.rs
+        symbol: extract_wordprocessing_xml
+    - name: extract_wordprocessing_xml
+      kind: function
+      line_start: 84
+      line_end: 150
+      signature: 'extract_wordprocessing_xml(xml: &str) -> ServiceResult<String>'
+      inputs:
+      - 'xml: &str'
+      output: ServiceResult<String>
+      dependencies:
+      - DocumentExtraction
+      - Empty
+      - End
+      - Err
+      - GeneralRef
+      - Ok
+      - Start
+      - Text
+      - append_general_reference
+      - append_paragraph
+      - decode
+      - error.to_string
+      - event.as_ref
+      - event.name
+      - from_str
+      - has_local_name
+      - map_err
+      - name.as_ref
+      - new
+      - numbering_is_active
+      - paragraph.clear
+      - paragraph.push
+      - paragraph.push_str
+      - reader.config_mut
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/document_extraction.rs
+        symbol: append_general_reference
+      - path: src-tauri/src/services/document_extraction.rs
+        symbol: append_paragraph
+      - &id005
+        path: src-tauri/src/services/document_extraction.rs
+        symbol: has_local_name
+      - path: src-tauri/src/services/document_extraction.rs
+        symbol: numbering_is_active
+    - name: numbering_is_active
+      kind: function
+      line_start: 151
+      line_end: 156
+      signature: 'numbering_is_active(event: &quick_xml::events::BytesStart<''_>) -> bool'
+      inputs:
+      - 'event: &quick_xml::events::BytesStart<''_>'
+      output: bool
+      dependencies:
+      - any
+      - attribute.key.as_ref
+      - attribute.value.as_ref
+      - event.attributes
+      - flatten
+      - has_local_name
+      parser: rust-pattern
+      dependency_targets:
+      - *id005
+    - name: append_paragraph
+      kind: function
+      line_start: 157
+      line_end: 172
+      signature: 'append_paragraph(output: &mut String, paragraph: &str, numbered: bool)'
+      inputs:
+      - 'output: &mut String'
+      - 'paragraph: &str'
+      - 'numbered: bool'
+      output: unspecified
+      dependencies:
+      - output.ends_with
+      - output.is_empty
+      - output.push
+      - output.push_str
+      - paragraph.is_empty
+      - paragraph.trim
+      parser: rust-pattern
+      dependency_targets: []
+    - name: append_general_reference
+      kind: function
+      line_start: 173
+      line_end: 196
+      signature: 'append_general_reference(output: &mut String, reference: &[u8]) -> ServiceResult<()>'
+      inputs:
+      - 'output: &mut String'
+      - 'reference: &[u8]'
+      output: ServiceResult<()>
+      dependencies:
+      - DocumentExtraction
+      - Ok
+      - append_numeric_reference
+      - error.to_string
+      - from_utf8
+      - map_err
+      - output.push
+      - output.push_str
+      - value.starts_with
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/document_extraction.rs
+        symbol: append_numeric_reference
+    - name: append_numeric_reference
+      kind: function
+      line_start: 197
+      line_end: 208
+      signature: 'append_numeric_reference(output: &mut String, digits: &[u8], radix: u32) -> ServiceResult<()>'
+      inputs:
+      - 'output: &mut String'
+      - 'digits: &[u8]'
+      - 'radix: u32'
+      output: ServiceResult<()>
+      dependencies:
+      - DocumentExtraction
+      - Ok
+      - error.to_string
+      - from_str_radix
+      - from_u32
+      - from_utf8
+      - map_err
+      - ok_or_else
+      - output.push
+      parser: rust-pattern
+      dependency_targets: []
+    - name: has_local_name
+      kind: function
+      line_start: 209
+      line_end: 215
+      signature: 'has_local_name(qualified_name: &[u8], local_name: &[u8]) -> bool'
+      inputs:
+      - 'qualified_name: &[u8]'
+      - 'local_name: &[u8]'
+      output: bool
+      dependencies:
+      - is_some_and
+      - prefix.ends_with
+      - strip_suffix
+      parser: rust-pattern
+      dependency_targets: []
+    - name: clean_extracted_text
+      kind: function
+      line_start: 216
+      line_end: 241
+      signature: 'clean_extracted_text(text: &str) -> String'
+      inputs:
+      - 'text: &str'
+      output: String
+      dependencies:
+      - blank_lines.saturating_add
+      - cleaned.ends_with
+      - cleaned.is_empty
+      - cleaned.push
+      - cleaned.push_str
+      - cleaned.trim
+      - is_empty
+      - line.trim
+      - line.trim_end
+      - normalized.len
+      - normalized.lines
+      - replace
+      - text.replace
+      - to_string
+      - with_capacity
+      parser: rust-pattern
+      dependency_targets: []
+    - name: extracts_paragraphs_tabs_and_escaped_text_from_docx_xml
+      kind: function
+      line_start: 248
+      line_end: 258
+      signature: extracts_paragraphs_tabs_and_escaped_text_from_docx_xml()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - clean_extracted_text
+      - expect
+      - extract_wordprocessing_xml
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+      - *id006
+    - name: preserves_numbered_word_paragraphs_as_explicit_list_items
+      kind: function
+      line_start: 261
+      line_end: 277
+      signature: preserves_numbered_word_paragraphs_as_explicit_list_items()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - clean_extracted_text
+      - expect
+      - extract_wordprocessing_xml
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+      - *id006
+    - name: ignores_disabled_numbering
+      kind: function
+      line_start: 280
+      line_end: 284
+      signature: ignores_disabled_numbering()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - clean_extracted_text
+      - expect
+      - extract_wordprocessing_xml
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+      - *id006
+    - name: extracts_numeric_character_references
+      kind: function
+      line_start: 287
+      line_end: 291
+      signature: extracts_numeric_character_references()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - clean_extracted_text
+      - expect
+      - extract_wordprocessing_xml
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+      - *id006
+    - name: collapses_repeated_blank_lines
+      kind: function
+      line_start: 294
+      line_end: 296
+      signature: collapses_repeated_blank_lines()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - clean_extracted_text
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+  - path: src-tauri/src/services/story_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: ed60cbab046aff8f1aabe365f7a183fc08911c16
+    dependencies:
+    - chrono::Utc
+    - crate::domain::stories::{SynthesisClaim, SynthesisMetric}
+    - "crate::{\n    domain::{\n        candidates::{CandidateStatus, StoryCandidate},\n        interviews::{AnswerClassification,\
+      \ InterviewSession, InterviewStatus, TurnActor},\n        models::{EntityReviewItem, PrivacyScanStatus},\n        stories::{\n\
+      \            ClaimClassification, EvidenceType, ImportStoryResponseResult, StoryClaim, StoryContent,\n            StoryDisclosure,\
+      \ StoryEvidence, StoryPrivacyScan, StoryRecord, StoryStatus,\n            StorySummary, StorySynthesisResponse, StoryType,\
+      \ SynthesisEvidenceLevel,\n        },\n    },\n    error::{ServiceResult, WorkLoreError},\n    io_utils::{read_json,\
+      \ write_json_atomic},\n    services::{\n        contextual_entity_scan::scan_named_projects,\n        entity_scan::{load_registry,\
+      \ scan_text},\n        performance_service::OperationSession,\n        role_service,\n    },\n}"
+    - serde_json::{Map, Value}
+    - "std::{\n    collections::{HashMap, HashSet},\n    fs,\n    io::Write,\n    path::{Path, PathBuf},\n}"
+    - super::*
+    - uuid::Uuid
+    provides:
+    - import_synthesis_response
+    - list_stories
+    - set_story_status
+    - read_story
+    - validate_response
+    - build_evidence
+    - build_claims
+    - claim_classification
+    - infer_story_type
+    - story_text_for_scan
+    - summarize_story
+    - pending_story_reviews
+    - write_story_pair
+    - render_markdown
+    - enum_label
+    - markdown_list
+    - write_synced
+    - replace_with_backup
+    - restore_backup
+    - remove_if_exists
+    - read_stories
+    - read_interview
+    - read_candidate
+    - story_json_path
+    - story_markdown_path
+    - interview_path
+    - candidate_path
+    - cleaned
+    - normalize_strings
+    - normalize
+    - ensure_vault
+    - response
+    - validates_required_story_title
+    - decision_evidence_classifies_story_as_decision
+    - normalization_removes_empty_and_duplicate_values
+    symbols:
+    - name: import_synthesis_response
+      kind: function
+      line_start: 32
+      line_end: 248
+      signature: 'import_synthesis_response(vault_path: &Path, interview_id: &str, response_path: &Path) -> ServiceResult<ImportStoryResponseResult>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'interview_id: &str'
+      - 'response_path: &Path'
+      output: ServiceResult<ImportStoryResponseResult>
+      dependencies:
+      - Err
+      - InvalidStoryResponse
+      - Ok
+      - Some
+      - String
+      - actions_and_decisions.extend
+      - and_then
+      - as_deref
+      - as_ref
+      - build_claims
+      - build_evidence
+      - candidate.context.entity_ids.clone
+      - candidate.context.role_ids.contains
+      - candidate.context.role_ids.push
+      - candidate.context.skills.clone
+      - candidate_path
+      - cleaned
+      - cloned
+      - ensure_role_for_candidate
+      - ensure_vault
+      - entity_ids.dedup
+      - entity_ids.push
+      - entity_ids.sort
+      - existing.as_ref
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/story_service.rs
+        symbol: build_claims
+      - path: src-tauri/src/services/story_service.rs
+        symbol: build_evidence
+      - &id011
+        path: src-tauri/src/services/story_service.rs
+        symbol: candidate_path
+      - path: src-tauri/src/services/story_service.rs
+        symbol: cleaned
+      - path: src-tauri/src/services/role_service.rs
+        symbol: ensure_role_for_candidate
+    - name: list_stories
+      kind: function
+      line_start: 249
+      line_end: 258
+      signature: 'list_stories(vault_path: &Path) -> ServiceResult<Vec<StorySummary>>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Vec<StorySummary>>
+      dependencies:
+      - collect
+      - ensure_vault
+      - iter
+      - map
+      - read_stories
+      - right.updated_at.cmp
+      - stories.sort_by
+      - summarize_story
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/story_service.rs
+        symbol: read_stories
+      - &id007
+        path: src-tauri/src/services/story_service.rs
+        symbol: summarize_story
+    - name: set_story_status
+      kind: function
+      line_start: 259
+      line_end: 271
+      signature: 'set_story_status(vault_path: &Path, story_id: &str, status: StoryStatus) -> ServiceResult<StorySummary>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'story_id: &str'
+      - 'status: StoryStatus'
+      output: ServiceResult<StorySummary>
+      dependencies:
+      - now
+      - read_story
+      - summarize_story
+      - to_rfc3339
+      - write_story_pair
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/story_service.rs
+        symbol: read_story
+      - *id007
+      - path: src-tauri/src/services/story_service.rs
+        symbol: write_story_pair
+    - name: read_story
+      kind: function
+      line_start: 272
+      line_end: 279
+      signature: 'read_story(vault_path: &Path, story_id: &str) -> ServiceResult<StoryRecord>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'story_id: &str'
+      output: ServiceResult<StoryRecord>
+      dependencies:
+      - Err
+      - path.is_file
+      - read_json
+      - story_json_path
+      parser: rust-pattern
+      dependency_targets:
+      - &id008
+        path: src-tauri/src/io_utils.rs
+        symbol: read_json
+      - &id009
+        path: src-tauri/src/services/story_service.rs
+        symbol: story_json_path
+    - name: validate_response
+      kind: function
+      line_start: 280
+      line_end: 311
+      signature: 'validate_response(response: &StorySynthesisResponse) -> ServiceResult<()>'
+      inputs:
+      - 'response: &StorySynthesisResponse'
+      output: ServiceResult<()>
+      dependencies:
+      - Err
+      - InvalidStoryResponse
+      - Ok
+      - any
+      - claim.statement.trim
+      - count
+      - is_empty
+      - iter
+      - metric.statement.trim
+      - response.title.chars
+      - response.title.trim
+      - to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: build_evidence
+      kind: function
+      line_start: 312
+      line_end: 365
+      signature: 'build_evidence(candidate: &StoryCandidate, interview: &InterviewSession) -> (Vec<StoryEvidence>, HashMap<String,
+        Vec<String>>)'
+      inputs:
+      - 'candidate: &StoryCandidate'
+      - 'interview: &InterviewSession'
+      output: (Vec<StoryEvidence>, HashMap<String, Vec<String>>)
+      dependencies:
+      - Some
+      - entry
+      - evidence.push
+      - evidence_id.clone
+      - field.clone
+      - filter
+      - iter
+      - new
+      - now_v7
+      - or_default
+      - push
+      - reference.captured_text.clone
+      - reference.fragment_id.clone
+      - reference.source_id.clone
+      - to_string
+      - turn.created_at.clone
+      - turn.text.clone
+      parser: rust-pattern
+      dependency_targets: []
+    - name: build_claims
+      kind: function
+      line_start: 366
+      line_end: 413
+      signature: 'build_claims(response: &StorySynthesisResponse, field_evidence: &HashMap<String, Vec<String>>) -> Vec<StoryClaim>'
+      inputs:
+      - 'response: &StorySynthesisResponse'
+      - 'field_evidence: &HashMap<String, Vec<String>>'
+      output: Vec<StoryClaim>
+      dependencies:
+      - any
+      - claim.statement.trim
+      - claim_classification
+      - cloned
+      - collect
+      - evidence_ids.dedup
+      - evidence_ids.is_empty
+      - evidence_ids.sort
+      - field_evidence.get
+      - flat_map
+      - into_iter
+      - iter
+      - let
+      - map
+      - metric.statement.clone
+      - normalize
+      - now_v7
+      - response.claims.clone
+      - source_claims.push
+      - to_string
+      - unwrap_or_default
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/story_service.rs
+        symbol: claim_classification
+      - &id012
+        path: src-tauri/src/services/contextual_entity_scan.rs
+        symbol: normalize
+      - &id013
+        path: src-tauri/src/services/entity_scan.rs
+        symbol: normalize
+      - &id014
+        path: src-tauri/src/services/role_service.rs
+        symbol: normalize
+      - &id015
+        path: src-tauri/src/services/story_service.rs
+        symbol: normalize
+    - name: claim_classification
+      kind: function
+      line_start: 414
+      line_end: 436
+      signature: 'claim_classification(level: SynthesisEvidenceLevel) -> (ClaimClassification, f32, String)'
+      inputs:
+      - 'level: SynthesisEvidenceLevel'
+      output: (ClaimClassification, f32, String)
+      dependencies:
+      - new
+      - to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: infer_story_type
+      kind: function
+      line_start: 437
+      line_end: 461
+      signature: 'infer_story_type(response: &StorySynthesisResponse) -> StoryType'
+      inputs:
+      - 'response: &StorySynthesisResponse'
+      output: StoryType
+      dependencies:
+      - response.decisions.is_empty
+      - text.contains
+      - to_ascii_lowercase
+      parser: rust-pattern
+      dependency_targets: []
+    - name: story_text_for_scan
+      kind: function
+      line_start: 462
+      line_end: 481
+      signature: 'story_text_for_scan(story: &StoryRecord) -> String'
+      inputs:
+      - 'story: &StoryRecord'
+      output: String
+      dependencies:
+      - claim.text.clone
+      - map
+      - sections.extend
+      - sections.join
+      - story.claims.iter
+      - story.content.actions_and_decisions.clone
+      - story.content.constraints.clone
+      - story.content.lessons_learned.clone
+      - story.content.metrics.clone
+      - story.content.operating_philosophy.clone
+      - story.content.outcomes.clone
+      - story.content.problem_or_opportunity.clone
+      - story.content.responsibilities.clone
+      - story.content.situation.clone
+      - story.content.stakeholders.clone
+      - story.content.summary.clone
+      - story.content.tools_and_systems.clone
+      - story.title.clone
+      parser: rust-pattern
+      dependency_targets: []
+    - name: summarize_story
+      kind: function
+      line_start: 482
+      line_end: 511
+      signature: 'summarize_story(vault_path: &Path, story: &StoryRecord) -> ServiceResult<StorySummary>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'story: &StoryRecord'
+      output: ServiceResult<StorySummary>
+      dependencies:
+      - Ok
+      - and_then
+      - entity.canonical_name.clone
+      - find
+      - first
+      - iter
+      - load_registry
+      - map
+      - ok
+      - read_role
+      - role.as_ref
+      - role.role_id.clone
+      - role.title.clone
+      - story.content.metrics.clone
+      - story.content.outcomes.clone
+      - story.content.summary.clone
+      - story.story_id.clone
+      - story.title.clone
+      - story.updated_at.clone
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/entity_scan.rs
+        symbol: load_registry
+      - path: src-tauri/src/services/role_service.rs
+        symbol: read_role
+    - name: pending_story_reviews
+      kind: function
+      line_start: 512
+      line_end: 530
+      signature: 'pending_story_reviews(vault_path: &Path, story_id: &str) -> ServiceResult<Vec<String>>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'story_id: &str'
+      output: ServiceResult<Vec<String>>
+      dependencies:
+      - Ok
+      - Some
+      - and_then
+      - directory.exists
+      - entry.path
+      - extension
+      - ids.push
+      - new
+      - read_dir
+      - read_json
+      - value.to_str
+      - vault_path.join
+      parser: rust-pattern
+      dependency_targets:
+      - *id008
+    - name: write_story_pair
+      kind: function
+      line_start: 531
+      line_end: 571
+      signature: 'write_story_pair(vault_path: &Path, story: &StoryRecord) -> ServiceResult<()>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'story: &StoryRecord'
+      output: ServiceResult<()>
+      dependencies:
+      - Err
+      - Ok
+      - as_bytes
+      - create_dir_all
+      - directory.join
+      - error.into
+      - json_path.parent
+      - now_v7
+      - ok_or
+      - remove_file
+      - remove_if_exists
+      - rename
+      - render_markdown
+      - replace_with_backup
+      - restore_backup
+      - story_json_path
+      - story_markdown_path
+      - to_vec_pretty
+      - write_synced
+      parser: rust-pattern
+      dependency_targets:
+      - &id010
+        path: src-tauri/src/services/story_service.rs
+        symbol: remove_if_exists
+      - path: src-tauri/src/services/story_service.rs
+        symbol: render_markdown
+      - path: src-tauri/src/services/story_service.rs
+        symbol: replace_with_backup
+      - path: src-tauri/src/services/story_service.rs
+        symbol: restore_backup
+      - *id009
+      - path: src-tauri/src/services/story_service.rs
+        symbol: story_markdown_path
+      - path: src-tauri/src/services/story_service.rs
+        symbol: write_synced
+    - name: render_markdown
+      kind: function
+      line_start: 572
+      line_end: 616
+      signature: 'render_markdown(story: &StoryRecord) -> String'
+      inputs:
+      - 'story: &StoryRecord'
+      output: String
+      dependencies:
+      - enum_label
+      - iter
+      - join
+      - map
+      - markdown_list
+      - to_string
+      - unwrap_or_else
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/story_service.rs
+        symbol: enum_label
+      - path: src-tauri/src/services/story_service.rs
+        symbol: markdown_list
+    - name: enum_label
+      kind: function
+      line_start: 617
+      line_end: 620
+      signature: 'enum_label(value: T) -> String'
+      inputs:
+      - 'value: T'
+      output: String
+      dependencies:
+      - to_ascii_lowercase
+      parser: rust-pattern
+      dependency_targets: []
+    - name: markdown_list
+      kind: function
+      line_start: 621
+      line_end: 632
+      signature: 'markdown_list(values: &[String]) -> String'
+      inputs:
+      - 'values: &[String]'
+      output: String
+      dependencies:
+      - iter
+      - join
+      - map
+      - to_string
+      - values.is_empty
+      parser: rust-pattern
+      dependency_targets: []
+    - name: write_synced
+      kind: function
+      line_start: 633
+      line_end: 639
+      signature: 'write_synced(path: &Path, bytes: &[u8]) -> ServiceResult<()>'
+      inputs:
+      - 'path: &Path'
+      - 'bytes: &[u8]'
+      output: ServiceResult<()>
+      dependencies:
+      - Ok
+      - create
+      - file.sync_all
+      - file.write_all
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/confidentiality_service.rs
+        symbol: create
+    - name: replace_with_backup
+      kind: function
+      line_start: 640
+      line_end: 647
+      signature: 'replace_with_backup(path: &Path, backup: &Path) -> ServiceResult<()>'
+      inputs:
+      - 'path: &Path'
+      - 'backup: &Path'
+      output: ServiceResult<()>
+      dependencies:
+      - Ok
+      - path.exists
+      - remove_if_exists
+      - rename
+      parser: rust-pattern
+      dependency_targets:
+      - *id010
+    - name: restore_backup
+      kind: function
+      line_start: 648
+      line_end: 654
+      signature: 'restore_backup(path: &Path, backup: &Path)'
+      inputs:
+      - 'path: &Path'
+      - 'backup: &Path'
+      output: unspecified
+      dependencies:
+      - backup.exists
+      - remove_file
+      - rename
+      parser: rust-pattern
+      dependency_targets: []
+    - name: remove_if_exists
+      kind: function
+      line_start: 655
+      line_end: 661
+      signature: 'remove_if_exists(path: &Path) -> ServiceResult<()>'
+      inputs:
+      - 'path: &Path'
+      output: ServiceResult<()>
+      dependencies:
+      - Ok
+      - path.exists
+      - remove_file
+      parser: rust-pattern
+      dependency_targets: []
+    - name: read_stories
+      kind: function
+      line_start: 662
+      line_end: 682
+      signature: 'read_stories(vault_path: &Path) -> ServiceResult<Vec<StoryRecord>>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Vec<StoryRecord>>
+      dependencies:
+      - Ok
+      - Some
+      - and_then
+      - directory.exists
+      - entry.path
+      - file_name
+      - is_some_and
+      - name.starts_with
+      - new
+      - path.extension
+      - read_dir
+      - read_json
+      - stories.push
+      - value.to_str
+      - vault_path.join
+      parser: rust-pattern
+      dependency_targets:
+      - *id008
+    - name: read_interview
+      kind: function
+      line_start: 683
+      line_end: 690
+      signature: 'read_interview(vault_path: &Path, interview_id: &str) -> ServiceResult<InterviewSession>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'interview_id: &str'
+      output: ServiceResult<InterviewSession>
+      dependencies:
+      - Err
+      - interview_path
+      - path.is_file
+      - read_json
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/story_service.rs
+        symbol: interview_path
+      - *id008
+    - name: read_candidate
+      kind: function
+      line_start: 691
+      line_end: 698
+      signature: 'read_candidate(vault_path: &Path, candidate_id: &str) -> ServiceResult<StoryCandidate>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'candidate_id: &str'
+      output: ServiceResult<StoryCandidate>
+      dependencies:
+      - Err
+      - candidate_path
+      - path.is_file
+      - read_json
+      parser: rust-pattern
+      dependency_targets:
+      - *id011
+      - *id008
+    - name: story_json_path
+      kind: function
+      line_start: 699
+      line_end: 702
+      signature: 'story_json_path(vault_path: &Path, story_id: &str) -> PathBuf'
+      inputs:
+      - 'vault_path: &Path'
+      - 'story_id: &str'
+      output: PathBuf
+      dependencies:
+      - join
+      - vault_path.join
+      parser: rust-pattern
+      dependency_targets: []
+    - name: story_markdown_path
+      kind: function
+      line_start: 703
+      line_end: 706
+      signature: 'story_markdown_path(vault_path: &Path, story_id: &str) -> PathBuf'
+      inputs:
+      - 'vault_path: &Path'
+      - 'story_id: &str'
+      output: PathBuf
+      dependencies:
+      - join
+      - vault_path.join
+      parser: rust-pattern
+      dependency_targets: []
+    - name: interview_path
+      kind: function
+      line_start: 707
+      line_end: 712
+      signature: 'interview_path(vault_path: &Path, interview_id: &str) -> PathBuf'
+      inputs:
+      - 'vault_path: &Path'
+      - 'interview_id: &str'
+      output: PathBuf
+      dependencies:
+      - join
+      parser: rust-pattern
+      dependency_targets: []
+    - name: candidate_path
+      kind: function
+      line_start: 713
+      line_end: 718
+      signature: 'candidate_path(vault_path: &Path, candidate_id: &str) -> PathBuf'
+      inputs:
+      - 'vault_path: &Path'
+      - 'candidate_id: &str'
+      output: PathBuf
+      dependencies:
+      - join
+      parser: rust-pattern
+      dependency_targets: []
+    - name: cleaned
+      kind: function
+      line_start: 719
+      line_end: 724
+      signature: 'cleaned(values: Vec<String>) -> Vec<String>'
+      inputs:
+      - 'values: Vec<String>'
+      output: Vec<String>
+      dependencies:
+      - normalize_strings
+      parser: rust-pattern
+      dependency_targets:
+      - &id017
+        path: src-tauri/src/services/story_service.rs
+        symbol: normalize_strings
+    - name: normalize_strings
+      kind: function
+      line_start: 725
+      line_end: 733
+      signature: 'normalize_strings(values: &mut Vec<String>)'
+      inputs:
+      - 'values: &mut Vec<String>'
+      output: unspecified
+      dependencies:
+      - new
+      - normalize
+      - seen.insert
+      - to_string
+      - value.is_empty
+      - value.trim
+      - values.iter_mut
+      - values.retain
+      parser: rust-pattern
+      dependency_targets:
+      - *id012
+      - *id013
+      - *id014
+      - *id015
+    - name: normalize
+      kind: function
+      line_start: 734
+      line_end: 741
+      signature: 'normalize(value: &str) -> String'
+      inputs:
+      - 'value: &str'
+      output: String
+      dependencies:
+      - character.is_ascii_alphanumeric
+      - chars
+      - collect
+      - filter
+      - flat_map
+      parser: rust-pattern
+      dependency_targets: []
+    - name: ensure_vault
+      kind: function
+      line_start: 742
+      line_end: 748
+      signature: 'ensure_vault(vault_path: &Path) -> ServiceResult<()>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<()>
+      dependencies:
+      - Err
+      - Ok
+      - is_file
+      - vault_path.join
+      parser: rust-pattern
+      dependency_targets: []
+    - name: response
+      kind: function
+      line_start: 754
+      line_end: 780
+      signature: response() -> StorySynthesisResponse
+      inputs: []
+      output: StorySynthesisResponse
+      dependencies:
+      - to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: validates_required_story_title
+      kind: function
+      line_start: 783
+      line_end: 787
+      signature: validates_required_story_title()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - is_err
+      - response
+      - validate_response
+      - value.title.clear
+      parser: rust-pattern
+      dependency_targets:
+      - &id016
+        path: src-tauri/src/services/story_service.rs
+        symbol: response
+      - path: src-tauri/src/services/story_service.rs
+        symbol: validate_response
+    - name: decision_evidence_classifies_story_as_decision
+      kind: function
+      line_start: 790
+      line_end: 792
+      signature: decision_evidence_classifies_story_as_decision()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - infer_story_type
+      - response
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/story_service.rs
+        symbol: infer_story_type
+      - *id016
+    - name: normalization_removes_empty_and_duplicate_values
+      kind: function
+      line_start: 795
+      line_end: 799
+      signature: normalization_removes_empty_and_duplicate_values()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - normalize_strings
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - *id017
+  - path: src/components/LibraryWorkspace.tsx
+    analysis_version: 1
+    language: typescript
+    content_hash: e2cfecc337c3ad840b98b3ea3e8a4ba362432ea1
+    dependencies:
+    - ../domain/types
+    - ../lib/workloreApi
+    - ./InfoButton
+    - ./InspirationPanel
+    - ./TargetContextPanel
+    - react
+    provides:
+    - refreshContext
+    - useForVoice
+    - formatDate
+    symbols:
+    - name: refreshContext
+      kind: function
+      line_start: 52
+      line_end: 66
+      signature: refreshContext()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Promise.all
+      - errorMessage
+      - listInspirations
+      - listTargetContexts
+      - listVoiceSourceCandidates
+      - setError
+      - setInspirations
+      - setTargets
+      - setVoiceCandidates
+      parser: typescript-pattern
+      dependency_targets:
+      - &id018
+        path: src/domain/types.ts
+        symbol: errorMessage
+      - path: src/lib/workloreApi.ts
+        symbol: listInspirations
+      - path: src/lib/workloreApi.ts
+        symbol: listTargetContexts
+      - path: src/lib/workloreApi.ts
+        symbol: listVoiceSourceCandidates
+    - name: useForVoice
+      kind: function
+      line_start: 67
+      line_end: 81
+      signature: 'useForVoice(sourceId: string)'
+      inputs:
+      - 'sourceId: string'
+      output: unspecified
+      dependencies:
+      - createVoiceEvidenceFromSource
+      - errorMessage
+      - refreshContext
+      - setBusySourceId
+      - setError
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/lib/workloreApi.ts
+        symbol: createVoiceEvidenceFromSource
+      - *id018
+      - path: src/components/LibraryWorkspace.tsx
+        symbol: refreshContext
+    - name: formatDate
+      kind: function
+      line_start: 237
+      line_end: 242
+      signature: 'formatDate(value: string) -> string'
+      inputs:
+      - 'value: string'
+      output: string
+      dependencies:
+      - Date
+      - Intl.DateTimeFormat
+      - Number.isNaN
+      - format
+      - parsed.getTime
+      parser: typescript-pattern
+      dependency_targets: []
