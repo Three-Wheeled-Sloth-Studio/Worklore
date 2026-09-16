@@ -173,13 +173,13 @@ source_catalog:
   - path: src-tauri/src/lib.rs
     analysis_version: 1
     language: rust
-    content_hash: dd94c91b2a6ab693ee8a74902118b999588faa10
+    content_hash: 41e5d065470d0f0bf85a130faeafb995ce28900a
     dependencies:
     - "commands::{\n    candidates::{extract_resume_candidates, list_story_candidates, set_story_candidate_status},\n    capture::{\n\
       \        classify_capture_source, create_capture_source, get_capture_source, list_captures,\n        list_unclassified_captures,\
       \ update_capture_source_type,\n    },\n    development::{\n        create_story_from_seed_development, start_story_seed_development,\n\
-      \        submit_story_seed_development_response,\n    },\n    feedback::{get_feedback_snapshot, mark_post_published,\
-      \ record_post_performance},\n    inspirations::{\n        add_inspiration_relationship, create_inspiration_from_source,\
+      \        submit_story_seed_development_response,\n    },\n    external::open_external_url,\n    feedback::{get_feedback_snapshot,\
+      \ mark_post_published, record_post_performance},\n    inspirations::{\n        add_inspiration_relationship, create_inspiration_from_source,\
       \ get_inspiration,\n        list_inspiration_link_targets, list_inspirations, remove_inspiration_relationship,\n   \
       \     update_inspiration,\n    },\n    interviews::{\n        list_guided_interviews, resume_guided_interview, start_guided_interview,\n\
       \        submit_guided_interview_response,\n    },\n    performance::get_performance_snapshot,\n    posts::{\n     \
@@ -205,8 +205,8 @@ source_catalog:
     symbols:
     - name: run
       kind: function
-      line_start: 72
-      line_end: 181
+      line_start: 73
+      line_end: 183
       signature: run()
       inputs: []
       output: unspecified

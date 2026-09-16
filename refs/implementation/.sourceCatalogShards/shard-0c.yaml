@@ -78,10 +78,124 @@ source_catalog:
   - path: src-tauri/src/commands/mod.rs
     analysis_version: 1
     language: rust
-    content_hash: fc5657a1efbd627c6f55fe6bf47cb6bcb59f4483
-    dependencies: []
-    provides: []
-    symbols: []
+    content_hash: f66f481590a5d46fab31431e366b8ff9655d2cf6
+    dependencies:
+    - std::process::Command
+    - super::{validate_external_url, LICENSE_URL, SUPPORT_URL}
+    provides:
+    - validate_external_url
+    - open_with_system_browser
+    - open_with_system_browser
+    - open_with_system_browser
+    - open_external_url
+    - approved_external_links_are_allowed
+    - arbitrary_external_links_are_rejected
+    symbols:
+    - name: validate_external_url
+      kind: function
+      line_start: 26
+      line_end: 32
+      signature: 'validate_external_url(url: &str) -> Result<(), String>'
+      inputs:
+      - 'url: &str'
+      output: Result<(), String>
+      dependencies:
+      - Err
+      - Ok
+      - to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: open_with_system_browser
+      kind: function
+      line_start: 35
+      line_end: 40
+      signature: 'open_with_system_browser(url: &str) -> std::io::Result<std::process::ExitStatus>'
+      inputs:
+      - 'url: &str'
+      output: std::io::Result<std::process::ExitStatus>
+      dependencies:
+      - arg
+      - new
+      - status
+      parser: rust-pattern
+      dependency_targets: []
+    - name: open_with_system_browser
+      kind: function
+      line_start: 43
+      line_end: 45
+      signature: 'open_with_system_browser(url: &str) -> std::io::Result<std::process::ExitStatus>'
+      inputs:
+      - 'url: &str'
+      output: std::io::Result<std::process::ExitStatus>
+      dependencies:
+      - arg
+      - new
+      - status
+      parser: rust-pattern
+      dependency_targets: []
+    - name: open_with_system_browser
+      kind: function
+      line_start: 48
+      line_end: 50
+      signature: 'open_with_system_browser(url: &str) -> std::io::Result<std::process::ExitStatus>'
+      inputs:
+      - 'url: &str'
+      output: std::io::Result<std::process::ExitStatus>
+      dependencies:
+      - arg
+      - new
+      - status
+      parser: rust-pattern
+      dependency_targets: []
+    - name: open_external_url
+      kind: function
+      line_start: 53
+      line_end: 62
+      signature: 'open_external_url(url: String) -> Result<(), String>'
+      inputs:
+      - 'url: String'
+      output: Result<(), String>
+      dependencies:
+      - Err
+      - Ok
+      - map_err
+      - open_with_system_browser
+      - status.success
+      - to_string
+      - validate_external_url
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/commands/mod.rs
+        symbol: open_with_system_browser
+      - &id001
+        path: src-tauri/src/commands/mod.rs
+        symbol: validate_external_url
+    - name: approved_external_links_are_allowed
+      kind: function
+      line_start: 69
+      line_end: 72
+      signature: approved_external_links_are_allowed()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - is_ok
+      - validate_external_url
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+    - name: arbitrary_external_links_are_rejected
+      kind: function
+      line_start: 75
+      line_end: 78
+      signature: arbitrary_external_links_are_rejected()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - is_err
+      - validate_external_url
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
   - path: src-tauri/src/commands/stories.rs
     analysis_version: 1
     language: rust
@@ -112,18 +226,18 @@ source_catalog:
       - migrate_prototype
       parser: rust-pattern
       dependency_targets:
-      - &id001
+      - &id002
         path: src-tauri/src/domain/candidates.rs
         symbol: from
-      - &id002
+      - &id003
         path: src-tauri/src/domain/models.rs
         symbol: from
-      - &id003
+      - &id004
         path: src-tauri/src/error.rs
         symbol: from
       - path: src-tauri/src/services/story_service.rs
         symbol: import_synthesis_response
-      - &id004
+      - &id005
         path: src-tauri/src/services/canonical_store.rs
         symbol: migrate_prototype
     - name: list_stories
@@ -139,9 +253,9 @@ source_catalog:
       - map_err
       parser: rust-pattern
       dependency_targets:
-      - *id001
       - *id002
       - *id003
+      - *id004
     - name: set_story_status
       kind: function
       line_start: 33
@@ -159,10 +273,10 @@ source_catalog:
       - migrate_prototype
       parser: rust-pattern
       dependency_targets:
-      - *id001
       - *id002
       - *id003
       - *id004
+      - *id005
   - path: src-tauri/src/commands/vault.rs
     analysis_version: 1
     language: rust
@@ -195,9 +309,9 @@ source_catalog:
       - map_err
       parser: rust-pattern
       dependency_targets:
-      - *id001
       - *id002
       - *id003
+      - *id004
     - name: create_vault_in_parent
       kind: function
       line_start: 17
@@ -212,9 +326,9 @@ source_catalog:
       - map_err
       parser: rust-pattern
       dependency_targets:
-      - *id001
       - *id002
       - *id003
+      - *id004
     - name: create_default_vault
       kind: function
       line_start: 23
@@ -248,9 +362,9 @@ source_catalog:
       - map_err
       parser: rust-pattern
       dependency_targets:
-      - *id001
       - *id002
       - *id003
+      - *id004
     - name: update_cloud_identifier_mode
       kind: function
       line_start: 34
@@ -265,9 +379,9 @@ source_catalog:
       - map_err
       parser: rust-pattern
       dependency_targets:
-      - *id001
       - *id002
       - *id003
+      - *id004
     - name: import_source
       kind: function
       line_start: 43
@@ -286,10 +400,10 @@ source_catalog:
       - spawn_blocking
       parser: rust-pattern
       dependency_targets:
-      - *id001
       - *id002
       - *id003
       - *id004
+      - *id005
     - name: list_sources
       kind: function
       line_start: 61
@@ -303,9 +417,9 @@ source_catalog:
       - map_err
       parser: rust-pattern
       dependency_targets:
-      - *id001
       - *id002
       - *id003
+      - *id004
   - path: src-tauri/src/domain/mod.rs
     analysis_version: 1
     language: rust

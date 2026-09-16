@@ -176,11 +176,27 @@ source_catalog:
   - path: src/main.tsx
     analysis_version: 1
     language: typescript
-    content_hash: aa9debf0411e7ee3e51be59ebf22bb8aaac53f7f
+    content_hash: 77bdfaabd3b0ce1d7ef3b94de3000f9c49f527c6
     dependencies:
     - ./App
     - ./components/WindowControls
+    - '@tauri-apps/api/core'
     - react
     - react-dom/client
-    provides: []
-    symbols: []
+    provides:
+    - handleExternalLinkClick
+    symbols:
+    - name: handleExternalLinkClick
+      kind: function
+      line_start: 12
+      line_end: 32
+      signature: 'handleExternalLinkClick(event: MouseEvent)'
+      inputs:
+      - 'event: MouseEvent'
+      output: unspecified
+      dependencies:
+      - console.error
+      - event.preventDefault
+      - target.closest
+      parser: typescript-pattern
+      dependency_targets: []
