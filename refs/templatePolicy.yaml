@@ -1,7 +1,7 @@
-version: 2
+version: 3
 schema: refs/schemas/schemaRegistry.yaml
-updated: 2026-09-12
-purpose: Defines required WorkLore project reference files, OKF discovery rules, and safety constraints.
+updated: 2026-09-16
+purpose: Defines required WorkLore project reference files, OKF discovery rules, generated source-discovery rules, and safety constraints.
 placeholder_tokens:
   - TEMPLATE_TODO
   - TEMPLATE_TODO_DATE
@@ -18,6 +18,7 @@ required_files:
   - refs/architecture/overview.md
   - refs/implementation/fileMap.yaml
   - refs/implementation/codingStandards.md
+  - refs/implementation/sourceCatalog/index.yaml
   - refs/implementation/okfCompatibility.md
   - refs/handoffs/currentHandoff.md
   - refs/handoffs/handoffTemplate.md
@@ -26,6 +27,7 @@ required_files:
   - refs/testing/regressionChecklist.md
   - refs/schemas/schemaRegistry.yaml
   - refs/tools/generate_agent_context.py
+  - refs/tools/generate_source_catalog.py
   - refs/tools/generate_okf_indexes.py
   - refs/tools/validate_refs.py
 bootstrap_files:
@@ -42,11 +44,13 @@ rules:
   - Real secrets and user data are prohibited in refs.
   - Unknown facts must be recorded as open questions instead of guessed.
   - Generated OKF indexes must match refs/tools/generate_okf_indexes.py.
+  - Generated source-catalog files must match refs/tools/generate_source_catalog.py and must never be hand-edited.
   - Tracked repository paths must remain unique after case-folding the complete normalized path.
 validation:
   schema_registry: refs/schemas/schemaRegistry.yaml
   okf_profile: refs/okfProfile.yaml
   okf_indexes_must_match_generator: true
+  source_catalog_must_match_generator: true
   initialized_mode_disallows_placeholders_in_bootstrap_files: true
   paths_must_be_relative: true
   disallowed_secret_patterns:
