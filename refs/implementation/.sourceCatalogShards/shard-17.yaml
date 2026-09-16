@@ -1,0 +1,545 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: '17'
+  files:
+  - path: src-tauri/src/services/privacy_scan_migration.rs
+    analysis_version: 1
+    language: rust
+    content_hash: b1454b3a1d68b0ed77fd8722d89bfe87b0af06de
+    dependencies:
+    - chrono::Utc
+    - crate::domain::models::{ReviewCandidateMatch, ReviewScores}
+    - "crate::{\n    domain::models::{EntityReviewItem, EntityStatus, PrivateEntityRegistry},\n    error::ServiceResult,\n\
+      \    io_utils::{read_json, write_json_atomic},\n    services::entity_scan::{\n        is_generic_entity_term, is_public_domain_acronym,\
+      \ load_registry, save_registry,\n    },\n}"
+    - serde_json::json
+    - std::{fs, path::Path}
+    - super::*
+    provides:
+    - migrate_legacy_review_noise
+    - legacy_review_action
+    - has_explicit_project_name_cue
+    - review_entity_index
+    - is_uppercase_acronym
+    - review
+    - generic_project_words_are_dismissed
+    - loose_legacy_project_cues_are_dismissed
+    - pii_is_auto_confirmed
+    - real_named_projects_remain_for_review
+    symbols:
+    - name: migrate_legacy_review_noise
+      kind: function
+      line_start: 14
+      line_end: 97
+      signature: 'migrate_legacy_review_noise(vault_path: &Path) -> ServiceResult<usize>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<usize>
+      dependencies:
+      - Ok
+      - Some
+      - all
+      - and_then
+      - directory.exists
+      - entry.path
+      - extension
+      - item.status.clone
+      - iter
+      - legacy_review_action
+      - load_registry
+      - now
+      - now.clone
+      - read_dir
+      - read_json
+      - review_entity_index
+      - save_registry
+      - to_rfc3339
+      - to_string
+      - value.to_str
+      - vault_path.join
+      - write_json_atomic
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/services/privacy_scan_migration.rs
+        symbol: legacy_review_action
+      - path: src-tauri/src/services/entity_scan.rs
+        symbol: load_registry
+      - path: src-tauri/src/io_utils.rs
+        symbol: read_json
+      - path: src-tauri/src/services/privacy_scan_migration.rs
+        symbol: review_entity_index
+      - path: src-tauri/src/services/entity_scan.rs
+        symbol: save_registry
+      - path: src-tauri/src/io_utils.rs
+        symbol: write_json_atomic
+    - name: legacy_review_action
+      kind: function
+      line_start: 104
+      line_end: 128
+      signature: 'legacy_review_action(item: &EntityReviewItem) -> Option<LegacyReviewAction>'
+      inputs:
+      - 'item: &EntityReviewItem'
+      output: Option<LegacyReviewAction>
+      dependencies:
+      - Some
+      - has_explicit_project_name_cue
+      - is_generic_entity_term
+      - is_public_domain_acronym
+      - is_uppercase_acronym
+      - item.suggested_entity_type.as_str
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/privacy_scan_migration.rs
+        symbol: has_explicit_project_name_cue
+      - path: src-tauri/src/services/entity_scan.rs
+        symbol: is_generic_entity_term
+      - path: src-tauri/src/services/entity_scan.rs
+        symbol: is_public_domain_acronym
+      - path: src-tauri/src/services/privacy_scan_migration.rs
+        symbol: is_uppercase_acronym
+    - name: has_explicit_project_name_cue
+      kind: function
+      line_start: 129
+      line_end: 149
+      signature: 'has_explicit_project_name_cue(item: &EntityReviewItem) -> bool'
+      inputs:
+      - 'item: &EntityReviewItem'
+      output: bool
+      dependencies:
+      - any
+      - context.contains
+      - item.context_excerpt.to_ascii_lowercase
+      - item.matched_text.to_ascii_lowercase
+      - iter
+      parser: rust-pattern
+      dependency_targets: []
+    - name: review_entity_index
+      kind: function
+      line_start: 150
+      line_end: 167
+      signature: 'review_entity_index(registry: &PrivateEntityRegistry, item: &EntityReviewItem) -> Option<usize>'
+      inputs:
+      - 'registry: &PrivateEntityRegistry'
+      - 'item: &EntityReviewItem'
+      output: Option<usize>
+      dependencies:
+      - Some
+      - any
+      - entity.occurrences.iter
+      - iter
+      - position
+      - registry.entities.iter
+      parser: rust-pattern
+      dependency_targets: []
+    - name: is_uppercase_acronym
+      kind: function
+      line_start: 168
+      line_end: 175
+      signature: 'is_uppercase_acronym(value: &str) -> bool'
+      inputs:
+      - 'value: &str'
+      output: bool
+      dependencies:
+      - all
+      - character.is_ascii_digit
+      - character.is_ascii_uppercase
+      - chars
+      - contains
+      - trimmed.len
+      - value.trim
+      parser: rust-pattern
+      dependency_targets: []
+    - name: review
+      kind: function
+      line_start: 181
+      line_end: 213
+      signature: 'review(matched_text: &str, suggested_entity_type: &str, context_excerpt: &str) -> EntityReviewItem'
+      inputs:
+      - 'matched_text: &str'
+      - 'suggested_entity_type: &str'
+      - 'context_excerpt: &str'
+      output: EntityReviewItem
+      dependencies:
+      - context_excerpt.to_string
+      - matched_text.to_ascii_lowercase
+      - matched_text.to_string
+      - new
+      - suggested_entity_type.to_string
+      - to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: generic_project_words_are_dismissed
+      kind: function
+      line_start: 216
+      line_end: 221
+      signature: generic_project_words_are_dismissed()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - legacy_review_action
+      - review
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - &id002
+        path: src-tauri/src/services/privacy_scan_migration.rs
+        symbol: review
+      - &id003
+        path: src/components/VoiceWorkspace.tsx
+        symbol: review
+    - name: loose_legacy_project_cues_are_dismissed
+      kind: function
+      line_start: 224
+      line_end: 233
+      signature: loose_legacy_project_cues_are_dismissed()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - legacy_review_action
+      - review
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: pii_is_auto_confirmed
+      kind: function
+      line_start: 236
+      line_end: 241
+      signature: pii_is_auto_confirmed()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - legacy_review_action
+      - review
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: real_named_projects_remain_for_review
+      kind: function
+      line_start: 244
+      line_end: 251
+      signature: real_named_projects_remain_for_review()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - is_none
+      - legacy_review_action
+      - review
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+  - path: src/components/TopicPanel.tsx
+    analysis_version: 1
+    language: typescript
+    content_hash: 1f896ad2e63114501e248bfc6909efc9881728b7
+    dependencies:
+    - ../domain/types
+    - ../lib/postApi
+    - ../lib/workloreApi
+    - ./InfoButton
+    - react
+    provides:
+    - loadTopic
+    - applyTopic
+    - loadTargets
+    - updateRequest
+    - handleSave
+    - handleGeneratePost
+    - handleAddRelationship
+    - handleRemoveRelationship
+    - handleCreateTheme
+    - humanize
+    - CloseIcon
+    - SaveIcon
+    - SparkIcon
+    - LinkIcon
+    - UnlinkIcon
+    - PlusIcon
+    symbols:
+    - name: loadTopic
+      kind: function
+      line_start: 71
+      line_end: 82
+      signature: loadTopic()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - applyTopic
+      - errorMessage
+      - getTopic
+      - setBusy
+      - setError
+      parser: typescript-pattern
+      dependency_targets:
+      - &id005
+        path: src/components/TopicPanel.tsx
+        symbol: applyTopic
+      - &id004
+        path: src/domain/types.ts
+        symbol: errorMessage
+      - &id008
+        path: src/lib/workloreApi.ts
+        symbol: getTopic
+    - name: applyTopic
+      kind: function
+      line_start: 83
+      line_end: 92
+      signature: 'applyTopic(next: TopicRecord)'
+      inputs:
+      - 'next: TopicRecord'
+      output: unspecified
+      dependencies:
+      - setLifecycle
+      - setRelevantUntil
+      - setSummary
+      - setTimelyNote
+      - setTimingClass
+      - setTitle
+      - setTopic
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: loadTargets
+      kind: function
+      line_start: 93
+      line_end: 106
+      signature: 'loadTargets(kind: TopicRelationKind)'
+      inputs:
+      - 'kind: TopicRelationKind'
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - listTopicLinkTargets
+      - setError
+      - setLinkTargets
+      - setSelectedTargetId
+      - targets.some
+      parser: typescript-pattern
+      dependency_targets:
+      - *id004
+      - path: src/lib/workloreApi.ts
+        symbol: listTopicLinkTargets
+    - name: updateRequest
+      kind: function
+      line_start: 107
+      line_end: 118
+      signature: updateRequest()
+      inputs: []
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: handleSave
+      kind: function
+      line_start: 119
+      line_end: 132
+      signature: handleSave()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - applyTopic
+      - errorMessage
+      - setBusy
+      - setError
+      - setNotice
+      - updateRequest
+      - updateTopic
+      parser: typescript-pattern
+      dependency_targets:
+      - *id005
+      - *id004
+      - &id006
+        path: src/components/TopicPanel.tsx
+        symbol: updateRequest
+      - &id007
+        path: src/lib/workloreApi.ts
+        symbol: updateTopic
+    - name: handleGeneratePost
+      kind: function
+      line_start: 133
+      line_end: 157
+      signature: handleGeneratePost()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - applyTopic
+      - errorMessage
+      - generatePostFromTopic
+      - getProviderSettings
+      - setBusy
+      - setError
+      - setNotice
+      - updateRequest
+      - updateTopic
+      parser: typescript-pattern
+      dependency_targets:
+      - *id005
+      - *id004
+      - path: src/lib/postApi.ts
+        symbol: generatePostFromTopic
+      - path: src/lib/workloreApi.ts
+        symbol: getProviderSettings
+      - *id006
+      - *id007
+    - name: handleAddRelationship
+      kind: function
+      line_start: 158
+      line_end: 174
+      signature: handleAddRelationship()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - addTopicRelationship
+      - applyTopic
+      - errorMessage
+      - getTopic
+      - loadTargets
+      - setBusy
+      - setError
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - &id009
+        path: src/lib/workloreApi.ts
+        symbol: addTopicRelationship
+      - *id005
+      - *id004
+      - *id008
+      - &id010
+        path: src/components/TopicPanel.tsx
+        symbol: loadTargets
+    - name: handleRemoveRelationship
+      kind: function
+      line_start: 175
+      line_end: 189
+      signature: 'handleRemoveRelationship(kind: TopicRelationKind, targetId: string)'
+      inputs:
+      - 'kind: TopicRelationKind'
+      - 'targetId: string'
+      output: unspecified
+      dependencies:
+      - applyTopic
+      - errorMessage
+      - getTopic
+      - removeTopicRelationship
+      - setBusy
+      - setError
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - *id005
+      - *id004
+      - *id008
+      - path: src/lib/workloreApi.ts
+        symbol: removeTopicRelationship
+    - name: handleCreateTheme
+      kind: function
+      line_start: 190
+      line_end: 212
+      signature: handleCreateTheme()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - addTopicRelationship
+      - applyTopic
+      - createTheme
+      - errorMessage
+      - getTopic
+      - loadTargets
+      - setBusy
+      - setError
+      - setNotice
+      - setRelationKind
+      - setThemeName
+      - themeName.trim
+      parser: typescript-pattern
+      dependency_targets:
+      - *id009
+      - *id005
+      - path: src/lib/workloreApi.ts
+        symbol: createTheme
+      - *id004
+      - *id008
+      - *id010
+    - name: humanize
+      kind: function
+      line_start: 462
+      line_end: 465
+      signature: 'humanize(value: string) -> string'
+      inputs:
+      - 'value: string'
+      output: string
+      dependencies:
+      - value.replaceAll
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: CloseIcon
+      kind: function
+      line_start: 466
+      line_end: 469
+      signature: CloseIcon()
+      inputs: []
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: SaveIcon
+      kind: function
+      line_start: 470
+      line_end: 473
+      signature: SaveIcon()
+      inputs: []
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: SparkIcon
+      kind: function
+      line_start: 474
+      line_end: 477
+      signature: SparkIcon()
+      inputs: []
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: LinkIcon
+      kind: function
+      line_start: 478
+      line_end: 481
+      signature: LinkIcon()
+      inputs: []
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: UnlinkIcon
+      kind: function
+      line_start: 482
+      line_end: 485
+      signature: UnlinkIcon()
+      inputs: []
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: PlusIcon
+      kind: function
+      line_start: 486
+      line_end: 489
+      signature: PlusIcon()
+      inputs: []
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []

@@ -1,0 +1,189 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: '14'
+  files:
+  - path: src-tauri/src/services/capture_metadata_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: d325da52a5cb2c837d6f9070713ba542a2fa5258
+    dependencies:
+    - chrono::Utc
+    - crate::services::vault_service
+    - "crate::{\n    domain::models::SourceType,\n    error::{ServiceResult, WorkLoreError},\n    services::{canonical_store,\
+      \ capture_service},\n}"
+    - rusqlite::{params, Connection, OptionalExtension}
+    - serde_json::json
+    - std::{path::Path, time::Duration}
+    - super::*
+    - uuid::Uuid
+    provides:
+    - update_capture_source_type
+    - open_connection
+    - source_type_text
+    - captured_text_can_be_retagged_without_rewriting_the_source
+    - retag_rolls_back_when_audit_write_fails
+    symbols:
+    - name: update_capture_source_type
+      kind: function
+      line_start: 13
+      line_end: 66
+      signature: 'update_capture_source_type(vault_path: &Path, source_id: &str, source_type: SourceType) -> ServiceResult<capture_service::CaptureSourceView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'source_id: &str'
+      - 'source_type: SourceType'
+      output: ServiceResult<capture_service::CaptureSourceView>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      - VALUES
+      - audit_events
+      - connection.transaction
+      - current.ok_or
+      - get_capture_source
+      - initialize
+      - let
+      - now
+      - now_v7
+      - open_connection
+      - optional
+      - query_row
+      - row.get
+      - source_id.is_empty
+      - source_id.trim
+      - source_type_text
+      - to_rfc3339
+      - to_string
+      - tx.commit
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/commands/capture.rs
+        symbol: get_capture_source
+      - path: src-tauri/src/services/capture_service.rs
+        symbol: get_capture_source
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: initialize
+      - path: src-tauri/src/services/capture_metadata_service.rs
+        symbol: source_type_text
+      - path: src-tauri/src/services/capture_service.rs
+        symbol: source_type_text
+    - name: open_connection
+      kind: function
+      line_start: 67
+      line_end: 73
+      signature: 'open_connection(vault_path: &Path) -> ServiceResult<Connection>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Connection>
+      dependencies:
+      - Ok
+      - connection.busy_timeout
+      - connection.pragma_update
+      - database_path
+      - from_secs
+      - open
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: database_path
+    - name: source_type_text
+      kind: function
+      line_start: 74
+      line_end: 84
+      signature: 'source_type_text(source_type: SourceType) -> &''static str'
+      inputs:
+      - 'source_type: SourceType'
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: captured_text_can_be_retagged_without_rewriting_the_source
+      kind: function
+      line_start: 92
+      line_end: 109
+      signature: captured_text_can_be_retagged_without_rewriting_the_source()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - create_capture_source
+      - create_vault
+      - join
+      - now_v7
+      - remove_dir_all
+      - temp_dir
+      - unwrap
+      - update_capture_source_type
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/commands/capture.rs
+        symbol: create_capture_source
+      - &id002
+        path: src-tauri/src/services/capture_service.rs
+        symbol: create_capture_source
+      - &id003
+        path: src-tauri/src/commands/vault.rs
+        symbol: create_vault
+      - &id004
+        path: src-tauri/src/services/vault_service.rs
+        symbol: create_vault
+      - &id005
+        path: src-tauri/src/commands/capture.rs
+        symbol: update_capture_source_type
+      - &id006
+        path: src-tauri/src/services/capture_metadata_service.rs
+        symbol: update_capture_source_type
+    - name: retag_rolls_back_when_audit_write_fails
+      kind: function
+      line_start: 112
+      line_end: 152
+      signature: retag_rolls_back_when_audit_write_fails()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - RAISE
+      - create_capture_source
+      - create_vault
+      - drop
+      - execute_batch
+      - is_err
+      - join
+      - now_v7
+      - open_connection
+      - query_row
+      - remove_dir_all
+      - row.get
+      - temp_dir
+      - unwrap
+      - update_capture_source_type
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - *id004
+      - path: src-tauri/src/services/confidentiality_service.rs
+        symbol: drop
+      - *id005
+      - *id006
+  - path: src/domain/editLearning.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: be0aa187c7084c8a975540e844f8d7ec576a549a
+    dependencies:
+    - ./posts
+    provides: []
+    symbols: []
+  - path: src/domain/types.test.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: 69bd8bf0fc3d10deb0a45244900fdb373f6e4e62
+    dependencies:
+    - ./types
+    - vitest
+    provides: []
+    symbols: []

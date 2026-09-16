@@ -1,0 +1,186 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: 1c
+  files:
+  - path: src-tauri/src/commands/capture.rs
+    analysis_version: 1
+    language: rust
+    content_hash: a9754513e281762e17f3d577bdba0e542c2856f5
+    dependencies:
+    - "crate::{\n    domain::models::SourceType,\n    error::{CommandError, CommandResult},\n    services::{\n        capture_catalog_service,\
+      \ capture_metadata_service,\n        capture_service::{self, CaptureClassificationResult, CaptureRole, CaptureSourceView},\n\
+      \    },\n}"
+    - std::path::PathBuf
+    provides:
+    - create_capture_source
+    - get_capture_source
+    - update_capture_source_type
+    - list_captures
+    - list_unclassified_captures
+    - classify_capture_source
+    symbols:
+    - name: create_capture_source
+      kind: function
+      line_start: 13
+      line_end: 24
+      signature: 'create_capture_source(vault_path: String, text: String, source_type: Option<SourceType>) -> CommandResult<CaptureSourceView>'
+      inputs:
+      - 'vault_path: String'
+      - 'text: String'
+      - 'source_type: Option<SourceType>'
+      output: CommandResult<CaptureSourceView>
+      dependencies:
+      - from
+      - map_err
+      - source_type.unwrap_or
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/domain/candidates.rs
+        symbol: from
+      - &id002
+        path: src-tauri/src/domain/models.rs
+        symbol: from
+      - &id003
+        path: src-tauri/src/error.rs
+        symbol: from
+    - name: get_capture_source
+      kind: function
+      line_start: 27
+      line_end: 33
+      signature: 'get_capture_source(vault_path: String, source_id: String) -> CommandResult<CaptureSourceView>'
+      inputs:
+      - 'vault_path: String'
+      - 'source_id: String'
+      output: CommandResult<CaptureSourceView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: update_capture_source_type
+      kind: function
+      line_start: 36
+      line_end: 47
+      signature: 'update_capture_source_type(vault_path: String, source_id: String, source_type: SourceType) -> CommandResult<CaptureSourceView>'
+      inputs:
+      - 'vault_path: String'
+      - 'source_id: String'
+      - 'source_type: SourceType'
+      output: CommandResult<CaptureSourceView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: list_captures
+      kind: function
+      line_start: 50
+      line_end: 56
+      signature: 'list_captures(vault_path: String, limit: Option<u32>) -> CommandResult<Vec<CaptureSourceView>>'
+      inputs:
+      - 'vault_path: String'
+      - 'limit: Option<u32>'
+      output: CommandResult<Vec<CaptureSourceView>>
+      dependencies:
+      - from
+      - limit.unwrap_or
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: list_unclassified_captures
+      kind: function
+      line_start: 59
+      line_end: 68
+      signature: 'list_unclassified_captures(vault_path: String, limit: Option<u32>) -> CommandResult<Vec<CaptureSourceView>>'
+      inputs:
+      - 'vault_path: String'
+      - 'limit: Option<u32>'
+      output: CommandResult<Vec<CaptureSourceView>>
+      dependencies:
+      - from
+      - limit.unwrap_or
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: classify_capture_source
+      kind: function
+      line_start: 71
+      line_end: 78
+      signature: 'classify_capture_source(vault_path: String, source_id: String, role: CaptureRole) -> CommandResult<CaptureClassificationResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'source_id: String'
+      - 'role: CaptureRole'
+      output: CommandResult<CaptureClassificationResult>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+  - path: src-tauri/src/domain/candidates.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 999c323f7349a757677e30245f7bc2cdd6b59d47
+    dependencies:
+    - serde::{Deserialize, Serialize}
+    provides:
+    - from
+    symbols:
+    - name: from
+      kind: function
+      line_start: 87
+      line_end: 102
+      signature: 'from(value: &StoryCandidate) -> Self'
+      inputs:
+      - 'value: &StoryCandidate'
+      output: Self
+      dependencies:
+      - first
+      - map
+      - reference.source_id.clone
+      - unwrap_or_default
+      - value.candidate_id.clone
+      - value.claim.clone
+      - value.context.metrics.clone
+      - value.context.surrounding_heading.clone
+      - value.created_at.clone
+      - value.missing_fields.clone
+      parser: rust-pattern
+      dependency_targets: []
+  - path: src/domain/confidentiality.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: 551d81a24da4b3aeb41859e9399bbfee3158eefe
+    dependencies:
+    - ./types
+    provides: []
+    symbols: []
+  - path: src/main.tsx
+    analysis_version: 1
+    language: typescript
+    content_hash: aa9debf0411e7ee3e51be59ebf22bb8aaac53f7f
+    dependencies:
+    - ./App
+    - ./components/WindowControls
+    - react
+    - react-dom/client
+    provides: []
+    symbols: []

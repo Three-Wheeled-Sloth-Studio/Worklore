@@ -1,0 +1,1021 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: '05'
+  files:
+  - path: src-tauri/src/commands/development.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 9af445b303e8dc05b869891ec4bf122aa9de279e
+    dependencies:
+    - "crate::{\n    domain::interviews::SubmitInterviewResponseRequest,\n    error::{CommandError, CommandResult},\n    services::seed_development_service::{\n\
+      \        self, SeedDevelopmentStoryResult, SeedDevelopmentSummary,\n    },\n}"
+    - std::path::PathBuf
+    provides:
+    - start_story_seed_development
+    - submit_story_seed_development_response
+    - create_story_from_seed_development
+    symbols:
+    - name: start_story_seed_development
+      kind: function
+      line_start: 12
+      line_end: 18
+      signature: 'start_story_seed_development(vault_path: String, seed_id: String) -> CommandResult<SeedDevelopmentSummary>'
+      inputs:
+      - 'vault_path: String'
+      - 'seed_id: String'
+      output: CommandResult<SeedDevelopmentSummary>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/domain/candidates.rs
+        symbol: from
+      - &id002
+        path: src-tauri/src/domain/models.rs
+        symbol: from
+      - &id003
+        path: src-tauri/src/error.rs
+        symbol: from
+    - name: submit_story_seed_development_response
+      kind: function
+      line_start: 21
+      line_end: 30
+      signature: 'submit_story_seed_development_response(vault_path: String, request: SubmitInterviewResponseRequest) -> CommandResult<SeedDevelopmentSummary>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: SubmitInterviewResponseRequest'
+      output: CommandResult<SeedDevelopmentSummary>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: create_story_from_seed_development
+      kind: function
+      line_start: 33
+      line_end: 42
+      signature: 'create_story_from_seed_development(vault_path: String, interview_id: String) -> CommandResult<SeedDevelopmentStoryResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'interview_id: String'
+      output: CommandResult<SeedDevelopmentStoryResult>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+  - path: src-tauri/src/services/canonical_store.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 8f434ba7cace920e76681bf4986c741634329d5e
+    dependencies:
+    - chrono::Utc
+    - "crate::{\n        domain::{\n            candidates::{CandidateContext, CandidateSourceRef, CandidateType},\n     \
+      \       models::{\n                ContentHash, ExtractionState, ExtractionStatus, PrivacyScanState,\n             \
+      \   PrivacyScanStatus, SourceProvenance,\n            },\n            stories::{\n                EvidenceType, StoryContent,\
+      \ StoryDisclosure, StoryEvidence, StoryPrivacyScan,\n                StoryType,\n            },\n        },\n      \
+      \  io_utils::write_json_atomic,\n        services::vault_service,\n    }"
+    - "crate::{\n    domain::{\n        candidates::{CandidateStatus, StoryCandidate},\n        interviews::InterviewSession,\n\
+      \        models::{SourceDocument, SourceType},\n        roles::RoleRecord,\n        stories::{StoryRecord, StoryStatus},\n\
+      \    },\n    error::{ServiceResult, WorkLoreError},\n}"
+    - rusqlite::{params, Connection, OptionalExtension, Transaction}
+    - serde::{de::DeserializeOwned, Serialize}
+    - serde_json::json
+    - "std::{\n    fs,\n    path::{Path, PathBuf},\n    time::Duration,\n}"
+    - super::*
+    - uuid::Uuid
+    provides:
+    - database_path
+    - initialize_and_migrate
+    - initialize
+    - schema_version
+    - create_story_seed
+    - load_story_seed
+    - create_story
+    - load_story
+    - create_evidence
+    - create_inspiration
+    - create_target_context
+    - migrate_prototype
+    - open_connection
+    - migrate_schema
+    - migrate_source
+    - migrate_job_target
+    - migrate_role
+    - migrate_candidate
+    - migrate_story
+    - migrate_interview
+    - relationship
+    - preserve_id
+    - transformed_id
+    - lineage
+    - read_records
+    - validate_relative
+    - enum_text
+    - normalized_title
+    - compact
+    - candidate_status
+    - story_states
+    - ensure_vault
+    - vault
+    - initializes_database
+    - seed_survives_reopen_without_resume
+    - story_does_not_require_role
+    - semantic_roles_are_separate
+    - migration_preserves_ids_and_uses_new_seed_id
+    symbols:
+    - name: database_path
+      kind: function
+      line_start: 331
+      line_end: 334
+      signature: 'database_path(vault_path: &Path) -> PathBuf'
+      inputs:
+      - 'vault_path: &Path'
+      output: PathBuf
+      dependencies:
+      - vault_path.join
+      parser: rust-pattern
+      dependency_targets: []
+    - name: initialize_and_migrate
+      kind: function
+      line_start: 335
+      line_end: 339
+      signature: 'initialize_and_migrate(vault_path: &Path) -> ServiceResult<PrototypeMigrationSummary>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<PrototypeMigrationSummary>
+      dependencies:
+      - initialize
+      - migrate_prototype
+      parser: rust-pattern
+      dependency_targets:
+      - &id004
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: initialize
+      - &id015
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: migrate_prototype
+    - name: initialize
+      kind: function
+      line_start: 340
+      line_end: 345
+      signature: 'initialize(vault_path: &Path) -> ServiceResult<()>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<()>
+      dependencies:
+      - ensure_vault
+      - migrate_schema
+      - open_connection
+      parser: rust-pattern
+      dependency_targets:
+      - &id007
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: migrate_schema
+    - name: schema_version
+      kind: function
+      line_start: 348
+      line_end: 356
+      signature: 'schema_version(vault_path: &Path) -> ServiceResult<i64>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<i64>
+      dependencies:
+      - COALESCE
+      - MAX
+      - Ok
+      - connection.query_row
+      - initialize
+      - open_connection
+      - row.get
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+    - name: create_story_seed
+      kind: function
+      line_start: 359
+      line_end: 381
+      signature: 'create_story_seed(vault_path: &Path, title: &str, summary: &str) -> ServiceResult<StorySeedRecord>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'title: &str'
+      - 'summary: &str'
+      output: ServiceResult<StorySeedRecord>
+      dependencies:
+      - Ok
+      - VALUES
+      - connection.execute
+      - initialize
+      - normalized_title
+      - now
+      - now_v7
+      - open_connection
+      - story_seeds
+      - summary.trim
+      - to_rfc3339
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+      - &id005
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: normalized_title
+      - &id006
+        path: src-tauri/src/services/post_lineage_service.rs
+        symbol: normalized_title
+    - name: load_story_seed
+      kind: function
+      line_start: 384
+      line_end: 403
+      signature: 'load_story_seed(vault_path: &Path, seed_id: &str) -> ServiceResult<StorySeedRecord>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'seed_id: &str'
+      output: ServiceResult<StorySeedRecord>
+      dependencies:
+      - InvalidVault
+      - Ok
+      - initialize
+      - ok_or_else
+      - open_connection
+      - optional
+      - query_row
+      - row.get
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+    - name: create_story
+      kind: function
+      line_start: 406
+      line_end: 430
+      signature: 'create_story(vault_path: &Path, title: &str, summary: &str) -> ServiceResult<CanonicalStoryRecord>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'title: &str'
+      - 'summary: &str'
+      output: ServiceResult<CanonicalStoryRecord>
+      dependencies:
+      - Ok
+      - VALUES
+      - connection.execute
+      - initialize
+      - normalized_title
+      - now
+      - now_v7
+      - open_connection
+      - stories
+      - summary.trim
+      - to_rfc3339
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+      - *id005
+      - *id006
+    - name: load_story
+      kind: function
+      line_start: 433
+      line_end: 441
+      signature: 'load_story(vault_path: &Path, story_id: &str) -> ServiceResult<CanonicalStoryRecord>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'story_id: &str'
+      output: ServiceResult<CanonicalStoryRecord>
+      dependencies:
+      - Ok
+      - connection.query_row
+      - initialize
+      - ok_or
+      - open_connection
+      - optional
+      - row.get
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+    - name: create_evidence
+      kind: function
+      line_start: 444
+      line_end: 455
+      signature: 'create_evidence(vault_path: &Path, text: &str) -> ServiceResult<String>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'text: &str'
+      output: ServiceResult<String>
+      dependencies:
+      - Ok
+      - VALUES
+      - connection.execute
+      - evidence_records
+      - initialize
+      - now
+      - now_v7
+      - open_connection
+      - text.trim
+      - to_rfc3339
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+    - name: create_inspiration
+      kind: function
+      line_start: 458
+      line_end: 469
+      signature: 'create_inspiration(vault_path: &Path, title: &str) -> ServiceResult<String>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'title: &str'
+      output: ServiceResult<String>
+      dependencies:
+      - Ok
+      - VALUES
+      - connection.execute
+      - initialize
+      - inspirations
+      - normalized_title
+      - now
+      - now_v7
+      - open_connection
+      - to_rfc3339
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+      - *id005
+      - *id006
+    - name: create_target_context
+      kind: function
+      line_start: 472
+      line_end: 488
+      signature: 'create_target_context(vault_path: &Path, context_type: &str, title: &str) -> ServiceResult<String>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'context_type: &str'
+      - 'title: &str'
+      output: ServiceResult<String>
+      dependencies:
+      - Ok
+      - VALUES
+      - connection.execute
+      - context_type.trim
+      - initialize
+      - normalized_title
+      - now
+      - now_v7
+      - open_connection
+      - target_contexts
+      - to_rfc3339
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+      - *id005
+      - *id006
+    - name: migrate_prototype
+      kind: function
+      line_start: 489
+      line_end: 527
+      signature: 'migrate_prototype(vault_path: &Path) -> ServiceResult<PrototypeMigrationSummary>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<PrototypeMigrationSummary>
+      dependencies:
+      - Ok
+      - connection.transaction
+      - default
+      - ensure_vault
+      - migrate_candidate
+      - migrate_interview
+      - migrate_job_target
+      - migrate_role
+      - migrate_schema
+      - migrate_source
+      - migrate_story
+      - open_connection
+      - tx.commit
+      - vault_path.join
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/app_preferences_service.rs
+        symbol: default
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: migrate_candidate
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: migrate_interview
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: migrate_job_target
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: migrate_role
+      - *id007
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: migrate_source
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: migrate_story
+    - name: open_connection
+      kind: function
+      line_start: 528
+      line_end: 535
+      signature: 'open_connection(vault_path: &Path) -> ServiceResult<Connection>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Connection>
+      dependencies:
+      - Ok
+      - connection.busy_timeout
+      - connection.pragma_update
+      - create_dir_all
+      - database_path
+      - from_secs
+      - open
+      - vault_path.join
+      parser: rust-pattern
+      dependency_targets:
+      - &id013
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: database_path
+    - name: migrate_schema
+      kind: function
+      line_start: 536
+      line_end: 632
+      signature: 'migrate_schema(connection: &mut Connection) -> ServiceResult<()>'
+      inputs:
+      - 'connection: &mut Connection'
+      output: ServiceResult<()>
+      dependencies:
+      - COALESCE
+      - Err
+      - InvalidVault
+      - MAX
+      - Ok
+      - VALUES
+      - connection.execute_batch
+      - connection.query_row
+      - connection.transaction
+      - now
+      - r.get
+      - schema_migrations
+      - to_rfc3339
+      - tx.commit
+      - tx.execute
+      - tx.execute_batch
+      parser: rust-pattern
+      dependency_targets: []
+    - name: migrate_source
+      kind: function
+      line_start: 633
+      line_end: 654
+      signature: 'migrate_source(tx: &Transaction<''_>, source: &SourceDocument) -> ServiceResult<()>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'source: &SourceDocument'
+      output: ServiceResult<()>
+      dependencies:
+      - CONFLICT
+      - InvalidVault
+      - VALUES
+      - enum_text
+      - map_err
+      - preserve_id
+      - sources
+      - to_string
+      - try_from
+      - tx.execute
+      - validate_relative
+      parser: rust-pattern
+      dependency_targets:
+      - &id011
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: enum_text
+      - &id008
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: preserve_id
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: validate_relative
+    - name: migrate_job_target
+      kind: function
+      line_start: 655
+      line_end: 673
+      signature: 'migrate_job_target(tx: &Transaction<''_>, source: &SourceDocument) -> ServiceResult<()>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'source: &SourceDocument'
+      output: ServiceResult<()>
+      dependencies:
+      - CONFLICT
+      - Ok
+      - VALUES
+      - target_contexts
+      - to_string
+      - transformed_id
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets:
+      - &id010
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: transformed_id
+    - name: migrate_role
+      kind: function
+      line_start: 674
+      line_end: 696
+      signature: 'migrate_role(tx: &Transaction<''_>, role: &RoleRecord) -> ServiceResult<()>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'role: &RoleRecord'
+      output: ServiceResult<()>
+      dependencies:
+      - CONFLICT
+      - Ok
+      - VALUES
+      - preserve_id
+      - relationship
+      - role_contexts
+      - to_string
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets:
+      - *id008
+      - &id009
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: relationship
+    - name: migrate_candidate
+      kind: function
+      line_start: 697
+      line_end: 728
+      signature: 'migrate_candidate(tx: &Transaction<''_>, candidate: &StoryCandidate) -> ServiceResult<String>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'candidate: &StoryCandidate'
+      output: ServiceResult<String>
+      dependencies:
+      - CONFLICT
+      - Ok
+      - VALUES
+      - candidate_status
+      - compact
+      - relationship
+      - story_seeds
+      - to_string
+      - transformed_id
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: candidate_status
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: compact
+      - path: src-tauri/src/services/capture_service.rs
+        symbol: compact
+      - *id009
+      - *id010
+    - name: migrate_story
+      kind: function
+      line_start: 729
+      line_end: 774
+      signature: 'migrate_story(tx: &Transaction<''_>, story: &StoryRecord) -> ServiceResult<usize>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'story: &StoryRecord'
+      output: ServiceResult<usize>
+      dependencies:
+      - CONFLICT
+      - Ok
+      - VALUES
+      - enum_text
+      - evidence_records
+      - let
+      - preserve_id
+      - relationship
+      - stories
+      - story_states
+      - to_string
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets:
+      - *id011
+      - *id008
+      - *id009
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: story_states
+    - name: migrate_interview
+      kind: function
+      line_start: 775
+      line_end: 795
+      signature: 'migrate_interview(tx: &Transaction<''_>, interview: &InterviewSession) -> ServiceResult<()>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'interview: &InterviewSession'
+      output: ServiceResult<()>
+      dependencies:
+      - CONFLICT
+      - Ok
+      - Some
+      - VALUES
+      - enum_text
+      - first
+      - interview.story_id.as_deref
+      - interview_sessions
+      - let
+      - map
+      - preserve_id
+      - relationship
+      - seed.as_deref
+      - to_string
+      - transformed_id
+      - transpose
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets:
+      - *id011
+      - *id008
+      - *id009
+      - *id010
+    - name: relationship
+      kind: function
+      line_start: 796
+      line_end: 809
+      signature: 'relationship(tx: &Transaction<''_>, from_type: &str, from_id: &str, kind: &str, to_type: &str, to_id: &str)
+        -> ServiceResult<()>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'from_type: &str'
+      - 'from_id: &str'
+      - 'kind: &str'
+      - 'to_type: &str'
+      - 'to_id: &str'
+      output: ServiceResult<()>
+      dependencies:
+      - Ok
+      - VALUES
+      - now
+      - now_v7
+      - record_relationships
+      - to_rfc3339
+      - to_string
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets: []
+    - name: preserve_id
+      kind: function
+      line_start: 810
+      line_end: 825
+      signature: 'preserve_id(tx: &Transaction<''_>, legacy_type: &str, id: &str, canonical_type: &str) -> ServiceResult<()>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'legacy_type: &str'
+      - 'id: &str'
+      - 'canonical_type: &str'
+      output: ServiceResult<()>
+      dependencies:
+      - lineage
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - &id012
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: lineage
+    - name: transformed_id
+      kind: function
+      line_start: 826
+      line_end: 846
+      signature: 'transformed_id(tx: &Transaction<''_>, legacy_type: &str, legacy_id: &str, canonical_type: &str, prefix:
+        &str) -> ServiceResult<String>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'legacy_type: &str'
+      - 'legacy_id: &str'
+      - 'canonical_type: &str'
+      - 'prefix: &str'
+      output: ServiceResult<String>
+      dependencies:
+      - Ok
+      - Some
+      - lineage
+      - now_v7
+      - optional
+      - r.get
+      - to_string
+      - tx.query_row
+      parser: rust-pattern
+      dependency_targets:
+      - *id012
+    - name: lineage
+      kind: function
+      line_start: 847
+      line_end: 867
+      signature: 'lineage(tx: &Transaction<''_>, legacy_type: &str, legacy_id: &str, canonical_type: &str, canonical_id: &str,
+        details: String) -> ServiceResult<()>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'legacy_type: &str'
+      - 'legacy_id: &str'
+      - 'canonical_type: &str'
+      - 'canonical_id: &str'
+      - 'details: String'
+      output: ServiceResult<()>
+      dependencies:
+      - Ok
+      - VALUES
+      - audit_events
+      - migration_lineage
+      - now
+      - now_v7
+      - to_rfc3339
+      - to_string
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets: []
+    - name: read_records
+      kind: function
+      line_start: 868
+      line_end: 883
+      signature: 'read_records(directory: &Path) -> ServiceResult<Vec<T>>'
+      inputs:
+      - 'directory: &Path'
+      output: ServiceResult<Vec<T>>
+      dependencies:
+      - Ok
+      - Some
+      - and_then
+      - directory.exists
+      - entry.file_type
+      - entry.path
+      - extension
+      - from_slice
+      - is_file
+      - new
+      - out.push
+      - read
+      - read_dir
+      - v.to_str
+      parser: rust-pattern
+      dependency_targets: []
+    - name: validate_relative
+      kind: function
+      line_start: 884
+      line_end: 894
+      signature: 'validate_relative(value: &str) -> ServiceResult<()>'
+      inputs:
+      - 'value: &str'
+      output: ServiceResult<()>
+      dependencies:
+      - Err
+      - Ok
+      - any
+      - b.len
+      - v.as_bytes
+      - v.is_empty
+      - v.split
+      - v.starts_with
+      - value.replace
+      parser: rust-pattern
+      dependency_targets: []
+    - name: enum_text
+      kind: function
+      line_start: 895
+      line_end: 903
+      signature: 'enum_text(value: &T) -> ServiceResult<String>'
+      inputs:
+      - 'value: &T'
+      output: ServiceResult<String>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      - String
+      - to_string
+      - to_value
+      parser: rust-pattern
+      dependency_targets: []
+    - name: normalized_title
+      kind: function
+      line_start: 905
+      line_end: 912
+      signature: 'normalized_title(value: &str, fallback: &str) -> String'
+      inputs:
+      - 'value: &str'
+      - 'fallback: &str'
+      output: String
+      dependencies:
+      - fallback.to_string
+      - v.is_empty
+      - v.to_string
+      - value.trim
+      parser: rust-pattern
+      dependency_targets: []
+    - name: compact
+      kind: function
+      line_start: 913
+      line_end: 922
+      signature: 'compact(value: &str, max: usize) -> String'
+      inputs:
+      - 'value: &str'
+      - 'max: usize'
+      output: String
+      dependencies:
+      - count
+      - join
+      - max.saturating_sub
+      - s.push_str
+      - take
+      - v.chars
+      - value.split_whitespace
+      parser: rust-pattern
+      dependency_targets: []
+    - name: candidate_status
+      kind: function
+      line_start: 923
+      line_end: 931
+      signature: 'candidate_status(status: CandidateStatus) -> &''static str'
+      inputs:
+      - 'status: CandidateStatus'
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: story_states
+      kind: function
+      line_start: 932
+      line_end: 939
+      signature: 'story_states(status: StoryStatus) -> (&''static str, &''static str)'
+      inputs:
+      - 'status: StoryStatus'
+      output: (&'static str, &'static str)
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: ensure_vault
+      kind: function
+      line_start: 940
+      line_end: 946
+      signature: 'ensure_vault(vault_path: &Path) -> ServiceResult<()>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<()>
+      dependencies:
+      - Err
+      - Ok
+      - is_file
+      - vault_path.join
+      parser: rust-pattern
+      dependency_targets: []
+    - name: vault
+      kind: function
+      line_start: 966
+      line_end: 971
+      signature: vault() -> PathBuf
+      inputs: []
+      output: PathBuf
+      dependencies:
+      - create_vault
+      - expect
+      - join
+      - now_v7
+      - temp_dir
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/commands/vault.rs
+        symbol: create_vault
+      - path: src-tauri/src/services/vault_service.rs
+        symbol: create_vault
+    - name: initializes_database
+      kind: function
+      line_start: 974
+      line_end: 979
+      signature: initializes_database()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - database_path
+      - is_file
+      - remove_dir_all
+      - schema_version
+      - unwrap
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - *id013
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: schema_version
+    - name: seed_survives_reopen_without_resume
+      kind: function
+      line_start: 981
+      line_end: 987
+      signature: seed_survives_reopen_without_resume()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - create_story_seed
+      - initialize_and_migrate
+      - load_story_seed
+      - remove_dir_all
+      - unwrap
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: create_story_seed
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: initialize_and_migrate
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: load_story_seed
+    - name: story_does_not_require_role
+      kind: function
+      line_start: 989
+      line_end: 999
+      signature: story_does_not_require_role()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - COUNT
+      - c.query_row
+      - create_story
+      - drop
+      - load_story
+      - open_connection
+      - r.get
+      - remove_dir_all
+      - unwrap
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: create_story
+      - &id014
+        path: src-tauri/src/services/confidentiality_service.rs
+        symbol: drop
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: load_story
+    - name: semantic_roles_are_separate
+      kind: function
+      line_start: 1001
+      line_end: 1019
+      signature: semantic_roles_are_separate()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - COUNT
+      - create_evidence
+      - create_inspiration
+      - create_target_context
+      - drop
+      - open_connection
+      - query_row
+      - r.get
+      - remove_dir_all
+      - unwrap
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: create_evidence
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: create_inspiration
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: create_target_context
+      - *id014
+    - name: migration_preserves_ids_and_uses_new_seed_id
+      kind: function
+      line_start: 1022
+      line_end: 1176
+      signature: migration_preserves_ids_and_uses_new_seed_id()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - COUNT
+      - Some
+      - c.query_row
+      - drop
+      - into
+      - is_file
+      - migrate_prototype
+      - new
+      - now
+      - now.clone
+      - open_connection
+      - p.join
+      - pragma_table_info
+      - query_row
+      - r.get
+      - remove_dir_all
+      - repeat
+      - seed.starts_with
+      - source.source_id.clone
+      - to_rfc3339
+      - unwrap
+      - vault
+      - write_json_atomic
+      parser: rust-pattern
+      dependency_targets:
+      - *id014
+      - *id015
+      - path: src-tauri/src/io_utils.rs
+        symbol: write_json_atomic

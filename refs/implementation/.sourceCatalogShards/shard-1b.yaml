@@ -1,0 +1,325 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: 1b
+  files:
+  - path: src-tauri/src/commands/feedback.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 3f0dfedbd9e941faae69a9dff6e474bc1b380fb1
+    dependencies:
+    - "crate::{\n    domain::feedback::{\n        FeedbackSnapshotView, ManualPublicationView, MarkPostPublishedRequest,\n\
+      \        PerformanceRecordView, RecordPostPerformanceRequest,\n    },\n    error::{CommandError, CommandResult},\n \
+      \   services::publication_feedback_service,\n}"
+    - std::path::PathBuf
+    provides:
+    - mark_post_published
+    - record_post_performance
+    - get_feedback_snapshot
+    symbols:
+    - name: mark_post_published
+      kind: function
+      line_start: 13
+      line_end: 19
+      signature: 'mark_post_published(vault_path: String, request: MarkPostPublishedRequest) -> CommandResult<ManualPublicationView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: MarkPostPublishedRequest'
+      output: CommandResult<ManualPublicationView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/domain/candidates.rs
+        symbol: from
+      - &id002
+        path: src-tauri/src/domain/models.rs
+        symbol: from
+      - &id003
+        path: src-tauri/src/error.rs
+        symbol: from
+    - name: record_post_performance
+      kind: function
+      line_start: 22
+      line_end: 28
+      signature: 'record_post_performance(vault_path: String, request: RecordPostPerformanceRequest) -> CommandResult<PerformanceRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: RecordPostPerformanceRequest'
+      output: CommandResult<PerformanceRecordView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: get_feedback_snapshot
+      kind: function
+      line_start: 31
+      line_end: 34
+      signature: 'get_feedback_snapshot(vault_path: String) -> CommandResult<FeedbackSnapshotView>'
+      inputs:
+      - 'vault_path: String'
+      output: CommandResult<FeedbackSnapshotView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+  - path: src-tauri/src/commands/roles.rs
+    analysis_version: 1
+    language: rust
+    content_hash: ea401951cd2625a7a2570e8c9ce26f83d9a41f52
+    dependencies:
+    - "crate::{\n    domain::roles::RoleSummary,\n    error::{CommandError, CommandResult},\n    services::role_service,\n\
+      }"
+    - std::path::PathBuf
+    provides:
+    - list_roles
+    symbols:
+    - name: list_roles
+      kind: function
+      line_start: 10
+      line_end: 12
+      signature: 'list_roles(vault_path: String) -> CommandResult<Vec<RoleSummary>>'
+      inputs:
+      - 'vault_path: String'
+      output: CommandResult<Vec<RoleSummary>>
+      dependencies:
+      - from
+      - list_role_summaries
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - path: src-tauri/src/services/role_service.rs
+        symbol: list_role_summaries
+  - path: src-tauri/src/commands/topics.rs
+    analysis_version: 1
+    language: rust
+    content_hash: c0dfdae5f3fe7696427a6efb0d2c226be7266b75
+    dependencies:
+    - "crate::{\n    error::{CommandError, CommandResult},\n    services::topic_service::{\n        self, CreateThemeRequest,\
+      \ CreateTopicRequest, ThemeRecordView, TopicLinkTargetView,\n        TopicRecordView, TopicRelationKind, TopicRelationshipMutationResult,\
+      \ UpdateThemeRequest,\n        UpdateTopicRequest,\n    },\n}"
+    - std::path::PathBuf
+    provides:
+    - create_topic
+    - get_topic
+    - list_topics
+    - update_topic
+    - create_theme
+    - get_theme
+    - list_themes
+    - update_theme
+    - add_topic_relationship
+    - remove_topic_relationship
+    - list_topic_link_targets
+    symbols:
+    - name: create_topic
+      kind: function
+      line_start: 13
+      line_end: 18
+      signature: 'create_topic(vault_path: String, request: CreateTopicRequest) -> CommandResult<TopicRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: CreateTopicRequest'
+      output: CommandResult<TopicRecordView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: get_topic
+      kind: function
+      line_start: 21
+      line_end: 23
+      signature: 'get_topic(vault_path: String, topic_id: String) -> CommandResult<TopicRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'topic_id: String'
+      output: CommandResult<TopicRecordView>
+      dependencies:
+      - from
+      - load_topic
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - path: src-tauri/src/services/topic_service.rs
+        symbol: load_topic
+    - name: list_topics
+      kind: function
+      line_start: 26
+      line_end: 28
+      signature: 'list_topics(vault_path: String) -> CommandResult<Vec<TopicRecordView>>'
+      inputs:
+      - 'vault_path: String'
+      output: CommandResult<Vec<TopicRecordView>>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: update_topic
+      kind: function
+      line_start: 31
+      line_end: 36
+      signature: 'update_topic(vault_path: String, request: UpdateTopicRequest) -> CommandResult<TopicRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: UpdateTopicRequest'
+      output: CommandResult<TopicRecordView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: create_theme
+      kind: function
+      line_start: 39
+      line_end: 44
+      signature: 'create_theme(vault_path: String, request: CreateThemeRequest) -> CommandResult<ThemeRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: CreateThemeRequest'
+      output: CommandResult<ThemeRecordView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: get_theme
+      kind: function
+      line_start: 47
+      line_end: 49
+      signature: 'get_theme(vault_path: String, theme_id: String) -> CommandResult<ThemeRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'theme_id: String'
+      output: CommandResult<ThemeRecordView>
+      dependencies:
+      - from
+      - load_theme
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - path: src-tauri/src/services/topic_service.rs
+        symbol: load_theme
+    - name: list_themes
+      kind: function
+      line_start: 52
+      line_end: 54
+      signature: 'list_themes(vault_path: String) -> CommandResult<Vec<ThemeRecordView>>'
+      inputs:
+      - 'vault_path: String'
+      output: CommandResult<Vec<ThemeRecordView>>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: update_theme
+      kind: function
+      line_start: 57
+      line_end: 62
+      signature: 'update_theme(vault_path: String, request: UpdateThemeRequest) -> CommandResult<ThemeRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: UpdateThemeRequest'
+      output: CommandResult<ThemeRecordView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: add_topic_relationship
+      kind: function
+      line_start: 65
+      line_end: 78
+      signature: 'add_topic_relationship(vault_path: String, topic_id: String, relation_kind: TopicRelationKind, target_id:
+        String) -> CommandResult<TopicRelationshipMutationResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'topic_id: String'
+      - 'relation_kind: TopicRelationKind'
+      - 'target_id: String'
+      output: CommandResult<TopicRelationshipMutationResult>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: remove_topic_relationship
+      kind: function
+      line_start: 81
+      line_end: 94
+      signature: 'remove_topic_relationship(vault_path: String, topic_id: String, relation_kind: TopicRelationKind, target_id:
+        String) -> CommandResult<TopicRelationshipMutationResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'topic_id: String'
+      - 'relation_kind: TopicRelationKind'
+      - 'target_id: String'
+      output: CommandResult<TopicRelationshipMutationResult>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: list_topic_link_targets
+      kind: function
+      line_start: 97
+      line_end: 103
+      signature: 'list_topic_link_targets(vault_path: String, relation_kind: TopicRelationKind) -> CommandResult<Vec<TopicLinkTargetView>>'
+      inputs:
+      - 'vault_path: String'
+      - 'relation_kind: TopicRelationKind'
+      output: CommandResult<Vec<TopicLinkTargetView>>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003

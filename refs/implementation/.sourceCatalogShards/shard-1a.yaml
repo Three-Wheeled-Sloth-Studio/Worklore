@@ -1,0 +1,655 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: 1a
+  files:
+  - path: src-tauri/src/services/seed_development_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: ab9fe5457a5db5de6d60b38c4140d2c7bc486fce
+    dependencies:
+    - chrono::Utc
+    - "crate::{\n        domain::{\n            interviews::{AnswerClassification, InterviewResponseAction, InterviewSession},\n\
+      \            models::SourceType,\n        },\n        services::{capture_service, vault_service},\n    }"
+    - "crate::{\n    domain::interviews::{\n        CompletenessItem, CompletenessStatus, InterviewStatus, InterviewTurn,\n\
+      \        SubmitInterviewResponseRequest, TurnActor, TurnType,\n    },\n    error::{ServiceResult, WorkLoreError},\n\
+      \    services::{canonical_store, guided_development_rules},\n}"
+    - rusqlite::{params, Connection, OptionalExtension}
+    - serde::{Deserialize, Serialize}
+    - serde_json::json
+    - std::{collections::HashSet, fs, path::Path, time::Duration}
+    - super::*
+    - uuid::Uuid
+    provides:
+    - start_story_seed_development
+    - submit_story_seed_development_response
+    - create_story_from_seed_development
+    - open_connection
+    - find_seed_session
+    - load_session
+    - insert_session
+    - persist_session
+    - add_next_question
+    - next_unasked_field
+    - summarize
+    - insert_relationship
+    - status_text
+    - vault
+    - captured_seed
+    - direct_seed_starts_reopens_and_reuses_one_canonical_interview
+    - direct_seed_preserves_answer_skip_and_memory_semantics_without_provider_runs
+    - completed_seed_development_creates_one_role_free_story_with_lineage
+    - legacy_interview_payload_is_not_mistaken_for_direct_seed_development
+    symbols:
+    - name: start_story_seed_development
+      kind: function
+      line_start: 59
+      line_end: 122
+      signature: 'start_story_seed_development(vault_path: &Path, seed_id: &str) -> ServiceResult<SeedDevelopmentSummary>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'seed_id: &str'
+      output: ServiceResult<SeedDevelopmentSummary>
+      dependencies:
+      - Some
+      - VALUES
+      - add_next_question
+      - audit_events
+      - collect
+      - connection.execute
+      - existing.active_question_turn_id.is_none
+      - find_seed_session
+      - initialize
+      - insert_session
+      - into_iter
+      - is_some
+      - load_story_seed
+      - map
+      - new
+      - next_unasked_field
+      - normalized_fields
+      - now
+      - now.clone
+      - now_v7
+      - open_connection
+      - persist_session
+      - seed.seed_id.clone
+      - summarize
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/services/interview_service.rs
+        symbol: add_next_question
+      - &id002
+        path: src-tauri/src/services/seed_development_service.rs
+        symbol: add_next_question
+      - path: src-tauri/src/services/seed_development_service.rs
+        symbol: find_seed_session
+      - &id003
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: initialize
+      - path: src-tauri/src/services/seed_development_service.rs
+        symbol: insert_session
+      - &id004
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: load_story_seed
+      - &id005
+        path: src-tauri/src/services/interview_service.rs
+        symbol: next_unasked_field
+      - &id006
+        path: src-tauri/src/services/seed_development_service.rs
+        symbol: next_unasked_field
+      - path: src-tauri/src/services/guided_development_rules.rs
+        symbol: normalized_fields
+      - &id007
+        path: src-tauri/src/services/seed_development_service.rs
+        symbol: persist_session
+      - path: src-tauri/src/services/interview_service.rs
+        symbol: summarize
+      - path: src-tauri/src/services/seed_development_service.rs
+        symbol: summarize
+      - path: src-tauri/src/services/vault_service.rs
+        symbol: summarize
+    - name: submit_story_seed_development_response
+      kind: function
+      line_start: 123
+      line_end: 189
+      signature: 'submit_story_seed_development_response(vault_path: &Path, request: SubmitInterviewResponseRequest) -> ServiceResult<SeedDevelopmentSummary>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: SubmitInterviewResponseRequest'
+      output: ServiceResult<SeedDevelopmentSummary>
+      dependencies:
+      - Err
+      - InvalidInterviewAction
+      - Some
+      - add_next_question
+      - and_then
+      - answer_text.clone
+      - cloned
+      - find
+      - initialize
+      - is_some
+      - iter
+      - iter_mut
+      - let
+      - load_session
+      - load_story_seed
+      - next_unasked_field
+      - now
+      - now.clone
+      - now_v7
+      - ok_or_else
+      - open_connection
+      - persist_session
+      - response_values
+      - session.active_question_turn_id.clone
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - &id008
+        path: src-tauri/src/services/seed_development_service.rs
+        symbol: load_session
+      - *id004
+      - *id005
+      - *id006
+      - *id007
+    - name: create_story_from_seed_development
+      kind: function
+      line_start: 190
+      line_end: 315
+      signature: 'create_story_from_seed_development(vault_path: &Path, interview_id: &str) -> ServiceResult<SeedDevelopmentStoryResult>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'interview_id: &str'
+      output: ServiceResult<SeedDevelopmentStoryResult>
+      dependencies:
+      - Err
+      - InvalidInterviewAction
+      - Ok
+      - Some
+      - VALUES
+      - audit_events
+      - connection.transaction
+      - content.to_string
+      - filter
+      - initialize
+      - insert_relationship
+      - iter
+      - load_session
+      - load_story
+      - load_story_seed
+      - map
+      - now
+      - now.clone
+      - now_v7
+      - open_connection
+      - provenance.to_string
+      - session.target_story_id.clone
+      - status_text
+      - stories
+      parser: rust-pattern
+      dependency_targets:
+      - *id003
+      - path: src-tauri/src/services/seed_development_service.rs
+        symbol: insert_relationship
+      - *id008
+      - &id014
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: load_story
+      - *id004
+      - &id009
+        path: src-tauri/src/services/seed_development_service.rs
+        symbol: status_text
+    - name: open_connection
+      kind: function
+      line_start: 316
+      line_end: 323
+      signature: 'open_connection(vault_path: &Path) -> ServiceResult<Connection>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Connection>
+      dependencies:
+      - Ok
+      - connection.busy_timeout
+      - connection.pragma_update
+      - create_dir_all
+      - database_path
+      - from_secs
+      - open
+      - vault_path.join
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: database_path
+    - name: find_seed_session
+      kind: function
+      line_start: 324
+      line_end: 342
+      signature: 'find_seed_session(connection: &Connection, seed_id: &str) -> ServiceResult<Option<SeedDevelopmentSession>>'
+      inputs:
+      - 'connection: &Connection'
+      - 'seed_id: &str'
+      output: ServiceResult<Option<SeedDevelopmentSession>>
+      dependencies:
+      - Ok
+      - Some
+      - connection.prepare
+      - statement.query_map
+      parser: rust-pattern
+      dependency_targets: []
+    - name: load_session
+      kind: function
+      line_start: 343
+      line_end: 357
+      signature: 'load_session(connection: &Connection, interview_id: &str) -> ServiceResult<SeedDevelopmentSession>'
+      inputs:
+      - 'connection: &Connection'
+      - 'interview_id: &str'
+      output: ServiceResult<SeedDevelopmentSession>
+      dependencies:
+      - from_str
+      - map_err
+      - ok_or
+      - optional
+      - query_row
+      parser: rust-pattern
+      dependency_targets: []
+    - name: insert_session
+      kind: function
+      line_start: 358
+      line_end: 375
+      signature: 'insert_session(connection: &Connection, session: &SeedDevelopmentSession) -> ServiceResult<()>'
+      inputs:
+      - 'connection: &Connection'
+      - 'session: &SeedDevelopmentSession'
+      output: ServiceResult<()>
+      dependencies:
+      - Ok
+      - VALUES
+      - connection.execute
+      - interview_sessions
+      - status_text
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - *id009
+    - name: persist_session
+      kind: function
+      line_start: 376
+      line_end: 391
+      signature: 'persist_session(connection: &Connection, session: &SeedDevelopmentSession) -> ServiceResult<()>'
+      inputs:
+      - 'connection: &Connection'
+      - 'session: &SeedDevelopmentSession'
+      output: ServiceResult<()>
+      dependencies:
+      - Ok
+      - connection.execute
+      - status_text
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - *id009
+    - name: add_next_question
+      kind: function
+      line_start: 392
+      line_end: 412
+      signature: 'add_next_question(session: &mut SeedDevelopmentSession, context: &str)'
+      inputs:
+      - 'session: &mut SeedDevelopmentSession'
+      - 'context: &str'
+      output: unspecified
+      dependencies:
+      - Some
+      - next_unasked_field
+      - now
+      - now.clone
+      - now_v7
+      - question_for_field
+      - session.turns.push
+      - to_rfc3339
+      - turn_id.clone
+      parser: rust-pattern
+      dependency_targets:
+      - *id005
+      - *id006
+      - path: src-tauri/src/services/guided_development_rules.rs
+        symbol: question_for_field
+    - name: next_unasked_field
+      kind: function
+      line_start: 413
+      line_end: 426
+      signature: 'next_unasked_field(session: &SeedDevelopmentSession) -> Option<String>'
+      inputs:
+      - 'session: &SeedDevelopmentSession'
+      output: Option<String>
+      dependencies:
+      - asked.contains
+      - cloned
+      - filter
+      - find
+      - flat_map
+      - item.field.clone
+      - iter
+      - map
+      - turn.target_fields.iter
+      parser: rust-pattern
+      dependency_targets: []
+    - name: summarize
+      kind: function
+      line_start: 427
+      line_end: 460
+      signature: 'summarize(session: &SeedDevelopmentSession, seed_title: &str, seed_summary: &str) -> ServiceResult<SeedDevelopmentSummary>'
+      inputs:
+      - 'session: &SeedDevelopmentSession'
+      - 'seed_title: &str'
+      - 'seed_summary: &str'
+      output: ServiceResult<SeedDevelopmentSummary>
+      dependencies:
+      - Ok
+      - and_then
+      - as_ref
+      - cloned
+      - count
+      - current_question.and_then
+      - current_question.map
+      - filter
+      - find
+      - iter
+      - seed_summary.to_string
+      - seed_title.to_string
+      - session.completeness.len
+      - session.interview_id.clone
+      - session.target_seed_id.clone
+      - session.target_story_id.clone
+      - session.turns.iter
+      - session.updated_at.clone
+      - turn.target_fields.first
+      - turn.text.clone
+      parser: rust-pattern
+      dependency_targets: []
+    - name: insert_relationship
+      kind: function
+      line_start: 461
+      line_end: 486
+      signature: 'insert_relationship(tx: &rusqlite::Transaction<''_>, from_type: &str, from_id: &str, relationship_type:
+        &str, to_type: &str, to_id: &str, now: &str) -> ServiceResult<()>'
+      inputs:
+      - 'tx: &rusqlite::Transaction<''_>'
+      - 'from_type: &str'
+      - 'from_id: &str'
+      - 'relationship_type: &str'
+      - 'to_type: &str'
+      - 'to_id: &str'
+      - 'now: &str'
+      output: ServiceResult<()>
+      dependencies:
+      - Ok
+      - VALUES
+      - now_v7
+      - record_relationships
+      - to_string
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets: []
+    - name: status_text
+      kind: function
+      line_start: 487
+      line_end: 497
+      signature: 'status_text(status: InterviewStatus) -> &''static str'
+      inputs:
+      - 'status: InterviewStatus'
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: vault
+      kind: function
+      line_start: 509
+      line_end: 514
+      signature: vault() -> std::path::PathBuf
+      inputs: []
+      output: std::path::PathBuf
+      dependencies:
+      - create_vault
+      - expect
+      - join
+      - now_v7
+      - temp_dir
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/commands/vault.rs
+        symbol: create_vault
+      - path: src-tauri/src/services/vault_service.rs
+        symbol: create_vault
+    - name: captured_seed
+      kind: function
+      line_start: 515
+      line_end: 530
+      signature: 'captured_seed(path: &Path) -> String'
+      inputs:
+      - 'path: &Path'
+      output: String
+      dependencies:
+      - classify_capture_source
+      - create_capture_source
+      - expect
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/commands/capture.rs
+        symbol: classify_capture_source
+      - path: src-tauri/src/services/capture_service.rs
+        symbol: classify_capture_source
+      - path: src-tauri/src/commands/capture.rs
+        symbol: create_capture_source
+      - path: src-tauri/src/services/capture_service.rs
+        symbol: create_capture_source
+    - name: direct_seed_starts_reopens_and_reuses_one_canonical_interview
+      kind: function
+      line_start: 533
+      line_end: 567
+      signature: direct_seed_starts_reopens_and_reuses_one_canonical_interview()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - COUNT
+      - as_deref
+      - captured_seed
+      - contains
+      - drop
+      - initialize_and_migrate
+      - open_connection
+      - payload.contains
+      - query_row
+      - remove_dir_all
+      - row.get
+      - start_story_seed_development
+      - unwrap
+      - unwrap_or_default
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - &id010
+        path: src-tauri/src/services/seed_development_service.rs
+        symbol: captured_seed
+      - &id011
+        path: src-tauri/src/services/confidentiality_service.rs
+        symbol: drop
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: initialize_and_migrate
+      - &id012
+        path: src-tauri/src/commands/development.rs
+        symbol: start_story_seed_development
+      - &id013
+        path: src-tauri/src/services/seed_development_service.rs
+        symbol: start_story_seed_development
+    - name: direct_seed_preserves_answer_skip_and_memory_semantics_without_provider_runs
+      kind: function
+      line_start: 570
+      line_end: 627
+      signature: direct_seed_preserves_answer_skip_and_memory_semantics_without_provider_runs()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - all
+      - captured_seed
+      - development.interview_id.clone
+      - drop
+      - filter
+      - interview_id.clone
+      - into
+      - iter
+      - load_session
+      - new
+      - open_connection
+      - remove_dir_all
+      - start_story_seed_development
+      - submit_story_seed_development_response
+      - turn.provider_run_id.is_none
+      - unwrap
+      - user_turns.iter
+      - user_turns.len
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - *id010
+      - *id011
+      - *id008
+      - *id012
+      - *id013
+      - &id015
+        path: src-tauri/src/commands/development.rs
+        symbol: submit_story_seed_development_response
+      - &id016
+        path: src-tauri/src/services/seed_development_service.rs
+        symbol: submit_story_seed_development_response
+    - name: completed_seed_development_creates_one_role_free_story_with_lineage
+      kind: function
+      line_start: 630
+      line_end: 688
+      signature: completed_seed_development_creates_one_role_free_story_with_lineage()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - COUNT
+      - Some
+      - captured_seed
+      - create_story_from_seed_development
+      - development.interview_id.clone
+      - drop
+      - load_story
+      - open_connection
+      - query_row
+      - remove_dir_all
+      - row.get
+      - start_story_seed_development
+      - submit_story_seed_development_response
+      - unwrap
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - *id010
+      - path: src-tauri/src/commands/development.rs
+        symbol: create_story_from_seed_development
+      - path: src-tauri/src/services/seed_development_service.rs
+        symbol: create_story_from_seed_development
+      - *id011
+      - *id014
+      - *id012
+      - *id013
+      - *id015
+      - *id016
+    - name: legacy_interview_payload_is_not_mistaken_for_direct_seed_development
+      kind: function
+      line_start: 691
+      line_end: 732
+      signature: legacy_interview_payload_is_not_mistaken_for_direct_seed_development()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - COUNT
+      - VALUES
+      - connection.execute
+      - create_story_seed
+      - drop
+      - interview_sessions
+      - into
+      - new
+      - now
+      - now.clone
+      - open_connection
+      - query_row
+      - remove_dir_all
+      - row.get
+      - start_story_seed_development
+      - to_rfc3339
+      - to_string
+      - unwrap
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: create_story_seed
+      - *id011
+      - *id012
+      - *id013
+  - path: src/lib/editLearningApi.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: b9e77a34d2a2157948d4063f5239db8724d33c90
+    dependencies:
+    - ../domain/editLearning
+    - '@tauri-apps/api/core'
+    provides:
+    - analyzeEditLearning
+    - decideEditLearningProposal
+    - listEditLearningDecisions
+    symbols:
+    - name: analyzeEditLearning
+      kind: function
+      line_start: 7
+      line_end: 12
+      signature: 'analyzeEditLearning(vaultPath: string) -> Promise<EditLearningAnalysisView>'
+      inputs:
+      - 'vaultPath: string'
+      output: Promise<EditLearningAnalysisView>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: decideEditLearningProposal
+      kind: function
+      line_start: 13
+      line_end: 22
+      signature: 'decideEditLearningProposal(vaultPath: string, request: DecideEditLearningProposalRequest) -> Promise<EditLearningDecisionView>'
+      inputs:
+      - 'vaultPath: string'
+      - 'request: DecideEditLearningProposalRequest'
+      output: Promise<EditLearningDecisionView>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: listEditLearningDecisions
+      kind: function
+      line_start: 23
+      line_end: 30
+      signature: 'listEditLearningDecisions(vaultPath: string) -> Promise<EditLearningDecisionView[]>'
+      inputs:
+      - 'vaultPath: string'
+      output: Promise<EditLearningDecisionView[]>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+  - path: src/voiceEvidencePolicy.test.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: f8d45bee378b91858fa71e6a67611a73df65b5f9
+    dependencies:
+    - ./voiceEvidencePolicy
+    - vitest
+    provides: []
+    symbols: []

@@ -1,0 +1,684 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: '07'
+  files:
+  - path: src-tauri/src/commands/candidates.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 5955db100a7079843e08124e6d9ddb823c2d3ed1
+    dependencies:
+    - "crate::{\n    domain::candidates::{CandidateStatus, CandidateSummary, ExtractCandidatesResult},\n    error::{CommandError,\
+      \ CommandResult},\n    services::{candidate_service, canonical_store, performance_service::OperationSession},\n}"
+    - serde_json::{Map, Value}
+    - std::path::PathBuf
+    provides:
+    - extract_resume_candidates
+    - list_story_candidates
+    - set_story_candidate_status
+    symbols:
+    - name: extract_resume_candidates
+      kind: function
+      line_start: 12
+      line_end: 33
+      signature: 'extract_resume_candidates(vault_path: String, source_id: String) -> CommandResult<ExtractCandidatesResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'source_id: String'
+      output: CommandResult<ExtractCandidatesResult>
+      dependencies:
+      - Ok
+      - String
+      - from
+      - map_err
+      - metadata.insert
+      - migrate_prototype
+      - new
+      - operation.finish
+      - operation.step
+      - source_id.clone
+      - spawn_blocking
+      - start
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/domain/candidates.rs
+        symbol: from
+      - &id002
+        path: src-tauri/src/domain/models.rs
+        symbol: from
+      - &id003
+        path: src-tauri/src/error.rs
+        symbol: from
+      - &id004
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: migrate_prototype
+      - path: src-tauri/src/services/performance_service.rs
+        symbol: finish
+      - path: src-tauri/src/services/performance_service.rs
+        symbol: start
+    - name: list_story_candidates
+      kind: function
+      line_start: 36
+      line_end: 38
+      signature: 'list_story_candidates(vault_path: String) -> CommandResult<Vec<CandidateSummary>>'
+      inputs:
+      - 'vault_path: String'
+      output: CommandResult<Vec<CandidateSummary>>
+      dependencies:
+      - from
+      - list_candidates
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - path: src-tauri/src/services/candidate_service.rs
+        symbol: list_candidates
+    - name: set_story_candidate_status
+      kind: function
+      line_start: 41
+      line_end: 51
+      signature: 'set_story_candidate_status(vault_path: String, candidate_id: String, status: CandidateStatus) -> CommandResult<CandidateSummary>'
+      inputs:
+      - 'vault_path: String'
+      - 'candidate_id: String'
+      - 'status: CandidateStatus'
+      output: CommandResult<CandidateSummary>
+      dependencies:
+      - Ok
+      - from
+      - map_err
+      - migrate_prototype
+      - set_candidate_status
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - *id004
+      - path: src-tauri/src/services/candidate_service.rs
+        symbol: set_candidate_status
+  - path: src-tauri/src/commands/preferences.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 2b113c17e444e858e72ab41579f2e784355f9437
+    dependencies:
+    - "crate::{\n    error::{CommandError, CommandResult},\n    services::app_preferences_service,\n}"
+    - std::path::PathBuf
+    provides:
+    - get_last_vault_path
+    - remember_last_vault
+    - clear_last_vault
+    - get_last_import_directory
+    - remember_last_import_file
+    - get_default_vault_root
+    symbols:
+    - name: get_last_vault_path
+      kind: function
+      line_start: 9
+      line_end: 11
+      signature: get_last_vault_path() -> CommandResult<Option<String>>
+      inputs: []
+      output: CommandResult<Option<String>>
+      dependencies:
+      - map_err
+      parser: rust-pattern
+      dependency_targets: []
+    - name: remember_last_vault
+      kind: function
+      line_start: 14
+      line_end: 17
+      signature: 'remember_last_vault(vault_path: String) -> CommandResult<()>'
+      inputs:
+      - 'vault_path: String'
+      output: CommandResult<()>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: clear_last_vault
+      kind: function
+      line_start: 20
+      line_end: 22
+      signature: clear_last_vault() -> CommandResult<()>
+      inputs: []
+      output: CommandResult<()>
+      dependencies:
+      - map_err
+      parser: rust-pattern
+      dependency_targets: []
+    - name: get_last_import_directory
+      kind: function
+      line_start: 25
+      line_end: 27
+      signature: get_last_import_directory() -> CommandResult<Option<String>>
+      inputs: []
+      output: CommandResult<Option<String>>
+      dependencies:
+      - map_err
+      parser: rust-pattern
+      dependency_targets: []
+    - name: remember_last_import_file
+      kind: function
+      line_start: 30
+      line_end: 33
+      signature: 'remember_last_import_file(file_path: String) -> CommandResult<String>'
+      inputs:
+      - 'file_path: String'
+      output: CommandResult<String>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: get_default_vault_root
+      kind: function
+      line_start: 36
+      line_end: 38
+      signature: get_default_vault_root() -> CommandResult<String>
+      inputs: []
+      output: CommandResult<String>
+      dependencies:
+      - map_err
+      parser: rust-pattern
+      dependency_targets: []
+  - path: src-tauri/src/services/interview_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: afed996fce9373504b4f19f060e6f5c5ae4f279c
+    dependencies:
+    - chrono::Utc
+    - "crate::{\n    domain::{\n        candidates::{CandidateStatus, StoryCandidate},\n        interviews::{\n          \
+      \  CompletenessItem, CompletenessStatus, InterviewSession, InterviewStatus,\n            InterviewSummary, InterviewTurn,\
+      \ SubmitInterviewResponseRequest, TurnActor, TurnType,\n        },\n    },\n    error::{ServiceResult, WorkLoreError},\n\
+      \    io_utils::{read_json, write_json_atomic},\n    services::guided_development_rules,\n}"
+    - std::{collections::HashSet, fs, path::Path}
+    - super::*
+    - uuid::Uuid
+    provides:
+    - start_interview
+    - list_interviews
+    - submit_response
+    - resume_interview
+    - add_next_question
+    - next_unasked_field
+    - summarize
+    - find_interview_for_candidate
+    - read_interviews
+    - read_candidate
+    - write_candidate
+    - write_interview
+    - ensure_vault
+    - question_map_keeps_work_grounded_in_the_claim
+    - normalized_fields_keep_required_interview_coverage
+    symbols:
+    - name: start_interview
+      kind: function
+      line_start: 18
+      line_end: 61
+      signature: 'start_interview(vault_path: &Path, candidate_id: &str) -> ServiceResult<InterviewSummary>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'candidate_id: &str'
+      output: ServiceResult<InterviewSummary>
+      dependencies:
+      - Some
+      - add_next_question
+      - candidate_id.to_string
+      - collect
+      - ensure_vault
+      - field.clone
+      - find_interview_for_candidate
+      - iter
+      - map
+      - new
+      - normalized_fields
+      - now
+      - now.clone
+      - now_v7
+      - read_candidate
+      - summarize
+      - to_rfc3339
+      - write_candidate
+      - write_interview
+      parser: rust-pattern
+      dependency_targets:
+      - &id011
+        path: src-tauri/src/services/interview_service.rs
+        symbol: add_next_question
+      - &id012
+        path: src-tauri/src/services/seed_development_service.rs
+        symbol: add_next_question
+      - path: src-tauri/src/services/interview_service.rs
+        symbol: find_interview_for_candidate
+      - &id020
+        path: src-tauri/src/services/guided_development_rules.rs
+        symbol: normalized_fields
+      - &id005
+        path: src-tauri/src/services/interview_service.rs
+        symbol: read_candidate
+      - &id006
+        path: src-tauri/src/services/manual_workspace_service.rs
+        symbol: read_candidate
+      - &id007
+        path: src-tauri/src/services/story_service.rs
+        symbol: read_candidate
+      - &id008
+        path: src-tauri/src/services/interview_service.rs
+        symbol: summarize
+      - &id009
+        path: src-tauri/src/services/seed_development_service.rs
+        symbol: summarize
+      - &id010
+        path: src-tauri/src/services/vault_service.rs
+        symbol: summarize
+      - path: src-tauri/src/services/candidate_service.rs
+        symbol: write_candidate
+      - path: src-tauri/src/services/interview_service.rs
+        symbol: write_candidate
+      - &id015
+        path: src-tauri/src/services/interview_service.rs
+        symbol: write_interview
+    - name: list_interviews
+      kind: function
+      line_start: 62
+      line_end: 77
+      signature: 'list_interviews(vault_path: &Path) -> ServiceResult<Vec<InterviewSummary>>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Vec<InterviewSummary>>
+      dependencies:
+      - Ok
+      - Some
+      - ensure_vault
+      - new
+      - read_candidate
+      - read_interviews
+      - right.updated_at.cmp
+      - session.candidate_ids.first
+      - sessions.sort_by
+      - summaries.push
+      - summarize
+      parser: rust-pattern
+      dependency_targets:
+      - *id005
+      - *id006
+      - *id007
+      - &id016
+        path: src-tauri/src/services/interview_service.rs
+        symbol: read_interviews
+      - *id008
+      - *id009
+      - *id010
+    - name: submit_response
+      kind: function
+      line_start: 78
+      line_end: 163
+      signature: 'submit_response(vault_path: &Path, request: SubmitInterviewResponseRequest) -> ServiceResult<InterviewSummary>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: SubmitInterviewResponseRequest'
+      output: ServiceResult<InterviewSummary>
+      dependencies:
+      - Err
+      - InvalidInterviewAction
+      - Some
+      - add_next_question
+      - and_then
+      - answer_text.clone
+      - cloned
+      - ensure_vault
+      - find
+      - first
+      - interview.active_question_turn_id.clone
+      - interview.turns.push
+      - is_some
+      - iter
+      - iter_mut
+      - join
+      - let
+      - next_unasked_field
+      - now
+      - now.clone
+      - now_v7
+      - ok_or
+      - ok_or_else
+      - path.is_file
+      parser: rust-pattern
+      dependency_targets:
+      - *id011
+      - *id012
+      - &id013
+        path: src-tauri/src/services/interview_service.rs
+        symbol: next_unasked_field
+      - &id014
+        path: src-tauri/src/services/seed_development_service.rs
+        symbol: next_unasked_field
+    - name: resume_interview
+      kind: function
+      line_start: 164
+      line_end: 196
+      signature: 'resume_interview(vault_path: &Path, interview_id: &str) -> ServiceResult<InterviewSummary>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'interview_id: &str'
+      output: ServiceResult<InterviewSummary>
+      dependencies:
+      - Err
+      - InvalidInterviewAction
+      - add_next_question
+      - cloned
+      - ensure_vault
+      - first
+      - interview.active_question_turn_id.is_none
+      - is_some
+      - join
+      - next_unasked_field
+      - now
+      - ok_or
+      - path.is_file
+      - read_candidate
+      - read_json
+      - summarize
+      - to_rfc3339
+      - to_string
+      - write_interview
+      parser: rust-pattern
+      dependency_targets:
+      - *id011
+      - *id012
+      - *id013
+      - *id014
+      - *id005
+      - *id006
+      - *id007
+      - &id017
+        path: src-tauri/src/io_utils.rs
+        symbol: read_json
+      - *id008
+      - *id009
+      - *id010
+      - *id015
+    - name: add_next_question
+      kind: function
+      line_start: 197
+      line_end: 218
+      signature: 'add_next_question(interview: &mut InterviewSession, claim: &str)'
+      inputs:
+      - 'interview: &mut InterviewSession'
+      - 'claim: &str'
+      output: unspecified
+      dependencies:
+      - Some
+      - interview.turns.push
+      - next_unasked_field
+      - now
+      - now.clone
+      - now_v7
+      - question_for_field
+      - to_rfc3339
+      - turn_id.clone
+      parser: rust-pattern
+      dependency_targets:
+      - *id013
+      - *id014
+      - &id019
+        path: src-tauri/src/services/guided_development_rules.rs
+        symbol: question_for_field
+    - name: next_unasked_field
+      kind: function
+      line_start: 219
+      line_end: 232
+      signature: 'next_unasked_field(interview: &InterviewSession) -> Option<String>'
+      inputs:
+      - 'interview: &InterviewSession'
+      output: Option<String>
+      dependencies:
+      - asked.contains
+      - cloned
+      - filter
+      - find
+      - flat_map
+      - item.field.clone
+      - iter
+      - map
+      - turn.target_fields.iter
+      parser: rust-pattern
+      dependency_targets: []
+    - name: summarize
+      kind: function
+      line_start: 233
+      line_end: 264
+      signature: 'summarize(interview: &InterviewSession, candidate: &StoryCandidate) -> ServiceResult<InterviewSummary>'
+      inputs:
+      - 'interview: &InterviewSession'
+      - 'candidate: &StoryCandidate'
+      output: ServiceResult<InterviewSummary>
+      dependencies:
+      - Ok
+      - and_then
+      - as_ref
+      - candidate.candidate_id.clone
+      - candidate.claim.clone
+      - cloned
+      - count
+      - current_question.and_then
+      - current_question.map
+      - filter
+      - find
+      - interview.completeness.len
+      - interview.interview_id.clone
+      - interview.turns.iter
+      - interview.updated_at.clone
+      - iter
+      - turn.target_fields.first
+      - turn.text.clone
+      parser: rust-pattern
+      dependency_targets: []
+    - name: find_interview_for_candidate
+      kind: function
+      line_start: 265
+      line_end: 274
+      signature: 'find_interview_for_candidate(vault_path: &Path, candidate_id: &str) -> ServiceResult<Option<InterviewSession>>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'candidate_id: &str'
+      output: ServiceResult<Option<InterviewSession>>
+      dependencies:
+      - Ok
+      - any
+      - find
+      - interview.candidate_ids.iter
+      - into_iter
+      - read_interviews
+      parser: rust-pattern
+      dependency_targets:
+      - *id016
+    - name: read_interviews
+      kind: function
+      line_start: 275
+      line_end: 291
+      signature: 'read_interviews(vault_path: &Path) -> ServiceResult<Vec<InterviewSession>>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Vec<InterviewSession>>
+      dependencies:
+      - Ok
+      - Some
+      - and_then
+      - directory.exists
+      - entry.file_type
+      - entry.path
+      - extension
+      - is_file
+      - new
+      - read_dir
+      - read_json
+      - sessions.push
+      - value.to_str
+      - vault_path.join
+      parser: rust-pattern
+      dependency_targets:
+      - *id017
+    - name: read_candidate
+      kind: function
+      line_start: 292
+      line_end: 301
+      signature: 'read_candidate(vault_path: &Path, candidate_id: &str) -> ServiceResult<StoryCandidate>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'candidate_id: &str'
+      output: ServiceResult<StoryCandidate>
+      dependencies:
+      - Err
+      - join
+      - path.is_file
+      - read_json
+      parser: rust-pattern
+      dependency_targets:
+      - *id017
+    - name: write_candidate
+      kind: function
+      line_start: 302
+      line_end: 310
+      signature: 'write_candidate(vault_path: &Path, candidate: &StoryCandidate) -> ServiceResult<()>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'candidate: &StoryCandidate'
+      output: ServiceResult<()>
+      dependencies:
+      - join
+      - write_json_atomic
+      parser: rust-pattern
+      dependency_targets:
+      - &id018
+        path: src-tauri/src/io_utils.rs
+        symbol: write_json_atomic
+    - name: write_interview
+      kind: function
+      line_start: 311
+      line_end: 319
+      signature: 'write_interview(vault_path: &Path, interview: &InterviewSession) -> ServiceResult<()>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'interview: &InterviewSession'
+      output: ServiceResult<()>
+      dependencies:
+      - join
+      - write_json_atomic
+      parser: rust-pattern
+      dependency_targets:
+      - *id018
+    - name: ensure_vault
+      kind: function
+      line_start: 320
+      line_end: 326
+      signature: 'ensure_vault(vault_path: &Path) -> ServiceResult<()>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<()>
+      dependencies:
+      - Err
+      - Ok
+      - is_file
+      - vault_path.join
+      parser: rust-pattern
+      dependency_targets: []
+    - name: question_map_keeps_work_grounded_in_the_claim
+      kind: function
+      line_start: 333
+      line_end: 340
+      signature: question_map_keeps_work_grounded_in_the_claim()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - question.contains
+      - question_for_field
+      parser: rust-pattern
+      dependency_targets:
+      - *id019
+    - name: normalized_fields_keep_required_interview_coverage
+      kind: function
+      line_start: 343
+      line_end: 354
+      signature: normalized_fields_keep_required_interview_coverage()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - count
+      - field.as_str
+      - fields.contains
+      - filter
+      - iter
+      - normalized_fields
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - *id020
+  - path: src-tauri/src/services/mod.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 3811ae4219b7f5702f9d52f039225c9d389d3416
+    dependencies: []
+    provides: []
+    symbols: []
+  - path: src/voiceEvidencePolicy.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: 018fed8e12c5162d92072cc853b51579af5d5dde
+    dependencies:
+    - ./domain/types
+    provides:
+    - isEligibleVoiceAuthorship
+    - canApproveVoiceEvidence
+    - voiceEligibilityReasonLabel
+    symbols:
+    - name: isEligibleVoiceAuthorship
+      kind: function
+      line_start: 2
+      line_end: 5
+      signature: 'isEligibleVoiceAuthorship(authorship: VoiceAuthorshipState) -> boolean'
+      inputs:
+      - 'authorship: VoiceAuthorshipState'
+      output: boolean
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: canApproveVoiceEvidence
+      kind: function
+      line_start: 6
+      line_end: 12
+      signature: 'canApproveVoiceEvidence(authorship: VoiceAuthorshipState, status: VoiceEvidenceStatus) -> boolean'
+      inputs:
+      - 'authorship: VoiceAuthorshipState'
+      - 'status: VoiceEvidenceStatus'
+      output: boolean
+      dependencies:
+      - isEligibleVoiceAuthorship
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/voiceEvidencePolicy.ts
+        symbol: isEligibleVoiceAuthorship
+    - name: voiceEligibilityReasonLabel
+      kind: function
+      line_start: 13
+      line_end: 25
+      signature: 'voiceEligibilityReasonLabel(reason: string) -> string'
+      inputs:
+      - 'reason: string'
+      output: string
+      dependencies:
+      - reason.replaceAll
+      parser: typescript-pattern
+      dependency_targets: []

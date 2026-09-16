@@ -1,0 +1,1810 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: '03'
+  files:
+  - path: src-tauri/src/commands/quality.rs
+    analysis_version: 1
+    language: rust
+    content_hash: be57d0168939c72ef286ccc850786c410638264d
+    dependencies:
+    - "crate::{\n    error::{CommandError, CommandResult},\n    services::writing_lint_service::{self, LintDraftRequest, LintDraftResult},\n\
+      }"
+    - std::path::PathBuf
+    provides:
+    - lint_draft
+    symbols:
+    - name: lint_draft
+      kind: function
+      line_start: 9
+      line_end: 12
+      signature: 'lint_draft(vault_path: String, request: LintDraftRequest) -> CommandResult<LintDraftResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: LintDraftRequest'
+      output: CommandResult<LintDraftResult>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/domain/candidates.rs
+        symbol: from
+      - &id002
+        path: src-tauri/src/domain/models.rs
+        symbol: from
+      - &id003
+        path: src-tauri/src/error.rs
+        symbol: from
+  - path: src-tauri/src/services/candidate_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 99fae81e0a56da092ca234334aa86f57f81ccef5
+    dependencies:
+    - chrono::Utc
+    - "crate::{\n    domain::{\n        candidates::{\n            CandidateContext, CandidateSourceRef, CandidateStatus,\
+      \ CandidateSummary, CandidateType,\n            ExtractCandidatesResult, StoryCandidate,\n        },\n        models::{ExtractionStatus,\
+      \ SourceDocument, SourceType},\n    },\n    error::{ServiceResult, WorkLoreError},\n    io_utils::{read_json, write_json_atomic},\n\
+      }"
+    - regex::Regex
+    - sha2::{Digest, Sha256}
+    - std::{collections::HashSet, fs, path::Path}
+    - super::*
+    - uuid::Uuid
+    provides:
+    - extract_resume_candidates
+    - list_candidates
+    - set_candidate_status
+    - read_source
+    - read_candidates
+    - write_candidate
+    - parse_resume_bullets
+    - push_candidate
+    - append_wrapped_continuation
+    - classify_resume_section_prefix
+    - match_section_prefix
+    - trim_section_separator
+    - looks_like_inline_employment_content
+    - strip_bullet_prefix
+    - is_bullet_character
+    - split_role_heading_and_claim
+    - looks_like_role_heading
+    - split_candidate_sentences
+    - looks_like_candidate_text
+    - starts_with_action_verb
+    - contains_action_verb
+    - action_verb_match
+    - action_verbs
+    - contains_outcome_signal
+    - contains_date_range
+    - date_range_match
+    - ends_sentence
+    - fragment_id
+    - infer_metrics
+    - infer_tools
+    - infer_skills
+    - infer_missing_fields
+    - contains_term
+    - ensure_vault
+    - parses_only_bullets_inside_work_history
+    - ignores_top_level_title_and_summary_when_no_employment_section_exists
+    - supports_employment_history_and_stops_at_education
+    - finds_bulletless_action_lines_inside_employment_only
+    - handles_section_heading_role_and_claim_flattened_on_one_line
+    - supports_pdf_bullet_glyphs
+    - detects_metrics_and_tools
+    - fragment_ids_are_stable
+    symbols:
+    - name: extract_resume_candidates
+      kind: function
+      line_start: 19
+      line_end: 117
+      signature: 'extract_resume_candidates(vault_path: &Path, source_id: &str) -> ServiceResult<ExtractCandidatesResult>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'source_id: &str'
+      output: ServiceResult<ExtractCandidatesResult>
+      dependencies:
+      - Err
+      - Ok
+      - SourceNotReady
+      - any
+      - bullet.claim.clone
+      - candidate.source_refs.iter
+      - candidates.len
+      - created.is_empty
+      - created.len
+      - created.push
+      - ensure_vault
+      - existing_fragments.contains
+      - filter
+      - flat_map
+      - fragment_id
+      - from
+      - infer_metrics
+      - infer_missing_fields
+      - infer_skills
+      - infer_tools
+      - into_iter
+      - iter
+      - map
+      - new
+      parser: rust-pattern
+      dependency_targets:
+      - &id016
+        path: src-tauri/src/services/candidate_service.rs
+        symbol: fragment_id
+      - *id001
+      - *id002
+      - *id003
+      - &id011
+        path: src-tauri/src/services/candidate_service.rs
+        symbol: infer_metrics
+      - path: src-tauri/src/services/candidate_service.rs
+        symbol: infer_missing_fields
+      - path: src-tauri/src/services/candidate_service.rs
+        symbol: infer_skills
+      - &id014
+        path: src-tauri/src/services/candidate_service.rs
+        symbol: infer_tools
+    - name: list_candidates
+      kind: function
+      line_start: 118
+      line_end: 124
+      signature: 'list_candidates(vault_path: &Path) -> ServiceResult<Vec<CandidateSummary>>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Vec<CandidateSummary>>
+      dependencies:
+      - Ok
+      - candidates.iter
+      - candidates.sort_by
+      - collect
+      - ensure_vault
+      - map
+      - read_candidates
+      - right.created_at.cmp
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/candidate_service.rs
+        symbol: read_candidates
+    - name: set_candidate_status
+      kind: function
+      line_start: 125
+      line_end: 145
+      signature: 'set_candidate_status(vault_path: &Path, candidate_id: &str, status: CandidateStatus) -> ServiceResult<CandidateSummary>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'candidate_id: &str'
+      - 'status: CandidateStatus'
+      output: ServiceResult<CandidateSummary>
+      dependencies:
+      - Err
+      - Ok
+      - ensure_vault
+      - from
+      - join
+      - now
+      - path.is_file
+      - read_json
+      - to_rfc3339
+      - write_json_atomic
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - &id004
+        path: src-tauri/src/io_utils.rs
+        symbol: read_json
+      - &id005
+        path: src-tauri/src/io_utils.rs
+        symbol: write_json_atomic
+    - name: read_source
+      kind: function
+      line_start: 146
+      line_end: 155
+      signature: 'read_source(vault_path: &Path, source_id: &str) -> ServiceResult<SourceDocument>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'source_id: &str'
+      output: ServiceResult<SourceDocument>
+      dependencies:
+      - Err
+      - join
+      - path.is_file
+      - read_json
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+    - name: read_candidates
+      kind: function
+      line_start: 156
+      line_end: 173
+      signature: 'read_candidates(vault_path: &Path) -> ServiceResult<Vec<StoryCandidate>>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Vec<StoryCandidate>>
+      dependencies:
+      - Ok
+      - Some
+      - and_then
+      - candidates.push
+      - directory.exists
+      - entry.file_type
+      - entry.path
+      - extension
+      - is_file
+      - new
+      - read_dir
+      - read_json
+      - value.to_str
+      - vault_path.join
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+    - name: write_candidate
+      kind: function
+      line_start: 174
+      line_end: 182
+      signature: 'write_candidate(vault_path: &Path, candidate: &StoryCandidate) -> ServiceResult<()>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'candidate: &StoryCandidate'
+      output: ServiceResult<()>
+      dependencies:
+      - join
+      - write_json_atomic
+      parser: rust-pattern
+      dependency_targets:
+      - *id005
+    - name: parse_resume_bullets
+      kind: function
+      line_start: 196
+      line_end: 273
+      signature: 'parse_resume_bullets(text: &str) -> Vec<ParsedBullet>'
+      inputs:
+      - 'text: &str'
+      output: Vec<ParsedBullet>
+      dependencies:
+      - Some
+      - append_wrapped_continuation
+      - candidate_sentences.is_empty
+      - classify_resume_section_prefix
+      - employment_line.is_empty
+      - employment_line.to_string
+      - enumerate
+      - heading.clone
+      - looks_like_role_heading
+      - new
+      - push_candidate
+      - raw_line.trim
+      - role_heading.to_string
+      - split_candidate_sentences
+      - split_role_heading_and_claim
+      - strip_bullet_prefix
+      - text.lines
+      - trimmed.is_empty
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/candidate_service.rs
+        symbol: append_wrapped_continuation
+      - path: src-tauri/src/services/candidate_service.rs
+        symbol: classify_resume_section_prefix
+      - &id006
+        path: src-tauri/src/services/candidate_service.rs
+        symbol: looks_like_role_heading
+      - path: src-tauri/src/services/candidate_service.rs
+        symbol: push_candidate
+      - path: src-tauri/src/services/candidate_service.rs
+        symbol: split_candidate_sentences
+      - path: src-tauri/src/services/candidate_service.rs
+        symbol: split_role_heading_and_claim
+      - path: src-tauri/src/services/candidate_service.rs
+        symbol: strip_bullet_prefix
+    - name: push_candidate
+      kind: function
+      line_start: 274
+      line_end: 306
+      signature: 'push_candidate(results: &mut Vec<ParsedBullet>, seen_claims: &mut HashSet<String>, line_number: usize, claim:
+        &str, heading: Option<String>)'
+      inputs:
+      - 'results: &mut Vec<ParsedBullet>'
+      - 'seen_claims: &mut HashSet<String>'
+      - 'line_number: usize'
+      - 'claim: &str'
+      - 'heading: Option<String>'
+      output: unspecified
+      dependencies:
+      - character.is_whitespace
+      - cleaned.to_string
+      - is_bullet_character
+      - join
+      - looks_like_candidate_text
+      - results.push
+      - seen_claims.insert
+      - split_whitespace
+      - to_ascii_lowercase
+      - trim
+      - trim_start_matches
+      parser: rust-pattern
+      dependency_targets:
+      - &id007
+        path: src-tauri/src/services/candidate_service.rs
+        symbol: is_bullet_character
+      - &id008
+        path: src-tauri/src/services/candidate_service.rs
+        symbol: looks_like_candidate_text
+    - name: append_wrapped_continuation
+      kind: function
+      line_start: 307
+      line_end: 322
+      signature: 'append_wrapped_continuation(results: &mut [ParsedBullet], line_number: usize, line: &str)'
+      inputs:
+      - 'results: &mut [ParsedBullet]'
+      - 'line_number: usize'
+      - 'line: &str'
+      output: unspecified
+      dependencies:
+      - Some
+      - ends_sentence
+      - line.len
+      - line.trim
+      - looks_like_role_heading
+      - previous.claim.push
+      - previous.claim.push_str
+      - results.last_mut
+      parser: rust-pattern
+      dependency_targets:
+      - &id010
+        path: src-tauri/src/services/candidate_service.rs
+        symbol: ends_sentence
+      - *id006
+    - name: classify_resume_section_prefix
+      kind: function
+      line_start: 323
+      line_end: 372
+      signature: 'classify_resume_section_prefix(line: &str) -> Option<(ResumeSection, &str)>'
+      inputs:
+      - 'line: &str'
+      output: Option<(ResumeSection, &str)>
+      dependencies:
+      - Some
+      - looks_like_inline_employment_content
+      - map
+      - match_section_prefix
+      - remainder.is_empty
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/candidate_service.rs
+        symbol: looks_like_inline_employment_content
+      - path: src-tauri/src/services/candidate_service.rs
+        symbol: match_section_prefix
+    - name: match_section_prefix
+      kind: function
+      line_start: 373
+      line_end: 393
+      signature: 'match_section_prefix(line: &''a str, headings: &[&str]) -> Option<&''a str>'
+      inputs:
+      - 'line: &''a str'
+      - 'headings: &[&str]'
+      output: Option<&'a str>
+      dependencies:
+      - Some
+      - character.is_ascii_alphabetic
+      - chars
+      - find_map
+      - heading.len
+      - headings.iter
+      - is_none_or
+      - line.get
+      - line.len
+      - next
+      - prefix.eq_ignore_ascii_case
+      - trim_section_separator
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/candidate_service.rs
+        symbol: trim_section_separator
+    - name: trim_section_separator
+      kind: function
+      line_start: 394
+      line_end: 399
+      signature: 'trim_section_separator(value: &str) -> &str'
+      inputs:
+      - 'value: &str'
+      output: '&str'
+      dependencies:
+      - character.is_whitespace
+      - value.trim_start_matches
+      parser: rust-pattern
+      dependency_targets: []
+    - name: looks_like_inline_employment_content
+      kind: function
+      line_start: 400
+      line_end: 408
+      signature: 'looks_like_inline_employment_content(value: &str) -> bool'
+      inputs:
+      - 'value: &str'
+      output: bool
+      dependencies:
+      - character.is_alphabetic
+      - chars
+      - contains_date_range
+      - find
+      - is_some_and
+      - value.contains
+      parser: rust-pattern
+      dependency_targets:
+      - &id009
+        path: src-tauri/src/services/candidate_service.rs
+        symbol: contains_date_range
+    - name: strip_bullet_prefix
+      kind: function
+      line_start: 409
+      line_end: 422
+      signature: 'strip_bullet_prefix(line: &str) -> Option<&str>'
+      inputs:
+      - 'line: &str'
+      output: Option<&str>
+      dependencies:
+      - Some
+      - expect
+      - find
+      - first.len_utf8
+      - is_bullet_character
+      - line.trim_start
+      - map
+      - matched.end
+      - new
+      - next
+      - trim_start
+      - trimmed.chars
+      parser: rust-pattern
+      dependency_targets:
+      - *id007
+    - name: is_bullet_character
+      kind: function
+      line_start: 423
+      line_end: 444
+      signature: 'is_bullet_character(character: char) -> bool'
+      inputs:
+      - 'character: char'
+      output: bool
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: split_role_heading_and_claim
+      kind: function
+      line_start: 445
+      line_end: 462
+      signature: 'split_role_heading_and_claim(line: &str) -> Option<(&str, &str)>'
+      inputs:
+      - 'line: &str'
+      output: Option<(&str, &str)>
+      dependencies:
+      - Some
+      - action_verb_match
+      - date_range_match
+      - end
+      - heading.len
+      - looks_like_candidate_text
+      - start
+      - trim
+      - trim_end_matches
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/candidate_service.rs
+        symbol: action_verb_match
+      - &id013
+        path: src-tauri/src/services/candidate_service.rs
+        symbol: date_range_match
+      - *id008
+      - path: src-tauri/src/services/performance_service.rs
+        symbol: start
+    - name: looks_like_role_heading
+      kind: function
+      line_start: 463
+      line_end: 479
+      signature: 'looks_like_role_heading(line: &str) -> bool'
+      inputs:
+      - 'line: &str'
+      output: bool
+      dependencies:
+      - all
+      - any
+      - character.is_alphabetic
+      - chars
+      - contains_date_range
+      - ends_sentence
+      - filter
+      - line.chars
+      - line.contains
+      - line.len
+      - separators.iter
+      parser: rust-pattern
+      dependency_targets:
+      - *id009
+      - *id010
+    - name: split_candidate_sentences
+      kind: function
+      line_start: 480
+      line_end: 523
+      signature: 'split_candidate_sentences(line: &str) -> Vec<&str>'
+      inputs:
+      - 'line: &str'
+      output: Vec<&str>
+      dependencies:
+      - byte.is_ascii_whitespace
+      - bytes.len
+      - character.len_utf8
+      - get
+      - is_some_and
+      - line.as_bytes
+      - line.char_indices
+      - line.len
+      - line.trim
+      - looks_like_candidate_text
+      - new
+      - results.is_empty
+      - results.push
+      - trim
+      parser: rust-pattern
+      dependency_targets:
+      - *id008
+    - name: looks_like_candidate_text
+      kind: function
+      line_start: 524
+      line_end: 534
+      signature: 'looks_like_candidate_text(line: &str) -> bool'
+      inputs:
+      - 'line: &str'
+      output: bool
+      dependencies:
+      - contains_action_verb
+      - contains_outcome_signal
+      - count
+      - infer_metrics
+      - is_empty
+      - line.len
+      - line.split_whitespace
+      - looks_like_role_heading
+      - starts_with_action_verb
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/candidate_service.rs
+        symbol: contains_action_verb
+      - path: src-tauri/src/services/candidate_service.rs
+        symbol: contains_outcome_signal
+      - *id011
+      - *id006
+      - path: src-tauri/src/services/candidate_service.rs
+        symbol: starts_with_action_verb
+      - path: src-tauri/src/services/target_context_service.rs
+        symbol: starts_with_action_verb
+    - name: starts_with_action_verb
+      kind: function
+      line_start: 535
+      line_end: 544
+      signature: 'starts_with_action_verb(line: &str) -> bool'
+      inputs:
+      - 'line: &str'
+      output: bool
+      dependencies:
+      - action_verbs
+      - character.is_ascii_alphabetic
+      - contains
+      - first_word.as_str
+      - next
+      - split_whitespace
+      - to_ascii_lowercase
+      - trim_matches
+      - unwrap_or_default
+      parser: rust-pattern
+      dependency_targets:
+      - &id012
+        path: src-tauri/src/services/candidate_service.rs
+        symbol: action_verbs
+    - name: contains_action_verb
+      kind: function
+      line_start: 545
+      line_end: 553
+      signature: 'contains_action_verb(line: &str) -> bool'
+      inputs:
+      - 'line: &str'
+      output: bool
+      dependencies:
+      - action_verbs
+      - any
+      - character.is_ascii_alphabetic
+      - contains
+      - line.split_whitespace
+      - normalized.as_str
+      - to_ascii_lowercase
+      - trim_matches
+      parser: rust-pattern
+      dependency_targets:
+      - *id012
+    - name: action_verb_match
+      kind: function
+      line_start: 554
+      line_end: 558
+      signature: 'action_verb_match(line: &str) -> Option<regex::Match<''_>>'
+      inputs:
+      - 'line: &str'
+      output: Option<regex::Match<'_>>
+      dependencies:
+      - action_verbs
+      - b
+      - expect
+      - find
+      - join
+      - new
+      parser: rust-pattern
+      dependency_targets:
+      - *id012
+    - name: action_verbs
+      kind: function
+      line_start: 559
+      line_end: 598
+      signature: action_verbs() -> &'static [&'static str]
+      inputs: []
+      output: '&''static [&''static str]'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: contains_outcome_signal
+      kind: function
+      line_start: 599
+      line_end: 619
+      signature: 'contains_outcome_signal(line: &str) -> bool'
+      inputs:
+      - 'line: &str'
+      output: bool
+      dependencies:
+      - any
+      - iter
+      - line.to_ascii_lowercase
+      - lower.contains
+      parser: rust-pattern
+      dependency_targets: []
+    - name: contains_date_range
+      kind: function
+      line_start: 620
+      line_end: 623
+      signature: 'contains_date_range(line: &str) -> bool'
+      inputs:
+      - 'line: &str'
+      output: bool
+      dependencies:
+      - date_range_match
+      - is_some
+      parser: rust-pattern
+      dependency_targets:
+      - *id013
+    - name: date_range_match
+      kind: function
+      line_start: 624
+      line_end: 629
+      signature: 'date_range_match(line: &str) -> Option<regex::Match<''_>>'
+      inputs:
+      - 'line: &str'
+      output: Option<regex::Match<'_>>
+      dependencies:
+      - b
+      - expect
+      - find
+      - new
+      parser: rust-pattern
+      dependency_targets: []
+    - name: ends_sentence
+      kind: function
+      line_start: 630
+      line_end: 636
+      signature: 'ends_sentence(line: &str) -> bool'
+      inputs:
+      - 'line: &str'
+      output: bool
+      dependencies:
+      - chars
+      - is_some_and
+      - line.trim_end
+      - next_back
+      parser: rust-pattern
+      dependency_targets: []
+    - name: fragment_id
+      kind: function
+      line_start: 637
+      line_end: 641
+      signature: 'fragment_id(line_number: usize, claim: &str) -> String'
+      inputs:
+      - 'line_number: usize'
+      - 'claim: &str'
+      output: String
+      dependencies:
+      - claim.as_bytes
+      - digest
+      - encode
+      parser: rust-pattern
+      dependency_targets: []
+    - name: infer_metrics
+      kind: function
+      line_start: 642
+      line_end: 652
+      signature: 'infer_metrics(claim: &str) -> Vec<String>'
+      inputs:
+      - 'claim: &str'
+      output: Vec<String>
+      dependencies:
+      - b
+      - collect
+      - expect
+      - find_iter
+      - map
+      - matched.as_str
+      - new
+      - to_string
+      - trim
+      parser: rust-pattern
+      dependency_targets: []
+    - name: infer_tools
+      kind: function
+      line_start: 653
+      line_end: 680
+      signature: 'infer_tools(claim: &str) -> Vec<String>'
+      inputs:
+      - 'claim: &str'
+      output: Vec<String>
+      dependencies:
+      - collect
+      - contains_term
+      - filter
+      - iter
+      - map
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/candidate_service.rs
+        symbol: contains_term
+    - name: infer_skills
+      kind: function
+      line_start: 681
+      line_end: 701
+      signature: 'infer_skills(claim: &str) -> Vec<String>'
+      inputs:
+      - 'claim: &str'
+      output: Vec<String>
+      dependencies:
+      - any
+      - claim.to_ascii_lowercase
+      - collect
+      - filter
+      - iter
+      - lower.contains
+      - map
+      - needles.iter
+      - to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: infer_missing_fields
+      kind: function
+      line_start: 702
+      line_end: 732
+      signature: 'infer_missing_fields(claim: &str) -> Vec<String>'
+      inputs:
+      - 'claim: &str'
+      output: Vec<String>
+      dependencies:
+      - claim.to_ascii_lowercase
+      - infer_metrics
+      - infer_tools
+      - is_empty
+      - lower.contains
+      - missing.dedup
+      - missing.push
+      - missing.sort
+      - new
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - *id011
+      - *id014
+    - name: contains_term
+      kind: function
+      line_start: 733
+      line_end: 738
+      signature: 'contains_term(haystack: &str, needle: &str) -> bool'
+      inputs:
+      - 'haystack: &str'
+      - 'needle: &str'
+      output: bool
+      dependencies:
+      - contains
+      - needle.to_ascii_lowercase
+      - to_ascii_lowercase
+      parser: rust-pattern
+      dependency_targets: []
+    - name: ensure_vault
+      kind: function
+      line_start: 739
+      line_end: 745
+      signature: 'ensure_vault(vault_path: &Path) -> ServiceResult<()>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<()>
+      dependencies:
+      - Err
+      - Ok
+      - is_file
+      - vault_path.join
+      parser: rust-pattern
+      dependency_targets: []
+    - name: parses_only_bullets_inside_work_history
+      kind: function
+      line_start: 752
+      line_end: 763
+      signature: parses_only_bullets_inside_work_history()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - all
+      - bullet.claim.contains
+      - bullets.len
+      - heading.as_deref
+      - iter
+      - parse_resume_bullets
+      parser: rust-pattern
+      dependency_targets:
+      - &id015
+        path: src-tauri/src/services/candidate_service.rs
+        symbol: parse_resume_bullets
+    - name: ignores_top_level_title_and_summary_when_no_employment_section_exists
+      kind: function
+      line_start: 766
+      line_end: 769
+      signature: ignores_top_level_title_and_summary_when_no_employment_section_exists()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - is_empty
+      - parse_resume_bullets
+      parser: rust-pattern
+      dependency_targets:
+      - *id015
+    - name: supports_employment_history_and_stops_at_education
+      kind: function
+      line_start: 772
+      line_end: 777
+      signature: supports_employment_history_and_stops_at_education()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - bullets.len
+      - parse_resume_bullets
+      parser: rust-pattern
+      dependency_targets:
+      - *id015
+    - name: finds_bulletless_action_lines_inside_employment_only
+      kind: function
+      line_start: 780
+      line_end: 790
+      signature: finds_bulletless_action_lines_inside_employment_only()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - all
+      - as_deref
+      - bullets.iter
+      - bullets.len
+      - heading.contains
+      - is_some_and
+      - parse_resume_bullets
+      parser: rust-pattern
+      dependency_targets:
+      - *id015
+    - name: handles_section_heading_role_and_claim_flattened_on_one_line
+      kind: function
+      line_start: 793
+      line_end: 806
+      signature: handles_section_heading_role_and_claim_flattened_on_one_line()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Solutions
+      - all
+      - bullet.claim.contains
+      - bullets.len
+      - iter
+      - parse_resume_bullets
+      - starts_with
+      parser: rust-pattern
+      dependency_targets:
+      - *id015
+    - name: supports_pdf_bullet_glyphs
+      kind: function
+      line_start: 809
+      line_end: 813
+      signature: supports_pdf_bullet_glyphs()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - bullets.len
+      - parse_resume_bullets
+      parser: rust-pattern
+      dependency_targets:
+      - *id015
+    - name: detects_metrics_and_tools
+      kind: function
+      line_start: 816
+      line_end: 820
+      signature: detects_metrics_and_tools()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - contains
+      - infer_metrics
+      - infer_tools
+      - len
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - *id011
+      - *id014
+    - name: fragment_ids_are_stable
+      kind: function
+      line_start: 823
+      line_end: 828
+      signature: fragment_ids_are_stable()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - fragment_id
+      parser: rust-pattern
+      dependency_targets:
+      - *id016
+  - path: src/components/CapturePanel.tsx
+    analysis_version: 1
+    language: typescript
+    content_hash: e890ce4f5df2c5eb5d6d325e3bbb659fe53c5a7a
+    dependencies:
+    - ../domain/types
+    - ../lib/captureApi
+    - ../lib/workloreApi
+    - ./InfoButton
+    - ./InspirationPanel
+    - ./SeedDevelopmentPanel
+    - ./TargetContextPanel
+    - ./TopicPanel
+    - react
+    provides:
+    - CapturePanel
+    - clearDevelopmentPanels
+    - openDevelopmentPanel
+    - handleCloseSaved
+    - refreshRecent
+    - handleSave
+    - handleRetag
+    - handleClassify
+    - handleUseForVoice
+    - handleSelectRecent
+    - roleLabel
+    - sourceTypeLabel
+    - SaveIcon
+    - CloseIcon
+    symbols:
+    - name: CapturePanel
+      kind: function
+      line_start: 34
+      line_end: 35
+      signature: 'CapturePanel({ vaultPath }: { vaultPath: string })'
+      inputs:
+      - '{ vaultPath }: { vaultPath: string }'
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: clearDevelopmentPanels
+      kind: function
+      line_start: 55
+      line_end: 61
+      signature: clearDevelopmentPanels()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - setDevelopmentInspirationId
+      - setDevelopmentSeedId
+      - setDevelopmentTargetContextId
+      - setDevelopmentTopicId
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: openDevelopmentPanel
+      kind: function
+      line_start: 62
+      line_end: 79
+      signature: 'openDevelopmentPanel(role: DevelopmentRole, targetId: string)'
+      inputs:
+      - 'role: DevelopmentRole'
+      - 'targetId: string'
+      output: unspecified
+      dependencies:
+      - clearDevelopmentPanels
+      - setDevelopmentInspirationId
+      - setDevelopmentSeedId
+      - setDevelopmentTargetContextId
+      - setDevelopmentTopicId
+      parser: typescript-pattern
+      dependency_targets:
+      - &id017
+        path: src/components/CapturePanel.tsx
+        symbol: clearDevelopmentPanels
+    - name: handleCloseSaved
+      kind: function
+      line_start: 80
+      line_end: 84
+      signature: handleCloseSaved()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - clearDevelopmentPanels
+      - setSaved
+      parser: typescript-pattern
+      dependency_targets:
+      - *id017
+    - name: refreshRecent
+      kind: function
+      line_start: 85
+      line_end: 92
+      signature: refreshRecent()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - listCaptureSources
+      - setError
+      - setRecent
+      parser: typescript-pattern
+      dependency_targets:
+      - &id018
+        path: src/domain/types.ts
+        symbol: errorMessage
+      - path: src/lib/captureApi.ts
+        symbol: listCaptureSources
+    - name: handleSave
+      kind: function
+      line_start: 93
+      line_end: 111
+      signature: handleSave()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - clearDevelopmentPanels
+      - createCaptureSource
+      - errorMessage
+      - refreshRecent
+      - setBusy
+      - setError
+      - setNotice
+      - setSaved
+      - setText
+      - text.trim
+      parser: typescript-pattern
+      dependency_targets:
+      - *id017
+      - path: src/lib/workloreApi.ts
+        symbol: createCaptureSource
+      - *id018
+      - &id019
+        path: src/components/CapturePanel.tsx
+        symbol: refreshRecent
+    - name: handleRetag
+      kind: function
+      line_start: 112
+      line_end: 129
+      signature: 'handleRetag(nextType: SourceType)'
+      inputs:
+      - 'nextType: SourceType'
+      output: unspecified
+      dependencies:
+      - clearDevelopmentPanels
+      - errorMessage
+      - refreshRecent
+      - setBusy
+      - setError
+      - setNotice
+      - setSaved
+      - sourceTypeLabel
+      - updateCaptureSourceType
+      parser: typescript-pattern
+      dependency_targets:
+      - *id017
+      - *id018
+      - *id019
+      - path: src/App.tsx
+        symbol: sourceTypeLabel
+      - path: src/components/CapturePanel.tsx
+        symbol: sourceTypeLabel
+      - path: src/lib/captureApi.ts
+        symbol: updateCaptureSourceType
+    - name: handleClassify
+      kind: function
+      line_start: 130
+      line_end: 150
+      signature: 'handleClassify(role: CaptureRole)'
+      inputs:
+      - 'role: CaptureRole'
+      output: unspecified
+      dependencies:
+      - classifyCaptureSource
+      - errorMessage
+      - getCaptureSource
+      - refreshRecent
+      - roleLabel
+      - setBusy
+      - setError
+      - setNotice
+      - setSaved
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/lib/workloreApi.ts
+        symbol: classifyCaptureSource
+      - *id018
+      - &id020
+        path: src/lib/workloreApi.ts
+        symbol: getCaptureSource
+      - *id019
+      - path: src/components/CapturePanel.tsx
+        symbol: roleLabel
+    - name: handleUseForVoice
+      kind: function
+      line_start: 151
+      line_end: 165
+      signature: handleUseForVoice()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - createVoiceEvidenceFromSource
+      - errorMessage
+      - setBusy
+      - setError
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - &id021
+        path: src/lib/workloreApi.ts
+        symbol: createVoiceEvidenceFromSource
+      - *id018
+    - name: handleSelectRecent
+      kind: function
+      line_start: 166
+      line_end: 179
+      signature: 'handleSelectRecent(sourceId: string)'
+      inputs:
+      - 'sourceId: string'
+      output: unspecified
+      dependencies:
+      - clearDevelopmentPanels
+      - errorMessage
+      - getCaptureSource
+      - setBusy
+      - setError
+      - setSaved
+      parser: typescript-pattern
+      dependency_targets:
+      - *id017
+      - *id018
+      - *id020
+    - name: roleLabel
+      kind: function
+      line_start: 391
+      line_end: 394
+      signature: 'roleLabel(role: CaptureRole) -> string'
+      inputs:
+      - 'role: CaptureRole'
+      output: string
+      dependencies:
+      - CAPTURE_ROLES.find
+      - label.toLowerCase
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: sourceTypeLabel
+      kind: function
+      line_start: 395
+      line_end: 398
+      signature: 'sourceTypeLabel(sourceType: SourceType) -> string'
+      inputs:
+      - 'sourceType: SourceType'
+      output: string
+      dependencies:
+      - CAPTURE_SOURCE_TYPES.find
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: SaveIcon
+      kind: function
+      line_start: 399
+      line_end: 402
+      signature: SaveIcon()
+      inputs: []
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: CloseIcon
+      kind: function
+      line_start: 403
+      line_end: 406
+      signature: CloseIcon()
+      inputs: []
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+  - path: src/components/PrivacyReviewPanel.tsx
+    analysis_version: 1
+    language: typescript
+    content_hash: cec70f159514517d6d3269ab398b8b390f83e18b
+    dependencies:
+    - ../domain/types
+    - react
+    provides:
+    - PrivacyReviewPanel
+    - submit
+    - parseEntityType
+    - entityTypeLabel
+    - percent
+    symbols:
+    - name: PrivacyReviewPanel
+      kind: function
+      line_start: 31
+      line_end: 32
+      signature: 'PrivacyReviewPanel({ reviews, onResolve }: PrivacyReviewPanelProps)'
+      inputs:
+      - '{ reviews, onResolve }: PrivacyReviewPanelProps'
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: submit
+      kind: function
+      line_start: 69
+      line_end: 80
+      signature: 'submit(request: Omit<ResolveEntityReviewRequest, <literal omitted>)'
+      inputs:
+      - 'request: Omit<ResolveEntityReviewRequest, <literal omitted>'
+      output: unspecified
+      dependencies:
+      - onResolve
+      - setSubmitting
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: parseEntityType
+      kind: function
+      line_start: 249
+      line_end: 254
+      signature: 'parseEntityType(value: string | undefined) -> EntityType'
+      inputs:
+      - 'value: string | undefined'
+      output: EntityType
+      dependencies:
+      - ENTITY_TYPES.some
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: entityTypeLabel
+      kind: function
+      line_start: 255
+      line_end: 258
+      signature: 'entityTypeLabel(value: EntityType) -> string'
+      inputs:
+      - 'value: EntityType'
+      output: string
+      dependencies:
+      - ENTITY_TYPES.find
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: percent
+      kind: function
+      line_start: 259
+      line_end: 262
+      signature: 'percent(value: number) -> string'
+      inputs:
+      - 'value: number'
+      output: string
+      dependencies:
+      - Math.round
+      parser: typescript-pattern
+      dependency_targets: []
+  - path: src/components/VoiceWorkspace.tsx
+    analysis_version: 1
+    language: typescript
+    content_hash: f89e174251a7625f871308bdcd163280d9f4b2ec
+    dependencies:
+    - ../domain/types
+    - ../lib/workloreApi
+    - ../voiceEvidencePolicy
+    - ../voiceWorkspaceQueue
+    - react
+    provides:
+    - VoiceWorkspace
+    - refresh
+    - createCandidate
+    - review
+    - addVoiceVersion
+    - draftFor
+    - updateTraitDraft
+    - editTrait
+    - saveTrait
+    - removeTrait
+    - activateVoice
+    - runVoiceAnalysis
+    - acceptVoiceProposal
+    - acceptWritingRuleProposal
+    - discardVoiceProposal
+    - discardWritingRuleProposal
+    - addTone
+    - setToneStatus
+    - addDirection
+    - setDirectionStatus
+    - runDraftLint
+    - addRule
+    - setRuleStatus
+    - renderPendingEvidence
+    symbols:
+    - name: VoiceWorkspace
+      kind: function
+      line_start: 76
+      line_end: 77
+      signature: 'VoiceWorkspace({ vaultPath }: { vaultPath: string })'
+      inputs:
+      - '{ vaultPath }: { vaultPath: string }'
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: refresh
+      kind: function
+      line_start: 144
+      line_end: 172
+      signature: refresh()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Promise.all
+      - errorMessage
+      - listCoreVoices
+      - listToneModes
+      - listVoiceDirections
+      - listVoiceEvidence
+      - listVoiceSourceCandidates
+      - listWritingRules
+      - setAuthorship
+      - setCandidates
+      - setDirections
+      - setError
+      - setEvidence
+      - setRules
+      - setTones
+      - setVoices
+      parser: typescript-pattern
+      dependency_targets:
+      - *id018
+      - path: src/lib/workloreApi.ts
+        symbol: listCoreVoices
+      - path: src/lib/workloreApi.ts
+        symbol: listToneModes
+      - path: src/lib/workloreApi.ts
+        symbol: listVoiceDirections
+      - path: src/lib/workloreApi.ts
+        symbol: listVoiceEvidence
+      - path: src/lib/workloreApi.ts
+        symbol: listVoiceSourceCandidates
+      - path: src/lib/workloreApi.ts
+        symbol: listWritingRules
+    - name: createCandidate
+      kind: function
+      line_start: 188
+      line_end: 195
+      signature: 'createCandidate(sourceId: string)'
+      inputs:
+      - 'sourceId: string'
+      output: unspecified
+      dependencies:
+      - createVoiceEvidenceFromSource
+      - run
+      parser: typescript-pattern
+      dependency_targets:
+      - *id021
+      - &id022
+        path: src-tauri/src/lib.rs
+        symbol: run
+    - name: review
+      kind: function
+      line_start: 196
+      line_end: 211
+      signature: 'review(item: VoiceEvidenceRecord, decision: VoiceEvidenceDecision)'
+      inputs:
+      - 'item: VoiceEvidenceRecord'
+      - 'decision: VoiceEvidenceDecision'
+      output: unspecified
+      dependencies:
+      - reviewVoiceEvidence
+      - run
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/lib/workloreApi.ts
+        symbol: reviewVoiceEvidence
+      - *id022
+    - name: addVoiceVersion
+      kind: function
+      line_start: 212
+      line_end: 222
+      signature: addVoiceVersion()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - createCoreVoice
+      - run
+      - setVoiceLabel
+      - voiceLabel.trim
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/lib/workloreApi.ts
+        symbol: createCoreVoice
+      - *id022
+    - name: draftFor
+      kind: function
+      line_start: 223
+      line_end: 226
+      signature: 'draftFor(voiceId: string) -> TraitDraft'
+      inputs:
+      - 'voiceId: string'
+      output: TraitDraft
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: updateTraitDraft
+      kind: function
+      line_start: 227
+      line_end: 233
+      signature: 'updateTraitDraft(voiceId: string, patch: Partial<TraitDraft>)'
+      inputs:
+      - 'voiceId: string'
+      - 'patch: Partial<TraitDraft>'
+      output: unspecified
+      dependencies:
+      - setTraitDrafts
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: editTrait
+      kind: function
+      line_start: 234
+      line_end: 248
+      signature: 'editTrait(voiceId: string, trait: CoreVoiceTrait)'
+      inputs:
+      - 'voiceId: string'
+      - 'trait: CoreVoiceTrait'
+      output: unspecified
+      dependencies:
+      - filter
+      - map
+      - setTraitDrafts
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: saveTrait
+      kind: function
+      line_start: 249
+      line_end: 266
+      signature: 'saveTrait(voiceId: string)'
+      inputs:
+      - 'voiceId: string'
+      output: unspecified
+      dependencies:
+      - draftFor
+      - run
+      - saveCoreVoiceTrait
+      - setTraitDrafts
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/components/VoiceWorkspace.tsx
+        symbol: draftFor
+      - *id022
+      - &id023
+        path: src/lib/workloreApi.ts
+        symbol: saveCoreVoiceTrait
+    - name: removeTrait
+      kind: function
+      line_start: 267
+      line_end: 274
+      signature: 'removeTrait(voiceId: string, traitId: string)'
+      inputs:
+      - 'voiceId: string'
+      - 'traitId: string'
+      output: unspecified
+      dependencies:
+      - deleteCoreVoiceTrait
+      - run
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/lib/workloreApi.ts
+        symbol: deleteCoreVoiceTrait
+      - *id022
+    - name: activateVoice
+      kind: function
+      line_start: 275
+      line_end: 282
+      signature: 'activateVoice(voiceId: string)'
+      inputs:
+      - 'voiceId: string'
+      output: unspecified
+      dependencies:
+      - activateCoreVoice
+      - run
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/lib/workloreApi.ts
+        symbol: activateCoreVoice
+      - *id022
+    - name: runVoiceAnalysis
+      kind: function
+      line_start: 283
+      line_end: 317
+      signature: runVoiceAnalysis()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - analyzeVoiceEvidence
+      - errorMessage
+      - setAnalysisResult
+      - setBusy
+      - setError
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/lib/workloreApi.ts
+        symbol: analyzeVoiceEvidence
+      - *id018
+    - name: acceptVoiceProposal
+      kind: function
+      line_start: 318
+      line_end: 347
+      signature: 'acceptVoiceProposal(proposal: VoiceTraitProposal)'
+      inputs:
+      - 'proposal: VoiceTraitProposal'
+      output: unspecified
+      dependencies:
+      - current.proposals.filter
+      - errorMessage
+      - refresh
+      - saveCoreVoiceTrait
+      - setAnalysisResult
+      - setBusy
+      - setError
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - *id018
+      - &id024
+        path: src/components/InsightsWorkspace.tsx
+        symbol: refresh
+      - &id025
+        path: src/components/StoryBankPanel.tsx
+        symbol: refresh
+      - &id026
+        path: src/components/TopicsWorkspace.tsx
+        symbol: refresh
+      - &id027
+        path: src/components/VoiceWorkspace.tsx
+        symbol: refresh
+      - *id023
+    - name: acceptWritingRuleProposal
+      kind: function
+      line_start: 348
+      line_end: 375
+      signature: 'acceptWritingRuleProposal(proposal: WritingRuleProposal)'
+      inputs:
+      - 'proposal: WritingRuleProposal'
+      output: unspecified
+      dependencies:
+      - createWritingRule
+      - current.ruleProposals.filter
+      - errorMessage
+      - refresh
+      - setAnalysisResult
+      - setBusy
+      - setError
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - &id028
+        path: src/lib/workloreApi.ts
+        symbol: createWritingRule
+      - *id018
+      - *id024
+      - *id025
+      - *id026
+      - *id027
+    - name: discardVoiceProposal
+      kind: function
+      line_start: 376
+      line_end: 386
+      signature: 'discardVoiceProposal(proposalId: string)'
+      inputs:
+      - 'proposalId: string'
+      output: unspecified
+      dependencies:
+      - current.proposals.filter
+      - setAnalysisResult
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: discardWritingRuleProposal
+      kind: function
+      line_start: 387
+      line_end: 397
+      signature: 'discardWritingRuleProposal(proposalId: string)'
+      inputs:
+      - 'proposalId: string'
+      output: unspecified
+      dependencies:
+      - current.ruleProposals.filter
+      - setAnalysisResult
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: addTone
+      kind: function
+      line_start: 398
+      line_end: 414
+      signature: addTone()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - createToneMode
+      - run
+      - setToneDescription
+      - setToneInstructions
+      - setToneName
+      - toneInstructions.trim
+      - toneName.trim
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/lib/workloreApi.ts
+        symbol: createToneMode
+      - *id022
+    - name: setToneStatus
+      kind: function
+      line_start: 415
+      line_end: 422
+      signature: 'setToneStatus(tone: ToneModeRecord, status: ToneModeRecord["status"])'
+      inputs:
+      - 'tone: ToneModeRecord'
+      - 'status: ToneModeRecord["status"]'
+      output: unspecified
+      dependencies:
+      - run
+      - updateToneMode
+      parser: typescript-pattern
+      dependency_targets:
+      - *id022
+      - path: src/lib/workloreApi.ts
+        symbol: updateToneMode
+    - name: addDirection
+      kind: function
+      line_start: 423
+      line_end: 437
+      signature: addDirection()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - createVoiceDirection
+      - directionStatement.trim
+      - run
+      - setDirectionRationale
+      - setDirectionStatement
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/lib/workloreApi.ts
+        symbol: createVoiceDirection
+      - *id022
+    - name: setDirectionStatus
+      kind: function
+      line_start: 438
+      line_end: 445
+      signature: 'setDirectionStatus(item: VoiceDirectionRecord, status: VoiceDirectionStatus)'
+      inputs:
+      - 'item: VoiceDirectionRecord'
+      - 'status: VoiceDirectionStatus'
+      output: unspecified
+      dependencies:
+      - run
+      - setVoiceDirectionStatus
+      parser: typescript-pattern
+      dependency_targets:
+      - *id022
+      - path: src/lib/workloreApi.ts
+        symbol: setVoiceDirectionStatus
+    - name: runDraftLint
+      kind: function
+      line_start: 446
+      line_end: 465
+      signature: runDraftLint()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - lintDraft
+      - lintText.trim
+      - setBusy
+      - setError
+      - setLintResult
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - *id018
+      - path: src/lib/workloreApi.ts
+        symbol: lintDraft
+    - name: addRule
+      kind: function
+      line_start: 466
+      line_end: 476
+      signature: addRule()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - createWritingRule
+      - ruleInstruction.trim
+      - ruleName.trim
+      - run
+      - setRuleInstruction
+      - setRuleName
+      parser: typescript-pattern
+      dependency_targets:
+      - *id028
+      - *id022
+    - name: setRuleStatus
+      kind: function
+      line_start: 477
+      line_end: 484
+      signature: 'setRuleStatus(item: WritingRuleRecord, status: WritingRuleStatus)'
+      inputs:
+      - 'item: WritingRuleRecord'
+      - 'status: WritingRuleStatus'
+      output: unspecified
+      dependencies:
+      - run
+      - updateWritingRule
+      parser: typescript-pattern
+      dependency_targets:
+      - *id022
+      - path: src/lib/workloreApi.ts
+        symbol: updateWritingRule
+    - name: renderPendingEvidence
+      kind: function
+      line_start: 485
+      line_end: 536
+      signature: 'renderPendingEvidence(item: VoiceEvidenceRecord)'
+      inputs:
+      - 'item: VoiceEvidenceRecord'
+      output: unspecified
+      dependencies:
+      - AUTHORSHIP_OPTIONS.map
+      - canApproveVoiceEvidence
+      - review
+      - setAuthorship
+      - voiceEligibilityReasonLabel
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/voiceEvidencePolicy.ts
+        symbol: canApproveVoiceEvidence
+      - path: src-tauri/src/services/privacy_scan_migration.rs
+        symbol: review
+      - path: src/components/VoiceWorkspace.tsx
+        symbol: review
+      - path: src/voiceEvidencePolicy.ts
+        symbol: voiceEligibilityReasonLabel
+  - path: src/domain/posts.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: 6bb5cc4ab32a4e0055b0770a378f10ae633c9492
+    dependencies: []
+    provides: []
+    symbols: []

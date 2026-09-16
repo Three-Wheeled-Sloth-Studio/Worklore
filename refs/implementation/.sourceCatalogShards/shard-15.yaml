@@ -1,0 +1,2056 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: '15'
+  files:
+  - path: src-tauri/src/services/ollama_provider.rs
+    analysis_version: 1
+    language: rust
+    content_hash: a4f8c605a591b3502e3cdd6e78b974b7c85b5108
+    dependencies:
+    - "crate::{\n    domain::providers::ProviderModelView,\n    error::{ServiceResult, WorkLoreError},\n}"
+    - reqwest::{Client, StatusCode, Url}
+    - serde::Deserialize
+    - serde_json::{json, Value}
+    - std::{collections::HashSet, time::Duration}
+    - super::*
+    provides:
+    - normalize_base_url
+    - list_models
+    - run_structured
+    - run_structured_once
+    - ordered_structured_model_ids
+    - is_likely_text_generation_model
+    - structured_affinity_score
+    - retryable_structured_model_failure
+    - client
+    - map_transport_error
+    - map_status
+    - provider_error
+    - model
+    - local_ollama_urls_are_normalized_and_remote_hosts_are_rejected
+    - http_statuses_map_to_normalized_provider_errors
+    - structured_candidates_keep_configured_model_first_then_rank_local_alternatives
+    - structured_retry_is_limited_to_model_specific_contract_failures
+    symbols:
+    - name: normalize_base_url
+      kind: function
+      line_start: 56
+      line_end: 103
+      signature: 'normalize_base_url(value: &str) -> ServiceResult<String>'
+      inputs:
+      - 'value: &str'
+      output: ServiceResult<String>
+      dependencies:
+      - Err
+      - Ok
+      - is_empty
+      - is_some
+      - map_err
+      - parse
+      - parsed.fragment
+      - parsed.host_str
+      - parsed.password
+      - parsed.path
+      - parsed.query
+      - parsed.scheme
+      - parsed.username
+      - provider_error
+      - trim_end_matches
+      - trimmed.is_empty
+      - trimmed.to_string
+      - unwrap_or_default
+      - value.trim
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/services/ollama_provider.rs
+        symbol: provider_error
+      - &id002
+        path: src-tauri/src/services/post_generation_service.rs
+        symbol: provider_error
+      - &id003
+        path: src-tauri/src/services/voice_analysis_service.rs
+        symbol: provider_error
+    - name: list_models
+      kind: function
+      line_start: 104
+      line_end: 133
+      signature: 'list_models(base_url: &str) -> ServiceResult<Vec<ProviderModelView>>'
+      inputs:
+      - 'base_url: &str'
+      output: ServiceResult<Vec<ProviderModelView>>
+      dependencies:
+      - Err
+      - Ok
+      - await.map_err
+      - client
+      - get
+      - into_iter
+      - is_success
+      - left.model_id.cmp
+      - map
+      - map_err
+      - map_status
+      - model.name.clone
+      - models.sort_by
+      - normalize_base_url
+      - provider_error
+      - response.json
+      - response.status
+      - send
+      parser: rust-pattern
+      dependency_targets:
+      - &id005
+        path: src-tauri/src/services/ollama_provider.rs
+        symbol: client
+      - &id006
+        path: src-tauri/src/services/ollama_provider.rs
+        symbol: map_status
+      - &id004
+        path: src-tauri/src/services/ollama_provider.rs
+        symbol: normalize_base_url
+      - *id001
+      - *id002
+      - *id003
+    - name: run_structured
+      kind: function
+      line_start: 134
+      line_end: 178
+      signature: 'run_structured(base_url: &str, request: StructuredProviderRequest) -> ServiceResult<StructuredProviderResponse>'
+      inputs:
+      - 'base_url: &str'
+      - 'request: StructuredProviderRequest'
+      output: ServiceResult<StructuredProviderResponse>
+      dependencies:
+      - Err
+      - Ok
+      - Some
+      - attempted.join
+      - attempted.len
+      - attempted.push
+      - candidates.into_iter
+      - candidates.is_empty
+      - last_structured_error.unwrap_or_else
+      - list_models
+      - model_id.clone
+      - new
+      - normalize_base_url
+      - ordered_structured_model_ids
+      - provider_error
+      - retryable_structured_model_failure
+      - run_structured_once
+      - take
+      parser: rust-pattern
+      dependency_targets:
+      - &id009
+        path: src-tauri/src/services/ollama_provider.rs
+        symbol: list_models
+      - &id010
+        path: src-tauri/src/services/provider_registry.rs
+        symbol: list_models
+      - *id004
+      - &id007
+        path: src-tauri/src/services/ollama_provider.rs
+        symbol: ordered_structured_model_ids
+      - *id001
+      - *id002
+      - *id003
+      - &id008
+        path: src-tauri/src/services/ollama_provider.rs
+        symbol: retryable_structured_model_failure
+      - path: src-tauri/src/services/ollama_provider.rs
+        symbol: run_structured_once
+    - name: run_structured_once
+      kind: function
+      line_start: 179
+      line_end: 215
+      signature: 'run_structured_once(base_url: &str, model_id: &str, request: &StructuredProviderRequest) -> ServiceResult<Value>'
+      inputs:
+      - 'base_url: &str'
+      - 'model_id: &str'
+      - 'request: &StructuredProviderRequest'
+      output: ServiceResult<Value>
+      dependencies:
+      - Err
+      - await.map_err
+      - client
+      - from_str
+      - is_success
+      - json
+      - map_err
+      - map_status
+      - post
+      - provider_error
+      - response.json
+      - response.status
+      - send
+      parser: rust-pattern
+      dependency_targets:
+      - *id005
+      - *id006
+      - *id001
+      - *id002
+      - *id003
+    - name: ordered_structured_model_ids
+      kind: function
+      line_start: 216
+      line_end: 243
+      signature: 'ordered_structured_model_ids(preferred_model_id: &str, installed_models: &[ProviderModelView]) -> Vec<String>'
+      inputs:
+      - 'preferred_model_id: &str'
+      - 'installed_models: &[ProviderModelView]'
+      output: Vec<String>
+      dependencies:
+      - alternatives.sort_by
+      - cmp
+      - filter
+      - is_likely_text_generation_model
+      - iter
+      - left.cmp
+      - map
+      - model.model_id.clone
+      - new
+      - ordered.extend
+      - ordered.push
+      - preferred.is_empty
+      - preferred.to_string
+      - preferred_model_id.trim
+      - seen.contains
+      - seen.insert
+      - structured_affinity_score
+      - then_with
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/ollama_provider.rs
+        symbol: is_likely_text_generation_model
+      - path: src-tauri/src/services/ollama_provider.rs
+        symbol: structured_affinity_score
+    - name: is_likely_text_generation_model
+      kind: function
+      line_start: 244
+      line_end: 258
+      signature: 'is_likely_text_generation_model(model_id: &str) -> bool'
+      inputs:
+      - 'model_id: &str'
+      output: bool
+      dependencies:
+      - any
+      - id.contains
+      - iter
+      - model_id.to_ascii_lowercase
+      parser: rust-pattern
+      dependency_targets: []
+    - name: structured_affinity_score
+      kind: function
+      line_start: 259
+      line_end: 279
+      signature: 'structured_affinity_score(model_id: &str) -> u8'
+      inputs:
+      - 'model_id: &str'
+      output: u8
+      dependencies:
+      - id.contains
+      - model_id.to_ascii_lowercase
+      parser: rust-pattern
+      dependency_targets: []
+    - name: retryable_structured_model_failure
+      kind: function
+      line_start: 280
+      line_end: 289
+      signature: 'retryable_structured_model_failure(error: &WorkLoreError) -> bool'
+      inputs:
+      - 'error: &WorkLoreError'
+      output: bool
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: client
+      kind: function
+      line_start: 290
+      line_end: 302
+      signature: client() -> ServiceResult<Client>
+      inputs: []
+      output: ServiceResult<Client>
+      dependencies:
+      - build
+      - builder
+      - connect_timeout
+      - from_secs
+      - map_err
+      - provider_error
+      - timeout
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: map_transport_error
+      kind: function
+      line_start: 303
+      line_end: 315
+      signature: 'map_transport_error(error: reqwest::Error) -> WorkLoreError'
+      inputs:
+      - 'error: reqwest::Error'
+      output: WorkLoreError
+      dependencies:
+      - error.is_connect
+      - error.is_timeout
+      - provider_error
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: map_status
+      kind: function
+      line_start: 316
+      line_end: 341
+      signature: 'map_status(status: StatusCode, model_request: bool) -> WorkLoreError'
+      inputs:
+      - 'status: StatusCode'
+      - 'model_request: bool'
+      output: WorkLoreError
+      dependencies:
+      - provider_error
+      - status.as_u16
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: provider_error
+      kind: function
+      line_start: 342
+      line_end: 348
+      signature: 'provider_error(code: &''static str, message: impl Into<String>) -> WorkLoreError'
+      inputs:
+      - 'code: &''static str'
+      - 'message: impl Into<String>'
+      output: WorkLoreError
+      dependencies:
+      - message.into
+      parser: rust-pattern
+      dependency_targets: []
+    - name: model
+      kind: function
+      line_start: 353
+      line_end: 361
+      signature: 'model(id: &str) -> ProviderModelView'
+      inputs:
+      - 'id: &str'
+      output: ProviderModelView
+      dependencies:
+      - id.to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: local_ollama_urls_are_normalized_and_remote_hosts_are_rejected
+      kind: function
+      line_start: 364
+      line_end: 376
+      signature: local_ollama_urls_are_normalized_and_remote_hosts_are_rejected()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - is_err
+      - normalize_base_url
+      - unwrap
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+    - name: http_statuses_map_to_normalized_provider_errors
+      kind: function
+      line_start: 379
+      line_end: 390
+      signature: http_statuses_map_to_normalized_provider_errors()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - map_status
+      parser: rust-pattern
+      dependency_targets:
+      - *id006
+    - name: structured_candidates_keep_configured_model_first_then_rank_local_alternatives
+      kind: function
+      line_start: 393
+      line_end: 413
+      signature: structured_candidates_keep_configured_model_first_then_rank_local_alternatives()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - model
+      - ordered_structured_model_ids
+      parser: rust-pattern
+      dependency_targets:
+      - &id011
+        path: src-tauri/src/services/ollama_provider.rs
+        symbol: model
+      - *id007
+    - name: structured_retry_is_limited_to_model_specific_contract_failures
+      kind: function
+      line_start: 416
+      line_end: 433
+      signature: structured_retry_is_limited_to_model_specific_contract_failures()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - provider_error
+      - retryable_structured_model_failure
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - *id008
+  - path: src-tauri/src/services/provider_registry.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 5ba64292167f5d73a2eae27b0b2bfa52cba8f025
+    dependencies:
+    - "crate::{\n    domain::providers::{\n        ProviderConnectionView, ProviderModelView, ProviderSettingsView,\n    \
+      \    UpdateProviderSettingsRequest, OLLAMA_PROVIDER_ID,\n    },\n    error::{ServiceResult, WorkLoreError},\n    services::{app_preferences_service,\
+      \ ollama_provider},\n}"
+    - super::*
+    provides:
+    - get_settings
+    - update_settings
+    - list_models
+    - test_connection
+    - require_selected_provider
+    - validate_requested_model
+    - sanitize_loaded_settings
+    - normalize_provider_id
+    - normalize_optional_text
+    - provider_not_configured
+    - provider_selection_is_explicit_and_does_not_fallback
+    - selected_provider_can_be_discovered_before_a_model_is_selected
+    - requested_model_must_match_explicit_configuration
+    symbols:
+    - name: get_settings
+      kind: function
+      line_start: 9
+      line_end: 13
+      signature: get_settings() -> ServiceResult<ProviderSettingsView>
+      inputs: []
+      output: ServiceResult<ProviderSettingsView>
+      dependencies:
+      - Ok
+      - get_provider_settings
+      - sanitize_loaded_settings
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/commands/providers.rs
+        symbol: get_provider_settings
+      - path: src-tauri/src/services/app_preferences_service.rs
+        symbol: get_provider_settings
+      - path: src-tauri/src/services/provider_registry.rs
+        symbol: sanitize_loaded_settings
+    - name: update_settings
+      kind: function
+      line_start: 14
+      line_end: 31
+      signature: 'update_settings(request: UpdateProviderSettingsRequest) -> ServiceResult<ProviderSettingsView>'
+      inputs:
+      - 'request: UpdateProviderSettingsRequest'
+      output: ServiceResult<ProviderSettingsView>
+      dependencies:
+      - Some
+      - normalize_base_url
+      - normalize_optional_text
+      - normalize_provider_id
+      - request.ollama_model_id.as_deref
+      - request.selected_provider_id.as_deref
+      - save_provider_settings
+      - selected_provider_id.as_deref
+      - to_string
+      - unwrap_or_else
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+      - &id013
+        path: src-tauri/src/services/provider_registry.rs
+        symbol: normalize_optional_text
+      - &id014
+        path: src-tauri/src/services/provider_registry.rs
+        symbol: normalize_provider_id
+      - path: src-tauri/src/services/app_preferences_service.rs
+        symbol: save_provider_settings
+    - name: list_models
+      kind: function
+      line_start: 32
+      line_end: 41
+      signature: 'list_models(provider_id: &str) -> ServiceResult<Vec<ProviderModelView>>'
+      inputs:
+      - 'provider_id: &str'
+      output: ServiceResult<Vec<ProviderModelView>>
+      dependencies:
+      - Err
+      - provider_not_configured
+      - require_selected_provider
+      parser: rust-pattern
+      dependency_targets:
+      - &id012
+        path: src-tauri/src/services/provider_registry.rs
+        symbol: provider_not_configured
+      - path: src-tauri/src/services/provider_registry.rs
+        symbol: require_selected_provider
+    - name: test_connection
+      kind: function
+      line_start: 42
+      line_end: 58
+      signature: 'test_connection(provider_id: &str) -> ServiceResult<ProviderConnectionView>'
+      inputs:
+      - 'provider_id: &str'
+      output: ServiceResult<ProviderConnectionView>
+      dependencies:
+      - Ok
+      - list_models
+      - model
+      - models.is_empty
+      - models.len
+      - provider_id.to_string
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - *id009
+      - *id010
+      - *id011
+    - name: require_selected_provider
+      kind: function
+      line_start: 59
+      line_end: 74
+      signature: 'require_selected_provider(provider_id: &str) -> ServiceResult<ProviderSettingsView>'
+      inputs:
+      - 'provider_id: &str'
+      output: ServiceResult<ProviderSettingsView>
+      dependencies:
+      - Err
+      - Ok
+      - Some
+      - get_settings
+      - provider_id.is_empty
+      - provider_id.trim
+      - provider_not_configured
+      - settings.selected_provider_id.as_deref
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/provider_registry.rs
+        symbol: get_settings
+      - *id012
+    - name: validate_requested_model
+      kind: function
+      line_start: 75
+      line_end: 92
+      signature: 'validate_requested_model(settings: &ProviderSettingsView, model_id: &str) -> ServiceResult<String>'
+      inputs:
+      - 'settings: &ProviderSettingsView'
+      - 'model_id: &str'
+      output: ServiceResult<String>
+      dependencies:
+      - Err
+      - Ok
+      - Some
+      - model_id.trim
+      - provider_not_configured
+      - requested.is_empty
+      - requested.to_string
+      - settings.ollama_model_id.as_deref
+      parser: rust-pattern
+      dependency_targets:
+      - *id012
+    - name: sanitize_loaded_settings
+      kind: function
+      line_start: 93
+      line_end: 100
+      signature: 'sanitize_loaded_settings(mut settings: ProviderSettingsView) -> ProviderSettingsView'
+      inputs:
+      - 'mut settings: ProviderSettingsView'
+      output: ProviderSettingsView
+      dependencies:
+      - Some
+      - normalize_optional_text
+      - settings.ollama_model_id.as_deref
+      - settings.selected_provider_id.as_deref
+      parser: rust-pattern
+      dependency_targets:
+      - *id013
+    - name: normalize_provider_id
+      kind: function
+      line_start: 101
+      line_end: 110
+      signature: 'normalize_provider_id(value: Option<&str>) -> ServiceResult<Option<String>>'
+      inputs:
+      - 'value: Option<&str>'
+      output: ServiceResult<Option<String>>
+      dependencies:
+      - Err
+      - OLLAMA_PROVIDER_ID.to_string
+      - Ok
+      - Some
+      - filter
+      - provider_not_configured
+      - value.is_empty
+      - value.map
+      parser: rust-pattern
+      dependency_targets:
+      - *id012
+    - name: normalize_optional_text
+      kind: function
+      line_start: 111
+      line_end: 117
+      signature: 'normalize_optional_text(value: Option<&str>) -> Option<String>'
+      inputs:
+      - 'value: Option<&str>'
+      output: Option<String>
+      dependencies:
+      - filter
+      - map
+      - value.is_empty
+      parser: rust-pattern
+      dependency_targets: []
+    - name: provider_not_configured
+      kind: function
+      line_start: 118
+      line_end: 124
+      signature: 'provider_not_configured(message: impl Into<String>) -> WorkLoreError'
+      inputs:
+      - 'message: impl Into<String>'
+      output: WorkLoreError
+      dependencies:
+      - message.into
+      parser: rust-pattern
+      dependency_targets: []
+    - name: provider_selection_is_explicit_and_does_not_fallback
+      kind: function
+      line_start: 131
+      line_end: 138
+      signature: provider_selection_is_explicit_and_does_not_fallback()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - is_err
+      - normalize_provider_id
+      - to_string
+      - unwrap
+      parser: rust-pattern
+      dependency_targets:
+      - *id014
+    - name: selected_provider_can_be_discovered_before_a_model_is_selected
+      kind: function
+      line_start: 141
+      line_end: 149
+      signature: selected_provider_can_be_discovered_before_a_model_is_selected()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - into
+      - is_err
+      - settings.selected_provider_id.as_deref
+      - validate_requested_model
+      parser: rust-pattern
+      dependency_targets:
+      - &id015
+        path: src-tauri/src/services/provider_registry.rs
+        symbol: validate_requested_model
+    - name: requested_model_must_match_explicit_configuration
+      kind: function
+      line_start: 152
+      line_end: 163
+      signature: requested_model_must_match_explicit_configuration()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - into
+      - is_err
+      - unwrap
+      - validate_requested_model
+      parser: rust-pattern
+      dependency_targets:
+      - *id015
+  - path: src-tauri/src/services/source_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: c5b80a2b659b00008c1f712a00de2f4b4437d7a1
+    dependencies:
+    - chrono::Utc
+    - "crate::{\n    domain::models::{\n        ContentHash, ExtractionState, ExtractionStatus, ImportSourceResult, PrivacyScanState,\n\
+      \        PrivacyScanStatus, SourceDocument, SourceProvenance, SourceSummary, SourceType,\n    },\n    error::{ServiceResult,\
+      \ WorkLoreError},\n    io_utils::{\n        read_json, sanitize_file_name, sha256_file, to_vault_relative, unique_destination,\n\
+      \        write_json_atomic,\n    },\n    services::{\n        contextual_entity_scan::scan_named_projects, document_extraction,\
+      \ entity_scan::scan_text,\n        performance_service::OperationSession,\n    },\n}"
+    - serde_json::{Map, Value}
+    - std::{fs, path::Path}
+    - super::*
+    - uuid::Uuid
+    provides:
+    - import_source
+    - list_sources
+    - read_source_documents
+    - find_source_by_hash
+    - extract_and_scan
+    - empty_metadata
+    - normalized_extension
+    - media_type_for_extension
+    - known_media_types_are_stable
+    symbols:
+    - name: import_source
+      kind: function
+      line_start: 22
+      line_end: 156
+      signature: 'import_source(vault_path: &Path, source_path: &Path, source_type: SourceType) -> ServiceResult<ImportSourceResult>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'source_path: &Path'
+      - 'source_type: SourceType'
+      output: ServiceResult<ImportSourceResult>
+      dependencies:
+      - Err
+      - Ok
+      - Some
+      - String
+      - and_then
+      - copy
+      - create_dir_all
+      - empty_metadata
+      - existing.source_id.clone
+      - extension.as_str
+      - extension.clone
+      - extract_and_scan
+      - file_name
+      - file_stem
+      - find_source_by_hash
+      - from
+      - is_file
+      - join
+      - len
+      - let
+      - match
+      - media_type_for_extension
+      - metadata
+      - metadata.len
+      parser: rust-pattern
+      dependency_targets:
+      - &id017
+        path: src-tauri/src/services/source_service.rs
+        symbol: empty_metadata
+      - path: src-tauri/src/services/source_service.rs
+        symbol: extract_and_scan
+      - path: src-tauri/src/services/source_service.rs
+        symbol: find_source_by_hash
+      - &id018
+        path: src-tauri/src/domain/candidates.rs
+        symbol: from
+      - &id019
+        path: src-tauri/src/domain/models.rs
+        symbol: from
+      - &id020
+        path: src-tauri/src/error.rs
+        symbol: from
+      - &id021
+        path: src-tauri/src/services/source_service.rs
+        symbol: media_type_for_extension
+    - name: list_sources
+      kind: function
+      line_start: 157
+      line_end: 162
+      signature: 'list_sources(vault_path: &Path) -> ServiceResult<Vec<SourceSummary>>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Vec<SourceSummary>>
+      dependencies:
+      - Ok
+      - collect
+      - documents.iter
+      - documents.sort_by
+      - map
+      - read_source_documents
+      - right.imported_at.cmp
+      parser: rust-pattern
+      dependency_targets:
+      - &id016
+        path: src-tauri/src/services/source_service.rs
+        symbol: read_source_documents
+    - name: read_source_documents
+      kind: function
+      line_start: 163
+      line_end: 180
+      signature: 'read_source_documents(vault_path: &Path) -> ServiceResult<Vec<SourceDocument>>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Vec<SourceDocument>>
+      dependencies:
+      - Ok
+      - Some
+      - and_then
+      - directory.exists
+      - documents.push
+      - entry.file_type
+      - entry.path
+      - extension
+      - is_file
+      - new
+      - read_dir
+      - read_json
+      - value.to_str
+      - vault_path.join
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/io_utils.rs
+        symbol: read_json
+    - name: find_source_by_hash
+      kind: function
+      line_start: 181
+      line_end: 186
+      signature: 'find_source_by_hash(vault_path: &Path, hash: &str) -> ServiceResult<Option<SourceDocument>>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'hash: &str'
+      output: ServiceResult<Option<SourceDocument>>
+      dependencies:
+      - Ok
+      - find
+      - into_iter
+      - read_source_documents
+      parser: rust-pattern
+      dependency_targets:
+      - *id016
+    - name: extract_and_scan
+      kind: function
+      line_start: 187
+      line_end: 289
+      signature: 'extract_and_scan(vault_path: &Path, source_id: &str, destination: &Path, extension: &str, now: &str, operation:
+        &mut OperationSession) -> ServiceResult<(ExtractionState, PrivacyScanState)>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'source_id: &str'
+      - 'destination: &Path'
+      - 'extension: &str'
+      - 'now: &str'
+      - 'operation: &mut OperationSession'
+      output: ServiceResult<(ExtractionState, PrivacyScanState)>
+      dependencies:
+      - Err
+      - Ok
+      - Some
+      - cache_metadata.insert
+      - count
+      - empty_metadata
+      - error.to_string
+      - extract
+      - extracted.text.chars
+      - extracted.text.trim
+      - from
+      - is_empty
+      - join
+      - new
+      - now.to_string
+      - operation.step
+      - review_item_ids.dedup
+      - review_item_ids.extend
+      - review_item_ids.is_empty
+      - review_item_ids.sort
+      - scan_named_projects
+      - scan_text
+      - to_string
+      - to_vault_relative
+      parser: rust-pattern
+      dependency_targets:
+      - *id017
+      - path: src-tauri/src/services/document_extraction.rs
+        symbol: extract
+      - *id018
+      - *id019
+      - *id020
+      - path: src-tauri/src/services/contextual_entity_scan.rs
+        symbol: scan_named_projects
+      - path: src-tauri/src/services/entity_scan.rs
+        symbol: scan_text
+      - path: src-tauri/src/io_utils.rs
+        symbol: to_vault_relative
+    - name: empty_metadata
+      kind: function
+      line_start: 290
+      line_end: 293
+      signature: empty_metadata() -> Map<String, Value>
+      inputs: []
+      output: Map<String, Value>
+      dependencies:
+      - new
+      parser: rust-pattern
+      dependency_targets: []
+    - name: normalized_extension
+      kind: function
+      line_start: 294
+      line_end: 300
+      signature: 'normalized_extension(path: &Path) -> ServiceResult<String>'
+      inputs:
+      - 'path: &Path'
+      output: ServiceResult<String>
+      dependencies:
+      - and_then
+      - map
+      - ok_or
+      - path.extension
+      - value.to_str
+      parser: rust-pattern
+      dependency_targets: []
+    - name: media_type_for_extension
+      kind: function
+      line_start: 301
+      line_end: 310
+      signature: 'media_type_for_extension(extension: &str) -> &''static str'
+      inputs:
+      - 'extension: &str'
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: known_media_types_are_stable
+      kind: function
+      line_start: 317
+      line_end: 320
+      signature: known_media_types_are_stable()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - media_type_for_extension
+      parser: rust-pattern
+      dependency_targets:
+      - *id021
+  - path: src-tauri/src/services/voice_profile_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: d9e9d4eb3dca128275bba2c347988b5893d33ac3
+    dependencies:
+    - chrono::Utc
+    - crate::services::vault_service
+    - "crate::{\n    error::{ServiceResult, WorkLoreError},\n    services::canonical_store,\n}"
+    - rusqlite::{params, Connection, OptionalExtension, Transaction}
+    - serde::{Deserialize, Serialize}
+    - serde_json::{json, Value}
+    - std::{collections::BTreeSet, path::Path, time::Duration}
+    - super::*
+    - uuid::Uuid
+    provides:
+    - parse
+    - as_str
+    - as_str
+    - as_str
+    - list_core_voices
+    - create_core_voice
+    - save_core_voice_trait
+    - delete_core_voice_trait
+    - activate_core_voice
+    - list_tone_modes
+    - create_tone_mode
+    - update_tone_mode
+    - list_voice_directions
+    - create_voice_direction
+    - set_voice_direction_status
+    - list_writing_rules
+    - create_writing_rule
+    - update_writing_rule
+    - open_connection
+    - required_text
+    - optional_text
+    - require_proposed_voice
+    - validate_eligible_evidence
+    - validate_voice_for_activation
+    - touch_voice
+    - load_core_voice_from_connection
+    - load_traits
+    - map_tone_mode
+    - load_tone_mode
+    - map_voice_direction
+    - load_voice_direction
+    - map_writing_rule
+    - load_writing_rule
+    - valid_direction_transition
+    - valid_rule_transition
+    - audit_tx
+    - audit_connection
+    - vault
+    - add_voice_evidence
+    - core_voice_requires_attributable_provenance_and_supersedes_transactionally
+    - rejected_or_retired_voice_evidence_cannot_support_new_traits
+    - later_evidence_retirement_surfaces_without_rewriting_historical_voice
+    - tone_direction_and_rules_have_independent_lifecycles
+    symbols:
+    - name: parse
+      kind: function
+      line_start: 23
+      line_end: 32
+      signature: 'parse(value: &str) -> ServiceResult<Self>'
+      inputs:
+      - 'value: &str'
+      output: ServiceResult<Self>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      parser: rust-pattern
+      dependency_targets: []
+    - name: as_str
+      kind: function
+      line_start: 44
+      line_end: 50
+      signature: as_str(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: as_str
+      kind: function
+      line_start: 63
+      line_end: 70
+      signature: as_str(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: as_str
+      kind: function
+      line_start: 83
+      line_end: 90
+      signature: as_str(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: list_core_voices
+      kind: function
+      line_start: 236
+      line_end: 248
+      signature: 'list_core_voices(vault_path: &Path) -> ServiceResult<Vec<CoreVoiceRecordView>>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Vec<CoreVoiceRecordView>>
+      dependencies:
+      - collect
+      - ids.into_iter
+      - initialize
+      - load_core_voice_from_connection
+      - map
+      - open_connection
+      - prepare
+      - query_map
+      parser: rust-pattern
+      dependency_targets:
+      - &id022
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: initialize
+      - &id023
+        path: src-tauri/src/services/voice_profile_service.rs
+        symbol: load_core_voice_from_connection
+    - name: create_core_voice
+      kind: function
+      line_start: 249
+      line_end: 286
+      signature: 'create_core_voice(vault_path: &Path, request: CreateCoreVoiceRequest) -> ServiceResult<CoreVoiceRecordView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: CreateCoreVoiceRequest'
+      output: ServiceResult<CoreVoiceRecordView>
+      dependencies:
+      - COALESCE
+      - MAX
+      - VALUES
+      - audit_tx
+      - connection.transaction
+      - core_voices
+      - initialize
+      - load_core_voice_from_connection
+      - now
+      - now_v7
+      - open_connection
+      - required_text
+      - row.get
+      - to_rfc3339
+      - to_string
+      - tx.commit
+      - tx.execute
+      - tx.query_row
+      parser: rust-pattern
+      dependency_targets:
+      - &id024
+        path: src-tauri/src/services/edit_learning_service.rs
+        symbol: audit_tx
+      - &id025
+        path: src-tauri/src/services/post_lineage_service.rs
+        symbol: audit_tx
+      - &id026
+        path: src-tauri/src/services/voice_evidence_service.rs
+        symbol: audit_tx
+      - &id027
+        path: src-tauri/src/services/voice_profile_service.rs
+        symbol: audit_tx
+      - *id022
+      - *id023
+      - &id029
+        path: src-tauri/src/services/inspiration_service.rs
+        symbol: required_text
+      - &id030
+        path: src-tauri/src/services/target_context_service.rs
+        symbol: required_text
+      - &id031
+        path: src-tauri/src/services/topic_service.rs
+        symbol: required_text
+      - &id032
+        path: src-tauri/src/services/voice_profile_service.rs
+        symbol: required_text
+    - name: save_core_voice_trait
+      kind: function
+      line_start: 287
+      line_end: 384
+      signature: 'save_core_voice_trait(vault_path: &Path, request: SaveCoreVoiceTraitRequest) -> ServiceResult<CoreVoiceRecordView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: SaveCoreVoiceTraitRequest'
+      output: ServiceResult<CoreVoiceRecordView>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Some
+      - VALUES
+      - audit_tx
+      - connection.transaction
+      - core_voice_trait_evidence
+      - core_voice_traits
+      - evidence_ids.is_empty
+      - filter
+      - guidance.is_none
+      - guidance.is_some
+      - initialize
+      - iter
+      - let
+      - load_core_voice_from_connection
+      - map
+      - now
+      - now_v7
+      - open_connection
+      - optional
+      - optional_text
+      - owner.as_deref
+      - query_row
+      parser: rust-pattern
+      dependency_targets:
+      - *id024
+      - *id025
+      - *id026
+      - *id027
+      - *id022
+      - *id023
+      - &id037
+        path: src-tauri/src/services/voice_profile_service.rs
+        symbol: optional_text
+    - name: delete_core_voice_trait
+      kind: function
+      line_start: 385
+      line_end: 416
+      signature: 'delete_core_voice_trait(vault_path: &Path, voice_id: &str, trait_id: &str) -> ServiceResult<CoreVoiceRecordView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'voice_id: &str'
+      - 'trait_id: &str'
+      output: ServiceResult<CoreVoiceRecordView>
+      dependencies:
+      - Err
+      - InvalidVault
+      - audit_tx
+      - connection.transaction
+      - initialize
+      - load_core_voice_from_connection
+      - now
+      - open_connection
+      - require_proposed_voice
+      - to_rfc3339
+      - to_string
+      - touch_voice
+      - tx.commit
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets:
+      - *id024
+      - *id025
+      - *id026
+      - *id027
+      - *id022
+      - *id023
+      - &id028
+        path: src-tauri/src/services/voice_profile_service.rs
+        symbol: require_proposed_voice
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: touch_voice
+    - name: activate_core_voice
+      kind: function
+      line_start: 417
+      line_end: 466
+      signature: 'activate_core_voice(vault_path: &Path, voice_id: &str) -> ServiceResult<CoreVoiceRecordView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'voice_id: &str'
+      output: ServiceResult<CoreVoiceRecordView>
+      dependencies:
+      - audit_tx
+      - connection.transaction
+      - initialize
+      - load_core_voice_from_connection
+      - now
+      - open_connection
+      - query_map
+      - require_proposed_voice
+      - to_rfc3339
+      - tx.commit
+      - tx.execute
+      - tx.prepare
+      - validate_voice_for_activation
+      parser: rust-pattern
+      dependency_targets:
+      - *id024
+      - *id025
+      - *id026
+      - *id027
+      - *id022
+      - *id023
+      - *id028
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: validate_voice_for_activation
+    - name: list_tone_modes
+      kind: function
+      line_start: 467
+      line_end: 479
+      signature: 'list_tone_modes(vault_path: &Path) -> ServiceResult<Vec<ToneModeRecordView>>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Vec<ToneModeRecordView>>
+      dependencies:
+      - Ok
+      - connection.prepare
+      - initialize
+      - open_connection
+      - query_map
+      parser: rust-pattern
+      dependency_targets:
+      - *id022
+    - name: create_tone_mode
+      kind: function
+      line_start: 480
+      line_end: 513
+      signature: 'create_tone_mode(vault_path: &Path, request: CreateToneModeRequest) -> ServiceResult<ToneModeRecordView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: CreateToneModeRequest'
+      output: ServiceResult<ToneModeRecordView>
+      dependencies:
+      - VALUES
+      - audit_connection
+      - connection.execute
+      - initialize
+      - load_tone_mode
+      - now
+      - now_v7
+      - open_connection
+      - request.description.trim
+      - required_text
+      - to_rfc3339
+      - to_string
+      - tone_modes
+      parser: rust-pattern
+      dependency_targets:
+      - &id033
+        path: src-tauri/src/services/voice_profile_service.rs
+        symbol: audit_connection
+      - *id022
+      - &id034
+        path: src-tauri/src/services/voice_profile_service.rs
+        symbol: load_tone_mode
+      - *id029
+      - *id030
+      - *id031
+      - *id032
+    - name: update_tone_mode
+      kind: function
+      line_start: 514
+      line_end: 552
+      signature: 'update_tone_mode(vault_path: &Path, request: UpdateToneModeRequest) -> ServiceResult<ToneModeRecordView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: UpdateToneModeRequest'
+      output: ServiceResult<ToneModeRecordView>
+      dependencies:
+      - Err
+      - InvalidVault
+      - audit_connection
+      - connection.execute
+      - initialize
+      - load_tone_mode
+      - now
+      - open_connection
+      - request.description.trim
+      - request.status.as_str
+      - required_text
+      - to_rfc3339
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - *id033
+      - *id022
+      - *id034
+      - *id029
+      - *id030
+      - *id031
+      - *id032
+    - name: list_voice_directions
+      kind: function
+      line_start: 553
+      line_end: 565
+      signature: 'list_voice_directions(vault_path: &Path) -> ServiceResult<Vec<VoiceDirectionRecordView>>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Vec<VoiceDirectionRecordView>>
+      dependencies:
+      - Ok
+      - connection.prepare
+      - initialize
+      - open_connection
+      - query_map
+      parser: rust-pattern
+      dependency_targets:
+      - *id022
+    - name: create_voice_direction
+      kind: function
+      line_start: 566
+      line_end: 598
+      signature: 'create_voice_direction(vault_path: &Path, request: CreateVoiceDirectionRequest) -> ServiceResult<VoiceDirectionRecordView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: CreateVoiceDirectionRequest'
+      output: ServiceResult<VoiceDirectionRecordView>
+      dependencies:
+      - VALUES
+      - audit_connection
+      - connection.execute
+      - initialize
+      - load_voice_direction
+      - now
+      - now_v7
+      - open_connection
+      - request.rationale.trim
+      - required_text
+      - to_rfc3339
+      - to_string
+      - voice_directions
+      parser: rust-pattern
+      dependency_targets:
+      - *id033
+      - *id022
+      - &id035
+        path: src-tauri/src/services/voice_profile_service.rs
+        symbol: load_voice_direction
+      - *id029
+      - *id030
+      - *id031
+      - *id032
+    - name: set_voice_direction_status
+      kind: function
+      line_start: 599
+      line_end: 648
+      signature: 'set_voice_direction_status(vault_path: &Path, request: SetVoiceDirectionStatusRequest) -> ServiceResult<VoiceDirectionRecordView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: SetVoiceDirectionStatusRequest'
+      output: ServiceResult<VoiceDirectionRecordView>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      - Some
+      - audit_connection
+      - connection.execute
+      - existing.accepted_at.clone
+      - existing.completed_at.clone
+      - existing.status.as_str
+      - initialize
+      - load_voice_direction
+      - now
+      - now.clone
+      - open_connection
+      - request.status.as_str
+      - to_rfc3339
+      - valid_direction_transition
+      parser: rust-pattern
+      dependency_targets:
+      - *id033
+      - *id022
+      - *id035
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: valid_direction_transition
+    - name: list_writing_rules
+      kind: function
+      line_start: 649
+      line_end: 661
+      signature: 'list_writing_rules(vault_path: &Path) -> ServiceResult<Vec<WritingRuleRecordView>>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Vec<WritingRuleRecordView>>
+      dependencies:
+      - Ok
+      - connection.prepare
+      - initialize
+      - open_connection
+      - query_map
+      parser: rust-pattern
+      dependency_targets:
+      - *id022
+    - name: create_writing_rule
+      kind: function
+      line_start: 662
+      line_end: 693
+      signature: 'create_writing_rule(vault_path: &Path, request: CreateWritingRuleRequest) -> ServiceResult<WritingRuleRecordView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: CreateWritingRuleRequest'
+      output: ServiceResult<WritingRuleRecordView>
+      dependencies:
+      - VALUES
+      - audit_connection
+      - connection.execute
+      - initialize
+      - load_writing_rule
+      - now
+      - now_v7
+      - open_connection
+      - required_text
+      - to_rfc3339
+      - to_string
+      - writing_rules
+      parser: rust-pattern
+      dependency_targets:
+      - *id033
+      - *id022
+      - &id036
+        path: src-tauri/src/services/voice_profile_service.rs
+        symbol: load_writing_rule
+      - *id029
+      - *id030
+      - *id031
+      - *id032
+    - name: update_writing_rule
+      kind: function
+      line_start: 694
+      line_end: 733
+      signature: 'update_writing_rule(vault_path: &Path, request: UpdateWritingRuleRequest) -> ServiceResult<WritingRuleRecordView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: UpdateWritingRuleRequest'
+      output: ServiceResult<WritingRuleRecordView>
+      dependencies:
+      - Err
+      - InvalidVault
+      - audit_connection
+      - connection.execute
+      - existing.status.as_str
+      - initialize
+      - load_writing_rule
+      - now
+      - open_connection
+      - request.status.as_str
+      - required_text
+      - to_rfc3339
+      - valid_rule_transition
+      parser: rust-pattern
+      dependency_targets:
+      - *id033
+      - *id022
+      - *id036
+      - *id029
+      - *id030
+      - *id031
+      - *id032
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: valid_rule_transition
+    - name: open_connection
+      kind: function
+      line_start: 734
+      line_end: 740
+      signature: 'open_connection(vault_path: &Path) -> ServiceResult<Connection>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Connection>
+      dependencies:
+      - Ok
+      - connection.busy_timeout
+      - connection.pragma_update
+      - database_path
+      - from_secs
+      - open
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: database_path
+    - name: required_text
+      kind: function
+      line_start: 741
+      line_end: 749
+      signature: 'required_text(value: &str, label: &str) -> ServiceResult<String>'
+      inputs:
+      - 'value: &str'
+      - 'label: &str'
+      output: ServiceResult<String>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      - value.is_empty
+      - value.to_string
+      - value.trim
+      parser: rust-pattern
+      dependency_targets: []
+    - name: optional_text
+      kind: function
+      line_start: 750
+      line_end: 756
+      signature: 'optional_text(value: Option<&str>) -> Option<String>'
+      inputs:
+      - 'value: Option<&str>'
+      output: Option<String>
+      dependencies:
+      - filter
+      - map
+      - value.is_empty
+      parser: rust-pattern
+      dependency_targets: []
+    - name: require_proposed_voice
+      kind: function
+      line_start: 757
+      line_end: 775
+      signature: 'require_proposed_voice(tx: &Transaction<''_>, voice_id: &str) -> ServiceResult<()>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'voice_id: &str'
+      output: ServiceResult<()>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      - Some
+      - optional
+      - query_row
+      - row.get
+      - status.as_deref
+      - to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: validate_eligible_evidence
+      kind: function
+      line_start: 776
+      line_end: 804
+      signature: 'validate_eligible_evidence(tx: &Transaction<''_>, evidence_ids: &BTreeSet<String>) -> ServiceResult<()>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'evidence_ids: &BTreeSet<String>'
+      output: ServiceResult<()>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      - Some
+      - optional
+      - query_row
+      - row.get
+      - status.as_deref
+      parser: rust-pattern
+      dependency_targets: []
+    - name: validate_voice_for_activation
+      kind: function
+      line_start: 805
+      line_end: 855
+      signature: 'validate_voice_for_activation(tx: &Transaction<''_>, voice_id: &str) -> ServiceResult<()>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'voice_id: &str'
+      output: ServiceResult<()>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      - Some
+      - find
+      - guidance.as_deref
+      - is_none
+      - optional_text
+      - query_map
+      - row.get
+      - statuses.is_empty
+      - statuses.iter
+      - to_string
+      - trait_ids.is_empty
+      - tx.prepare
+      - tx.query_row
+      parser: rust-pattern
+      dependency_targets:
+      - *id037
+    - name: touch_voice
+      kind: function
+      line_start: 856
+      line_end: 863
+      signature: 'touch_voice(tx: &Transaction<''_>, voice_id: &str, now: &str) -> ServiceResult<()>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'voice_id: &str'
+      - 'now: &str'
+      output: ServiceResult<()>
+      dependencies:
+      - Ok
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets: []
+    - name: load_core_voice_from_connection
+      kind: function
+      line_start: 864
+      line_end: 903
+      signature: 'load_core_voice_from_connection(connection: &Connection, voice_id: &str) -> ServiceResult<CoreVoiceRecordView>'
+      inputs:
+      - 'connection: &Connection'
+      - 'voice_id: &str'
+      output: ServiceResult<CoreVoiceRecordView>
+      dependencies:
+      - InvalidVault
+      - Ok
+      - load_traits
+      - ok_or_else
+      - optional
+      - parse
+      - query_row
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: load_traits
+    - name: load_traits
+      kind: function
+      line_start: 904
+      line_end: 974
+      signature: 'load_traits(connection: &Connection, voice_id: &str) -> ServiceResult<Vec<CoreVoiceTraitView>>'
+      inputs:
+      - 'connection: &Connection'
+      - 'voice_id: &str'
+      output: ServiceResult<Vec<CoreVoiceTraitView>>
+      dependencies:
+      - Ok
+      - collect
+      - connection.prepare
+      - evidence.is_empty
+      - evidence_row.get
+      - filter
+      - invalidated_evidence_ids.is_empty
+      - is_some
+      - item.voice_evidence_id.clone
+      - iter
+      - map
+      - match
+      - optional_text
+      - query_map
+      - row.3.as_deref
+      - rows.into_iter
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - *id037
+    - name: map_tone_mode
+      kind: function
+      line_start: 975
+      line_end: 993
+      signature: 'map_tone_mode(row: &rusqlite::Row<''_>) -> rusqlite::Result<ToneModeRecordView>'
+      inputs:
+      - 'row: &rusqlite::Row<''_>'
+      output: rusqlite::Result<ToneModeRecordView>
+      dependencies:
+      - Err
+      - Ok
+      - row.get
+      - status.as_str
+      parser: rust-pattern
+      dependency_targets: []
+    - name: load_tone_mode
+      kind: function
+      line_start: 994
+      line_end: 1005
+      signature: 'load_tone_mode(connection: &Connection, tone_id: &str) -> ServiceResult<ToneModeRecordView>'
+      inputs:
+      - 'connection: &Connection'
+      - 'tone_id: &str'
+      output: ServiceResult<ToneModeRecordView>
+      dependencies:
+      - InvalidVault
+      - ok_or_else
+      - optional
+      - query_row
+      parser: rust-pattern
+      dependency_targets: []
+    - name: map_voice_direction
+      kind: function
+      line_start: 1006
+      line_end: 1028
+      signature: 'map_voice_direction(row: &rusqlite::Row<''_>) -> rusqlite::Result<VoiceDirectionRecordView>'
+      inputs:
+      - 'row: &rusqlite::Row<''_>'
+      output: rusqlite::Result<VoiceDirectionRecordView>
+      dependencies:
+      - Err
+      - Ok
+      - row.get
+      - status.as_str
+      parser: rust-pattern
+      dependency_targets: []
+    - name: load_voice_direction
+      kind: function
+      line_start: 1029
+      line_end: 1047
+      signature: 'load_voice_direction(connection: &Connection, voice_direction_id: &str) -> ServiceResult<VoiceDirectionRecordView>'
+      inputs:
+      - 'connection: &Connection'
+      - 'voice_direction_id: &str'
+      output: ServiceResult<VoiceDirectionRecordView>
+      dependencies:
+      - InvalidVault
+      - ok_or_else
+      - optional
+      - query_row
+      parser: rust-pattern
+      dependency_targets: []
+    - name: map_writing_rule
+      kind: function
+      line_start: 1048
+      line_end: 1067
+      signature: 'map_writing_rule(row: &rusqlite::Row<''_>) -> rusqlite::Result<WritingRuleRecordView>'
+      inputs:
+      - 'row: &rusqlite::Row<''_>'
+      output: rusqlite::Result<WritingRuleRecordView>
+      dependencies:
+      - Err
+      - Ok
+      - row.get
+      - status.as_str
+      parser: rust-pattern
+      dependency_targets: []
+    - name: load_writing_rule
+      kind: function
+      line_start: 1068
+      line_end: 1084
+      signature: 'load_writing_rule(connection: &Connection, rule_id: &str) -> ServiceResult<WritingRuleRecordView>'
+      inputs:
+      - 'connection: &Connection'
+      - 'rule_id: &str'
+      output: ServiceResult<WritingRuleRecordView>
+      dependencies:
+      - InvalidVault
+      - ok_or_else
+      - optional
+      - query_row
+      parser: rust-pattern
+      dependency_targets: []
+    - name: valid_direction_transition
+      kind: function
+      line_start: 1085
+      line_end: 1106
+      signature: 'valid_direction_transition(from: VoiceDirectionStatus, to: VoiceDirectionStatus) -> bool'
+      inputs:
+      - 'from: VoiceDirectionStatus'
+      - 'to: VoiceDirectionStatus'
+      output: bool
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: valid_rule_transition
+      kind: function
+      line_start: 1107
+      line_end: 1118
+      signature: 'valid_rule_transition(from: WritingRuleStatus, to: WritingRuleStatus) -> bool'
+      inputs:
+      - 'from: WritingRuleStatus'
+      - 'to: WritingRuleStatus'
+      output: bool
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: audit_tx
+      kind: function
+      line_start: 1119
+      line_end: 1141
+      signature: 'audit_tx(tx: &Transaction<''_>, event_type: &str, record_type: &str, record_id: &str, details: Value, now:
+        &str) -> ServiceResult<()>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'event_type: &str'
+      - 'record_type: &str'
+      - 'record_id: &str'
+      - 'details: Value'
+      - 'now: &str'
+      output: ServiceResult<()>
+      dependencies:
+      - Ok
+      - VALUES
+      - audit_events
+      - details.to_string
+      - now_v7
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets: []
+    - name: audit_connection
+      kind: function
+      line_start: 1142
+      line_end: 1164
+      signature: 'audit_connection(connection: &Connection, event_type: &str, record_type: &str, record_id: &str, details:
+        Value, now: &str) -> ServiceResult<()>'
+      inputs:
+      - 'connection: &Connection'
+      - 'event_type: &str'
+      - 'record_type: &str'
+      - 'record_id: &str'
+      - 'details: Value'
+      - 'now: &str'
+      output: ServiceResult<()>
+      dependencies:
+      - Ok
+      - VALUES
+      - audit_events
+      - connection.execute
+      - details.to_string
+      - now_v7
+      parser: rust-pattern
+      dependency_targets: []
+    - name: vault
+      kind: function
+      line_start: 1170
+      line_end: 1175
+      signature: vault() -> std::path::PathBuf
+      inputs: []
+      output: std::path::PathBuf
+      dependencies:
+      - create_vault
+      - expect
+      - join
+      - now_v7
+      - temp_dir
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/commands/vault.rs
+        symbol: create_vault
+      - path: src-tauri/src/services/vault_service.rs
+        symbol: create_vault
+    - name: add_voice_evidence
+      kind: function
+      line_start: 1176
+      line_end: 1191
+      signature: 'add_voice_evidence(path: &Path, status: &str) -> String'
+      inputs:
+      - 'path: &Path'
+      - 'status: &str'
+      output: String
+      dependencies:
+      - VALUES
+      - execute
+      - initialize
+      - now
+      - now_v7
+      - open_connection
+      - to_rfc3339
+      - unwrap
+      - voice_evidence
+      parser: rust-pattern
+      dependency_targets:
+      - *id022
+    - name: core_voice_requires_attributable_provenance_and_supersedes_transactionally
+      kind: function
+      line_start: 1194
+      line_end: 1278
+      signature: core_voice_requires_attributable_provenance_and_supersedes_transactionally()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - activate_core_voice
+      - add_voice_evidence
+      - count
+      - create_core_voice
+      - filter
+      - find
+      - into
+      - is_err
+      - iter
+      - list_core_voices
+      - remove_dir_all
+      - save_core_voice_trait
+      - unwrap
+      - vault
+      - voice_one.voice_id.clone
+      - voice_two.voice_id.clone
+      parser: rust-pattern
+      dependency_targets:
+      - &id043
+        path: src-tauri/src/commands/voice.rs
+        symbol: activate_core_voice
+      - &id044
+        path: src-tauri/src/services/voice_profile_service.rs
+        symbol: activate_core_voice
+      - &id038
+        path: src-tauri/src/services/voice_profile_service.rs
+        symbol: add_voice_evidence
+      - &id039
+        path: src-tauri/src/commands/voice.rs
+        symbol: create_core_voice
+      - &id040
+        path: src-tauri/src/services/voice_profile_service.rs
+        symbol: create_core_voice
+      - &id045
+        path: src-tauri/src/commands/voice.rs
+        symbol: list_core_voices
+      - &id046
+        path: src-tauri/src/services/voice_profile_service.rs
+        symbol: list_core_voices
+      - &id041
+        path: src-tauri/src/commands/voice.rs
+        symbol: save_core_voice_trait
+      - &id042
+        path: src-tauri/src/services/voice_profile_service.rs
+        symbol: save_core_voice_trait
+    - name: rejected_or_retired_voice_evidence_cannot_support_new_traits
+      kind: function
+      line_start: 1281
+      line_end: 1306
+      signature: rejected_or_retired_voice_evidence_cannot_support_new_traits()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - add_voice_evidence
+      - create_core_voice
+      - into
+      - is_err
+      - remove_dir_all
+      - save_core_voice_trait
+      - unwrap
+      - vault
+      - voice.voice_id.clone
+      parser: rust-pattern
+      dependency_targets:
+      - *id038
+      - *id039
+      - *id040
+      - *id041
+      - *id042
+    - name: later_evidence_retirement_surfaces_without_rewriting_historical_voice
+      kind: function
+      line_start: 1309
+      line_end: 1354
+      signature: later_evidence_retirement_surfaces_without_rewriting_historical_voice()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - activate_core_voice
+      - add_voice_evidence
+      - create_core_voice
+      - drop
+      - evidence.clone
+      - execute
+      - find
+      - initialize
+      - into
+      - iter
+      - list_core_voices
+      - open_connection
+      - remove_dir_all
+      - save_core_voice_trait
+      - unwrap
+      - vault
+      - voice.voice_id.clone
+      parser: rust-pattern
+      dependency_targets:
+      - *id043
+      - *id044
+      - *id038
+      - *id039
+      - *id040
+      - path: src-tauri/src/services/confidentiality_service.rs
+        symbol: drop
+      - *id022
+      - *id045
+      - *id046
+      - *id041
+      - *id042
+    - name: tone_direction_and_rules_have_independent_lifecycles
+      kind: function
+      line_start: 1357
+      line_end: 1415
+      signature: tone_direction_and_rules_have_independent_lifecycles()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - create_tone_mode
+      - create_voice_direction
+      - create_writing_rule
+      - direction.voice_direction_id.clone
+      - into
+      - is_empty
+      - list_core_voices
+      - list_tone_modes
+      - list_voice_directions
+      - list_writing_rules
+      - remove_dir_all
+      - rule.rule_id.clone
+      - set_voice_direction_status
+      - unwrap
+      - update_writing_rule
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/commands/voice.rs
+        symbol: create_tone_mode
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: create_tone_mode
+      - path: src-tauri/src/commands/voice.rs
+        symbol: create_voice_direction
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: create_voice_direction
+      - path: src-tauri/src/commands/voice.rs
+        symbol: create_writing_rule
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: create_writing_rule
+      - *id045
+      - *id046
+      - path: src-tauri/src/commands/voice.rs
+        symbol: list_tone_modes
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: list_tone_modes
+      - path: src-tauri/src/commands/voice.rs
+        symbol: list_voice_directions
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: list_voice_directions
+      - path: src-tauri/src/commands/voice.rs
+        symbol: list_writing_rules
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: list_writing_rules
+      - path: src-tauri/src/commands/voice.rs
+        symbol: set_voice_direction_status
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: set_voice_direction_status
+      - path: src-tauri/src/commands/voice.rs
+        symbol: update_writing_rule
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: update_writing_rule
+  - path: src/domain/feedback.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: 6425e0581ca77628efd9ec8997e635e6daf3eb6d
+    dependencies: []
+    provides: []
+    symbols: []

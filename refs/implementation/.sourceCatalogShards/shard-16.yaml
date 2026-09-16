@@ -1,0 +1,125 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: '16'
+  files:
+  - path: src-tauri/src/commands/providers.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 43157e9c72a3bdf19fa6b4dca0849f226c74e363
+    dependencies:
+    - "crate::{\n    domain::providers::{\n        AnalyzeVoiceEvidenceRequest, CreateManualWorkspaceRequest, ManualWorkspaceResult,\n\
+      \        ProviderConnectionView, ProviderModelView, ProviderSettingsView,\n        UpdateProviderSettingsRequest, VoiceAnalysisProposalSet,\n\
+      \    },\n    error::{CommandError, CommandResult},\n    services::{manual_workspace_service, provider_registry, voice_analysis_service},\n\
+      }"
+    - std::path::PathBuf
+    provides:
+    - create_manual_workspace
+    - get_provider_settings
+    - update_provider_settings
+    - list_provider_models
+    - test_provider_connection
+    - analyze_voice_evidence
+    symbols:
+    - name: create_manual_workspace
+      kind: function
+      line_start: 14
+      line_end: 20
+      signature: 'create_manual_workspace(vault_path: String, request: CreateManualWorkspaceRequest) -> CommandResult<ManualWorkspaceResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: CreateManualWorkspaceRequest'
+      output: CommandResult<ManualWorkspaceResult>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/domain/candidates.rs
+        symbol: from
+      - &id002
+        path: src-tauri/src/domain/models.rs
+        symbol: from
+      - &id003
+        path: src-tauri/src/error.rs
+        symbol: from
+    - name: get_provider_settings
+      kind: function
+      line_start: 23
+      line_end: 25
+      signature: get_provider_settings() -> CommandResult<ProviderSettingsView>
+      inputs: []
+      output: CommandResult<ProviderSettingsView>
+      dependencies:
+      - get_settings
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/provider_registry.rs
+        symbol: get_settings
+    - name: update_provider_settings
+      kind: function
+      line_start: 28
+      line_end: 32
+      signature: 'update_provider_settings(request: UpdateProviderSettingsRequest) -> CommandResult<ProviderSettingsView>'
+      inputs:
+      - 'request: UpdateProviderSettingsRequest'
+      output: CommandResult<ProviderSettingsView>
+      dependencies:
+      - map_err
+      - update_settings
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/provider_registry.rs
+        symbol: update_settings
+    - name: list_provider_models
+      kind: function
+      line_start: 35
+      line_end: 39
+      signature: 'list_provider_models(provider_id: String) -> CommandResult<Vec<ProviderModelView>>'
+      inputs:
+      - 'provider_id: String'
+      output: CommandResult<Vec<ProviderModelView>>
+      dependencies:
+      - list_models
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/ollama_provider.rs
+        symbol: list_models
+      - path: src-tauri/src/services/provider_registry.rs
+        symbol: list_models
+    - name: test_provider_connection
+      kind: function
+      line_start: 42
+      line_end: 48
+      signature: 'test_provider_connection(provider_id: String) -> CommandResult<ProviderConnectionView>'
+      inputs:
+      - 'provider_id: String'
+      output: CommandResult<ProviderConnectionView>
+      dependencies:
+      - map_err
+      - test_connection
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/provider_registry.rs
+        symbol: test_connection
+    - name: analyze_voice_evidence
+      kind: function
+      line_start: 51
+      line_end: 58
+      signature: 'analyze_voice_evidence(vault_path: String, request: AnalyzeVoiceEvidenceRequest) -> CommandResult<VoiceAnalysisProposalSet>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: AnalyzeVoiceEvidenceRequest'
+      output: CommandResult<VoiceAnalysisProposalSet>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003

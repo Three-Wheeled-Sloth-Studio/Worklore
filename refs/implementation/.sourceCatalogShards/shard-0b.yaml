@@ -1,0 +1,762 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: 0b
+  files:
+  - path: src-tauri/src/commands/posts.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 21b9e1c106b14bfee1e4ba4aa8b906df859304b8
+    dependencies:
+    - "crate::{\n    domain::posts::{\n        AppendPostRevisionRequest, ApprovePostRevisionRequest, CreatePostRequest,\n\
+      \        GeneratePostFromTopicRequest, GeneratePostFromTopicResult,\n        LinkPostSupportingMaterialRequest, PostLineageView,\
+      \ PostRecordView,\n    },\n    error::{CommandError, CommandResult, WorkLoreError},\n    services::{\n        confidentiality_service::{\n\
+      \            self, ConfidentialityState, ConfidentialityTransformRequest,\n            ConfidentialityTransformResult,\n\
+      \        },\n        post_catalog_service, post_generation_service, post_lineage_service,\n    },\n}"
+    - std::path::PathBuf
+    - super::*
+    provides:
+    - create_post
+    - list_posts
+    - generate_post_from_topic
+    - append_post_revision
+    - approve_post_revision
+    - ensure_public_safe_revision
+    - get_post_lineage
+    - link_post_supporting_material
+    - preflight
+    - final_approval_requires_ready_exact_public_safe_text
+    symbols:
+    - name: create_post
+      kind: function
+      line_start: 20
+      line_end: 26
+      signature: 'create_post(vault_path: String, request: CreatePostRequest) -> CommandResult<PostLineageView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: CreatePostRequest'
+      output: CommandResult<PostLineageView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/domain/candidates.rs
+        symbol: from
+      - &id002
+        path: src-tauri/src/domain/models.rs
+        symbol: from
+      - &id003
+        path: src-tauri/src/error.rs
+        symbol: from
+    - name: list_posts
+      kind: function
+      line_start: 29
+      line_end: 31
+      signature: 'list_posts(vault_path: String) -> CommandResult<Vec<PostRecordView>>'
+      inputs:
+      - 'vault_path: String'
+      output: CommandResult<Vec<PostRecordView>>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: generate_post_from_topic
+      kind: function
+      line_start: 34
+      line_end: 41
+      signature: 'generate_post_from_topic(vault_path: String, request: GeneratePostFromTopicRequest) -> CommandResult<GeneratePostFromTopicResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: GeneratePostFromTopicRequest'
+      output: CommandResult<GeneratePostFromTopicResult>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: append_post_revision
+      kind: function
+      line_start: 44
+      line_end: 50
+      signature: 'append_post_revision(vault_path: String, request: AppendPostRevisionRequest) -> CommandResult<PostLineageView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: AppendPostRevisionRequest'
+      output: CommandResult<PostLineageView>
+      dependencies:
+      - append_revision
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: append_revision
+      - *id001
+      - *id002
+      - *id003
+    - name: approve_post_revision
+      kind: function
+      line_start: 53
+      line_end: 80
+      signature: 'approve_post_revision(vault_path: String, request: ApprovePostRevisionRequest) -> CommandResult<PostLineageView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: ApprovePostRevisionRequest'
+      output: CommandResult<PostLineageView>
+      dependencies:
+      - InvalidVault
+      - approve_revision
+      - ensure_public_safe_revision
+      - find
+      - from
+      - get_post_lineage
+      - iter
+      - map_err
+      - ok_or_else
+      - revision.text.clone
+      - transform_for_public_use
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: approve_revision
+      - &id004
+        path: src-tauri/src/commands/posts.rs
+        symbol: ensure_public_safe_revision
+      - *id001
+      - *id002
+      - *id003
+      - path: src-tauri/src/commands/posts.rs
+        symbol: get_post_lineage
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: get_post_lineage
+      - path: src-tauri/src/services/confidentiality_service.rs
+        symbol: transform_for_public_use
+    - name: ensure_public_safe_revision
+      kind: function
+      line_start: 81
+      line_end: 98
+      signature: 'ensure_public_safe_revision(revision_text: &str, preflight: &ConfidentialityTransformResult) -> Result<(),
+        WorkLoreError>'
+      inputs:
+      - 'revision_text: &str'
+      - 'preflight: &ConfidentialityTransformResult'
+      output: Result<(), WorkLoreError>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      - to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: get_post_lineage
+      kind: function
+      line_start: 101
+      line_end: 104
+      signature: 'get_post_lineage(vault_path: String, post_id: String) -> CommandResult<PostLineageView>'
+      inputs:
+      - 'vault_path: String'
+      - 'post_id: String'
+      output: CommandResult<PostLineageView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: link_post_supporting_material
+      kind: function
+      line_start: 107
+      line_end: 118
+      signature: 'link_post_supporting_material(vault_path: String, request: LinkPostSupportingMaterialRequest) -> CommandResult<PostLineageView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: LinkPostSupportingMaterialRequest'
+      output: CommandResult<PostLineageView>
+      dependencies:
+      - from
+      - link_supporting_material
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: link_supporting_material
+    - name: preflight
+      kind: function
+      line_start: 123
+      line_end: 138
+      signature: 'preflight(state: ConfidentialityState, public_safe_text: &str) -> ConfidentialityTransformResult'
+      inputs:
+      - 'state: ConfidentialityState'
+      - 'public_safe_text: &str'
+      output: ConfidentialityTransformResult
+      dependencies:
+      - new
+      - public_safe_text.to_string
+      - to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: final_approval_requires_ready_exact_public_safe_text
+      kind: function
+      line_start: 141
+      line_end: 157
+      signature: final_approval_requires_ready_exact_public_safe_text()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - ensure_public_safe_revision
+      - is_err
+      - is_ok
+      - preflight
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+      - path: src-tauri/src/commands/posts.rs
+        symbol: preflight
+  - path: src-tauri/src/commands/target_contexts.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 8749dd4d25b0bd55030840e2674c2c4cc0f89d29
+    dependencies:
+    - "crate::{\n    error::{CommandError, CommandResult},\n    services::target_context_service::{\n        self, CreateTargetContextResult,\
+      \ TargetContextExtractionResult,\n        TargetContextLinkTargetView, TargetContextRecordView, TargetContextRelationKind,\n\
+      \        TargetContextRelationshipMutationResult, UpdateTargetContextRequest,\n    },\n}"
+    - std::path::PathBuf
+    provides:
+    - create_target_context_from_source
+    - get_target_context
+    - list_target_contexts
+    - update_target_context
+    - extract_target_context_signals
+    - add_target_context_relationship
+    - remove_target_context_relationship
+    - list_target_context_link_targets
+    symbols:
+    - name: create_target_context_from_source
+      kind: function
+      line_start: 13
+      line_end: 22
+      signature: 'create_target_context_from_source(vault_path: String, source_id: String) -> CommandResult<CreateTargetContextResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'source_id: String'
+      output: CommandResult<CreateTargetContextResult>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: get_target_context
+      kind: function
+      line_start: 25
+      line_end: 31
+      signature: 'get_target_context(vault_path: String, target_id: String) -> CommandResult<TargetContextRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'target_id: String'
+      output: CommandResult<TargetContextRecordView>
+      dependencies:
+      - from
+      - load_target_context
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - path: src-tauri/src/services/target_context_service.rs
+        symbol: load_target_context
+    - name: list_target_contexts
+      kind: function
+      line_start: 34
+      line_end: 37
+      signature: 'list_target_contexts(vault_path: String) -> CommandResult<Vec<TargetContextRecordView>>'
+      inputs:
+      - 'vault_path: String'
+      output: CommandResult<Vec<TargetContextRecordView>>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: update_target_context
+      kind: function
+      line_start: 40
+      line_end: 46
+      signature: 'update_target_context(vault_path: String, request: UpdateTargetContextRequest) -> CommandResult<TargetContextRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: UpdateTargetContextRequest'
+      output: CommandResult<TargetContextRecordView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: extract_target_context_signals
+      kind: function
+      line_start: 49
+      line_end: 55
+      signature: 'extract_target_context_signals(vault_path: String, target_id: String) -> CommandResult<TargetContextExtractionResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'target_id: String'
+      output: CommandResult<TargetContextExtractionResult>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: add_target_context_relationship
+      kind: function
+      line_start: 58
+      line_end: 71
+      signature: 'add_target_context_relationship(vault_path: String, target_context_id: String, relation_kind: TargetContextRelationKind,
+        target_id: String) -> CommandResult<TargetContextRelationshipMutationResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'target_context_id: String'
+      - 'relation_kind: TargetContextRelationKind'
+      - 'target_id: String'
+      output: CommandResult<TargetContextRelationshipMutationResult>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: remove_target_context_relationship
+      kind: function
+      line_start: 74
+      line_end: 87
+      signature: 'remove_target_context_relationship(vault_path: String, target_context_id: String, relation_kind: TargetContextRelationKind,
+        target_id: String) -> CommandResult<TargetContextRelationshipMutationResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'target_context_id: String'
+      - 'relation_kind: TargetContextRelationKind'
+      - 'target_id: String'
+      output: CommandResult<TargetContextRelationshipMutationResult>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: list_target_context_link_targets
+      kind: function
+      line_start: 90
+      line_end: 99
+      signature: 'list_target_context_link_targets(vault_path: String, relation_kind: TargetContextRelationKind) -> CommandResult<Vec<TargetContextLinkTargetView>>'
+      inputs:
+      - 'vault_path: String'
+      - 'relation_kind: TargetContextRelationKind'
+      output: CommandResult<Vec<TargetContextLinkTargetView>>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+  - path: src-tauri/src/domain/performance.rs
+    analysis_version: 1
+    language: rust
+    content_hash: a9edc1860dcba0e46f03225ce97e4c4e96eb400b
+    dependencies:
+    - serde::{Deserialize, Serialize}
+    provides: []
+    symbols: []
+  - path: src/components/PerformancePanel.tsx
+    analysis_version: 1
+    language: typescript
+    content_hash: 184f64c24065637184ad2e74e18e5747698f8a3e
+    dependencies:
+    - ../domain/types
+    provides:
+    - PerformancePanel
+    - MetricTable
+    - progressLabel
+    - formatDuration
+    - humanize
+    symbols:
+    - name: PerformancePanel
+      kind: function
+      line_start: 7
+      line_end: 8
+      signature: 'PerformancePanel({ snapshot, onRefresh }: PerformancePanelProps)'
+      inputs:
+      - '{ snapshot, onRefresh }: PerformancePanelProps'
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: MetricTable
+      kind: function
+      line_start: 75
+      line_end: 79
+      signature: MetricTable({ metrics, showOperation)
+      inputs:
+      - '{ metrics, showOperation'
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: progressLabel
+      kind: function
+      line_start: 100
+      line_end: 106
+      signature: 'progressLabel(current: number | null, total: number | null) -> string'
+      inputs:
+      - 'current: number | null'
+      - 'total: number | null'
+      output: string
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: formatDuration
+      kind: function
+      line_start: 107
+      line_end: 119
+      signature: 'formatDuration(durationMs: number) -> string'
+      inputs:
+      - 'durationMs: number'
+      output: string
+      dependencies:
+      - Math.floor
+      - Math.round
+      - seconds.toFixed
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: humanize
+      kind: function
+      line_start: 120
+      line_end: 123
+      signature: 'humanize(value: string) -> string'
+      inputs:
+      - 'value: string'
+      output: string
+      dependencies:
+      - value.replaceAll
+      parser: typescript-pattern
+      dependency_targets: []
+  - path: src/components/ProviderSettingsPanel.tsx
+    analysis_version: 1
+    language: typescript
+    content_hash: c819f8e5ba4547f35a409ab8f8461906d27b8f6d
+    dependencies:
+    - ../domain/types
+    - ../lib/workloreApi
+    - react
+    provides:
+    - ProviderSettingsPanel
+    - save
+    - refreshModels
+    - testConnection
+    symbols:
+    - name: ProviderSettingsPanel
+      kind: function
+      line_start: 13
+      line_end: 177
+      signature: ProviderSettingsPanel()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - async
+      - errorMessage
+      - getProviderSettings
+      - listProviderModels
+      - models.map
+      - models.some
+      - refreshModels
+      - save
+      - setBusy
+      - setError
+      - setModels
+      - setNotice
+      - setSettings
+      - testConnection
+      - testProviderConnection
+      - updateProviderSettings
+      - useEffect
+      - void
+      parser: typescript-pattern
+      dependency_targets:
+      - &id005
+        path: src/domain/types.ts
+        symbol: errorMessage
+      - path: src/lib/workloreApi.ts
+        symbol: getProviderSettings
+      - &id007
+        path: src/lib/workloreApi.ts
+        symbol: listProviderModels
+      - path: src/components/ProviderSettingsPanel.tsx
+        symbol: refreshModels
+      - &id008
+        path: src/components/ProviderSettingsPanel.tsx
+        symbol: save
+      - path: src/components/ProviderSettingsPanel.tsx
+        symbol: testConnection
+      - &id009
+        path: src/lib/workloreApi.ts
+        symbol: testProviderConnection
+      - &id006
+        path: src/lib/workloreApi.ts
+        symbol: updateProviderSettings
+    - name: save
+      kind: function
+      line_start: 34
+      line_end: 54
+      signature: save() -> Promise<ProviderSettings | null>
+      inputs: []
+      output: Promise<ProviderSettings | null>
+      dependencies:
+      - errorMessage
+      - setBusy
+      - setError
+      - setNotice
+      - setSettings
+      - updateProviderSettings
+      parser: typescript-pattern
+      dependency_targets:
+      - *id005
+      - *id006
+    - name: refreshModels
+      kind: function
+      line_start: 55
+      line_end: 76
+      signature: refreshModels()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - listProviderModels
+      - save
+      - setBusy
+      - setError
+      - setModels
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - *id005
+      - *id007
+      - *id008
+    - name: testConnection
+      kind: function
+      line_start: 77
+      line_end: 92
+      signature: testConnection()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - save
+      - setBusy
+      - setError
+      - setNotice
+      - testProviderConnection
+      parser: typescript-pattern
+      dependency_targets:
+      - *id005
+      - *id008
+      - *id009
+  - path: src/components/StoryBankPanel.tsx
+    analysis_version: 1
+    language: typescript
+    content_hash: 432c3ffaf0a1809929e44e862597d79bfe75a55e
+    dependencies:
+    - ../domain/types
+    - ../lib/captureApi
+    - ../lib/workloreApi
+    - ./InfoButton
+    - ./SeedDevelopmentPanel
+    - react
+    provides:
+    - StoryBankPanel
+    - resolveVaultPath
+    - refresh
+    - develop
+    - handleStatusChange
+    - DevelopIcon
+    - humanize
+    symbols:
+    - name: StoryBankPanel
+      kind: function
+      line_start: 14
+      line_end: 15
+      signature: 'StoryBankPanel({ vaultPath: vaultPathProp, stories, onStatusChange }: StoryBankPanelProps)'
+      inputs:
+      - '{ vaultPath: vaultPathProp, stories, onStatusChange }: StoryBankPanelProps'
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: resolveVaultPath
+      kind: function
+      line_start: 41
+      line_end: 45
+      signature: resolveVaultPath() -> Promise<string | null>
+      inputs: []
+      output: Promise<string | null>
+      dependencies:
+      - getLastVaultPath
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/lib/workloreApi.ts
+        symbol: getLastVaultPath
+    - name: refresh
+      kind: function
+      line_start: 46
+      line_end: 61
+      signature: refresh()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Promise.all
+      - errorMessage
+      - listCaptureSources
+      - listStories
+      - resolveVaultPath
+      - setActiveVaultPath
+      - setCaptures
+      - setError
+      - setLocalStories
+      parser: typescript-pattern
+      dependency_targets:
+      - *id005
+      - path: src/lib/captureApi.ts
+        symbol: listCaptureSources
+      - path: src/lib/workloreApi.ts
+        symbol: listStories
+      - &id010
+        path: src/components/StoryBankPanel.tsx
+        symbol: resolveVaultPath
+    - name: develop
+      kind: function
+      line_start: 62
+      line_end: 81
+      signature: 'develop(capture: CaptureSource)'
+      inputs:
+      - 'capture: CaptureSource'
+      output: unspecified
+      dependencies:
+      - capture.classifications.find
+      - classifyCaptureSource
+      - errorMessage
+      - refresh
+      - resolveVaultPath
+      - setActiveVaultPath
+      - setBusySourceId
+      - setDevelopmentSeedId
+      - setError
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/lib/workloreApi.ts
+        symbol: classifyCaptureSource
+      - *id005
+      - &id011
+        path: src/components/InsightsWorkspace.tsx
+        symbol: refresh
+      - &id012
+        path: src/components/StoryBankPanel.tsx
+        symbol: refresh
+      - &id013
+        path: src/components/TopicsWorkspace.tsx
+        symbol: refresh
+      - &id014
+        path: src/components/VoiceWorkspace.tsx
+        symbol: refresh
+      - *id010
+    - name: handleStatusChange
+      kind: function
+      line_start: 82
+      line_end: 86
+      signature: 'handleStatusChange(storyId: string, status: StoryStatus)'
+      inputs:
+      - 'storyId: string'
+      - 'status: StoryStatus'
+      output: unspecified
+      dependencies:
+      - onStatusChange
+      - refresh
+      parser: typescript-pattern
+      dependency_targets:
+      - *id011
+      - *id012
+      - *id013
+      - *id014
+    - name: DevelopIcon
+      kind: function
+      line_start: 219
+      line_end: 226
+      signature: DevelopIcon()
+      inputs: []
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: humanize
+      kind: function
+      line_start: 227
+      line_end: 230
+      signature: 'humanize(value: string) -> string'
+      inputs:
+      - 'value: string'
+      output: string
+      dependencies:
+      - value.replaceAll
+      parser: typescript-pattern
+      dependency_targets: []
+  - path: src/lib/confidentialityApi.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: 6f3a22f5c8ef31c24bbc9806d69034a518eb1542
+    dependencies:
+    - ../domain/confidentiality
+    - '@tauri-apps/api/core'
+    provides:
+    - transformConfidentialityForPublicUse
+    symbols:
+    - name: transformConfidentialityForPublicUse
+      kind: function
+      line_start: 6
+      line_end: 15
+      signature: 'transformConfidentialityForPublicUse(vaultPath: string, request: ConfidentialityTransformRequest) -> Promise<ConfidentialityTransformResult>'
+      inputs:
+      - 'vaultPath: string'
+      - 'request: ConfidentialityTransformRequest'
+      output: Promise<ConfidentialityTransformResult>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
