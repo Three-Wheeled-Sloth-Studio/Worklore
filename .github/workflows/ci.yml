@@ -78,7 +78,7 @@ jobs:
         run: |
           python -m pip install pyyaml 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\pip-install.log"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python -m py_compile refs/tools/*.py 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\python-tools.log"
+          python -m compileall -q refs/tools 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\python-tools.log"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python scripts/check-case-collisions.py 2>&1 | Tee-Object -FilePath "$env:VALIDATION_LOG_ROOT\path-collisions.log"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
