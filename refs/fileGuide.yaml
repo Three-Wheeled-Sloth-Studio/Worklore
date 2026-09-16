@@ -1,11 +1,11 @@
-version: 2
+version: 3
 schema: refs/schemas/schemaRegistry.yaml
-updated: 2026-09-12
-purpose: Guide to the durable WorkLore project reference files and derived discovery tooling.
+updated: 2026-09-16
+purpose: Guide to durable WorkLore project references and derived discovery tooling.
 files:
   index.md: Generated OKF discovery surface for the refs bundle. Do not hand-edit.
   project.yaml: Project identity, purpose, stack, source-of-truth paths, and open questions.
-  agents.yaml: Progressive context-loading rules and WorkLore-specific agent constraints.
+  agents.yaml: Progressive context-loading, bounded source-discovery, delegation, and WorkLore-specific agent constraints.
   okfProfile.yaml: Pinned Agent Academy and OKF compatibility profile plus migration exceptions.
   planning/roadmap.yaml: Major product phases and sequencing.
   planning/todos.yaml: Durable implementation task list.
@@ -16,19 +16,22 @@ files:
   architecture/standalone-deployment-contract.md: Locked standalone deployment and publication boundary.
   product/prd.md: Authoritative refocused WorkLore PRD.
   product/featureCatalog.yaml: Planned and implemented feature inventory.
-  implementation/fileMap.yaml: Important files, source roots, and targeted lookup hints.
+  implementation/fileMap.yaml: Important files, source roots, and targeted ownership hints.
+  implementation/sourceCatalog/index.yaml: Generated compact source-catalog index. Never hand-edit.
+  implementation/.sourceCatalogShards/: Generated sharded source detail used for local catalog queries. Never hand-edit.
   implementation/repoConventions.md: Repository, data-safety, and cross-platform path conventions.
-  implementation/codingStandards.md: Project coding standards and mandatory case-collision safety.
+  implementation/codingStandards.md: Project coding standards, bounded source modularity, and mandatory case-collision safety.
   implementation/okfCompatibility.md: WorkLore authority boundaries and Agent Academy OKF alignment.
   implementation/envVars.example: Safe environment variable examples.
-  handoffs/currentHandoff.md: Delta-oriented accepted baseline, recent delta, gap, next slice, constraints, and validation.
-  handoffs/handoffTemplate.md: Reusable delta-oriented handoff structure.
+  handoffs/currentHandoff.md: Delta-oriented accepted baseline, recent delta, gap, next slice, required reads, constraints, and validation.
+  handoffs/handoffTemplate.md: Reusable delta-oriented handoff structure with bounded Required Reads.
   handoffs/implementationLog.yaml: Chronological implementation log.
   handoffs/next-dev-prompt.md: Bounded next-slice prompt that starts from generated agent context.
   operations/okfMigration.md: Non-destructive WorkLore adoption notes for the Agent Academy OKF profile.
-  testing/validationCommands.yaml: Commands to run before completing work.
+  testing/validationCommands.yaml: Commands to run before completing work, including source-catalog freshness.
   testing/regressionChecklist.md: Known regressions and cross-platform repository checks.
-  tools/generate_agent_context.py: Generate or check a bounded derived coding-agent re-entry packet.
+  tools/generate_agent_context.py: Refresh source discovery and generate or check a bounded derived coding-agent re-entry packet.
+  tools/generate_source_catalog.py: Deterministically generate, check, and query sharded source discovery without requiring broad source reads.
   tools/generate_okf_indexes.py: Generate or check committed OKF discovery indexes.
   tools/validate_refs.py: Validate WorkLore refs, OKF compatibility, indexes, portability, secrets, and path collisions.
   UI/designPrinciples.md: Shared design source and WorkLore-specific application notes.
