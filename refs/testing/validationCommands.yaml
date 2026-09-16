@@ -1,7 +1,17 @@
-version: 2
+version: 3
 schema: refs/schemas/schemaRegistry.yaml
-updated: 2026-09-12
+updated: 2026-09-16
 commands:
+  - id: generate-source-catalog
+    status: maintenance
+    command: python refs/tools/generate_source_catalog.py
+    purpose: Regenerate deterministic source discovery after implementation source changes.
+    verifies: Generated catalog and shards reflect the current Git-tracked implementation source.
+  - id: validation-source-catalog
+    status: active
+    command: python refs/tools/generate_source_catalog.py --check
+    purpose: Fail when committed source discovery is missing or stale.
+    verifies: Agents can rely on current bounded file, symbol, input, output, and dependency discovery.
   - id: validation-path-collisions
     status: active
     command: python scripts/check-case-collisions.py
@@ -20,8 +30,8 @@ commands:
   - id: validation-agent-context
     status: active
     command: python refs/tools/generate_agent_context.py --check
-    purpose: Verify the bounded derived re-entry packet can be generated within the context budget.
-    verifies: Routine coding-agent re-entry remains deterministic and compact.
+    purpose: Verify the bounded derived re-entry packet and source-catalog dependency can be generated within the context budget.
+    verifies: Routine coding-agent re-entry remains deterministic, compact, and source-aware.
   - id: validation-frontend-tests
     status: active
     command: npm run test
