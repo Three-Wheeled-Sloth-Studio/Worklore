@@ -1,13 +1,13 @@
 ---
 type: Handoff
 title: Current WorkLore Handoff
-description: Runtime QA checkpoint covering Stories readability, Voice action ordering, governed writing-sample analysis, and structured Ollama model routing.
+description: Agent Academy bounded-discovery alignment layered over the accepted v0.1.4 runtime QA checkpoint.
 status: draft
 tags: [handoff, worklore]
 ---
 # Current Handoff
 
-Updated: 2026-09-15
+Updated: 2026-09-16
 
 ## Product Baseline
 
@@ -30,54 +30,77 @@ Locked boundaries remain:
 - the Private Entity Registry remains the privacy source of truth;
 - no fake AI/human probability or opaque quality score.
 
-## Last Fully Green Accepted Checkpoint
+## Accepted Baseline
 
-`ab1eeaea21bc31c4921279ff1e973b0e49e91465`
+The last fully green product checkpoint is:
+
+`f38e75618b5967177b37ba1040aab68a27c177d1`
 
 Validation:
 
-- Actions `35011151906`
-- Job `104523135322`
-- frontend: 11 passed / 0 failed across 5 files
-- production frontend build: green
-- Rust: 131 passed / 0 failed
-- warnings-denied Clippy: green
-- rustfmt: green
-- build-layout, refs/OKF/path-safety, bounded agent context, case-collision, and repository/source-only checks: green
+- Actions `35016169532`, run 330;
+- Job `104540027121`;
+- frontend: 11 passed / 0 failed across 5 files;
+- production frontend build: green, 72 modules transformed;
+- Rust: 133 passed / 0 failed;
+- warnings-denied Clippy: green;
+- rustfmt: green;
+- build-layout, refs/OKF/path-safety, bounded agent context, case-collision, and repository/source-only checks: green.
 
-This remains the accepted checkpoint until the current structured-model-routing remediation head passes fresh full validation.
+QA build version remains `0.1.4`.
 
-## Current QA Remediation
+## What Landed Since The Accepted Baseline
 
-The current `dev` head contains an additional observed runtime QA fix. Treat it as pending until fresh full validation is green.
+The current `dev` work is an Agent Academy framework-alignment pass, not a product-behavior change.
 
-QA build version is `0.1.4`. The package, Tauri manifest, and visible sidebar marker are aligned to that version.
+It incorporates the bounded implementation-discovery guidance from Agent Academy commit `e4118f96cc0138490b950402ba711399580ee854`:
 
-### Structured Ollama model routing
+- deterministic sharded source catalog under `refs/implementation/sourceCatalog/` plus hidden detail shards;
+- `generate_agent_context.py` now uses handoff Required Reads and source-catalog matches before file-map hints;
+- source discovery is catalog-first, then symbol/range reads, with broad reads only when concretely justified;
+- handoffs explicitly state the minimum Required Reads for the next slice;
+- when the environment supports sub-agents, bounded independent work should be delegated when useful, using the least expensive capable agent/model while keeping integration and validation responsibility with the parent;
+- repeated diagnostics/searches should become reusable tooling rather than repeated manual work;
+- coding standards now require cohesive modules and discourage adding unrelated responsibilities to already-large or mixed-purpose files;
+- source-catalog freshness is part of normal validation and CI.
 
-Observed defect:
+WorkLore-specific privacy, provenance, branch, public-repository, and product-boundary guidance remains authoritative where it is stricter than the reusable Agent Academy harness.
 
-- `Analyze approved writing` failed because the configured Ollama model returned output that did not parse as the requested structured JSON contract even though multiple local models were installed.
+## Current Evidence Or Gap
 
-Current remediation:
+The v0.1.4 product code remains the accepted green implementation baseline. The Agent Academy alignment is documentation/tooling only and is not accepted until the final exact `dev` head passes the complete WorkLore validation path with generated source-catalog and OKF indexes current.
 
-- the configured Ollama model remains the preferred first attempt;
-- structured-output operations can retry a bounded set of other installed local text-generation models after `invalid_structured_output` or `model_unavailable` failures;
-- likely embedding-only models are excluded from fallback candidates;
-- alternatives are deterministically ranked, favoring model families that commonly follow structured-output instructions well;
-- retries remain inside the explicitly selected local Ollama provider and never cross to cloud or another provider;
-- provider/server/auth/request-size failures do not trigger model spraying;
-- the actual successful fallback model is preserved in Voice analysis results, Post lineage, and provider-run audit metadata;
-- Voice analysis operation contract version is now 3;
-- deterministic Rust coverage protects candidate ordering and retryable-error boundaries.
+## Next Slice
 
-The existing v0.1.3 runtime remediation remains in place:
+After the alignment head is fully green, return to runtime QA. The first live check remains the defect that prompted v0.1.4:
 
-1. Sidebar version is real selectable DOM content inside sidebar flow.
-2. Story Seed development owns explicit readable light-surface colors.
-3. Voice unfinished review work is action-first; reviewed evidence is moved out of the primary queue.
-4. `Learn from approved writing` replaces the low-level evidence picker framing.
-5. Approved samples are selected by default and trait/rule suggestions remain review-only.
+1. Confirm the sidebar reports `v0.1.4`.
+2. Run `Analyze approved writing` with the currently configured local Ollama model.
+3. If that model cannot satisfy structured JSON, confirm WorkLore transparently succeeds through another installed local text-generation model rather than surfacing the first JSON failure.
+4. Confirm returned suggestions remain separated into Core Voice traits and Writing Rules.
+5. Confirm the actual successful model is preserved in returned provenance/audit state rather than the originally configured model.
+6. Confirm non-model failures such as an unreachable Ollama server still fail immediately.
+7. Continue the accepted QA path for Stories readability, Voice action ordering, explicit trait/rule acceptance, discard behavior, and restart/reopen persistence.
+
+Stop on the first concrete correctness, provenance, privacy, recoverability, or blocking UX defect. Do not widen scope based on hypothetical behavior.
+
+## Required Reads For Next Slice
+
+- `refs/handoffs/currentHandoff.md` - establishes the accepted v0.1.4 baseline, QA focus, and constraints for the next session.
+- `refs/agents.yaml` - required only to apply the new bounded source-discovery and delegation rules during continuation.
+- `refs/testing/validationCommands.yaml` - required before finalizing any code change exposed by QA.
+- Do not pre-read implementation source for routine QA. If QA exposes a defect, query `python refs/tools/generate_source_catalog.py --query "<observed behavior or symbol>"` and read only the returned source symbols/ranges plus concrete dependencies.
+
+## Relevant Files
+
+- `refs/tools/generate_source_catalog.py`
+- `refs/tools/generate_agent_context.py`
+- `refs/implementation/sourceCatalog/index.yaml`
+- `refs/implementation/.sourceCatalogShards/`
+- `refs/implementation/codingStandards.md`
+- `refs/handoffs/handoffTemplate.md`
+- `refs/templatePolicy.yaml`
+- `.github/workflows/ci.yml`
 
 ## Current Task State
 
@@ -87,35 +110,6 @@ The existing v0.1.3 runtime remediation remains in place:
 - `task-035`: in progress. Topic-to-Post generation exists; current work is bounded runtime UX/correctness dogfood.
 - `task-036`: complete for exact lineage/publication/performance association.
 - `task-037`: in progress. Manual performance snapshots and conservative Insights exist.
-
-## Immediate Next Step
-
-Run full validation against current `dev` before asking the user to resume QA:
-
-```powershell
-python scripts/check-case-collisions.py
-git diff --check
-python refs/tools/validate_refs.py --mode initialized
-python refs/tools/generate_agent_context.py --check
-npm run test
-npm run build:frontend
-cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
-cargo test --manifest-path src-tauri/Cargo.toml
-cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
-./scripts/assert-repo-clean.ps1
-```
-
-If a check fails, fix only the concrete failure and rerun validation. Preserve draft PR #1 as `dev -> qa` and do not promote `qa` or `main`.
-
-## Runtime QA Focus After Validation
-
-1. Confirm the sidebar reports `v0.1.4`.
-2. Re-run `Analyze approved writing` with the currently configured local model.
-3. If that model cannot satisfy structured JSON, confirm WorkLore transparently succeeds through another installed Ollama text-generation model rather than surfacing the first JSON failure.
-4. Confirm returned suggestions remain separated into Core Voice traits and Writing Rules.
-5. Confirm the actual successful model is preserved in returned provenance/audit state rather than the originally configured model.
-6. Confirm non-model failures such as an unreachable Ollama server still fail immediately.
-7. Continue the previously accepted QA path for Stories readability, Voice action ordering, explicit trait/rule acceptance, discard behavior, and restart/reopen persistence.
 
 ## Do Not Reopen
 
@@ -132,5 +126,25 @@ Unless runtime, test, legal, or user evidence materially changes the plan:
 - do not add fake AI/human probability scores or opaque quality scores;
 - do not create a second confidentiality/private-entity model;
 - do not add WorkLore-hosted SaaS, account, sync, automatic publishing, scheduling, or autonomous engagement;
-- do not hand-edit generated OKF indexes;
+- do not hand-edit generated OKF indexes or source-catalog files;
 - do not promote `qa` or `main` without explicit approval.
+
+## Validation
+
+For the Agent Academy alignment, require the normal full validation path, including:
+
+```powershell
+python scripts/check-case-collisions.py
+git diff --check
+python refs/tools/generate_source_catalog.py --check
+python refs/tools/validate_refs.py --mode initialized
+python refs/tools/generate_agent_context.py --check
+npm run test
+npm run build:frontend
+cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
+cargo test --manifest-path src-tauri/Cargo.toml
+cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
+./scripts/assert-repo-clean.ps1
+```
+
+Do not call the alignment accepted or hand QA back until those checks pass on the exact current `dev` head.
