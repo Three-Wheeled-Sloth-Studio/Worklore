@@ -14,6 +14,7 @@ use commands::{
         create_story_from_seed_development, start_story_seed_development,
         submit_story_seed_development_response,
     },
+    external::open_external_url,
     feedback::{get_feedback_snapshot, mark_post_published, record_post_performance},
     inspirations::{
         add_inspiration_relationship, create_inspiration_from_source, get_inspiration,
@@ -76,6 +77,7 @@ pub fn run() {
             create_vault,
             create_vault_in_parent,
             create_default_vault,
+            open_external_url,
             create_capture_source,
             get_capture_source,
             update_capture_source_type,
