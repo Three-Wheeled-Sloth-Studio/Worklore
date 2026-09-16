@@ -1,0 +1,48 @@
+name: Bootstrap Source Catalog
+
+on:
+  pull_request:
+    branches:
+      - qa
+      - main
+    types:
+      - reopened
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Install catalog dependency
+        shell: pwsh
+        run: python -m pip install pyyaml
+      - name: Generate source catalog
+        shell: pwsh
+        run: python .github/bootstrap_generate_source_catalog.py
+      - name: Emit compressed catalog payload
+        shell: pwsh
+        run: |
+          @'
+          import base64
+          import io
+          from pathlib import Path
+          import zipfile
+
+          root = Path.cwd()
+          paths = [root / "refs/implementation/sourceCatalog/index.yaml"]
+          paths.extend(sorted((root / "refs/implementation/.sourceCatalogShards").glob("shard-*.yaml")))
+          buffer = io.BytesIO()
+          with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+              for path in paths:
+                  archive.writestr(path.relative_to(root).as_posix(), path.read_bytes())
+          payload = base64.b64encode(buffer.getvalue()).decode("ascii")
+          print("SOURCE_CATALOG_BASE64_BEGIN")
+          for index in range(0, len(payload), 60000):
+              print(payload[index:index + 60000])
+          print("SOURCE_CATALOG_BASE64_END")
+          '@ | python -
