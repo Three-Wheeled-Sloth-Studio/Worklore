@@ -27,7 +27,9 @@ pub mod external {
     fn validate_external_url(url: &str) -> Result<(), String> {
         match url {
             SUPPORT_URL | LICENSE_URL => Ok(()),
-            _ => Err("WorkLore only opens approved external links in the system browser.".to_string()),
+            _ => Err(
+                "WorkLore only opens approved external links in the system browser.".to_string(),
+            ),
         }
     }
 
