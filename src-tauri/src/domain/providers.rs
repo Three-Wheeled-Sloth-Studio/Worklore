@@ -50,8 +50,10 @@ pub struct RedactionReplacement {
 }
 
 pub const OLLAMA_PROVIDER_ID: &str = "ollama";
+pub const OPENAI_PROVIDER_ID: &str = "openai";
+pub const GEMINI_PROVIDER_ID: &str = "gemini";
 pub const ANALYZE_VOICE_EVIDENCE_OPERATION: &str = "analyze_voice_evidence";
-pub const ANALYZE_VOICE_EVIDENCE_VERSION: u32 = 3;
+pub const ANALYZE_VOICE_EVIDENCE_VERSION: u32 = 4;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -59,14 +61,26 @@ pub struct ProviderSettingsView {
     pub selected_provider_id: Option<String>,
     pub ollama_base_url: String,
     pub ollama_model_id: Option<String>,
+    pub openai_model_id: Option<String>,
+    pub openai_api_key_configured: bool,
+    pub gemini_model_id: Option<String>,
+    pub gemini_api_key_configured: bool,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateProviderSettingsRequest {
     pub selected_provider_id: Option<String>,
     pub ollama_base_url: String,
     pub ollama_model_id: Option<String>,
+    pub openai_model_id: Option<String>,
+    pub openai_api_key: Option<String>,
+    #[serde(default)]
+    pub clear_openai_api_key: bool,
+    pub gemini_model_id: Option<String>,
+    pub gemini_api_key: Option<String>,
+    #[serde(default)]
+    pub clear_gemini_api_key: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
