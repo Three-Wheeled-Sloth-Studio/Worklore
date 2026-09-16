@@ -2,6 +2,10 @@
 
 Generated OKF discovery index. Do not edit manually.
 
+## Directories
+
+* [Source Catalog](sourceCatalog/) - Browse Source Catalog knowledge and resources.
+
 ## Concepts
 
 * [Coding Standards](codingStandards.md) - WorkLore knowledge concept.
