@@ -78,7 +78,7 @@ source_catalog:
   - path: src-tauri/src/commands/mod.rs
     analysis_version: 1
     language: rust
-    content_hash: f66f481590a5d46fab31431e366b8ff9655d2cf6
+    content_hash: 8f39775ba94f0a22726cb006c8819c95a88449ea
     dependencies:
     - std::process::Command
     - super::{validate_external_url, LICENSE_URL, SUPPORT_URL}
@@ -94,7 +94,7 @@ source_catalog:
     - name: validate_external_url
       kind: function
       line_start: 26
-      line_end: 32
+      line_end: 34
       signature: 'validate_external_url(url: &str) -> Result<(), String>'
       inputs:
       - 'url: &str'
@@ -107,8 +107,8 @@ source_catalog:
       dependency_targets: []
     - name: open_with_system_browser
       kind: function
-      line_start: 35
-      line_end: 40
+      line_start: 37
+      line_end: 42
       signature: 'open_with_system_browser(url: &str) -> std::io::Result<std::process::ExitStatus>'
       inputs:
       - 'url: &str'
@@ -121,8 +121,8 @@ source_catalog:
       dependency_targets: []
     - name: open_with_system_browser
       kind: function
-      line_start: 43
-      line_end: 45
+      line_start: 45
+      line_end: 47
       signature: 'open_with_system_browser(url: &str) -> std::io::Result<std::process::ExitStatus>'
       inputs:
       - 'url: &str'
@@ -135,8 +135,8 @@ source_catalog:
       dependency_targets: []
     - name: open_with_system_browser
       kind: function
-      line_start: 48
-      line_end: 50
+      line_start: 50
+      line_end: 52
       signature: 'open_with_system_browser(url: &str) -> std::io::Result<std::process::ExitStatus>'
       inputs:
       - 'url: &str'
@@ -149,8 +149,8 @@ source_catalog:
       dependency_targets: []
     - name: open_external_url
       kind: function
-      line_start: 53
-      line_end: 62
+      line_start: 55
+      line_end: 64
       signature: 'open_external_url(url: String) -> Result<(), String>'
       inputs:
       - 'url: String'
@@ -172,8 +172,8 @@ source_catalog:
         symbol: validate_external_url
     - name: approved_external_links_are_allowed
       kind: function
-      line_start: 69
-      line_end: 72
+      line_start: 71
+      line_end: 74
       signature: approved_external_links_are_allowed()
       inputs: []
       output: unspecified
@@ -185,8 +185,8 @@ source_catalog:
       - *id001
     - name: arbitrary_external_links_are_rejected
       kind: function
-      line_start: 75
-      line_end: 78
+      line_start: 77
+      line_end: 80
       signature: arbitrary_external_links_are_rejected()
       inputs: []
       output: unspecified
