@@ -1,4 +1,4 @@
-name: Bootstrap Source Catalog
+name: Refresh Agent Discovery Artifacts
 
 on:
   pull_request:
@@ -21,21 +21,25 @@ jobs:
         with:
           ref: dev
           fetch-depth: 1
-      - name: Install catalog dependency
+      - name: Install generator dependency
         shell: pwsh
         run: python -m pip install pyyaml
-      - name: Generate source catalog
+      - name: Refresh generated discovery
         shell: pwsh
-        run: python .github/bootstrap_generate_source_catalog.py
-      - name: Commit generated catalog
+        run: |
+          python refs/tools/generate_source_catalog.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python refs/tools/generate_okf_indexes.py
+          exit $LASTEXITCODE
+      - name: Commit generated discovery
         shell: pwsh
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add refs/implementation/sourceCatalog refs/implementation/.sourceCatalogShards
+          git add refs
           if (git diff --cached --quiet) {
-            Write-Host "Catalog already current."
+            Write-Host "Generated discovery already current."
             exit 0
           }
-          git commit -m "docs: bootstrap generated source catalog"
+          git commit -m "docs: refresh generated agent discovery"
           git push origin HEAD:dev
