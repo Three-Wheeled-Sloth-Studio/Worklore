@@ -1,7 +1,7 @@
 ---
 type: Handoff Prompt
 title: Next WorkLore Development Slice
-description: Validate structured Ollama model routing, then resume bounded runtime QA on approved-writing analysis.
+description: Resume runtime QA from the accepted v0.1.4 checkpoint using Agent Academy bounded source discovery.
 status: draft
 tags: [handoff, next-slice]
 ---
@@ -21,47 +21,28 @@ The governing loop remains:
 
 `Capture -> Understand -> Develop -> Connect -> Draft -> Challenge -> Publish manually -> Measure -> Learn`
 
-Read `refs/handoffs/currentHandoff.md` first.
+The last fully green product implementation checkpoint is:
 
-Last fully green accepted implementation before the current QA fix:
-
-`ab1eeaea21bc31c4921279ff1e973b0e49e91465`
+`f38e75618b5967177b37ba1040aab68a27c177d1`
 
 Validation for that checkpoint:
 
-- Actions `35011151906`
-- Job `104523135322`
+- Actions `35016169532`, run 330
+- Job `104540027121`
 - 11 frontend tests passed
 - production frontend build green
-- 131 Rust tests passed
+- 133 Rust tests passed
 - warnings-denied Clippy green
 - rustfmt green
 - refs/OKF/path-safety, build-layout, case-collision, bounded agent context, and source-only checks green
 
-The current newer `dev` head contains the observed structured-output routing remediation and must pass fresh full validation before becoming the next accepted checkpoint. QA build version is `0.1.4`.
+QA build version is `0.1.4`.
 
-## Current QA Defect
-
-Runtime QA reported:
-
-`Analyze approved writing` -> `Ollama did not return JSON matching the requested structured-output contract.`
-
-Multiple local Ollama models are available. WorkLore must not force the user to manually choose a JSON-capable model for each structured operation.
-
-Implemented behavior:
-
-- the explicitly configured Ollama model is still the preferred first attempt;
-- if that model returns `invalid_structured_output` or is unavailable, WorkLore retries a bounded deterministic set of other installed local text-generation models;
-- likely embedding-only models are excluded from fallback candidates;
-- retries never leave the selected local Ollama provider;
-- server/auth/request-size and other non-model failures stop immediately;
-- successful fallback uses the actual model ID in Voice analysis results, generated Post lineage, and provider audit metadata;
-- Voice analysis operation contract is version 3;
-- deterministic Rust tests cover candidate ordering and retry boundaries.
+Agent Academy bounded implementation discovery is now part of the WorkLore harness. Source discovery should use the deterministic catalog and targeted symbol/range reads rather than broad repository loading.
 
 ## Start With Bounded Re-entry
 
-Do not reread repository history.
+Do not reread repository history or implementation source broadly.
 
 First run:
 
@@ -69,30 +50,21 @@ First run:
 python refs/tools/generate_agent_context.py --focus "WorkLore structured Ollama model routing JSON contract approved writing voice analysis actual model provenance"
 ```
 
-Treat the packet as derived orientation, not source of truth. Follow it only into files needed for a concrete observed defect.
+Treat the packet as derived orientation, not source of truth. Follow `Required Reads For Next Slice` and source-catalog matches first.
 
-## Immediate Objective 1: Validate Current Candidate
-
-Run the full normal validation set against current `dev`:
+If source detail is still needed, query:
 
 ```powershell
-python scripts/check-case-collisions.py
-git diff --check
-python refs/tools/validate_refs.py --mode initialized
-python refs/tools/generate_agent_context.py --check
-npm run test
-npm run build:frontend
-cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
-cargo test --manifest-path src-tauri/Cargo.toml
-cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
-./scripts/assert-repo-clean.ps1
+python refs/tools/generate_source_catalog.py --query "<observed behavior or symbol>"
 ```
 
-If validation fails, fix only the concrete failure and rerun the relevant checks. Do not widen scope while validation is red.
+Read only the returned symbols/ranges and concrete dependencies unless the task genuinely crosses a broader boundary.
 
-## Immediate Objective 2: Resume Runtime QA
+Where the environment supports sub-agents, delegate bounded independent search, test inspection, diagnostics, or documentation checks when that reduces parent context or enables useful parallel work. Use the least expensive capable agent/model. Keep overlapping writes and final integration/validation with the parent.
 
-After validation is green, ask the user to pull the exact accepted `dev` SHA and focus first on the defect just reported:
+## Immediate Objective: Resume Runtime QA
+
+Focus first on the v0.1.4 defect:
 
 1. Confirm the sidebar reports `v0.1.4`.
 2. Run `Analyze approved writing` with the existing configured Ollama model.
@@ -103,6 +75,39 @@ After validation is green, ask the user to pull the exact accepted `dev` SHA and
 7. Continue the accepted QA path: Story Seed readability, Voice action ordering, explicit trait/rule acceptance, discard behavior, and restart/reopen persistence.
 
 Continue beyond this only when runtime QA exposes another concrete correctness, provenance, privacy, recoverability, or blocking UX defect.
+
+## Required Reads For Next Slice
+
+- `refs/handoffs/currentHandoff.md` - accepted checkpoint, current QA focus, and locked boundaries.
+- `refs/agents.yaml` - bounded discovery/delegation rules.
+- Do not pre-read implementation source. Let observed runtime behavior drive a source-catalog query.
+- `refs/testing/validationCommands.yaml` - read before finalizing any code change.
+
+## Validation After Any Change
+
+Run the normal validation path, including source-catalog freshness:
+
+```powershell
+python scripts/check-case-collisions.py
+git diff --check
+python refs/tools/generate_source_catalog.py --check
+python refs/tools/validate_refs.py --mode initialized
+python refs/tools/generate_agent_context.py --check
+npm run test
+npm run build:frontend
+cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
+cargo test --manifest-path src-tauri/Cargo.toml
+cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
+./scripts/assert-repo-clean.ps1
+```
+
+If implementation source changes, regenerate the catalog before checking it:
+
+```powershell
+python refs/tools/generate_source_catalog.py
+```
+
+Do not hand-edit source-catalog or OKF index output.
 
 ## Locked Constraints
 
@@ -120,9 +125,10 @@ Continue beyond this only when runtime QA exposes another concrete correctness, 
 - no fake human-vs-AI probability or opaque quality score;
 - public fixtures remain synthetic;
 - keep build/dev/QA output outside the repository;
-- do not hand-edit generated OKF indexes;
+- prefer cohesive, bounded source modules over expanding large mixed-purpose files;
+- do not hand-edit generated OKF indexes or source-catalog files;
 - do not promote `qa` or `main`.
 
 ## Stop Point
 
-Stop after the current candidate is fully validated and handed back for runtime QA, or after a newly observed blocker is reproduced, fixed, tested, and documented. Do not convert pending validation or unobserved behavior into an accepted claim.
+Stop after the next observed blocker is reproduced, fixed, tested, documented, and handed back for QA. Do not convert unobserved behavior into an accepted claim.
