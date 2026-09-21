@@ -703,9 +703,7 @@ source_catalog:
       - to_string
       - with_capacity
       parser: rust-pattern
-      dependency_targets:
-      - path: src-tauri/src/services/discovery_query_plan.rs
-        symbol: len
+      dependency_targets: []
     - name: extracts_paragraphs_tabs_and_escaped_text_from_docx_xml
       kind: function
       line_start: 248

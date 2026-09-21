@@ -220,9 +220,7 @@ source_catalog:
       - trimmed.len
       - value.trim
       parser: rust-pattern
-      dependency_targets:
-      - path: src-tauri/src/services/discovery_query_plan.rs
-        symbol: len
+      dependency_targets: []
     - name: review
       kind: function
       line_start: 181

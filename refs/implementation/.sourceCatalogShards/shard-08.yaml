@@ -227,7 +227,7 @@ source_catalog:
         symbol: add_occurrence
       - path: src-tauri/src/services/contextual_entity_scan.rs
         symbol: create_provisional_project
-      - &id009
+      - &id008
         path: src-tauri/src/services/contextual_entity_scan.rs
         symbol: detect_named_projects
       - path: src-tauri/src/services/contextual_entity_scan.rs
@@ -268,21 +268,18 @@ source_catalog:
         symbol: is_plausible_project_name
       - path: src-tauri/src/services/performance_service.rs
         symbol: start
-      - &id005
+      - &id004
         path: src-tauri/src/services/contextual_entity_scan.rs
         symbol: normalize
-      - &id006
+      - &id005
         path: src-tauri/src/services/entity_scan.rs
         symbol: normalize
-      - &id007
+      - &id006
         path: src-tauri/src/services/role_service.rs
         symbol: normalize
-      - &id008
+      - &id007
         path: src-tauri/src/services/story_service.rs
         symbol: normalize
-      - &id004
-        path: src-tauri/src/services/discovery_query_plan.rs
-        symbol: len
     - name: is_plausible_project_name
       kind: function
       line_start: 182
@@ -305,7 +302,6 @@ source_catalog:
         symbol: is_generic_entity_term
       - path: src-tauri/src/services/entity_scan.rs
         symbol: is_public_domain_acronym
-      - *id004
     - name: ranked_candidates
       kind: function
       line_start: 197
@@ -337,8 +333,7 @@ source_catalog:
       - unwrap_or
       parser: rust-pattern
       dependency_targets:
-      - *id004
-      - &id010
+      - &id009
         path: src-tauri/src/services/contextual_entity_scan.rs
         symbol: meaningful_tokens
     - name: meaningful_tokens
@@ -359,8 +354,7 @@ source_catalog:
       - token.as_str
       - token.len
       parser: rust-pattern
-      dependency_targets:
-      - *id004
+      dependency_targets: []
     - name: create_provisional_project
       kind: function
       line_start: 299
@@ -440,10 +434,10 @@ source_catalog:
       - position
       parser: rust-pattern
       dependency_targets:
+      - *id004
       - *id005
       - *id006
       - *id007
-      - *id008
     - name: occurrence_already_exists
       kind: function
       line_start: 394
@@ -515,8 +509,7 @@ source_catalog:
       - detections.len
       parser: rust-pattern
       dependency_targets:
-      - *id009
-      - *id004
+      - *id008
     - name: does_not_treat_role_and_skill_words_as_project_names
       kind: function
       line_start: 445
@@ -529,7 +522,7 @@ source_catalog:
       - is_empty
       parser: rust-pattern
       dependency_targets:
-      - *id009
+      - *id008
     - name: loose_built_and_product_cues_do_not_create_entities
       kind: function
       line_start: 451
@@ -542,7 +535,7 @@ source_catalog:
       - is_empty
       parser: rust-pattern
       dependency_targets:
-      - *id009
+      - *id008
     - name: explicit_named_tool_is_detected
       kind: function
       line_start: 457
@@ -555,8 +548,7 @@ source_catalog:
       - detections.len
       parser: rust-pattern
       dependency_targets:
-      - *id009
-      - *id004
+      - *id008
     - name: lexical_candidate_score_requires_real_overlap
       kind: function
       line_start: 465
@@ -569,7 +561,7 @@ source_catalog:
       - tokens.contains
       parser: rust-pattern
       dependency_targets:
-      - *id010
+      - *id009
   - path: src/voiceWorkspaceQueue.test.ts
     analysis_version: 1
     language: typescript

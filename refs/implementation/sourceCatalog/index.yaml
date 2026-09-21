@@ -5,14 +5,14 @@ source_catalog:
   generated_by: refs/tools/generate_source_catalog.py
   derived: true
   tracked_source_files: 130
-  symbols: 1306
+  symbols: 1305
   languages:
     python: 1
     rust: 80
     typescript: 49
   parsers:
     python-ast: 3
-    rust-pattern: 995
+    rust-pattern: 994
     typescript-pattern: 308
   shards:
   - path: refs/implementation/.sourceCatalogShards/shard-00.yaml
@@ -23,7 +23,7 @@ source_catalog:
     symbols: 92
   - path: refs/implementation/.sourceCatalogShards/shard-02.yaml
     files: 1
-    symbols: 13
+    symbols: 12
   - path: refs/implementation/.sourceCatalogShards/shard-03.yaml
     files: 7
     symbols: 86

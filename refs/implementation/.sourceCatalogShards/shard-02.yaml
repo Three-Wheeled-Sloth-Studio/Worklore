@@ -7,12 +7,11 @@ source_catalog:
   - path: src-tauri/src/services/discovery_query_plan.rs
     analysis_version: 1
     language: rust
-    content_hash: b4c3c58e647ccf0208f4523d87001fa234572c0d
+    content_hash: 0533de5d21736552e00418a8ed16e14201d57ad1
     dependencies:
     - super::*
     provides:
     - queries
-    - len
     - is_explicit_focus
     - build_query_plan
     - push_first_unique
@@ -36,21 +35,10 @@ source_catalog:
       dependencies: []
       parser: rust-pattern
       dependency_targets: []
-    - name: len
+    - name: is_explicit_focus
       kind: function
       line_start: 20
       line_end: 23
-      signature: len(&self) -> usize
-      inputs:
-      - '&self'
-      output: usize
-      dependencies: []
-      parser: rust-pattern
-      dependency_targets: []
-    - name: is_explicit_focus
-      kind: function
-      line_start: 24
-      line_end: 27
       signature: is_explicit_focus(&self) -> bool
       inputs:
       - '&self'
@@ -60,8 +48,8 @@ source_catalog:
       dependency_targets: []
     - name: build_query_plan
       kind: function
-      line_start: 29
-      line_end: 60
+      line_start: 25
+      line_end: 56
       signature: 'build_query_plan(focus: &str, theme_labels: &[String], target_context_labels: &[String], good_candidate_titles:
         &[String]) -> DiscoveryQueryPlan'
       inputs:
@@ -88,13 +76,10 @@ source_catalog:
         symbol: push_unique
       - path: src-tauri/src/services/target_context_service.rs
         symbol: push_unique
-      - &id002
-        path: src-tauri/src/services/discovery_query_plan.rs
-        symbol: len
     - name: push_first_unique
       kind: function
-      line_start: 61
-      line_end: 73
+      line_start: 57
+      line_end: 69
       signature: 'push_first_unique(queries: &mut Vec<String>, candidates: &[String])'
       inputs:
       - 'queries: &mut Vec<String>'
@@ -113,15 +98,14 @@ source_catalog:
       - value.is_empty
       parser: rust-pattern
       dependency_targets:
-      - &id003
+      - &id002
         path: src-tauri/src/services/discovery_query_plan.rs
         symbol: contains_query
       - *id001
-      - *id002
     - name: push_unique
       kind: function
-      line_start: 74
-      line_end: 83
+      line_start: 70
+      line_end: 79
       signature: 'push_unique(queries: &mut Vec<String>, value: &str)'
       inputs:
       - 'queries: &mut Vec<String>'
@@ -135,13 +119,12 @@ source_catalog:
       - queries.push
       parser: rust-pattern
       dependency_targets:
-      - *id003
-      - *id001
       - *id002
+      - *id001
     - name: contains_query
       kind: function
-      line_start: 84
-      line_end: 89
+      line_start: 80
+      line_end: 85
       signature: 'contains_query(queries: &[String], candidate: &str) -> bool'
       inputs:
       - 'queries: &[String]'
@@ -155,8 +138,8 @@ source_catalog:
       dependency_targets: []
     - name: normalize_query
       kind: function
-      line_start: 90
-      line_end: 93
+      line_start: 86
+      line_end: 89
       signature: 'normalize_query(value: &str) -> String'
       inputs:
       - 'value: &str'
@@ -168,8 +151,8 @@ source_catalog:
       dependency_targets: []
     - name: blank_focus_succeeds_without_themes_or_other_personal_signals
       kind: function
-      line_start: 100
-      line_end: 105
+      line_start: 96
+      line_end: 101
       signature: blank_focus_succeeds_without_themes_or_other_personal_signals()
       inputs: []
       output: unspecified
@@ -177,22 +160,21 @@ source_catalog:
       - all
       - build_query_plan
       - iter
-      - plan.len
+      - len
       - plan.queries
       - query.is_empty
       parser: rust-pattern
       dependency_targets:
-      - &id004
+      - &id003
         path: src-tauri/src/services/discovery_query_plan.rs
         symbol: build_query_plan
-      - *id002
-      - &id005
+      - &id004
         path: src-tauri/src/services/discovery_query_plan.rs
         symbol: queries
     - name: blank_focus_is_bounded_and_diverse
       kind: function
-      line_start: 108
-      line_end: 123
+      line_start: 104
+      line_end: 119
       signature: blank_focus_is_bounded_and_diverse()
       inputs: []
       output: unspecified
@@ -200,20 +182,20 @@ source_catalog:
       - build_query_plan
       - into
       - iter
+      - len
       - map
-      - plan.len
+      - plan.queries
       - queries
       - query.to_ascii_lowercase
       - unique.len
       parser: rust-pattern
       dependency_targets:
+      - *id003
       - *id004
-      - *id002
-      - *id005
     - name: explicit_focus_narrows_discovery_to_one_query
       kind: function
-      line_start: 126
-      line_end: 139
+      line_start: 122
+      line_end: 135
       signature: explicit_focus_narrows_discovery_to_one_query()
       inputs: []
       output: unspecified
@@ -225,7 +207,7 @@ source_catalog:
       - plan.queries
       parser: rust-pattern
       dependency_targets:
-      - *id004
+      - *id003
       - path: src-tauri/src/domain/candidates.rs
         symbol: from
       - path: src-tauri/src/domain/models.rs
@@ -234,11 +216,11 @@ source_catalog:
         symbol: from
       - path: src-tauri/src/services/discovery_query_plan.rs
         symbol: is_explicit_focus
-      - *id005
+      - *id004
     - name: active_theme_can_inform_but_is_not_required
       kind: function
-      line_start: 142
-      line_end: 148
+      line_start: 138
+      line_end: 144
       signature: active_theme_can_inform_but_is_not_required()
       inputs: []
       output: unspecified
@@ -250,12 +232,12 @@ source_catalog:
       - without_theme.queries
       parser: rust-pattern
       dependency_targets:
+      - *id003
       - *id004
-      - *id005
     - name: planner_has_no_story_or_proof_point_input_surface
       kind: function
-      line_start: 151
-      line_end: 164
+      line_start: 147
+      line_end: 160
       signature: planner_has_no_story_or_proof_point_input_surface()
       inputs: []
       output: unspecified
@@ -267,5 +249,5 @@ source_catalog:
       - rendered.contains
       parser: rust-pattern
       dependency_targets:
+      - *id003
       - *id004
-      - *id005

@@ -510,10 +510,10 @@ source_catalog:
       - load_query_plan_signals
       parser: rust-pattern
       dependency_targets:
-      - &id021
+      - &id020
         path: src-tauri/src/services/discovery_query_plan.rs
         symbol: build_query_plan
-      - &id017
+      - &id016
         path: src-tauri/src/services/discovery_service.rs
         symbol: cluster_sources
       - &id013
@@ -522,9 +522,6 @@ source_catalog:
       - &id011
         path: src-tauri/src/services/confidentiality_service.rs
         symbol: drop
-      - &id014
-        path: src-tauri/src/services/discovery_query_plan.rs
-        symbol: len
       - *id001
       - *id002
       - *id003
@@ -537,7 +534,7 @@ source_catalog:
         symbol: load_audience_signals
       - path: src-tauri/src/services/discovery_service.rs
         symbol: load_prior_feedback
-      - &id022
+      - &id021
         path: src-tauri/src/services/discovery_service.rs
         symbol: load_query_plan_signals
     - name: list_opportunities
@@ -614,10 +611,10 @@ source_catalog:
         symbol: audit
       - *id005
       - *id006
-      - &id019
+      - &id018
         path: src-tauri/src/services/discovery_service.rs
         symbol: normalize_reasons
-      - &id016
+      - &id015
         path: src-tauri/src/services/discovery_service.rs
         symbol: tokens
     - name: save_as_inspiration
@@ -781,7 +778,6 @@ source_catalog:
       - *id008
       - *id009
       - *id010
-      - *id014
       - path: src-tauri/src/commands/inspirations.rs
         symbol: create_inspiration_from_source
       - path: src-tauri/src/services/inspiration_service.rs
@@ -828,12 +824,11 @@ source_catalog:
       - sources.len
       parser: rust-pattern
       dependency_targets:
-      - &id020
+      - &id019
         path: src-tauri/src/services/discovery_service.rs
         symbol: bias
       - path: src-tauri/src/services/discovery_service.rs
         symbol: matching_signals
-      - *id014
     - name: compare_ranked
       kind: function
       line_start: 679
@@ -855,8 +850,7 @@ source_catalog:
       - right.view.sources.len
       - then_with
       parser: rust-pattern
-      dependency_targets:
-      - *id014
+      dependency_targets: []
     - name: persist_opportunity
       kind: function
       line_start: 709
@@ -927,7 +921,7 @@ source_catalog:
       - *id013
       - path: src-tauri/src/services/discovery_query_plan.rs
         symbol: is_explicit_focus
-      - &id023
+      - &id022
         path: src-tauri/src/services/discovery_query_plan.rs
         symbol: queries
       - path: src-tauri/src/services/redaction_service.rs
@@ -974,7 +968,7 @@ source_catalog:
       - load_signals
       parser: rust-pattern
       dependency_targets:
-      - &id015
+      - &id014
         path: src-tauri/src/services/discovery_service.rs
         symbol: load_signals
     - name: load_standing_signals
@@ -991,7 +985,7 @@ source_catalog:
       - out.extend
       parser: rust-pattern
       dependency_targets:
-      - *id015
+      - *id014
     - name: load_audience_signals
       kind: function
       line_start: 882
@@ -1004,7 +998,7 @@ source_catalog:
       - load_signals
       parser: rust-pattern
       dependency_targets:
-      - *id015
+      - *id014
     - name: load_recent_topic_signals
       kind: function
       line_start: 890
@@ -1017,7 +1011,7 @@ source_catalog:
       - load_signals
       parser: rust-pattern
       dependency_targets:
-      - *id015
+      - *id014
     - name: load_signals
       kind: function
       line_start: 899
@@ -1035,7 +1029,7 @@ source_catalog:
       - tokens
       parser: rust-pattern
       dependency_targets:
-      - *id016
+      - *id015
     - name: matching_signals
       kind: function
       line_start: 921
@@ -1078,8 +1072,7 @@ source_catalog:
       - next
       - value.len
       parser: rust-pattern
-      dependency_targets:
-      - *id014
+      dependency_targets: []
     - name: load_prior_feedback
       kind: function
       line_start: 949
@@ -1126,7 +1119,7 @@ source_catalog:
       dependency_targets:
       - path: src-tauri/src/services/app_preferences_service.rs
         symbol: default
-      - &id018
+      - &id017
         path: src-tauri/src/services/discovery_service.rs
         symbol: token_similarity
     - name: token_similarity
@@ -1172,7 +1165,7 @@ source_catalog:
       dependency_targets:
       - path: src-tauri/src/services/discovery_service.rs
         symbol: title_similarity
-      - *id016
+      - *id015
     - name: title_similarity
       kind: function
       line_start: 1037
@@ -1207,8 +1200,7 @@ source_catalog:
       - token.as_str
       - token.len
       parser: rust-pattern
-      dependency_targets:
-      - *id014
+      dependency_targets: []
     - name: normalize_reasons
       kind: function
       line_start: 1059
@@ -1318,8 +1310,7 @@ source_catalog:
       - new
       parser: rust-pattern
       dependency_targets:
-      - *id017
-      - *id014
+      - *id016
     - name: feedback_similarity_requires_more_than_one_generic_token
       kind: function
       line_start: 1164
@@ -1332,8 +1323,8 @@ source_catalog:
       - tokens
       parser: rust-pattern
       dependency_targets:
-      - *id018
-      - *id016
+      - *id017
+      - *id015
     - name: normalized_feedback_reasons_are_bounded_and_deduplicated
       kind: function
       line_start: 1176
@@ -1347,7 +1338,7 @@ source_catalog:
       - to_string
       parser: rust-pattern
       dependency_targets:
-      - *id019
+      - *id018
     - name: duplicate_urls_from_exploration_queries_collapse_before_qualification
       kind: function
       line_start: 1188
@@ -1362,8 +1353,7 @@ source_catalog:
       - len
       parser: rust-pattern
       dependency_targets:
-      - *id017
-      - *id014
+      - *id016
     - name: feedback_keeps_timing_separate_from_personal_fit
       kind: function
       line_start: 1212
@@ -1384,10 +1374,10 @@ source_catalog:
       - verdict.into
       parser: rust-pattern
       dependency_targets:
-      - *id020
+      - *id019
       - path: src-tauri/src/services/discovery_service.rs
         symbol: summarize_feedback
-      - *id016
+      - *id015
     - name: query_plan_inputs_exclude_story_and_proof_point_bodies
       kind: function
       line_start: 1247
@@ -1416,22 +1406,22 @@ source_catalog:
       - temp_dir
       parser: rust-pattern
       dependency_targets:
-      - *id021
+      - *id020
       - path: src-tauri/src/services/canonical_store.rs
         symbol: create_story
       - path: src-tauri/src/commands/topics.rs
         symbol: create_theme
       - path: src-tauri/src/services/topic_service.rs
         symbol: create_theme
-      - &id024
+      - &id023
         path: src-tauri/src/commands/vault.rs
         symbol: create_vault
-      - &id025
+      - &id024
         path: src-tauri/src/services/vault_service.rs
         symbol: create_vault
       - *id011
+      - *id021
       - *id022
-      - *id023
     - name: develop_topic_requires_explicit_user_summary
       kind: function
       line_start: 1297
@@ -1453,8 +1443,8 @@ source_catalog:
       - temp_dir
       parser: rust-pattern
       dependency_targets:
+      - *id023
       - *id024
-      - *id025
       - path: src-tauri/src/services/discovery_service.rs
         symbol: develop_topic
     - name: saving_discovery_inspiration_preserves_external_source_provenance
@@ -1491,8 +1481,8 @@ source_catalog:
       - save_as_inspiration
       parser: rust-pattern
       dependency_targets:
+      - *id023
       - *id024
-      - *id025
       - *id011
       - path: src-tauri/src/services/discovery_service.rs
         symbol: persist_opportunity
@@ -1622,23 +1612,23 @@ source_catalog:
       - setOpenaiApiKey
       parser: typescript-pattern
       dependency_targets:
-      - &id026
+      - &id025
         path: src/domain/types.ts
         symbol: errorMessage
       - path: src/lib/workloreApi.ts
         symbol: getProviderSettings
-      - &id028
+      - &id027
         path: src/lib/workloreApi.ts
         symbol: listProviderModels
-      - &id029
+      - &id028
         path: src/components/ProviderSettingsPanel.tsx
         symbol: providerLabel
       - path: src/components/ProviderSettingsPanel.tsx
         symbol: refreshModels
-      - &id030
+      - &id029
         path: src/components/ProviderSettingsPanel.tsx
         symbol: save
-      - &id027
+      - &id026
         path: src/components/ProviderSettingsPanel.tsx
         symbol: saveMessage
       - path: src/components/ProviderSettingsPanel.tsx
@@ -1669,8 +1659,8 @@ source_catalog:
       - updateProviderSettings
       parser: typescript-pattern
       dependency_targets:
+      - *id025
       - *id026
-      - *id027
       - path: src/lib/workloreApi.ts
         symbol: updateProviderSettings
     - name: refreshModels
@@ -1691,10 +1681,10 @@ source_catalog:
       - setNotice
       parser: typescript-pattern
       dependency_targets:
-      - *id026
+      - *id025
+      - *id027
       - *id028
       - *id029
-      - *id030
     - name: testConnection
       kind: function
       line_start: 108
@@ -1712,9 +1702,9 @@ source_catalog:
       - testProviderConnection
       parser: typescript-pattern
       dependency_targets:
-      - *id026
+      - *id025
+      - *id028
       - *id029
-      - *id030
       - path: src/lib/workloreApi.ts
         symbol: testProviderConnection
     - name: selectProvider
@@ -1815,12 +1805,12 @@ source_catalog:
       - setLocalStories
       parser: typescript-pattern
       dependency_targets:
-      - *id026
+      - *id025
       - path: src/lib/captureApi.ts
         symbol: listCaptureSources
       - path: src/lib/workloreApi.ts
         symbol: listStories
-      - &id031
+      - &id030
         path: src/components/StoryBankPanel.tsx
         symbol: resolveVaultPath
     - name: develop
@@ -1845,8 +1835,8 @@ source_catalog:
       dependency_targets:
       - path: src/lib/workloreApi.ts
         symbol: classifyCaptureSource
-      - *id026
-      - *id031
+      - *id025
+      - *id030
     - name: handleStatusChange
       kind: function
       line_start: 82

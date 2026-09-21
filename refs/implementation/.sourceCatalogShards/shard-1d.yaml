@@ -294,10 +294,7 @@ source_catalog:
       - trimmed.trim_start
       - with_capacity
       parser: rust-pattern
-      dependency_targets:
-      - &id005
-        path: src-tauri/src/services/discovery_query_plan.rs
-        symbol: len
+      dependency_targets: []
     - name: support_role
       kind: function
       line_start: 297
@@ -484,11 +481,10 @@ source_catalog:
       - try_from
       parser: rust-pattern
       dependency_targets:
-      - &id006
+      - &id005
         path: src-tauri/src/services/provider_secret_service.rs
         symbol: copy_and_free
-      - *id005
-      - &id007
+      - &id006
         path: src-tauri/src/services/provider_secret_service.rs
         symbol: secret_error
     - name: unprotect_secret
@@ -515,9 +511,8 @@ source_catalog:
       - try_from
       parser: rust-pattern
       dependency_targets:
-      - *id006
       - *id005
-      - *id007
+      - *id006
     - name: copy_and_free
       kind: function
       line_start: 122
@@ -536,7 +531,7 @@ source_catalog:
       - to_vec
       parser: rust-pattern
       dependency_targets:
-      - *id007
+      - *id006
     - name: windows_user_secret_round_trips_without_plaintext_storage
       kind: function
       line_start: 139
@@ -568,7 +563,7 @@ source_catalog:
       - secret_error
       parser: rust-pattern
       dependency_targets:
-      - *id007
+      - *id006
     - name: unprotect_secret
       kind: function
       line_start: 158
@@ -582,7 +577,7 @@ source_catalog:
       - secret_error
       parser: rust-pattern
       dependency_targets:
-      - *id007
+      - *id006
     - name: secret_error
       kind: function
       line_start: 167
@@ -653,7 +648,7 @@ source_catalog:
       - setSnapshot
       parser: typescript-pattern
       dependency_targets:
-      - &id008
+      - &id007
         path: src/domain/types.ts
         symbol: errorMessage
       - path: src/lib/feedbackApi.ts
@@ -684,7 +679,7 @@ source_catalog:
       dependency_targets:
       - path: src/components/InsightsWorkspace.tsx
         symbol: defaultPublicationTime
-      - *id008
+      - *id007
       - path: src/lib/feedbackApi.ts
         symbol: markPostPublished
     - name: savePerformance
@@ -704,7 +699,7 @@ source_catalog:
       - setNotice
       parser: typescript-pattern
       dependency_targets:
-      - *id008
+      - *id007
       - path: src/components/InsightsWorkspace.tsx
         symbol: formToMetrics
       - path: src/lib/feedbackApi.ts

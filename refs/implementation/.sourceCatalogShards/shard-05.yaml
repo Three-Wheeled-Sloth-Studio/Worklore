@@ -777,9 +777,7 @@ source_catalog:
       - v.starts_with
       - value.replace
       parser: rust-pattern
-      dependency_targets:
-      - path: src-tauri/src/services/discovery_query_plan.rs
-        symbol: len
+      dependency_targets: []
     - name: enum_text
       kind: function
       line_start: 961

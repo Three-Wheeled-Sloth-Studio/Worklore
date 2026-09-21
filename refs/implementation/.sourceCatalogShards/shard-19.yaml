@@ -84,8 +84,6 @@ source_catalog:
         symbol: read_interview
       - path: src-tauri/src/services/redaction_service.rs
         symbol: redact_for_external_use
-      - path: src-tauri/src/services/discovery_query_plan.rs
-        symbol: len
     - name: build_context
       kind: function
       line_start: 132

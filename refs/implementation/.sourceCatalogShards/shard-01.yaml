@@ -418,9 +418,6 @@ source_catalog:
       - &id009
         path: src-tauri/src/services/entity_scan.rs
         symbol: allocate_token
-      - &id031
-        path: src-tauri/src/services/discovery_query_plan.rs
-        symbol: len
     - name: confirm_entity
       kind: function
       line_start: 405
@@ -1667,22 +1664,21 @@ source_catalog:
       - with_capacity
       parser: rust-pattern
       dependency_targets:
-      - &id032
+      - &id031
         path: src-tauri/src/services/canonical_store.rs
         symbol: initialize
-      - &id033
+      - &id032
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: is_target_context_source
-      - &id034
+      - &id033
         path: src-tauri/src/services/target_context_service.rs
         symbol: load_source_text
-      - &id035
+      - &id034
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: load_source_text
-      - &id041
+      - &id040
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: preview
-      - *id031
     - name: load_eligible_voice_evidence_material
       kind: function
       line_start: 246
@@ -1715,7 +1711,6 @@ source_catalog:
       - with_capacity
       parser: rust-pattern
       dependency_targets:
-      - *id032
       - *id031
     - name: create_voice_evidence_from_source
       kind: function
@@ -1753,29 +1748,29 @@ source_catalog:
       - to_string
       parser: rust-pattern
       dependency_targets:
-      - &id037
+      - &id036
         path: src-tauri/src/services/edit_learning_service.rs
         symbol: audit_tx
-      - &id038
+      - &id037
         path: src-tauri/src/services/post_lineage_service.rs
         symbol: audit_tx
-      - &id039
+      - &id038
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: audit_tx
-      - &id040
+      - &id039
         path: src-tauri/src/services/voice_profile_service.rs
         symbol: audit_tx
       - path: src-tauri/src/services/voice_evidence_service.rs
         symbol: hash_text
+      - *id031
       - *id032
-      - *id033
-      - &id036
+      - &id035
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: load_from_connection
       - path: src-tauri/src/services/voice_evidence_service.rs
         symbol: load_source
+      - *id033
       - *id034
-      - *id035
     - name: load_voice_evidence
       kind: function
       line_start: 397
@@ -1791,8 +1786,8 @@ source_catalog:
       - open_connection
       parser: rust-pattern
       dependency_targets:
-      - *id032
-      - *id036
+      - *id031
+      - *id035
     - name: list_voice_evidence
       kind: function
       line_start: 406
@@ -1812,8 +1807,8 @@ source_catalog:
       - query_map
       parser: rust-pattern
       dependency_targets:
-      - *id032
-      - *id036
+      - *id031
+      - *id035
     - name: review_voice_evidence
       kind: function
       line_start: 420
@@ -1850,16 +1845,16 @@ source_catalog:
       - to_rfc3339
       parser: rust-pattern
       dependency_targets:
+      - *id036
       - *id037
       - *id038
       - *id039
-      - *id040
       - path: src-tauri/src/services/voice_evidence_service.rs
         symbol: is_eligible_authorship
       - path: src-tauri/src/services/voice_evidence_service.rs
         symbol: is_permanently_prohibited
-      - *id032
-      - *id036
+      - *id031
+      - *id035
     - name: load_from_connection
       kind: function
       line_start: 551
@@ -1879,7 +1874,7 @@ source_catalog:
       - voice_evidence_not_found
       parser: rust-pattern
       dependency_targets:
-      - *id041
+      - *id040
       - path: src-tauri/src/services/voice_evidence_service.rs
         symbol: voice_evidence_not_found
     - name: load_source
@@ -2097,33 +2092,32 @@ source_catalog:
       - writing_source
       parser: rust-pattern
       dependency_targets:
-      - *id031
-      - &id042
+      - &id041
         path: src-tauri/src/commands/voice.rs
         symbol: create_voice_evidence_from_source
-      - &id043
+      - &id042
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: create_voice_evidence_from_source
-      - &id052
+      - &id051
         path: src-tauri/src/services/confidentiality_service.rs
         symbol: drop
-      - *id032
-      - &id050
+      - *id031
+      - &id049
         path: src-tauri/src/commands/voice.rs
         symbol: list_voice_source_candidates
-      - &id051
+      - &id050
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: list_voice_source_candidates
-      - &id044
+      - &id043
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: load_voice_evidence
-      - &id045
+      - &id044
         path: src-tauri/src/commands/voice.rs
         symbol: review_voice_evidence
-      - &id046
+      - &id045
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: review_voice_evidence
-      - &id047
+      - &id046
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: writing_source
     - name: raw_model_origin_is_rejected_and_cannot_be_rewritten_as_user_authored
@@ -2146,12 +2140,12 @@ source_catalog:
       - writing_source
       parser: rust-pattern
       dependency_targets:
+      - *id041
       - *id042
       - *id043
       - *id044
       - *id045
       - *id046
-      - *id047
     - name: inspiration_link_does_not_silently_make_writing_voice_evidence
       kind: function
       line_start: 830
@@ -2168,15 +2162,15 @@ source_catalog:
       - writing_source
       parser: rust-pattern
       dependency_targets:
-      - &id048
+      - &id047
         path: src-tauri/src/commands/capture.rs
         symbol: classify_capture_source
-      - &id049
+      - &id048
         path: src-tauri/src/services/capture_service.rs
         symbol: classify_capture_source
+      - *id041
       - *id042
-      - *id043
-      - *id047
+      - *id046
     - name: target_context_source_is_blocked_from_voice_evidence
       kind: function
       line_start: 852
@@ -2197,13 +2191,13 @@ source_catalog:
       - writing_source
       parser: rust-pattern
       dependency_targets:
-      - *id048
-      - *id049
-      - *id042
-      - *id043
-      - *id050
-      - *id051
       - *id047
+      - *id048
+      - *id041
+      - *id042
+      - *id049
+      - *id050
+      - *id046
     - name: retiring_eligibility_preserves_source_and_records_revisioned_audit
       kind: function
       line_start: 875
@@ -2228,12 +2222,12 @@ source_catalog:
       - writing_source
       parser: rust-pattern
       dependency_targets:
+      - *id041
       - *id042
-      - *id043
-      - *id052
+      - *id051
+      - *id044
       - *id045
       - *id046
-      - *id047
   - path: src/components/HelpLauncher.tsx
     analysis_version: 1
     language: typescript

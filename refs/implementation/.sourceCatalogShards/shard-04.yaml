@@ -157,8 +157,6 @@ source_catalog:
         symbol: list_posts
       - path: src-tauri/src/services/post_catalog_service.rs
         symbol: list_posts
-      - path: src-tauri/src/services/discovery_query_plan.rs
-        symbol: len
       - path: src-tauri/src/services/post_catalog_service.rs
         symbol: user_post
       - path: src-tauri/src/services/post_lineage_service.rs

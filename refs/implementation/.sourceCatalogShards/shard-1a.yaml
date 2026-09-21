@@ -197,7 +197,7 @@ source_catalog:
       - path: src-tauri/src/services/seed_development_service.rs
         symbol: insert_relationship
       - *id008
-      - &id015
+      - &id014
         path: src-tauri/src/services/canonical_store.rs
         symbol: load_story
       - *id004
@@ -371,10 +371,7 @@ source_catalog:
       - turn.target_fields.first
       - turn.text.clone
       parser: rust-pattern
-      dependency_targets:
-      - &id014
-        path: src-tauri/src/services/discovery_query_plan.rs
-        symbol: len
+      dependency_targets: []
     - name: insert_relationship
       kind: function
       line_start: 461
@@ -525,13 +522,12 @@ source_catalog:
       - *id008
       - *id012
       - *id013
-      - &id016
+      - &id015
         path: src-tauri/src/commands/development.rs
         symbol: submit_story_seed_development_response
-      - &id017
+      - &id016
         path: src-tauri/src/services/seed_development_service.rs
         symbol: submit_story_seed_development_response
-      - *id014
     - name: completed_seed_development_creates_one_role_free_story_with_lineage
       kind: function
       line_start: 630
@@ -563,11 +559,11 @@ source_catalog:
       - path: src-tauri/src/services/seed_development_service.rs
         symbol: create_story_from_seed_development
       - *id011
-      - *id015
+      - *id014
       - *id012
       - *id013
+      - *id015
       - *id016
-      - *id017
     - name: legacy_interview_payload_is_not_mistaken_for_direct_seed_development
       kind: function
       line_start: 691

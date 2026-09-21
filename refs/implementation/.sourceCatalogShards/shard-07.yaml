@@ -485,9 +485,7 @@ source_catalog:
       - turn.target_fields.first
       - turn.text.clone
       parser: rust-pattern
-      dependency_targets:
-      - path: src-tauri/src/services/discovery_query_plan.rs
-        symbol: len
+      dependency_targets: []
     - name: find_interview_for_candidate
       kind: function
       line_start: 265
