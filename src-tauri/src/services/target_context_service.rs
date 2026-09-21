@@ -1302,7 +1302,7 @@ mod tests {
             capture_service::CaptureRole::TargetContext,
         )
         .expect("classify");
-        assert_eq!(canonical_store::schema_version(&path).unwrap(), 8);
+        assert_eq!(canonical_store::schema_version(&path).unwrap(), 9);
         let before =
             load_target_context(&path, &classified.target_id).expect("load target context");
         assert_eq!(before.context_type, "job_description");
