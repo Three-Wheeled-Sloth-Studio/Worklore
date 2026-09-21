@@ -65,6 +65,7 @@ pub struct ProviderSettingsView {
     pub openai_api_key_configured: bool,
     pub gemini_model_id: Option<String>,
     pub gemini_api_key_configured: bool,
+    pub brave_search_api_key_configured: bool,
 }
 
 #[derive(Clone, Deserialize)]
@@ -81,6 +82,9 @@ pub struct UpdateProviderSettingsRequest {
     pub gemini_api_key: Option<String>,
     #[serde(default)]
     pub clear_gemini_api_key: bool,
+    pub brave_search_api_key: Option<String>,
+    #[serde(default)]
+    pub clear_brave_search_api_key: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
