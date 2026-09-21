@@ -1,4 +1,5 @@
 pub mod app_preferences_service;
+pub mod brave_search_provider;
 pub mod candidate_service;
 pub mod canonical_store;
 pub mod capture_catalog_service;
@@ -7,6 +8,7 @@ pub mod capture_service;
 pub mod confidentiality_service;
 pub mod contextual_entity_scan;
 pub mod document_extraction;
+pub mod discovery_service;
 pub mod edit_learning_service;
 pub mod entity_review;
 pub mod entity_scan;
