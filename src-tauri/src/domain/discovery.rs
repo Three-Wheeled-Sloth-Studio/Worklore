@@ -127,6 +127,7 @@ pub struct ScanDiscoveryRequest {
 pub struct DiscoveryScanResult {
     pub run_id: String,
     pub external_query: String,
+    pub external_queries: Vec<String>,
     pub freshness: DiscoveryFreshness,
     pub feedback_examples_used: usize,
     pub opportunities: Vec<DiscoveryOpportunityView>,
