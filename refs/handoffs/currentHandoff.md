@@ -1,7 +1,7 @@
 ---
 type: Handoff
 title: Current WorkLore Handoff
-description: Open-ended timely-topic discovery candidate for v0.1.9, pending exact-head validation.
+description: Accepted v0.1.9 open-ended timely-topic discovery checkpoint and runtime-smoke handoff.
 status: draft
 tags: [handoff, worklore, discovery]
 ---
@@ -29,11 +29,11 @@ Locked boundaries remain:
 - Story and Proof Point bodies are not external-search query inputs;
 - no fake AI/human probability or opaque quality score.
 
-## Current Candidate
+## Accepted Checkpoint
 
 Version: `0.1.9`
 
-The open-ended discovery slice is implemented on `dev` and is pending the normal exact-head validation gate before acceptance.
+The open-ended discovery slice is implemented and accepted after the normal exact-head validation gate. Use the current `dev` head as the implementation source of truth; promoted branches remain unchanged until explicitly requested.
 
 What changed:
 
@@ -147,4 +147,4 @@ cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -
 ./scripts/assert-repo-clean.ps1
 ```
 
-Do not call v0.1.9 accepted until those checks pass on the exact current `dev` head.
+Any subsequent change to `dev` requires this full gate again before that new head is called accepted.
