@@ -93,7 +93,7 @@ source_catalog:
       - &id002
         path: src-tauri/src/io_utils.rs
         symbol: read_json
-      - &id010
+      - &id011
         path: src-tauri/src/services/redaction_service.rs
         symbol: redact_for_external_use
       - path: src-tauri/src/services/confidentiality_service.rs
@@ -173,6 +173,9 @@ source_catalog:
       - path: src-tauri/src/services/confidentiality_service.rs
         symbol: is_known_entity_scanner_wrapper
       - *id001
+      - &id006
+        path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: len
       - path: src-tauri/src/services/confidentiality_service.rs
         symbol: parse_char_locator
       - path: src-tauri/src/services/confidentiality_service.rs
@@ -395,13 +398,14 @@ source_catalog:
       parser: rust-pattern
       dependency_targets:
       - *id005
-      - &id008
+      - &id009
         path: src-tauri/src/services/confidentiality_service.rs
         symbol: entity
-      - &id009
+      - &id010
         path: src-tauri/src/services/redaction_service.rs
         symbol: entity
-      - &id006
+      - *id006
+      - &id007
         path: src-tauri/src/services/confidentiality_service.rs
         symbol: transform_for_public_use
     - name: high_risk_pending_review_blocks_when_vault_policy_requires_it
@@ -427,7 +431,8 @@ source_catalog:
       dependency_targets:
       - *id005
       - *id006
-      - &id007
+      - *id007
+      - &id008
         path: src-tauri/src/services/confidentiality_service.rs
         symbol: add_review
     - name: lower_risk_pending_review_remains_visible_without_claiming_ready
@@ -450,6 +455,7 @@ source_catalog:
       - *id005
       - *id006
       - *id007
+      - *id008
     - name: unregistered_high_risk_text_is_blocked_without_mutating_the_registry
       kind: function
       line_start: 650
@@ -471,7 +477,7 @@ source_catalog:
       parser: rust-pattern
       dependency_targets:
       - *id005
-      - *id006
+      - *id007
     - name: never_send_to_cloud_stays_redacted_on_existing_external_path
       kind: function
       line_start: 677
@@ -488,9 +494,9 @@ source_catalog:
       parser: rust-pattern
       dependency_targets:
       - *id005
-      - *id008
       - *id009
       - *id010
+      - *id011
   - path: src/lib/captureApi.ts
     analysis_version: 1
     language: typescript

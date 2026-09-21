@@ -302,7 +302,9 @@ source_catalog:
       - value.trim
       - with_capacity
       parser: rust-pattern
-      dependency_targets: []
+      dependency_targets:
+      - path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: len
     - name: unique_destination
       kind: function
       line_start: 88

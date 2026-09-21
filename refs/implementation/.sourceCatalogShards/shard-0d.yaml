@@ -133,19 +133,19 @@ source_catalog:
       - &id003
         path: src-tauri/src/services/entity_scan.rs
         symbol: load_registry
-      - &id005
+      - &id006
         path: src-tauri/src/services/contextual_entity_scan.rs
         symbol: normalize
-      - &id006
+      - &id007
         path: src-tauri/src/services/entity_scan.rs
         symbol: normalize
-      - &id007
+      - &id008
         path: src-tauri/src/services/role_service.rs
         symbol: normalize
-      - &id008
+      - &id009
         path: src-tauri/src/services/story_service.rs
         symbol: normalize
-      - &id009
+      - &id010
         path: src-tauri/src/services/role_service.rs
         symbol: parse_role_heading
       - &id001
@@ -219,6 +219,9 @@ source_catalog:
       dependency_targets:
       - *id003
       - *id004
+      - &id005
+        path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: len
     - name: parse_role_heading
       kind: function
       line_start: 122
@@ -261,6 +264,7 @@ source_catalog:
         symbol: looks_like_date_segment
       - path: src-tauri/src/services/role_service.rs
         symbol: parse_dates
+      - *id005
       - path: src-tauri/src/services/role_service.rs
         symbol: split_heading
     - name: split_heading
@@ -279,7 +283,8 @@ source_catalog:
       - value.is_empty
       - values.len
       parser: rust-pattern
-      dependency_targets: []
+      dependency_targets:
+      - *id005
     - name: split_title_at_organization
       kind: function
       line_start: 189
@@ -354,10 +359,10 @@ source_catalog:
       - registry.entities.iter
       parser: rust-pattern
       dependency_targets:
-      - *id005
       - *id006
       - *id007
       - *id008
+      - *id009
     - name: ensure_employer_entity
       kind: function
       line_start: 234
@@ -400,10 +405,10 @@ source_catalog:
       dependency_targets:
       - path: src-tauri/src/domain/models.rs
         symbol: token_family
-      - *id005
       - *id006
       - *id007
       - *id008
+      - *id009
     - name: read_roles
       kind: function
       line_start: 334
@@ -475,10 +480,10 @@ source_catalog:
       - parsed.start_date.as_deref
       parser: rust-pattern
       dependency_targets:
-      - &id010
+      - &id011
         path: src-tauri/src/services/entity_scan.rs
         symbol: initialize_registry
-      - *id009
+      - *id010
     - name: parses_title_at_organization_without_absorbing_date_text
       kind: function
       line_start: 381
@@ -492,8 +497,8 @@ source_catalog:
       - parse_role_heading
       parser: rust-pattern
       dependency_targets:
+      - *id011
       - *id010
-      - *id009
     - name: rejects_headings_without_organization_and_title
       kind: function
       line_start: 391
@@ -507,8 +512,8 @@ source_catalog:
       - parse_role_heading
       parser: rust-pattern
       dependency_targets:
+      - *id011
       - *id010
-      - *id009
   - path: src/navigation.test.ts
     analysis_version: 1
     language: typescript

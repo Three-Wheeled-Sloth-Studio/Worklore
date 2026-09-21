@@ -258,6 +258,9 @@ source_catalog:
       - to_string
       parser: rust-pattern
       dependency_targets:
+      - &id004
+        path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: len
       - path: src-tauri/src/services/publication_feedback_service.rs
         symbol: rate_insight
     - name: rate_insight
@@ -390,34 +393,35 @@ source_catalog:
       - vault
       parser: rust-pattern
       dependency_targets:
-      - &id004
+      - &id005
         path: src-tauri/src/services/post_lineage_service.rs
         symbol: approve_revision
-      - &id005
+      - &id006
         path: src-tauri/src/commands/posts.rs
         symbol: create_post
-      - &id006
+      - &id007
         path: src-tauri/src/services/post_lineage_service.rs
         symbol: create_post
-      - &id007
-        path: src-tauri/src/commands/feedback.rs
-        symbol: get_feedback_snapshot
       - &id008
-        path: src-tauri/src/services/publication_feedback_service.rs
+        path: src-tauri/src/commands/feedback.rs
         symbol: get_feedback_snapshot
       - &id009
+        path: src-tauri/src/services/publication_feedback_service.rs
+        symbol: get_feedback_snapshot
+      - &id010
         path: src-tauri/src/commands/feedback.rs
         symbol: mark_post_published
-      - &id010
+      - &id011
         path: src-tauri/src/services/publication_feedback_service.rs
         symbol: mark_post_published
-      - &id011
+      - *id004
+      - &id012
         path: src-tauri/src/services/post_catalog_service.rs
         symbol: user_post
-      - &id012
+      - &id013
         path: src-tauri/src/services/post_lineage_service.rs
         symbol: user_post
-      - &id013
+      - &id014
         path: src-tauri/src/services/publication_feedback_service.rs
         symbol: user_post
     - name: performance_snapshots_are_append_only_and_latest_value_drives_baseline
@@ -445,22 +449,23 @@ source_catalog:
       - vault
       parser: rust-pattern
       dependency_targets:
-      - *id004
       - *id005
       - *id006
+      - *id007
       - path: src-tauri/src/services/app_preferences_service.rs
         symbol: default
-      - *id007
       - *id008
       - *id009
       - *id010
+      - *id011
       - path: src-tauri/src/commands/feedback.rs
         symbol: record_post_performance
       - path: src-tauri/src/services/publication_feedback_service.rs
         symbol: record_post_performance
-      - *id011
+      - *id004
       - *id012
       - *id013
+      - *id014
   - path: src/App.tsx
     analysis_version: 1
     language: typescript
@@ -551,27 +556,27 @@ source_catalog:
       - handleCreateVault
       parser: typescript-pattern
       dependency_targets:
-      - &id016
+      - &id017
         path: src/App.tsx
         symbol: activateVault
-      - &id024
+      - &id025
         path: src/App.tsx
         symbol: candidateStatusMessage
-      - &id019
+      - &id020
         path: src/lib/workloreApi.ts
         symbol: clearLastVault
-      - &id022
+      - &id023
         path: src/lib/workloreApi.ts
         symbol: createManualWorkspace
-      - &id017
+      - &id018
         path: src/lib/vaultApi.ts
         symbol: createVaultInParent
       - path: src/App.tsx
         symbol: displayVaultPath
-      - &id014
+      - &id015
         path: src/domain/types.ts
         symbol: errorMessage
-      - &id020
+      - &id021
         path: src/lib/workloreApi.ts
         symbol: extractResumeCandidates
       - path: src/lib/workloreApi.ts
@@ -580,7 +585,7 @@ source_catalog:
         symbol: getLastImportDirectory
       - path: src/lib/workloreApi.ts
         symbol: getLastVaultPath
-      - &id015
+      - &id016
         path: src/lib/workloreApi.ts
         symbol: getPerformanceSnapshot
       - path: src/App.tsx
@@ -623,21 +628,21 @@ source_catalog:
       - setVault
       parser: typescript-pattern
       dependency_targets:
-      - *id014
       - *id015
+      - *id016
       - path: src/lib/workloreApi.ts
         symbol: listEntityReviews
       - path: src/lib/workloreApi.ts
         symbol: listGuidedInterviews
       - path: src/lib/workloreApi.ts
         symbol: listSources
-      - &id026
+      - &id027
         path: src/lib/workloreApi.ts
         symbol: listStories
-      - &id025
+      - &id026
         path: src/lib/workloreApi.ts
         symbol: listStoryCandidates
-      - &id018
+      - &id019
         path: src/lib/workloreApi.ts
         symbol: openVault
     - name: refreshPerformance
@@ -656,8 +661,8 @@ source_catalog:
       - setPerformance
       parser: typescript-pattern
       dependency_targets:
-      - *id014
       - *id015
+      - *id016
     - name: activateVault
       kind: function
       line_start: 241
@@ -691,9 +696,9 @@ source_catalog:
       - vaultName.trim
       parser: typescript-pattern
       dependency_targets:
-      - *id016
       - *id017
-      - *id014
+      - *id018
+      - *id015
     - name: handleChooseVaultLocation
       kind: function
       line_start: 276
@@ -726,9 +731,9 @@ source_catalog:
       - setNotice
       parser: typescript-pattern
       dependency_targets:
-      - *id016
-      - *id014
-      - *id018
+      - *id017
+      - *id015
+      - *id019
     - name: handleCloseVault
       kind: function
       line_start: 315
@@ -745,8 +750,8 @@ source_catalog:
       - setVault
       parser: typescript-pattern
       dependency_targets:
-      - *id019
-      - *id014
+      - *id020
+      - *id015
     - name: rememberFileLocation
       kind: function
       line_start: 329
@@ -783,13 +788,13 @@ source_catalog:
       - toLowerCase
       parser: typescript-pattern
       dependency_targets:
-      - *id014
+      - *id015
       - path: src/lib/workloreApi.ts
         symbol: importSource
-      - &id021
+      - &id022
         path: src/App.tsx
         symbol: refreshWorkspace
-      - &id023
+      - &id024
         path: src/App.tsx
         symbol: rememberFileLocation
       - path: src/App.tsx
@@ -813,9 +818,9 @@ source_catalog:
       - setNotice
       parser: typescript-pattern
       dependency_targets:
-      - *id014
-      - *id020
+      - *id015
       - *id021
+      - *id022
     - name: handleStartInterview
       kind: function
       line_start: 389
@@ -834,8 +839,8 @@ source_catalog:
       - startGuidedInterview
       parser: typescript-pattern
       dependency_targets:
-      - *id014
-      - *id021
+      - *id015
+      - *id022
       - path: src/lib/workloreApi.ts
         symbol: startGuidedInterview
     - name: handleInterviewResponse
@@ -860,8 +865,8 @@ source_catalog:
       - submitGuidedInterviewResponse
       parser: typescript-pattern
       dependency_targets:
-      - *id014
-      - *id021
+      - *id015
+      - *id022
       - path: src/lib/workloreApi.ts
         symbol: submitGuidedInterviewResponse
     - name: handleExportWorkspace
@@ -884,9 +889,9 @@ source_catalog:
       - setNotice
       parser: typescript-pattern
       dependency_targets:
-      - *id022
-      - *id014
-      - &id027
+      - *id023
+      - *id015
+      - &id028
         path: src/App.tsx
         symbol: refreshPerformance
     - name: handleImportStoryResponse
@@ -910,11 +915,11 @@ source_catalog:
       - setSelectedInterviewId
       parser: typescript-pattern
       dependency_targets:
-      - *id014
+      - *id015
       - path: src/lib/workloreApi.ts
         symbol: importStoryResponse
-      - *id021
-      - *id023
+      - *id022
+      - *id024
     - name: handleCandidateStatusChange
       kind: function
       line_start: 511
@@ -935,9 +940,9 @@ source_catalog:
       - setStoryCandidateStatus
       parser: typescript-pattern
       dependency_targets:
-      - *id024
-      - *id014
       - *id025
+      - *id015
+      - *id026
       - path: src/lib/workloreApi.ts
         symbol: setStoryCandidateStatus
     - name: handleStoryStatusChange
@@ -960,8 +965,8 @@ source_catalog:
       - setStoryStatus
       parser: typescript-pattern
       dependency_targets:
-      - *id014
-      - *id026
+      - *id015
+      - *id027
       - path: src/lib/workloreApi.ts
         symbol: setStoryStatus
     - name: handlePrivacyModeChange
@@ -981,7 +986,7 @@ source_catalog:
       - updateCloudIdentifierMode
       parser: typescript-pattern
       dependency_targets:
-      - *id014
+      - *id015
       - path: src/lib/workloreApi.ts
         symbol: updateCloudIdentifierMode
     - name: handleResolveReview
@@ -1001,8 +1006,8 @@ source_catalog:
       - setNotice
       parser: typescript-pattern
       dependency_targets:
-      - *id014
-      - *id021
+      - *id015
+      - *id022
       - path: src/lib/workloreApi.ts
         symbol: resolveEntityReview
     - name: renderWorkspace
@@ -1028,8 +1033,8 @@ source_catalog:
         symbol: handleImportSource
       - path: src/App.tsx
         symbol: handlePrivacyModeChange
-      - *id027
-      - *id021
+      - *id028
+      - *id022
     - name: StatusItem
       kind: function
       line_start: 885

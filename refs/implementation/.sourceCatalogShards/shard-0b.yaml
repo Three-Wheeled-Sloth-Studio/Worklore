@@ -401,21 +401,25 @@ source_catalog:
   - path: src-tauri/src/services/discovery_service.rs
     analysis_version: 1
     language: rust
-    content_hash: 4c52c9fc218ab445d21b754bad44acadfa347f61
+    content_hash: 0cc3d0dc69ef81d8189fda5dc6b935865ed289cb
     dependencies:
     - chrono::Utc
+    - crate::services::vault_service
+    - crate::services::{topic_service, vault_service}
     - "crate::{\n    domain::discovery::{\n        DevelopDiscoveryTopicRequest, DevelopDiscoveryTopicResult, DiscoveryFeedbackView,\n\
       \        DiscoveryMatchView, DiscoveryOpportunityStatus, DiscoveryOpportunityView,\n        DiscoveryScanResult, DiscoverySourceView,\
       \ RecordDiscoveryFeedbackRequest,\n        SaveDiscoveryInspirationResult, ScanDiscoveryRequest,\n    },\n    error::{ServiceResult,\
-      \ WorkLoreError},\n    services::{\n        app_preferences_service, brave_search_provider, canonical_store, inspiration_service,\n\
-      \        redaction_service, topic_service,\n    },\n}"
+      \ WorkLoreError},\n    services::{\n        app_preferences_service, brave_search_provider, canonical_store, discovery_query_plan,\n\
+      \        inspiration_service, redaction_service, topic_service,\n    },\n}"
     - rusqlite::{params, Connection, OptionalExtension}
     - serde_json::{json, Value}
     - sha2::{Digest, Sha256}
+    - std::fs
     - "std::{\n    cmp::Ordering,\n    collections::{BTreeSet, HashSet},\n    path::Path,\n    time::Duration,\n}"
     - super::*
     - uuid::Uuid
     provides:
+    - bias
     - scan
     - list_opportunities
     - record_feedback
@@ -428,7 +432,9 @@ source_catalog:
     - compare_ranked
     - persist_opportunity
     - load_opportunity
-    - discovery_query
+    - privacy_safe_queries
+    - load_query_plan_signals
+    - load_string_column
     - load_theme_signals
     - load_standing_signals
     - load_audience_signals
@@ -437,6 +443,7 @@ source_catalog:
     - matching_signals
     - signal_matches
     - load_prior_feedback
+    - summarize_feedback
     - token_similarity
     - cluster_sources
     - title_similarity
@@ -449,11 +456,28 @@ source_catalog:
     - clustering_collapses_substantially_similar_headlines
     - feedback_similarity_requires_more_than_one_generic_token
     - normalized_feedback_reasons_are_bounded_and_deduplicated
+    - duplicate_urls_from_exploration_queries_collapse_before_qualification
+    - feedback_keeps_timing_separate_from_personal_fit
+    - query_plan_inputs_exclude_story_and_proof_point_bodies
+    - develop_topic_requires_explicit_user_summary
+    - saving_discovery_inspiration_preserves_external_source_provenance
     symbols:
+    - name: bias
+      kind: function
+      line_start: 76
+      line_end: 82
+      signature: bias(&self) -> i8
+      inputs:
+      - '&self'
+      output: i8
+      dependencies:
+      - self.positive.cmp
+      parser: rust-pattern
+      dependency_targets: []
     - name: scan
       kind: function
-      line_start: 67
-      line_end: 163
+      line_start: 91
+      line_end: 197
       signature: 'scan(vault_path: &Path, request: ScanDiscoveryRequest) -> ServiceResult<DiscoveryScanResult>'
       inputs:
       - 'vault_path: &Path'
@@ -463,40 +487,47 @@ source_catalog:
       - Err
       - Ok
       - VALUES
+      - build_query_plan
       - clamp
       - cluster_sources
       - collect
       - connection.execute
+      - count.max
       - discovery_error
-      - discovery_query
       - discovery_runs
       - drop
       - enumerate
-      - external_query.is_empty
+      - external_queries.is_empty
+      - external_queries.iter
+      - external_queries.join
+      - external_queries.len
+      - from
       - get_brave_search_api_key
       - initialize
       - into_iter
       - load_audience_signals
       - load_prior_feedback
-      - load_recent_topic_signals
-      - load_standing_signals
-      - load_theme_signals
-      - map
-      - new
-      - now
+      - load_query_plan_signals
       parser: rust-pattern
       dependency_targets:
-      - &id016
+      - &id021
+        path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: build_query_plan
+      - &id017
         path: src-tauri/src/services/discovery_service.rs
         symbol: cluster_sources
       - &id013
         path: src-tauri/src/services/discovery_service.rs
         symbol: discovery_error
-      - path: src-tauri/src/services/discovery_service.rs
-        symbol: discovery_query
       - &id011
         path: src-tauri/src/services/confidentiality_service.rs
         symbol: drop
+      - &id014
+        path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: len
+      - *id001
+      - *id002
+      - *id003
       - path: src-tauri/src/services/app_preferences_service.rs
         symbol: get_brave_search_api_key
       - &id005
@@ -506,16 +537,13 @@ source_catalog:
         symbol: load_audience_signals
       - path: src-tauri/src/services/discovery_service.rs
         symbol: load_prior_feedback
-      - path: src-tauri/src/services/discovery_service.rs
-        symbol: load_recent_topic_signals
-      - path: src-tauri/src/services/discovery_service.rs
-        symbol: load_standing_signals
-      - path: src-tauri/src/services/discovery_service.rs
-        symbol: load_theme_signals
+      - &id022
+        path: src-tauri/src/services/discovery_service.rs
+        symbol: load_query_plan_signals
     - name: list_opportunities
       kind: function
-      line_start: 164
-      line_end: 182
+      line_start: 198
+      line_end: 216
       signature: 'list_opportunities(vault_path: &Path, limit: usize) -> ServiceResult<Vec<DiscoveryOpportunityView>>'
       inputs:
       - 'vault_path: &Path'
@@ -541,8 +569,8 @@ source_catalog:
         symbol: load_opportunity
     - name: record_feedback
       kind: function
-      line_start: 183
-      line_end: 239
+      line_start: 217
+      line_end: 273
       signature: 'record_feedback(vault_path: &Path, request: RecordDiscoveryFeedbackRequest) -> ServiceResult<DiscoveryFeedbackView>'
       inputs:
       - 'vault_path: &Path'
@@ -586,16 +614,16 @@ source_catalog:
         symbol: audit
       - *id005
       - *id006
-      - &id017
+      - &id019
         path: src-tauri/src/services/discovery_service.rs
         symbol: normalize_reasons
-      - &id015
+      - &id016
         path: src-tauri/src/services/discovery_service.rs
         symbol: tokens
     - name: save_as_inspiration
       kind: function
-      line_start: 240
-      line_end: 247
+      line_start: 274
+      line_end: 281
       signature: 'save_as_inspiration(vault_path: &Path, opportunity_id: &str) -> ServiceResult<SaveDiscoveryInspirationResult>'
       inputs:
       - 'vault_path: &Path'
@@ -611,8 +639,8 @@ source_catalog:
         symbol: ensure_inspiration
     - name: develop_topic
       kind: function
-      line_start: 248
-      line_end: 346
+      line_start: 282
+      line_end: 380
       signature: 'develop_topic(vault_path: &Path, request: DevelopDiscoveryTopicRequest) -> ServiceResult<DevelopDiscoveryTopicResult>'
       inputs:
       - 'vault_path: &Path'
@@ -661,8 +689,8 @@ source_catalog:
       - *id006
     - name: dismiss_opportunity
       kind: function
-      line_start: 347
-      line_end: 368
+      line_start: 381
+      line_end: 402
       signature: 'dismiss_opportunity(vault_path: &Path, opportunity_id: &str) -> ServiceResult<DiscoveryOpportunityView>'
       inputs:
       - 'vault_path: &Path'
@@ -686,8 +714,8 @@ source_catalog:
       - *id006
     - name: validate_source_url
       kind: function
-      line_start: 369
-      line_end: 395
+      line_start: 403
+      line_end: 429
       signature: 'validate_source_url(vault_path: &Path, opportunity_id: &str, requested_url: &str) -> ServiceResult<String>'
       inputs:
       - 'vault_path: &Path'
@@ -715,8 +743,8 @@ source_catalog:
       - *id006
     - name: ensure_inspiration
       kind: function
-      line_start: 396
-      line_end: 510
+      line_start: 430
+      line_end: 544
       signature: 'ensure_inspiration(vault_path: &Path, opportunity_id: &str) -> ServiceResult<String>'
       inputs:
       - 'vault_path: &Path'
@@ -753,6 +781,7 @@ source_catalog:
       - *id008
       - *id009
       - *id010
+      - *id014
       - path: src-tauri/src/commands/inspirations.rs
         symbol: create_inspiration_from_source
       - path: src-tauri/src/services/inspiration_service.rs
@@ -762,8 +791,8 @@ source_catalog:
       - *id006
     - name: qualify_cluster
       kind: function
-      line_start: 511
-      line_end: 661
+      line_start: 545
+      line_end: 678
       signature: 'qualify_cluster(context: &QualificationContext<''_>, provider_position: usize, sources: Vec<DiscoverySourceView>,
         used_feedback_ids: &mut HashSet<String>) -> RankedOpportunity'
       inputs:
@@ -781,8 +810,7 @@ source_catalog:
       - context.run_id.to_string
       - description.is_empty
       - discussion
-      - feedback.feedback_id.clone
-      - feedback.verdict.as_str
+      - feedback.bias
       - find
       - first
       - iter
@@ -791,20 +819,25 @@ source_catalog:
       - matching_signals
       - new
       - now_v7
-      - positive.cmp
       - push
       - recent_matches.is_empty
       - source.age.as_deref
       - source.description.trim
       - source.title.clone
+      - sources.first
+      - sources.len
       parser: rust-pattern
       dependency_targets:
+      - &id020
+        path: src-tauri/src/services/discovery_service.rs
+        symbol: bias
       - path: src-tauri/src/services/discovery_service.rs
         symbol: matching_signals
+      - *id014
     - name: compare_ranked
       kind: function
-      line_start: 662
-      line_end: 691
+      line_start: 679
+      line_end: 708
       signature: 'compare_ranked(left: &RankedOpportunity, right: &RankedOpportunity) -> Ordering'
       inputs:
       - 'left: &RankedOpportunity'
@@ -822,11 +855,12 @@ source_catalog:
       - right.view.sources.len
       - then_with
       parser: rust-pattern
-      dependency_targets: []
+      dependency_targets:
+      - *id014
     - name: persist_opportunity
       kind: function
-      line_start: 692
-      line_end: 726
+      line_start: 709
+      line_end: 743
       signature: 'persist_opportunity(connection: &Connection, item: &RankedOpportunity, rank_position: usize) -> ServiceResult<()>'
       inputs:
       - 'connection: &Connection'
@@ -848,8 +882,8 @@ source_catalog:
       dependency_targets: []
     - name: load_opportunity
       kind: function
-      line_start: 727
-      line_end: 786
+      line_start: 744
+      line_end: 803
       signature: 'load_opportunity(connection: &Connection, opportunity_id: &str) -> ServiceResult<DiscoveryOpportunityView>'
       inputs:
       - 'connection: &Connection'
@@ -865,33 +899,73 @@ source_catalog:
       - query_row
       parser: rust-pattern
       dependency_targets: []
-    - name: discovery_query
+    - name: privacy_safe_queries
       kind: function
-      line_start: 787
-      line_end: 807
-      signature: 'discovery_query(connection: &Connection, focus: &str) -> ServiceResult<String>'
+      line_start: 804
+      line_end: 828
+      signature: 'privacy_safe_queries(vault_path: &Path, plan: &discovery_query_plan::DiscoveryQueryPlan) -> ServiceResult<Vec<String>>'
       inputs:
-      - 'connection: &Connection'
-      - 'focus: &str'
-      output: ServiceResult<String>
+      - 'vault_path: &Path'
+      - 'plan: &discovery_query_plan::DiscoveryQueryPlan'
+      output: ServiceResult<Vec<String>>
       dependencies:
       - Err
       - Ok
-      - connection.prepare
       - discovery_error
-      - focus.is_empty
-      - focus.to_string
-      - focus.trim
-      - names.is_empty
-      - names.join
-      - query_map
+      - external_queries.push
+      - external_query.is_empty
+      - external_query.to_ascii_lowercase
+      - new
+      - plan.is_explicit_focus
+      - plan.queries
+      - redact_for_external_use
+      - redacted.text.trim
+      - seen.insert
+      - to_string
       parser: rust-pattern
       dependency_targets:
       - *id013
+      - path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: is_explicit_focus
+      - &id023
+        path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: queries
+      - path: src-tauri/src/services/redaction_service.rs
+        symbol: redact_for_external_use
+    - name: load_query_plan_signals
+      kind: function
+      line_start: 829
+      line_end: 851
+      signature: 'load_query_plan_signals(connection: &Connection) -> ServiceResult<QueryPlanSignals>'
+      inputs:
+      - 'connection: &Connection'
+      output: ServiceResult<QueryPlanSignals>
+      dependencies:
+      - Ok
+      - load_string_column
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: load_string_column
+    - name: load_string_column
+      kind: function
+      line_start: 852
+      line_end: 859
+      signature: 'load_string_column(connection: &Connection, sql: &str) -> ServiceResult<Vec<String>>'
+      inputs:
+      - 'connection: &Connection'
+      - 'sql: &str'
+      output: ServiceResult<Vec<String>>
+      dependencies:
+      - Ok
+      - connection.prepare
+      - query_map
+      parser: rust-pattern
+      dependency_targets: []
     - name: load_theme_signals
       kind: function
-      line_start: 808
-      line_end: 815
+      line_start: 860
+      line_end: 867
       signature: 'load_theme_signals(connection: &Connection) -> ServiceResult<Vec<SignalRecord>>'
       inputs:
       - 'connection: &Connection'
@@ -900,13 +974,13 @@ source_catalog:
       - load_signals
       parser: rust-pattern
       dependency_targets:
-      - &id014
+      - &id015
         path: src-tauri/src/services/discovery_service.rs
         symbol: load_signals
     - name: load_standing_signals
       kind: function
-      line_start: 816
-      line_end: 829
+      line_start: 868
+      line_end: 881
       signature: 'load_standing_signals(connection: &Connection) -> ServiceResult<Vec<SignalRecord>>'
       inputs:
       - 'connection: &Connection'
@@ -917,11 +991,11 @@ source_catalog:
       - out.extend
       parser: rust-pattern
       dependency_targets:
-      - *id014
+      - *id015
     - name: load_audience_signals
       kind: function
-      line_start: 830
-      line_end: 837
+      line_start: 882
+      line_end: 889
       signature: 'load_audience_signals(connection: &Connection) -> ServiceResult<Vec<SignalRecord>>'
       inputs:
       - 'connection: &Connection'
@@ -930,11 +1004,11 @@ source_catalog:
       - load_signals
       parser: rust-pattern
       dependency_targets:
-      - *id014
+      - *id015
     - name: load_recent_topic_signals
       kind: function
-      line_start: 838
-      line_end: 846
+      line_start: 890
+      line_end: 898
       signature: 'load_recent_topic_signals(connection: &Connection) -> ServiceResult<Vec<SignalRecord>>'
       inputs:
       - 'connection: &Connection'
@@ -943,11 +1017,11 @@ source_catalog:
       - load_signals
       parser: rust-pattern
       dependency_targets:
-      - *id014
+      - *id015
     - name: load_signals
       kind: function
-      line_start: 847
-      line_end: 868
+      line_start: 899
+      line_end: 920
       signature: 'load_signals(connection: &Connection, sql: &str, kind: &''static str) -> ServiceResult<Vec<SignalRecord>>'
       inputs:
       - 'connection: &Connection'
@@ -961,11 +1035,11 @@ source_catalog:
       - tokens
       parser: rust-pattern
       dependency_targets:
-      - *id015
+      - *id016
     - name: matching_signals
       kind: function
-      line_start: 869
-      line_end: 885
+      line_start: 921
+      line_end: 937
       signature: 'matching_signals(signals: &[SignalRecord], opportunity_tokens: &BTreeSet<String>) -> Vec<DiscoveryMatchView>'
       inputs:
       - 'signals: &[SignalRecord]'
@@ -988,8 +1062,8 @@ source_catalog:
         symbol: signal_matches
     - name: signal_matches
       kind: function
-      line_start: 886
-      line_end: 896
+      line_start: 938
+      line_end: 948
       signature: 'signal_matches(left: &BTreeSet<String>, right: &BTreeSet<String>) -> bool'
       inputs:
       - 'left: &BTreeSet<String>'
@@ -1004,11 +1078,12 @@ source_catalog:
       - next
       - value.len
       parser: rust-pattern
-      dependency_targets: []
+      dependency_targets:
+      - *id014
     - name: load_prior_feedback
       kind: function
-      line_start: 897
-      line_end: 934
+      line_start: 949
+      line_end: 986
       signature: 'load_prior_feedback(connection: &Connection) -> ServiceResult<Vec<PriorFeedback>>'
       inputs:
       - 'connection: &Connection'
@@ -1030,10 +1105,34 @@ source_catalog:
       - unwrap_or_else
       parser: rust-pattern
       dependency_targets: []
+    - name: summarize_feedback
+      kind: function
+      line_start: 987
+      line_end: 1006
+      signature: 'summarize_feedback(prior_feedback: &[PriorFeedback], feature_tokens: &BTreeSet<String>, used_feedback_ids:
+        &mut HashSet<String>) -> FeedbackSummary'
+      inputs:
+      - 'prior_feedback: &[PriorFeedback]'
+      - 'feature_tokens: &BTreeSet<String>'
+      - 'used_feedback_ids: &mut HashSet<String>'
+      output: FeedbackSummary
+      dependencies:
+      - default
+      - feedback.feedback_id.clone
+      - feedback.verdict.as_str
+      - token_similarity
+      - used_feedback_ids.insert
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/app_preferences_service.rs
+        symbol: default
+      - &id018
+        path: src-tauri/src/services/discovery_service.rs
+        symbol: token_similarity
     - name: token_similarity
       kind: function
-      line_start: 935
-      line_end: 943
+      line_start: 1007
+      line_end: 1015
       signature: 'token_similarity(left: &BTreeSet<String>, right: &BTreeSet<String>) -> bool'
       inputs:
       - 'left: &BTreeSet<String>'
@@ -1047,8 +1146,8 @@ source_catalog:
       dependency_targets: []
     - name: cluster_sources
       kind: function
-      line_start: 944
-      line_end: 960
+      line_start: 1016
+      line_end: 1036
       signature: 'cluster_sources(results: Vec<DiscoverySourceView>) -> Vec<Vec<DiscoverySourceView>>'
       inputs:
       - 'results: Vec<DiscoverySourceView>'
@@ -1065,17 +1164,19 @@ source_catalog:
       - map
       - new
       - once
+      - seen_urls.insert
+      - source.url.clone
       - title_similarity
       - tokens
       parser: rust-pattern
       dependency_targets:
       - path: src-tauri/src/services/discovery_service.rs
         symbol: title_similarity
-      - *id015
+      - *id016
     - name: title_similarity
       kind: function
-      line_start: 961
-      line_end: 966
+      line_start: 1037
+      line_end: 1042
       signature: 'title_similarity(left: &BTreeSet<String>, right: &BTreeSet<String>) -> bool'
       inputs:
       - 'left: &BTreeSet<String>'
@@ -1089,8 +1190,8 @@ source_catalog:
       dependency_targets: []
     - name: tokens
       kind: function
-      line_start: 967
-      line_end: 975
+      line_start: 1043
+      line_end: 1051
       signature: 'tokens(value: &str) -> BTreeSet<String>'
       inputs:
       - 'value: &str'
@@ -1106,11 +1207,12 @@ source_catalog:
       - token.as_str
       - token.len
       parser: rust-pattern
-      dependency_targets: []
+      dependency_targets:
+      - *id014
     - name: normalize_reasons
       kind: function
-      line_start: 983
-      line_end: 1004
+      line_start: 1059
+      line_end: 1080
       signature: 'normalize_reasons(values: Vec<String>) -> Vec<String>'
       inputs:
       - 'values: Vec<String>'
@@ -1129,8 +1231,8 @@ source_catalog:
       dependency_targets: []
     - name: required_text
       kind: function
-      line_start: 1005
-      line_end: 1015
+      line_start: 1081
+      line_end: 1091
       signature: 'required_text(value: &str, label: &str) -> ServiceResult<String>'
       inputs:
       - 'value: &str'
@@ -1147,8 +1249,8 @@ source_catalog:
       dependency_targets: []
     - name: open_connection
       kind: function
-      line_start: 1016
-      line_end: 1022
+      line_start: 1092
+      line_end: 1098
       signature: 'open_connection(vault_path: &Path) -> ServiceResult<Connection>'
       inputs:
       - 'vault_path: &Path'
@@ -1166,8 +1268,8 @@ source_catalog:
         symbol: database_path
     - name: audit
       kind: function
-      line_start: 1023
-      line_end: 1044
+      line_start: 1099
+      line_end: 1120
       signature: 'audit(connection: &Connection, event_type: &str, record_type: &str, record_id: &str, details: Value) ->
         ServiceResult<()>'
       inputs:
@@ -1190,8 +1292,8 @@ source_catalog:
       dependency_targets: []
     - name: discovery_error
       kind: function
-      line_start: 1045
-      line_end: 1051
+      line_start: 1121
+      line_end: 1127
       signature: 'discovery_error(code: &''static str, message: impl Into<String>) -> WorkLoreError'
       inputs:
       - 'code: &''static str'
@@ -1203,8 +1305,8 @@ source_catalog:
       dependency_targets: []
     - name: clustering_collapses_substantially_similar_headlines
       kind: function
-      line_start: 1058
-      line_end: 1085
+      line_start: 1134
+      line_end: 1161
       signature: clustering_collapses_substantially_similar_headlines()
       inputs: []
       output: unspecified
@@ -1216,11 +1318,12 @@ source_catalog:
       - new
       parser: rust-pattern
       dependency_targets:
-      - *id016
+      - *id017
+      - *id014
     - name: feedback_similarity_requires_more_than_one_generic_token
       kind: function
-      line_start: 1088
-      line_end: 1097
+      line_start: 1164
+      line_end: 1173
       signature: feedback_similarity_requires_more_than_one_generic_token()
       inputs: []
       output: unspecified
@@ -1229,13 +1332,12 @@ source_catalog:
       - tokens
       parser: rust-pattern
       dependency_targets:
-      - path: src-tauri/src/services/discovery_service.rs
-        symbol: token_similarity
-      - *id015
+      - *id018
+      - *id016
     - name: normalized_feedback_reasons_are_bounded_and_deduplicated
       kind: function
-      line_start: 1100
-      line_end: 1109
+      line_start: 1176
+      line_end: 1185
       signature: normalized_feedback_reasons_are_bounded_and_deduplicated()
       inputs: []
       output: unspecified
@@ -1245,7 +1347,157 @@ source_catalog:
       - to_string
       parser: rust-pattern
       dependency_targets:
+      - *id019
+    - name: duplicate_urls_from_exploration_queries_collapse_before_qualification
+      kind: function
+      line_start: 1188
+      line_end: 1209
+      signature: duplicate_urls_from_exploration_queries_collapse_before_qualification()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - cluster_sources
+      - clustered.len
+      - into
+      - len
+      parser: rust-pattern
+      dependency_targets:
       - *id017
+      - *id014
+    - name: feedback_keeps_timing_separate_from_personal_fit
+      kind: function
+      line_start: 1212
+      line_end: 1244
+      signature: feedback_keeps_timing_separate_from_personal_fit()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - feature_tokens.clone
+      - id.into
+      - make_feedback
+      - negative.bias
+      - new
+      - positive.bias
+      - summarize_feedback
+      - timing_only.bias
+      - tokens
+      - verdict.into
+      parser: rust-pattern
+      dependency_targets:
+      - *id020
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: summarize_feedback
+      - *id016
+    - name: query_plan_inputs_exclude_story_and_proof_point_bodies
+      kind: function
+      line_start: 1247
+      line_end: 1294
+      signature: query_plan_inputs_exclude_story_and_proof_point_bodies()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - VALUES
+      - build_query_plan
+      - create_story
+      - create_theme
+      - create_vault
+      - drop
+      - execute
+      - expect
+      - into
+      - join
+      - load_query_plan_signals
+      - now_v7
+      - open_connection
+      - plan.queries
+      - proof_points
+      - remove_dir_all
+      - rendered.contains
+      - temp_dir
+      parser: rust-pattern
+      dependency_targets:
+      - *id021
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: create_story
+      - path: src-tauri/src/commands/topics.rs
+        symbol: create_theme
+      - path: src-tauri/src/services/topic_service.rs
+        symbol: create_theme
+      - &id024
+        path: src-tauri/src/commands/vault.rs
+        symbol: create_vault
+      - &id025
+        path: src-tauri/src/services/vault_service.rs
+        symbol: create_vault
+      - *id011
+      - *id022
+      - *id023
+    - name: develop_topic_requires_explicit_user_summary
+      kind: function
+      line_start: 1297
+      line_end: 1317
+      signature: develop_topic_requires_explicit_user_summary()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - contains
+      - create_vault
+      - develop_topic
+      - error.to_string
+      - expect
+      - expect_err
+      - into
+      - join
+      - now_v7
+      - remove_dir_all
+      - temp_dir
+      parser: rust-pattern
+      dependency_targets:
+      - *id024
+      - *id025
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: develop_topic
+    - name: saving_discovery_inspiration_preserves_external_source_provenance
+      kind: function
+      line_start: 1320
+      line_end: 1407
+      signature: saving_discovery_inspiration_preserves_external_source_provenance()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Ok
+      - Some
+      - VALUES
+      - and_then
+      - create_vault
+      - discovery_runs
+      - drop
+      - execute
+      - expect
+      - from_str
+      - get
+      - into
+      - join
+      - let
+      - new
+      - now_v7
+      - open_connection
+      - persist_opportunity
+      - provenance.get
+      - query_row
+      - remove_dir_all
+      - row.get
+      - run_id.into
+      - save_as_inspiration
+      parser: rust-pattern
+      dependency_targets:
+      - *id024
+      - *id025
+      - *id011
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: persist_opportunity
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: save_as_inspiration
   - path: src/components/PerformancePanel.tsx
     analysis_version: 1
     language: typescript
@@ -1370,23 +1622,23 @@ source_catalog:
       - setOpenaiApiKey
       parser: typescript-pattern
       dependency_targets:
-      - &id018
+      - &id026
         path: src/domain/types.ts
         symbol: errorMessage
       - path: src/lib/workloreApi.ts
         symbol: getProviderSettings
-      - &id020
+      - &id028
         path: src/lib/workloreApi.ts
         symbol: listProviderModels
-      - &id021
+      - &id029
         path: src/components/ProviderSettingsPanel.tsx
         symbol: providerLabel
       - path: src/components/ProviderSettingsPanel.tsx
         symbol: refreshModels
-      - &id022
+      - &id030
         path: src/components/ProviderSettingsPanel.tsx
         symbol: save
-      - &id019
+      - &id027
         path: src/components/ProviderSettingsPanel.tsx
         symbol: saveMessage
       - path: src/components/ProviderSettingsPanel.tsx
@@ -1417,8 +1669,8 @@ source_catalog:
       - updateProviderSettings
       parser: typescript-pattern
       dependency_targets:
-      - *id018
-      - *id019
+      - *id026
+      - *id027
       - path: src/lib/workloreApi.ts
         symbol: updateProviderSettings
     - name: refreshModels
@@ -1439,10 +1691,10 @@ source_catalog:
       - setNotice
       parser: typescript-pattern
       dependency_targets:
-      - *id018
-      - *id020
-      - *id021
-      - *id022
+      - *id026
+      - *id028
+      - *id029
+      - *id030
     - name: testConnection
       kind: function
       line_start: 108
@@ -1460,9 +1712,9 @@ source_catalog:
       - testProviderConnection
       parser: typescript-pattern
       dependency_targets:
-      - *id018
-      - *id021
-      - *id022
+      - *id026
+      - *id029
+      - *id030
       - path: src/lib/workloreApi.ts
         symbol: testProviderConnection
     - name: selectProvider
@@ -1563,12 +1815,12 @@ source_catalog:
       - setLocalStories
       parser: typescript-pattern
       dependency_targets:
-      - *id018
+      - *id026
       - path: src/lib/captureApi.ts
         symbol: listCaptureSources
       - path: src/lib/workloreApi.ts
         symbol: listStories
-      - &id023
+      - &id031
         path: src/components/StoryBankPanel.tsx
         symbol: resolveVaultPath
     - name: develop
@@ -1593,8 +1845,8 @@ source_catalog:
       dependency_targets:
       - path: src/lib/workloreApi.ts
         symbol: classifyCaptureSource
-      - *id018
-      - *id023
+      - *id026
+      - *id031
     - name: handleStatusChange
       kind: function
       line_start: 82

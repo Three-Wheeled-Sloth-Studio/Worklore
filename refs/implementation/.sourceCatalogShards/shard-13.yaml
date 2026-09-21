@@ -746,7 +746,7 @@ source_catalog:
       - write_json_atomic
       parser: rust-pattern
       dependency_targets:
-      - &id020
+      - &id021
         path: src-tauri/src/io_utils.rs
         symbol: write_json_atomic
     - name: scan_text
@@ -793,7 +793,7 @@ source_catalog:
       - &id012
         path: src-tauri/src/services/entity_scan.rs
         symbol: add_occurrence
-      - &id023
+      - &id024
         path: src-tauri/src/services/entity_scan.rs
         symbol: collect_detections
       - path: src-tauri/src/services/entity_scan.rs
@@ -841,7 +841,7 @@ source_catalog:
       dependency_targets:
       - *id011
       - *id012
-      - &id024
+      - &id025
         path: src-tauri/src/services/entity_scan.rs
         symbol: find_case_insensitive_ascii
       - &id013
@@ -890,7 +890,7 @@ source_catalog:
         symbol: allocate_token
       - path: src-tauri/src/services/entity_scan.rs
         symbol: default_sensitivity
-      - &id019
+      - &id020
         path: src-tauri/src/services/entity_scan.rs
         symbol: occurrence_for
     - name: collect_detections
@@ -932,10 +932,10 @@ source_catalog:
         symbol: add_regex_detections
       - path: src-tauri/src/services/entity_scan.rs
         symbol: is_acronym_in_entity_context
-      - &id021
+      - &id022
         path: src-tauri/src/services/entity_scan.rs
         symbol: is_generic_entity_term
-      - &id022
+      - &id023
         path: src-tauri/src/services/entity_scan.rs
         symbol: is_public_domain_acronym
       - &id017
@@ -976,9 +976,12 @@ source_catalog:
       - *id014
       - *id015
       - *id016
-      - &id018
+      - &id019
         path: src-tauri/src/services/entity_scan.rs
         symbol: trim_terminal_punctuation
+      - &id018
+        path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: len
     - name: trim_organization_noise
       kind: function
       line_start: 355
@@ -1001,6 +1004,7 @@ source_catalog:
       parser: rust-pattern
       dependency_targets:
       - *id018
+      - *id019
     - name: is_acronym_in_entity_context
       kind: function
       line_start: 383
@@ -1024,7 +1028,8 @@ source_catalog:
       - text.len
       - to_ascii_lowercase
       parser: rust-pattern
-      dependency_targets: []
+      dependency_targets:
+      - *id018
     - name: is_public_domain_acronym
       kind: function
       line_start: 410
@@ -1145,6 +1150,7 @@ source_catalog:
         symbol: is_token_boundary
       - path: src-tauri/src/services/redaction_service.rs
         symbol: is_token_boundary
+      - *id018
     - name: is_token_boundary
       kind: function
       line_start: 551
@@ -1216,7 +1222,7 @@ source_catalog:
       - occurrence_for
       parser: rust-pattern
       dependency_targets:
-      - *id019
+      - *id020
     - name: occurrence_for
       kind: function
       line_start: 610
@@ -1274,7 +1280,8 @@ source_catalog:
       - to_string
       - unwrap_or_default
       parser: rust-pattern
-      dependency_targets: []
+      dependency_targets:
+      - *id018
     - name: write_review_item
       kind: function
       line_start: 675
@@ -1289,7 +1296,7 @@ source_catalog:
       - write_json_atomic
       parser: rust-pattern
       dependency_targets:
-      - *id020
+      - *id021
     - name: count_pending_review_items
       kind: function
       line_start: 684
@@ -1323,7 +1330,7 @@ source_catalog:
       - is_generic_entity_term
       parser: rust-pattern
       dependency_targets:
-      - *id021
+      - *id022
     - name: common_technical_acronyms_are_suppressed
       kind: function
       line_start: 726
@@ -1335,7 +1342,7 @@ source_catalog:
       - is_public_domain_acronym
       parser: rust-pattern
       dependency_targets:
-      - *id022
+      - *id023
     - name: standalone_acronyms_without_entity_context_are_not_detected
       kind: function
       line_start: 733
@@ -1348,7 +1355,7 @@ source_catalog:
       - detections.is_empty
       parser: rust-pattern
       dependency_targets:
-      - *id023
+      - *id024
     - name: acronyms_in_employment_context_can_be_registered
       kind: function
       line_start: 739
@@ -1362,7 +1369,7 @@ source_catalog:
       - detections.iter
       parser: rust-pattern
       dependency_targets:
-      - *id023
+      - *id024
     - name: pii_is_detected_without_creating_generic_word_detections
       kind: function
       line_start: 745
@@ -1379,7 +1386,7 @@ source_catalog:
       - iter
       parser: rust-pattern
       dependency_targets:
-      - *id023
+      - *id024
     - name: alias_matching_uses_token_boundaries
       kind: function
       line_start: 767
@@ -1391,7 +1398,7 @@ source_catalog:
       - find_case_insensitive_ascii
       parser: rust-pattern
       dependency_targets:
-      - *id024
+      - *id025
   - path: src-tauri/src/services/structured_provider.rs
     analysis_version: 1
     language: rust
@@ -1489,7 +1496,7 @@ source_catalog:
       - submitStorySeedDevelopmentResponse
       parser: typescript-pattern
       dependency_targets:
-      - &id025
+      - &id026
         path: src/domain/types.ts
         symbol: errorMessage
       - path: src/lib/workloreApi.ts
@@ -1512,7 +1519,7 @@ source_catalog:
       dependency_targets:
       - path: src/lib/workloreApi.ts
         symbol: createStoryFromSeedDevelopment
-      - *id025
+      - *id026
     - name: humanizeField
       kind: function
       line_start: 234

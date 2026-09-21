@@ -133,20 +133,23 @@ source_catalog:
       - new
       parser: rust-pattern
       dependency_targets:
-      - &id016
+      - &id006
+        path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: len
+      - &id017
         path: src-tauri/src/services/candidate_service.rs
         symbol: fragment_id
       - *id001
       - *id002
       - *id003
-      - &id011
+      - &id012
         path: src-tauri/src/services/candidate_service.rs
         symbol: infer_metrics
       - path: src-tauri/src/services/candidate_service.rs
         symbol: infer_missing_fields
       - path: src-tauri/src/services/candidate_service.rs
         symbol: infer_skills
-      - &id014
+      - &id015
         path: src-tauri/src/services/candidate_service.rs
         symbol: infer_tools
     - name: list_candidates
@@ -293,7 +296,7 @@ source_catalog:
         symbol: append_wrapped_continuation
       - path: src-tauri/src/services/candidate_service.rs
         symbol: classify_resume_section_prefix
-      - &id006
+      - &id007
         path: src-tauri/src/services/candidate_service.rs
         symbol: looks_like_role_heading
       - path: src-tauri/src/services/candidate_service.rs
@@ -331,10 +334,10 @@ source_catalog:
       - trim_start_matches
       parser: rust-pattern
       dependency_targets:
-      - &id007
+      - &id008
         path: src-tauri/src/services/candidate_service.rs
         symbol: is_bullet_character
-      - &id008
+      - &id009
         path: src-tauri/src/services/candidate_service.rs
         symbol: looks_like_candidate_text
     - name: append_wrapped_continuation
@@ -358,10 +361,11 @@ source_catalog:
       - results.last_mut
       parser: rust-pattern
       dependency_targets:
-      - &id010
+      - &id011
         path: src-tauri/src/services/candidate_service.rs
         symbol: ends_sentence
       - *id006
+      - *id007
     - name: classify_resume_section_prefix
       kind: function
       line_start: 323
@@ -406,6 +410,7 @@ source_catalog:
       - trim_section_separator
       parser: rust-pattern
       dependency_targets:
+      - *id006
       - path: src-tauri/src/services/candidate_service.rs
         symbol: trim_section_separator
     - name: trim_section_separator
@@ -438,7 +443,7 @@ source_catalog:
       - value.contains
       parser: rust-pattern
       dependency_targets:
-      - &id009
+      - &id010
         path: src-tauri/src/services/candidate_service.rs
         symbol: contains_date_range
     - name: strip_bullet_prefix
@@ -464,7 +469,7 @@ source_catalog:
       - trimmed.chars
       parser: rust-pattern
       dependency_targets:
-      - *id007
+      - *id008
     - name: is_bullet_character
       kind: function
       line_start: 423
@@ -498,10 +503,11 @@ source_catalog:
       dependency_targets:
       - path: src-tauri/src/services/candidate_service.rs
         symbol: action_verb_match
-      - &id013
+      - &id014
         path: src-tauri/src/services/candidate_service.rs
         symbol: date_range_match
-      - *id008
+      - *id006
+      - *id009
       - path: src-tauri/src/services/performance_service.rs
         symbol: start
     - name: looks_like_role_heading
@@ -526,8 +532,9 @@ source_catalog:
       - separators.iter
       parser: rust-pattern
       dependency_targets:
-      - *id009
       - *id010
+      - *id011
+      - *id006
     - name: split_candidate_sentences
       kind: function
       line_start: 480
@@ -553,7 +560,8 @@ source_catalog:
       - trim
       parser: rust-pattern
       dependency_targets:
-      - *id008
+      - *id006
+      - *id009
     - name: looks_like_candidate_text
       kind: function
       line_start: 524
@@ -578,8 +586,9 @@ source_catalog:
         symbol: contains_action_verb
       - path: src-tauri/src/services/candidate_service.rs
         symbol: contains_outcome_signal
-      - *id011
+      - *id012
       - *id006
+      - *id007
       - path: src-tauri/src/services/candidate_service.rs
         symbol: starts_with_action_verb
       - path: src-tauri/src/services/target_context_service.rs
@@ -604,7 +613,7 @@ source_catalog:
       - unwrap_or_default
       parser: rust-pattern
       dependency_targets:
-      - &id012
+      - &id013
         path: src-tauri/src/services/candidate_service.rs
         symbol: action_verbs
     - name: contains_action_verb
@@ -626,7 +635,7 @@ source_catalog:
       - trim_matches
       parser: rust-pattern
       dependency_targets:
-      - *id012
+      - *id013
     - name: action_verb_match
       kind: function
       line_start: 554
@@ -644,7 +653,7 @@ source_catalog:
       - new
       parser: rust-pattern
       dependency_targets:
-      - *id012
+      - *id013
     - name: action_verbs
       kind: function
       line_start: 559
@@ -683,7 +692,7 @@ source_catalog:
       - is_some
       parser: rust-pattern
       dependency_targets:
-      - *id013
+      - *id014
     - name: date_range_match
       kind: function
       line_start: 624
@@ -809,8 +818,8 @@ source_catalog:
       - to_string
       parser: rust-pattern
       dependency_targets:
-      - *id011
-      - *id014
+      - *id012
+      - *id015
     - name: contains_term
       kind: function
       line_start: 733
@@ -858,7 +867,8 @@ source_catalog:
       - parse_resume_bullets
       parser: rust-pattern
       dependency_targets:
-      - &id015
+      - *id006
+      - &id016
         path: src-tauri/src/services/candidate_service.rs
         symbol: parse_resume_bullets
     - name: ignores_top_level_title_and_summary_when_no_employment_section_exists
@@ -873,7 +883,7 @@ source_catalog:
       - parse_resume_bullets
       parser: rust-pattern
       dependency_targets:
-      - *id015
+      - *id016
     - name: supports_employment_history_and_stops_at_education
       kind: function
       line_start: 772
@@ -886,7 +896,8 @@ source_catalog:
       - parse_resume_bullets
       parser: rust-pattern
       dependency_targets:
-      - *id015
+      - *id006
+      - *id016
     - name: finds_bulletless_action_lines_inside_employment_only
       kind: function
       line_start: 780
@@ -904,7 +915,8 @@ source_catalog:
       - parse_resume_bullets
       parser: rust-pattern
       dependency_targets:
-      - *id015
+      - *id006
+      - *id016
     - name: handles_section_heading_role_and_claim_flattened_on_one_line
       kind: function
       line_start: 793
@@ -922,7 +934,8 @@ source_catalog:
       - starts_with
       parser: rust-pattern
       dependency_targets:
-      - *id015
+      - *id006
+      - *id016
     - name: supports_pdf_bullet_glyphs
       kind: function
       line_start: 809
@@ -935,7 +948,8 @@ source_catalog:
       - parse_resume_bullets
       parser: rust-pattern
       dependency_targets:
-      - *id015
+      - *id006
+      - *id016
     - name: detects_metrics_and_tools
       kind: function
       line_start: 816
@@ -951,8 +965,9 @@ source_catalog:
       - to_string
       parser: rust-pattern
       dependency_targets:
-      - *id011
-      - *id014
+      - *id012
+      - *id015
+      - *id006
     - name: fragment_ids_are_stable
       kind: function
       line_start: 823
@@ -964,7 +979,7 @@ source_catalog:
       - fragment_id
       parser: rust-pattern
       dependency_targets:
-      - *id016
+      - *id017
   - path: src/components/CapturePanel.tsx
     analysis_version: 1
     language: typescript
@@ -1025,7 +1040,7 @@ source_catalog:
       - setDevelopmentTopicId
       parser: typescript-pattern
       dependency_targets:
-      - &id017
+      - &id018
         path: src/components/CapturePanel.tsx
         symbol: clearDevelopmentPanels
     - name: handleCloseSaved
@@ -1040,7 +1055,7 @@ source_catalog:
       - setSaved
       parser: typescript-pattern
       dependency_targets:
-      - *id017
+      - *id018
     - name: refreshRecent
       kind: function
       line_start: 91
@@ -1055,7 +1070,7 @@ source_catalog:
       - setRecent
       parser: typescript-pattern
       dependency_targets:
-      - &id018
+      - &id019
         path: src/domain/types.ts
         symbol: errorMessage
       - path: src/lib/captureApi.ts
@@ -1080,11 +1095,11 @@ source_catalog:
       - text.trim
       parser: typescript-pattern
       dependency_targets:
-      - *id017
+      - *id018
       - path: src/lib/workloreApi.ts
         symbol: createCaptureSource
-      - *id018
-      - &id019
+      - *id019
+      - &id020
         path: src/components/CapturePanel.tsx
         symbol: refreshRecent
     - name: handleRetag
@@ -1107,9 +1122,9 @@ source_catalog:
       - updateCaptureSourceType
       parser: typescript-pattern
       dependency_targets:
-      - *id017
       - *id018
       - *id019
+      - *id020
       - path: src/App.tsx
         symbol: sourceTypeLabel
       - path: src/components/CapturePanel.tsx
@@ -1138,11 +1153,11 @@ source_catalog:
       dependency_targets:
       - path: src/lib/workloreApi.ts
         symbol: classifyCaptureSource
-      - *id018
-      - &id020
+      - *id019
+      - &id021
         path: src/lib/workloreApi.ts
         symbol: getCaptureSource
-      - *id019
+      - *id020
       - path: src/components/CapturePanel.tsx
         symbol: roleLabel
     - name: handleUseForVoice
@@ -1160,10 +1175,10 @@ source_catalog:
       - setNotice
       parser: typescript-pattern
       dependency_targets:
-      - &id021
+      - &id022
         path: src/lib/workloreApi.ts
         symbol: createVoiceEvidenceFromSource
-      - *id018
+      - *id019
     - name: handleSelectRecent
       kind: function
       line_start: 172
@@ -1181,9 +1196,9 @@ source_catalog:
       - setSaved
       parser: typescript-pattern
       dependency_targets:
-      - *id017
       - *id018
-      - *id020
+      - *id019
+      - *id021
     - name: roleLabel
       kind: function
       line_start: 402
@@ -1388,7 +1403,7 @@ source_catalog:
       - setVoices
       parser: typescript-pattern
       dependency_targets:
-      - *id018
+      - *id019
       - path: src/lib/workloreApi.ts
         symbol: listCoreVoices
       - path: src/lib/workloreApi.ts
@@ -1414,8 +1429,8 @@ source_catalog:
       - run
       parser: typescript-pattern
       dependency_targets:
-      - *id021
-      - &id022
+      - *id022
+      - &id023
         path: src-tauri/src/lib.rs
         symbol: run
     - name: review
@@ -1434,7 +1449,7 @@ source_catalog:
       dependency_targets:
       - path: src/lib/workloreApi.ts
         symbol: reviewVoiceEvidence
-      - *id022
+      - *id023
     - name: addVoiceVersion
       kind: function
       line_start: 225
@@ -1451,7 +1466,7 @@ source_catalog:
       dependency_targets:
       - path: src/lib/workloreApi.ts
         symbol: createCoreVoice
-      - *id022
+      - *id023
     - name: draftFor
       kind: function
       line_start: 236
@@ -1508,8 +1523,8 @@ source_catalog:
       dependency_targets:
       - path: src/components/VoiceWorkspace.tsx
         symbol: draftFor
-      - *id022
-      - &id023
+      - *id023
+      - &id024
         path: src/lib/workloreApi.ts
         symbol: saveCoreVoiceTrait
     - name: removeTrait
@@ -1528,7 +1543,7 @@ source_catalog:
       dependency_targets:
       - path: src/lib/workloreApi.ts
         symbol: deleteCoreVoiceTrait
-      - *id022
+      - *id023
     - name: activateVoice
       kind: function
       line_start: 288
@@ -1544,7 +1559,7 @@ source_catalog:
       dependency_targets:
       - path: src/lib/workloreApi.ts
         symbol: activateCoreVoice
-      - *id022
+      - *id023
     - name: runVoiceAnalysis
       kind: function
       line_start: 296
@@ -1564,7 +1579,7 @@ source_catalog:
       dependency_targets:
       - path: src/lib/workloreApi.ts
         symbol: analyzeVoiceEvidence
-      - *id018
+      - *id019
     - name: acceptVoiceProposal
       kind: function
       line_start: 332
@@ -1584,8 +1599,8 @@ source_catalog:
       - setNotice
       parser: typescript-pattern
       dependency_targets:
-      - *id018
-      - *id023
+      - *id019
+      - *id024
     - name: acceptWritingRuleProposal
       kind: function
       line_start: 362
@@ -1605,10 +1620,10 @@ source_catalog:
       - setNotice
       parser: typescript-pattern
       dependency_targets:
-      - &id024
+      - &id025
         path: src/lib/workloreApi.ts
         symbol: createWritingRule
-      - *id018
+      - *id019
     - name: discardVoiceProposal
       kind: function
       line_start: 390
@@ -1654,7 +1669,7 @@ source_catalog:
       dependency_targets:
       - path: src/lib/workloreApi.ts
         symbol: createToneMode
-      - *id022
+      - *id023
     - name: setToneStatus
       kind: function
       line_start: 429
@@ -1669,7 +1684,7 @@ source_catalog:
       - updateToneMode
       parser: typescript-pattern
       dependency_targets:
-      - *id022
+      - *id023
       - path: src/lib/workloreApi.ts
         symbol: updateToneMode
     - name: addDirection
@@ -1689,7 +1704,7 @@ source_catalog:
       dependency_targets:
       - path: src/lib/workloreApi.ts
         symbol: createVoiceDirection
-      - *id022
+      - *id023
     - name: setDirectionStatus
       kind: function
       line_start: 452
@@ -1704,7 +1719,7 @@ source_catalog:
       - setVoiceDirectionStatus
       parser: typescript-pattern
       dependency_targets:
-      - *id022
+      - *id023
       - path: src/lib/workloreApi.ts
         symbol: setVoiceDirectionStatus
     - name: runDraftLint
@@ -1724,7 +1739,7 @@ source_catalog:
       - setNotice
       parser: typescript-pattern
       dependency_targets:
-      - *id018
+      - *id019
       - path: src/lib/workloreApi.ts
         symbol: lintDraft
     - name: addRule
@@ -1743,8 +1758,8 @@ source_catalog:
       - setRuleName
       parser: typescript-pattern
       dependency_targets:
-      - *id024
-      - *id022
+      - *id025
+      - *id023
     - name: setRuleStatus
       kind: function
       line_start: 491
@@ -1759,7 +1774,7 @@ source_catalog:
       - updateWritingRule
       parser: typescript-pattern
       dependency_targets:
-      - *id022
+      - *id023
       - path: src/lib/workloreApi.ts
         symbol: updateWritingRule
     - name: renderPendingEvidence
@@ -1789,7 +1804,7 @@ source_catalog:
   - path: src/domain/discovery.ts
     analysis_version: 1
     language: typescript
-    content_hash: 560c6a01066aa34017062971438d0bd0571d1c7e
+    content_hash: 4ed0e56166e8ca11d750178343b9580c957ae765
     dependencies: []
     provides: []
     symbols: []

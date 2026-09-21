@@ -86,13 +86,13 @@ source_catalog:
       - list_writing_rules
       parser: rust-pattern
       dependency_targets:
-      - &id003
+      - &id004
         path: src-tauri/src/services/writing_lint_service.rs
         symbol: lint_text_with_rules
-      - &id005
+      - &id006
         path: src-tauri/src/commands/voice.rs
         symbol: list_writing_rules
-      - &id006
+      - &id007
         path: src-tauri/src/services/voice_profile_service.rs
         symbol: list_writing_rules
     - name: lint_text_with_rules
@@ -126,6 +126,9 @@ source_catalog:
       - unsupported_writing_rules.push
       parser: rust-pattern
       dependency_targets:
+      - &id001
+        path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: len
       - path: src-tauri/src/services/writing_lint_service.rs
         symbol: lint_engagement_bait_closing
       - path: src-tauri/src/services/writing_lint_service.rs
@@ -159,7 +162,7 @@ source_catalog:
       - to_string
       parser: rust-pattern
       dependency_targets:
-      - &id001
+      - &id002
         path: src-tauri/src/services/writing_lint_service.rs
         symbol: make_finding
     - name: lint_engagement_bait_closing
@@ -192,6 +195,7 @@ source_catalog:
       parser: rust-pattern
       dependency_targets:
       - *id001
+      - *id002
     - name: lint_engagement_bait_phrase
       kind: function
       line_start: 257
@@ -210,9 +214,10 @@ source_catalog:
       - to_string
       parser: rust-pattern
       dependency_targets:
-      - &id002
+      - &id003
         path: src-tauri/src/services/writing_lint_service.rs
         symbol: find_case_insensitive
+      - *id002
       - *id001
     - name: lint_excessive_hashtags
       kind: function
@@ -232,6 +237,7 @@ source_catalog:
       - path: src-tauri/src/services/writing_lint_service.rs
         symbol: hashtag_ranges
       - *id001
+      - *id002
     - name: lint_list_dominance
       kind: function
       line_start: 316
@@ -265,6 +271,7 @@ source_catalog:
       - path: src-tauri/src/services/writing_lint_service.rs
         symbol: is_list_line
       - *id001
+      - *id002
     - name: lint_writing_rule
       kind: function
       line_start: 363
@@ -295,7 +302,7 @@ source_catalog:
       dependency_targets:
       - path: src-tauri/src/services/writing_lint_service.rs
         symbol: earliest_pattern
-      - *id002
+      - *id003
       - path: src-tauri/src/services/writing_lint_service.rs
         symbol: find_word_case_insensitive
       - path: src-tauri/src/services/capture_service.rs
@@ -304,6 +311,7 @@ source_catalog:
         symbol: label
       - path: src-tauri/src/services/writing_lint_service.rs
         symbol: patterns
+      - *id002
       - *id001
     - name: parse_deterministic_rule
       kind: function
@@ -363,7 +371,8 @@ source_catalog:
       - prefix.len
       - value.get
       parser: rust-pattern
-      dependency_targets: []
+      dependency_targets:
+      - *id001
     - name: hashtag_ranges
       kind: function
       line_start: 473
@@ -441,9 +450,10 @@ source_catalog:
       - word.len
       parser: rust-pattern
       dependency_targets:
-      - *id002
+      - *id003
       - path: src-tauri/src/services/writing_lint_service.rs
         symbol: is_word_boundary
+      - *id001
     - name: is_word_boundary
       kind: function
       line_start: 542
@@ -540,7 +550,7 @@ source_catalog:
       - result.findings.is_empty
       parser: rust-pattern
       dependency_targets:
-      - *id003
+      - *id004
     - name: rhetorical_question_opening_is_deterministic_and_located
       kind: function
       line_start: 618
@@ -557,7 +567,7 @@ source_catalog:
       - lint_text_with_rules
       parser: rust-pattern
       dependency_targets:
-      - *id003
+      - *id004
     - name: bait_style_closing_is_detected_but_other_questions_are_not
       kind: function
       line_start: 636
@@ -571,7 +581,7 @@ source_catalog:
       - lint_text_with_rules
       parser: rust-pattern
       dependency_targets:
-      - *id003
+      - *id004
     - name: hashtag_threshold_is_boundary_tested
       kind: function
       line_start: 657
@@ -589,7 +599,7 @@ source_catalog:
       - lint_text_with_rules
       parser: rust-pattern
       dependency_targets:
-      - *id003
+      - *id004
     - name: list_dominance_uses_transparent_thresholds
       kind: function
       line_start: 674
@@ -603,7 +613,7 @@ source_catalog:
       - lint_text_with_rules
       parser: rust-pattern
       dependency_targets:
-      - *id003
+      - *id004
     - name: only_active_explicit_writing_rules_are_enforced
       kind: function
       line_start: 684
@@ -621,10 +631,11 @@ source_catalog:
       - writing_findings.len
       parser: rust-pattern
       dependency_targets:
-      - *id003
-      - &id004
+      - *id004
+      - &id005
         path: src-tauri/src/services/writing_lint_service.rs
         symbol: rule
+      - *id001
     - name: unsupported_active_rule_is_reported_without_hidden_inference
       kind: function
       line_start: 723
@@ -639,8 +650,9 @@ source_catalog:
       - rule
       parser: rust-pattern
       dependency_targets:
-      - *id003
       - *id004
+      - *id001
+      - *id005
     - name: punctuation_rule_is_enforced_with_browser_compatible_offsets
       kind: function
       line_start: 737
@@ -658,8 +670,8 @@ source_catalog:
       - rule
       parser: rust-pattern
       dependency_targets:
-      - *id003
       - *id004
+      - *id005
     - name: lint_command_reads_rules_without_mutating_canonical_voice_state
       kind: function
       line_start: 755
@@ -715,8 +727,8 @@ source_catalog:
         symbol: list_voice_directions
       - path: src-tauri/src/services/voice_profile_service.rs
         symbol: list_voice_directions
-      - *id005
       - *id006
+      - *id007
       - path: src-tauri/src/commands/voice.rs
         symbol: update_writing_rule
       - path: src-tauri/src/services/voice_profile_service.rs
@@ -759,13 +771,13 @@ source_catalog:
       - setTargets
       parser: typescript-pattern
       dependency_targets:
-      - &id007
+      - &id008
         path: src/components/InspirationPanel.tsx
         symbol: applyRecord
-      - &id008
+      - &id009
         path: src/components/TargetContextPanel.tsx
         symbol: applyRecord
-      - &id009
+      - &id010
         path: src/domain/types.ts
         symbol: errorMessage
       - path: src/lib/workloreApi.ts
@@ -825,9 +837,9 @@ source_catalog:
       - updateInspiration
       parser: typescript-pattern
       dependency_targets:
-      - *id007
       - *id008
       - *id009
+      - *id010
       - path: src/components/InspirationPanel.tsx
         symbol: excerptInputsFrom
       - path: src/components/InspirationPanel.tsx
@@ -854,11 +866,11 @@ source_catalog:
       dependency_targets:
       - path: src/lib/workloreApi.ts
         symbol: addInspirationRelationship
-      - *id009
-      - &id010
+      - *id010
+      - &id011
         path: src/components/InspirationPanel.tsx
         symbol: refreshAll
-      - &id011
+      - &id012
         path: src/components/TargetContextPanel.tsx
         symbol: refreshAll
     - name: handleRemoveRelationship
@@ -879,9 +891,9 @@ source_catalog:
       - setNotice
       parser: typescript-pattern
       dependency_targets:
-      - *id009
       - *id010
       - *id011
+      - *id012
       - path: src/lib/workloreApi.ts
         symbol: removeInspirationRelationship
     - name: linesFrom

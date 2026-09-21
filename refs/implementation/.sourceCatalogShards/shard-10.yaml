@@ -73,14 +73,17 @@ source_catalog:
       dependency_targets:
       - path: src-tauri/src/services/voice_analysis_service.rs
         symbol: analyze_inner
-      - &id003
+      - &id004
         path: src-tauri/src/services/post_generation_service.rs
         symbol: audit_provider_run
-      - &id004
+      - &id005
         path: src-tauri/src/services/voice_analysis_service.rs
         symbol: audit_provider_run
       - path: src-tauri/src/services/canonical_store.rs
         symbol: initialize
+      - &id001
+        path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: len
     - name: analyze_inner
       kind: function
       line_start: 102
@@ -133,7 +136,7 @@ source_catalog:
         symbol: run_structured
       - path: src-tauri/src/services/provider_registry.rs
         symbol: run_structured
-      - &id001
+      - &id002
         path: src-tauri/src/services/voice_analysis_service.rs
         symbol: validate_analysis_output
       - path: src-tauri/src/services/provider_registry.rs
@@ -176,6 +179,7 @@ source_catalog:
       - validate_evidence_ids
       parser: rust-pattern
       dependency_targets:
+      - *id001
       - path: src-tauri/src/services/voice_analysis_service.rs
         symbol: required_trimmed
       - path: src-tauri/src/services/voice_analysis_service.rs
@@ -311,10 +315,10 @@ source_catalog:
       - validate_analysis_output
       parser: rust-pattern
       dependency_targets:
-      - &id002
+      - &id003
         path: src-tauri/src/services/voice_analysis_service.rs
         symbol: selected
-      - *id001
+      - *id002
     - name: structured_output_rejects_missing_evidence_and_duplicates
       kind: function
       line_start: 423
@@ -328,8 +332,8 @@ source_catalog:
       - validate_analysis_output
       parser: rust-pattern
       dependency_targets:
+      - *id003
       - *id002
-      - *id001
     - name: valid_proposals_are_transient_and_do_not_mutate_core_voice
       kind: function
       line_start: 459
@@ -354,6 +358,7 @@ source_catalog:
         symbol: list_core_voices
       - path: src-tauri/src/services/voice_profile_service.rs
         symbol: list_core_voices
+      - *id003
       - *id002
       - *id001
     - name: provider_audit_metadata_excludes_prompt_and_response_bodies
@@ -376,8 +381,8 @@ source_catalog:
       - vault
       parser: rust-pattern
       dependency_targets:
-      - *id003
       - *id004
+      - *id005
       - path: src-tauri/src/services/confidentiality_service.rs
         symbol: drop
   - path: src/components/HomeWorkspace.tsx
@@ -412,7 +417,7 @@ source_catalog:
       dependency_targets:
       - path: src/lib/workloreApi.ts
         symbol: createCaptureSource
-      - &id005
+      - &id006
         path: src/domain/types.ts
         symbol: errorMessage
   - path: src/components/TopicsWorkspace.tsx
@@ -445,7 +450,7 @@ source_catalog:
       - setTopics
       parser: typescript-pattern
       dependency_targets:
-      - *id005
+      - *id006
       - path: src/lib/workloreApi.ts
         symbol: listTopics
     - name: createNewTopic
@@ -470,7 +475,7 @@ source_catalog:
         symbol: createTopic
       - path: src/lib/workloreApi.ts
         symbol: createTopic
-      - *id005
+      - *id006
     - name: PlusIcon
       kind: function
       line_start: 138

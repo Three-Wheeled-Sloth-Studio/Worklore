@@ -1,0 +1,271 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: '02'
+  files:
+  - path: src-tauri/src/services/discovery_query_plan.rs
+    analysis_version: 1
+    language: rust
+    content_hash: b4c3c58e647ccf0208f4523d87001fa234572c0d
+    dependencies:
+    - super::*
+    provides:
+    - queries
+    - len
+    - is_explicit_focus
+    - build_query_plan
+    - push_first_unique
+    - push_unique
+    - contains_query
+    - normalize_query
+    - blank_focus_succeeds_without_themes_or_other_personal_signals
+    - blank_focus_is_bounded_and_diverse
+    - explicit_focus_narrows_discovery_to_one_query
+    - active_theme_can_inform_but_is_not_required
+    - planner_has_no_story_or_proof_point_input_surface
+    symbols:
+    - name: queries
+      kind: function
+      line_start: 17
+      line_end: 19
+      signature: queries(&self) -> &[String]
+      inputs:
+      - '&self'
+      output: '&[String]'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: len
+      kind: function
+      line_start: 20
+      line_end: 23
+      signature: len(&self) -> usize
+      inputs:
+      - '&self'
+      output: usize
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: is_explicit_focus
+      kind: function
+      line_start: 24
+      line_end: 27
+      signature: is_explicit_focus(&self) -> bool
+      inputs:
+      - '&self'
+      output: bool
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: build_query_plan
+      kind: function
+      line_start: 29
+      line_end: 60
+      signature: 'build_query_plan(focus: &str, theme_labels: &[String], target_context_labels: &[String], good_candidate_titles:
+        &[String]) -> DiscoveryQueryPlan'
+      inputs:
+      - 'focus: &str'
+      - 'theme_labels: &[String]'
+      - 'target_context_labels: &[String]'
+      - 'good_candidate_titles: &[String]'
+      output: DiscoveryQueryPlan
+      dependencies:
+      - focus.is_empty
+      - normalize_query
+      - push_first_unique
+      - push_unique
+      - queries.len
+      - with_capacity
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: normalize_query
+      - path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: push_first_unique
+      - path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: push_unique
+      - path: src-tauri/src/services/target_context_service.rs
+        symbol: push_unique
+      - &id002
+        path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: len
+    - name: push_first_unique
+      kind: function
+      line_start: 61
+      line_end: 73
+      signature: 'push_first_unique(queries: &mut Vec<String>, candidates: &[String])'
+      inputs:
+      - 'queries: &mut Vec<String>'
+      - 'candidates: &[String]'
+      output: unspecified
+      dependencies:
+      - MAX_DISCOVERY_QUERIES.saturating_sub
+      - Some
+      - contains_query
+      - find
+      - iter
+      - map
+      - normalize_query
+      - queries.len
+      - queries.push
+      - value.is_empty
+      parser: rust-pattern
+      dependency_targets:
+      - &id003
+        path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: contains_query
+      - *id001
+      - *id002
+    - name: push_unique
+      kind: function
+      line_start: 74
+      line_end: 83
+      signature: 'push_unique(queries: &mut Vec<String>, value: &str)'
+      inputs:
+      - 'queries: &mut Vec<String>'
+      - 'value: &str'
+      output: unspecified
+      dependencies:
+      - contains_query
+      - normalize_query
+      - normalized.is_empty
+      - queries.len
+      - queries.push
+      parser: rust-pattern
+      dependency_targets:
+      - *id003
+      - *id001
+      - *id002
+    - name: contains_query
+      kind: function
+      line_start: 84
+      line_end: 89
+      signature: 'contains_query(queries: &[String], candidate: &str) -> bool'
+      inputs:
+      - 'queries: &[String]'
+      - 'candidate: &str'
+      output: bool
+      dependencies:
+      - any
+      - iter
+      - value.eq_ignore_ascii_case
+      parser: rust-pattern
+      dependency_targets: []
+    - name: normalize_query
+      kind: function
+      line_start: 90
+      line_end: 93
+      signature: 'normalize_query(value: &str) -> String'
+      inputs:
+      - 'value: &str'
+      output: String
+      dependencies:
+      - join
+      - value.split_whitespace
+      parser: rust-pattern
+      dependency_targets: []
+    - name: blank_focus_succeeds_without_themes_or_other_personal_signals
+      kind: function
+      line_start: 100
+      line_end: 105
+      signature: blank_focus_succeeds_without_themes_or_other_personal_signals()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - all
+      - build_query_plan
+      - iter
+      - plan.len
+      - plan.queries
+      - query.is_empty
+      parser: rust-pattern
+      dependency_targets:
+      - &id004
+        path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: build_query_plan
+      - *id002
+      - &id005
+        path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: queries
+    - name: blank_focus_is_bounded_and_diverse
+      kind: function
+      line_start: 108
+      line_end: 123
+      signature: blank_focus_is_bounded_and_diverse()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - build_query_plan
+      - into
+      - iter
+      - map
+      - plan.len
+      - queries
+      - query.to_ascii_lowercase
+      - unique.len
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+      - *id002
+      - *id005
+    - name: explicit_focus_narrows_discovery_to_one_query
+      kind: function
+      line_start: 126
+      line_end: 139
+      signature: explicit_focus_narrows_discovery_to_one_query()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - build_query_plan
+      - from
+      - into
+      - plan.is_explicit_focus
+      - plan.queries
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+      - path: src-tauri/src/domain/candidates.rs
+        symbol: from
+      - path: src-tauri/src/domain/models.rs
+        symbol: from
+      - path: src-tauri/src/error.rs
+        symbol: from
+      - path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: is_explicit_focus
+      - *id005
+    - name: active_theme_can_inform_but_is_not_required
+      kind: function
+      line_start: 142
+      line_end: 148
+      signature: active_theme_can_inform_but_is_not_required()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - build_query_plan
+      - into
+      - is_empty
+      - with_theme.queries
+      - without_theme.queries
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+      - *id005
+    - name: planner_has_no_story_or_proof_point_input_surface
+      kind: function
+      line_start: 151
+      line_end: 164
+      signature: planner_has_no_story_or_proof_point_input_surface()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - build_query_plan
+      - into
+      - join
+      - plan.queries
+      - rendered.contains
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+      - *id005

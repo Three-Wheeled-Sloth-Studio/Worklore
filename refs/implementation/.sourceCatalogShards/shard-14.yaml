@@ -173,7 +173,7 @@ source_catalog:
   - path: src/components/DiscoveryPanel.tsx
     analysis_version: 1
     language: typescript
-    content_hash: 008e621c5da40d4e63c131a5b03ea5945220ffbf
+    content_hash: 608dad3952972dbe7878105cc81da75788516298
     dependencies:
     - ../domain/discovery
     - ../domain/types
@@ -214,7 +214,7 @@ source_catalog:
     - name: scan
       kind: function
       line_start: 56
-      line_end: 79
+      line_end: 84
       signature: scan()
       inputs: []
       output: unspecified
@@ -233,8 +233,8 @@ source_catalog:
         symbol: scanDiscovery
     - name: saveInspiration
       kind: function
-      line_start: 80
-      line_end: 93
+      line_start: 85
+      line_end: 98
       signature: 'saveInspiration(opportunityId: string)'
       inputs:
       - 'opportunityId: string'
@@ -253,8 +253,8 @@ source_catalog:
         symbol: saveDiscoveryInspiration
     - name: dismiss
       kind: function
-      line_start: 94
-      line_end: 106
+      line_start: 99
+      line_end: 111
       signature: 'dismiss(opportunityId: string)'
       inputs:
       - 'opportunityId: string'
@@ -272,8 +272,8 @@ source_catalog:
       - *id007
     - name: toggleReason
       kind: function
-      line_start: 221
-      line_end: 228
+      line_start: 226
+      line_end: 233
       signature: 'toggleReason(reason: string)'
       inputs:
       - 'reason: string'
@@ -286,8 +286,8 @@ source_catalog:
       dependency_targets: []
     - name: saveFeedback
       kind: function
-      line_start: 229
-      line_end: 251
+      line_start: 234
+      line_end: 256
       signature: saveFeedback()
       inputs: []
       output: unspecified
@@ -308,8 +308,8 @@ source_catalog:
         symbol: recordDiscoveryFeedback
     - name: createTopic
       kind: function
-      line_start: 252
-      line_end: 273
+      line_start: 257
+      line_end: 278
       signature: createTopic()
       inputs: []
       output: unspecified
@@ -329,8 +329,8 @@ source_catalog:
       - *id007
     - name: openSource
       kind: function
-      line_start: 274
-      line_end: 282
+      line_start: 279
+      line_end: 287
       signature: 'openSource(url: string)'
       inputs:
       - 'url: string'
@@ -346,8 +346,8 @@ source_catalog:
         symbol: openDiscoverySource
     - name: Explanation
       kind: function
-      line_start: 478
-      line_end: 479
+      line_start: 483
+      line_end: 484
       signature: 'Explanation({ title, body }: { title: string; body: string })'
       inputs:
       - '{ title, body }: { title: string; body: string }'
@@ -357,8 +357,8 @@ source_catalog:
       dependency_targets: []
     - name: MatchRow
       kind: function
-      line_start: 487
-      line_end: 488
+      line_start: 492
+      line_end: 493
       signature: 'MatchRow({ label, values }: { label: string; values: string[] })'
       inputs:
       - '{ label, values }: { label: string; values: string[] }'
@@ -368,8 +368,8 @@ source_catalog:
       dependency_targets: []
     - name: humanize
       kind: function
-      line_start: 496
-      line_end: 499
+      line_start: 501
+      line_end: 504
       signature: 'humanize(value: string) -> string'
       inputs:
       - 'value: string'

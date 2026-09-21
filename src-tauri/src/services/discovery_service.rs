@@ -572,8 +572,7 @@ fn qualify_cluster(
     let recent_matches = matching_signals(context.recent_topics, &feature_tokens);
     let recent_overlap = !recent_matches.is_empty();
 
-    let feedback =
-        summarize_feedback(context.prior_feedback, &feature_tokens, used_feedback_ids);
+    let feedback = summarize_feedback(context.prior_feedback, &feature_tokens, used_feedback_ids);
     let feedback_bias = feedback.bias();
     let feedback_adjustment = if feedback.positive > feedback.negative {
         Some(format!(
@@ -858,7 +857,6 @@ fn load_string_column(connection: &Connection, sql: &str) -> ServiceResult<Vec<S
         .collect::<Result<Vec<_>, _>>()?;
     Ok(values)
 }
-
 
 fn load_theme_signals(connection: &Connection) -> ServiceResult<Vec<SignalRecord>> {
     load_signals(
@@ -1250,8 +1248,7 @@ mod tests {
         use crate::services::{topic_service, vault_service};
         use std::fs;
 
-        let path =
-            std::env::temp_dir().join(format!("worklore-discovery-plan-{}", Uuid::now_v7()));
+        let path = std::env::temp_dir().join(format!("worklore-discovery-plan-{}", Uuid::now_v7()));
         vault_service::create_vault(&path, "Discovery Plan Test").expect("create vault");
         canonical_store::create_story(
             &path,

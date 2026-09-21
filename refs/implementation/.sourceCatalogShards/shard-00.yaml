@@ -138,16 +138,16 @@ source_catalog:
       - requested_pairs.is_empty
       parser: rust-pattern
       dependency_targets:
-      - &id006
+      - &id007
         path: src-tauri/src/services/edit_learning_service.rs
         symbol: audit_tx
-      - &id007
+      - &id008
         path: src-tauri/src/services/post_lineage_service.rs
         symbol: audit_tx
-      - &id008
+      - &id009
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: audit_tx
-      - &id009
+      - &id010
         path: src-tauri/src/services/voice_profile_service.rs
         symbol: audit_tx
       - path: src-tauri/src/services/edit_learning_service.rs
@@ -242,7 +242,10 @@ source_catalog:
       - removed.is_empty
       - saturating_sub
       parser: rust-pattern
-      dependency_targets: []
+      dependency_targets:
+      - &id006
+        path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: len
     - name: build_proposals
       kind: function
       line_start: 267
@@ -274,6 +277,7 @@ source_catalog:
       - proposal_statement
       parser: rust-pattern
       dependency_targets:
+      - *id006
       - path: src-tauri/src/services/edit_learning_service.rs
         symbol: proposal_key
       - path: src-tauri/src/services/edit_learning_service.rs
@@ -457,10 +461,11 @@ source_catalog:
       - writing_rules
       parser: rust-pattern
       dependency_targets:
-      - *id006
       - *id007
       - *id008
       - *id009
+      - *id010
+      - *id006
     - name: audit_tx
       kind: function
       line_start: 506
@@ -556,13 +561,13 @@ source_catalog:
       - unwrap
       parser: rust-pattern
       dependency_targets:
-      - &id010
+      - &id011
         path: src-tauri/src/services/post_lineage_service.rs
         symbol: append_revision
-      - &id011
+      - &id012
         path: src-tauri/src/commands/posts.rs
         symbol: create_post
-      - &id012
+      - &id013
         path: src-tauri/src/services/post_lineage_service.rs
         symbol: create_post
     - name: create_model_edit_pair
@@ -589,9 +594,9 @@ source_catalog:
       - unwrap
       parser: rust-pattern
       dependency_targets:
-      - *id010
       - *id011
       - *id012
+      - *id013
     - name: recurring_proposal
       kind: function
       line_start: 632
@@ -606,10 +611,10 @@ source_catalog:
       - unwrap
       parser: rust-pattern
       dependency_targets:
-      - &id013
+      - &id014
         path: src-tauri/src/commands/voice.rs
         symbol: analyze_edit_learning
-      - &id014
+      - &id015
         path: src-tauri/src/services/edit_learning_service.rs
         symbol: analyze_edit_learning
     - name: empty_history_yields_no_observations_or_proposals
@@ -628,8 +633,8 @@ source_catalog:
       - vault
       parser: rust-pattern
       dependency_targets:
-      - *id013
       - *id014
+      - *id015
     - name: persisted_edits_expose_addition_removal_and_replacement
       kind: function
       line_start: 647
@@ -652,9 +657,10 @@ source_catalog:
       - vault
       parser: rust-pattern
       dependency_targets:
-      - *id013
+      - *id006
       - *id014
-      - &id015
+      - *id015
+      - &id016
         path: src-tauri/src/services/edit_learning_service.rs
         symbol: create_user_edit_pair
     - name: model_text_is_context_not_voice_evidence
@@ -682,21 +688,21 @@ source_catalog:
       - vault
       parser: rust-pattern
       dependency_targets:
-      - *id013
       - *id014
-      - *id010
+      - *id015
       - *id011
       - *id012
-      - &id027
+      - *id013
+      - &id028
         path: src-tauri/src/commands/posts.rs
         symbol: get_post_lineage
-      - &id028
+      - &id029
         path: src-tauri/src/services/post_lineage_service.rs
         symbol: get_post_lineage
-      - &id016
+      - &id017
         path: src-tauri/src/commands/voice.rs
         symbol: list_voice_evidence
-      - &id017
+      - &id018
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: list_voice_evidence
     - name: repeated_correction_across_distinct_posts_proposes_review_only_preference
@@ -723,9 +729,10 @@ source_catalog:
       - vault
       parser: rust-pattern
       dependency_targets:
-      - *id013
+      - *id006
       - *id014
       - *id015
+      - *id016
     - name: analysis_does_not_mutate_governed_voice_state
       kind: function
       line_start: 802
@@ -762,49 +769,48 @@ source_catalog:
         symbol: activate_core_voice
       - path: src-tauri/src/services/voice_profile_service.rs
         symbol: activate_core_voice
-      - *id013
+      - *id006
       - *id014
-      - path: src-tauri/src/commands/voice.rs
-        symbol: create_core_voice
-      - path: src-tauri/src/services/voice_profile_service.rs
-        symbol: create_core_voice
-      - path: src-tauri/src/commands/voice.rs
-        symbol: create_tone_mode
-      - path: src-tauri/src/services/voice_profile_service.rs
-        symbol: create_tone_mode
       - *id015
       - path: src-tauri/src/commands/voice.rs
-        symbol: create_voice_direction
+        symbol: create_core_voice
       - path: src-tauri/src/services/voice_profile_service.rs
-        symbol: create_voice_direction
+        symbol: create_core_voice
       - path: src-tauri/src/commands/voice.rs
-        symbol: create_writing_rule
+        symbol: create_tone_mode
       - path: src-tauri/src/services/voice_profile_service.rs
-        symbol: create_writing_rule
-      - &id018
-        path: src-tauri/src/commands/voice.rs
-        symbol: list_core_voices
-      - &id019
-        path: src-tauri/src/services/voice_profile_service.rs
-        symbol: list_core_voices
-      - path: src-tauri/src/commands/voice.rs
-        symbol: list_tone_modes
-      - path: src-tauri/src/services/voice_profile_service.rs
-        symbol: list_tone_modes
-      - path: src-tauri/src/commands/voice.rs
-        symbol: list_voice_directions
-      - path: src-tauri/src/services/voice_profile_service.rs
-        symbol: list_voice_directions
+        symbol: create_tone_mode
       - *id016
-      - *id017
+      - path: src-tauri/src/commands/voice.rs
+        symbol: create_voice_direction
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: create_voice_direction
+      - path: src-tauri/src/commands/voice.rs
+        symbol: create_writing_rule
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: create_writing_rule
+      - &id019
+        path: src-tauri/src/commands/voice.rs
+        symbol: list_core_voices
       - &id020
+        path: src-tauri/src/services/voice_profile_service.rs
+        symbol: list_core_voices
+      - path: src-tauri/src/commands/voice.rs
+        symbol: list_tone_modes
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: list_tone_modes
+      - path: src-tauri/src/commands/voice.rs
+        symbol: list_voice_directions
+      - path: src-tauri/src/services/voice_profile_service.rs
+        symbol: list_voice_directions
+      - *id017
+      - *id018
+      - &id021
         path: src-tauri/src/commands/voice.rs
         symbol: list_writing_rules
-      - &id021
+      - &id022
         path: src-tauri/src/services/voice_profile_service.rs
         symbol: list_writing_rules
-      - path: src-tauri/src/commands/voice.rs
-        symbol: save_core_voice_trait
     - name: accepted_decision_is_explicit_durable_and_creates_only_a_proposed_rule
       kind: function
       line_start: 899
@@ -838,28 +844,29 @@ source_catalog:
       - vault
       parser: rust-pattern
       dependency_targets:
-      - *id013
       - *id014
       - *id015
-      - &id022
-        path: src-tauri/src/commands/voice.rs
-        symbol: decide_edit_learning_proposal
-      - &id023
-        path: src-tauri/src/services/edit_learning_service.rs
-        symbol: decide_edit_learning_proposal
-      - *id018
-      - *id019
-      - &id025
-        path: src-tauri/src/commands/voice.rs
-        symbol: list_edit_learning_decisions
-      - &id026
-        path: src-tauri/src/services/edit_learning_service.rs
-        symbol: list_edit_learning_decisions
       - *id016
-      - *id017
-      - *id020
-      - *id021
+      - &id023
+        path: src-tauri/src/commands/voice.rs
+        symbol: decide_edit_learning_proposal
       - &id024
+        path: src-tauri/src/services/edit_learning_service.rs
+        symbol: decide_edit_learning_proposal
+      - *id006
+      - *id019
+      - *id020
+      - &id026
+        path: src-tauri/src/commands/voice.rs
+        symbol: list_edit_learning_decisions
+      - &id027
+        path: src-tauri/src/services/edit_learning_service.rs
+        symbol: list_edit_learning_decisions
+      - *id017
+      - *id018
+      - *id021
+      - *id022
+      - &id025
         path: src-tauri/src/services/edit_learning_service.rs
         symbol: recurring_proposal
     - name: rejected_evidence_is_suppressed_until_real_support_expands
@@ -884,14 +891,15 @@ source_catalog:
       - vault
       parser: rust-pattern
       dependency_targets:
-      - *id013
       - *id014
       - *id015
-      - *id022
+      - *id016
       - *id023
-      - *id020
-      - *id021
       - *id024
+      - *id021
+      - *id022
+      - *id025
+      - *id006
     - name: tampered_or_stale_decision_evidence_is_rejected
       kind: function
       line_start: 1005
@@ -914,12 +922,12 @@ source_catalog:
       - vault
       parser: rust-pattern
       dependency_targets:
-      - *id015
-      - *id022
+      - *id016
       - *id023
-      - *id025
-      - *id026
       - *id024
+      - *id026
+      - *id027
+      - *id025
     - name: accepting_recurring_model_edits_preserves_model_ancestry_and_voice_boundary
       kind: function
       line_start: 1054
@@ -941,10 +949,10 @@ source_catalog:
       dependency_targets:
       - path: src-tauri/src/services/edit_learning_service.rs
         symbol: create_model_edit_pair
-      - *id022
       - *id023
-      - *id027
-      - *id028
-      - *id016
-      - *id017
       - *id024
+      - *id028
+      - *id029
+      - *id017
+      - *id018
+      - *id025

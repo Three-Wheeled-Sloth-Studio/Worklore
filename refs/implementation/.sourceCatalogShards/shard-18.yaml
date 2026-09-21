@@ -84,7 +84,7 @@ source_catalog:
       - *id001
       - *id002
       - *id003
-      - &id037
+      - &id038
         path: src-tauri/src/services/confidentiality_service.rs
         symbol: transform_for_public_use
   - path: src-tauri/src/services/capture_service.rs
@@ -210,6 +210,9 @@ source_catalog:
         symbol: source_type_text
       - path: src-tauri/src/services/capture_service.rs
         symbol: source_type_text
+      - &id012
+        path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: len
       - path: src-tauri/src/services/capture_service.rs
         symbol: text_hash
     - name: get_capture_source
@@ -308,16 +311,16 @@ source_catalog:
         symbol: label
       - path: src-tauri/src/services/writing_lint_service.rs
         symbol: label
-      - &id021
+      - &id022
         path: src-tauri/src/domain/posts.rs
         symbol: relationship_type
-      - &id022
+      - &id023
         path: src-tauri/src/services/capture_service.rs
         symbol: relationship_type
-      - &id023
+      - &id024
         path: src-tauri/src/services/inspiration_service.rs
         symbol: relationship_type
-      - &id024
+      - &id025
         path: src-tauri/src/services/topic_service.rs
         symbol: relationship_type
       - path: src-tauri/src/services/capture_catalog_service.rs
@@ -341,7 +344,7 @@ source_catalog:
       - open
       parser: rust-pattern
       dependency_targets:
-      - &id028
+      - &id029
         path: src-tauri/src/services/canonical_store.rs
         symbol: database_path
     - name: load_classifications
@@ -477,10 +480,10 @@ source_catalog:
       - temp_dir
       parser: rust-pattern
       dependency_targets:
-      - &id029
+      - &id030
         path: src-tauri/src/commands/vault.rs
         symbol: create_vault
-      - &id030
+      - &id031
         path: src-tauri/src/services/vault_service.rs
         symbol: create_vault
     - name: capture_persists_before_classification_and_reopen
@@ -580,6 +583,7 @@ source_catalog:
       - *id009
       - *id005
       - *id006
+      - *id012
       - path: src-tauri/src/commands/capture.rs
         symbol: list_unclassified_captures
       - path: src-tauri/src/services/capture_service.rs
@@ -668,26 +672,26 @@ source_catalog:
       - validate_text
       parser: rust-pattern
       dependency_targets:
-      - &id012
+      - &id013
         path: src-tauri/src/services/edit_learning_service.rs
         symbol: audit_tx
-      - &id013
+      - &id014
         path: src-tauri/src/services/post_lineage_service.rs
         symbol: audit_tx
-      - &id014
+      - &id015
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: audit_tx
-      - &id015
+      - &id016
         path: src-tauri/src/services/voice_profile_service.rs
         symbol: audit_tx
-      - &id016
+      - &id017
         path: src-tauri/src/commands/posts.rs
         symbol: get_post_lineage
-      - &id017
+      - &id018
         path: src-tauri/src/services/post_lineage_service.rs
         symbol: get_post_lineage
       - *id004
-      - &id018
+      - &id019
         path: src-tauri/src/services/post_lineage_service.rs
         symbol: insert_revision
       - path: src-tauri/src/services/canonical_store.rs
@@ -734,18 +738,18 @@ source_catalog:
       - tx.execute
       parser: rust-pattern
       dependency_targets:
-      - *id012
       - *id013
       - *id014
       - *id015
       - *id016
       - *id017
-      - *id004
       - *id018
-      - &id019
+      - *id004
+      - *id019
+      - &id020
         path: src-tauri/src/services/post_lineage_service.rs
         symbol: load_post_tx
-      - &id020
+      - &id021
         path: src-tauri/src/services/post_lineage_service.rs
         symbol: load_revision_tx
     - name: approve_revision
@@ -776,15 +780,15 @@ source_catalog:
       - tx.execute
       parser: rust-pattern
       dependency_targets:
-      - *id012
       - *id013
       - *id014
       - *id015
       - *id016
       - *id017
+      - *id018
       - *id004
-      - *id019
       - *id020
+      - *id021
     - name: link_supporting_material
       kind: function
       line_start: 212
@@ -822,20 +826,20 @@ source_catalog:
       - tx.execute
       parser: rust-pattern
       dependency_targets:
-      - *id012
       - *id013
       - *id014
       - *id015
+      - *id016
       - path: src-tauri/src/services/post_lineage_service.rs
         symbol: ensure_support_target_exists
-      - *id016
       - *id017
+      - *id018
       - *id004
-      - *id019
-      - *id021
+      - *id020
       - *id022
       - *id023
       - *id024
+      - *id025
     - name: get_post_lineage
       kind: function
       line_start: 264
@@ -976,13 +980,13 @@ source_catalog:
       - query_row
       parser: rust-pattern
       dependency_targets:
-      - &id025
+      - &id026
         path: src-tauri/src/services/post_catalog_service.rs
         symbol: post_from_raw
-      - &id026
+      - &id027
         path: src-tauri/src/services/post_lineage_service.rs
         symbol: post_from_raw
-      - &id027
+      - &id028
         path: src-tauri/src/services/post_lineage_service.rs
         symbol: post_not_found
     - name: load_post_tx
@@ -1004,9 +1008,9 @@ source_catalog:
       - tx.query_row
       parser: rust-pattern
       dependency_targets:
-      - *id025
       - *id026
       - *id027
+      - *id028
     - name: post_from_raw
       kind: function
       line_start: 457
@@ -1134,10 +1138,10 @@ source_catalog:
       - tx.query_row
       parser: rust-pattern
       dependency_targets:
-      - *id021
       - *id022
       - *id023
       - *id024
+      - *id025
     - name: audit_tx
       kind: function
       line_start: 613
@@ -1176,7 +1180,7 @@ source_catalog:
       - open
       parser: rust-pattern
       dependency_targets:
-      - *id028
+      - *id029
     - name: post_not_found
       kind: function
       line_start: 641
@@ -1216,8 +1220,8 @@ source_catalog:
       - temp_dir
       parser: rust-pattern
       dependency_targets:
-      - *id029
       - *id030
+      - *id031
     - name: user_post
       kind: function
       line_start: 664
@@ -1262,28 +1266,29 @@ source_catalog:
       - vault
       parser: rust-pattern
       dependency_targets:
-      - &id031
+      - &id032
         path: src-tauri/src/services/post_lineage_service.rs
         symbol: append_revision
-      - &id038
+      - &id039
         path: src-tauri/src/services/post_lineage_service.rs
         symbol: approve_revision
-      - &id032
+      - &id033
         path: src-tauri/src/commands/posts.rs
         symbol: create_post
-      - &id033
+      - &id034
         path: src-tauri/src/services/post_lineage_service.rs
         symbol: create_post
-      - *id016
+      - *id012
       - *id017
+      - *id018
       - *id004
-      - &id034
+      - &id035
         path: src-tauri/src/services/post_catalog_service.rs
         symbol: user_post
-      - &id035
+      - &id036
         path: src-tauri/src/services/post_lineage_service.rs
         symbol: user_post
-      - &id036
+      - &id037
         path: src-tauri/src/services/publication_feedback_service.rs
         symbol: user_post
     - name: model_ancestor_stays_model_and_human_edit_is_user_edited_model
@@ -1313,9 +1318,9 @@ source_catalog:
       - vault
       parser: rust-pattern
       dependency_targets:
-      - *id031
       - *id032
       - *id033
+      - *id034
       - *id009
     - name: support_links_keep_semantic_roles_distinct
       kind: function
@@ -1346,15 +1351,15 @@ source_catalog:
         symbol: create_evidence
       - path: src-tauri/src/services/canonical_store.rs
         symbol: create_inspiration
-      - *id032
       - *id033
+      - *id034
       - path: src-tauri/src/services/canonical_store.rs
         symbol: create_target_context
       - path: src-tauri/src/services/post_lineage_service.rs
         symbol: link_supporting_material
-      - *id034
       - *id035
       - *id036
+      - *id037
     - name: schema_upgrade_does_not_invent_post_history
       kind: function
       line_start: 852
@@ -1397,14 +1402,14 @@ source_catalog:
       - vault
       parser: rust-pattern
       dependency_targets:
-      - *id032
       - *id033
-      - *id016
-      - *id017
-      - *id037
       - *id034
+      - *id017
+      - *id018
+      - *id038
       - *id035
       - *id036
+      - *id037
     - name: final_approval_freezes_foundation_until_explicit_reopen_exists
       kind: function
       line_start: 890
@@ -1426,13 +1431,13 @@ source_catalog:
       - vault
       parser: rust-pattern
       dependency_targets:
-      - *id031
-      - *id038
       - *id032
+      - *id039
       - *id033
       - *id034
       - *id035
       - *id036
+      - *id037
   - path: src/lib/vaultApi.ts
     analysis_version: 1
     language: typescript

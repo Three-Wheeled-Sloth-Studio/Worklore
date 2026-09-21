@@ -54,7 +54,10 @@ source_catalog:
       - set
       - sorted
       parser: python-ast
-      dependency_targets: []
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: len
     - name: main
       kind: function
       line_start: 48
@@ -73,6 +76,7 @@ source_catalog:
       dependency_targets:
       - path: scripts/check-case-collisions.py
         symbol: find_collisions
+      - *id001
       - path: scripts/check-case-collisions.py
         symbol: tracked_paths
   - path: src-tauri/src/commands/mod.rs
@@ -183,7 +187,7 @@ source_catalog:
       dependency_targets:
       - path: src-tauri/src/commands/mod.rs
         symbol: open_system_browser
-      - &id001
+      - &id002
         path: src-tauri/src/commands/mod.rs
         symbol: validate_external_url
     - name: approved_external_links_are_allowed
@@ -198,7 +202,7 @@ source_catalog:
       - validate_external_url
       parser: rust-pattern
       dependency_targets:
-      - *id001
+      - *id002
     - name: arbitrary_external_links_are_rejected
       kind: function
       line_start: 82
@@ -211,7 +215,7 @@ source_catalog:
       - validate_external_url
       parser: rust-pattern
       dependency_targets:
-      - *id001
+      - *id002
   - path: src-tauri/src/commands/stories.rs
     analysis_version: 1
     language: rust
@@ -242,18 +246,18 @@ source_catalog:
       - migrate_prototype
       parser: rust-pattern
       dependency_targets:
-      - &id002
+      - &id003
         path: src-tauri/src/domain/candidates.rs
         symbol: from
-      - &id003
+      - &id004
         path: src-tauri/src/domain/models.rs
         symbol: from
-      - &id004
+      - &id005
         path: src-tauri/src/error.rs
         symbol: from
       - path: src-tauri/src/services/story_service.rs
         symbol: import_synthesis_response
-      - &id005
+      - &id006
         path: src-tauri/src/services/canonical_store.rs
         symbol: migrate_prototype
     - name: list_stories
@@ -269,9 +273,9 @@ source_catalog:
       - map_err
       parser: rust-pattern
       dependency_targets:
-      - *id002
       - *id003
       - *id004
+      - *id005
     - name: set_story_status
       kind: function
       line_start: 33
@@ -289,10 +293,10 @@ source_catalog:
       - migrate_prototype
       parser: rust-pattern
       dependency_targets:
-      - *id002
       - *id003
       - *id004
       - *id005
+      - *id006
   - path: src-tauri/src/commands/vault.rs
     analysis_version: 1
     language: rust
@@ -325,9 +329,9 @@ source_catalog:
       - map_err
       parser: rust-pattern
       dependency_targets:
-      - *id002
       - *id003
       - *id004
+      - *id005
     - name: create_vault_in_parent
       kind: function
       line_start: 17
@@ -342,9 +346,9 @@ source_catalog:
       - map_err
       parser: rust-pattern
       dependency_targets:
-      - *id002
       - *id003
       - *id004
+      - *id005
     - name: create_default_vault
       kind: function
       line_start: 23
@@ -378,9 +382,9 @@ source_catalog:
       - map_err
       parser: rust-pattern
       dependency_targets:
-      - *id002
       - *id003
       - *id004
+      - *id005
     - name: update_cloud_identifier_mode
       kind: function
       line_start: 34
@@ -395,9 +399,9 @@ source_catalog:
       - map_err
       parser: rust-pattern
       dependency_targets:
-      - *id002
       - *id003
       - *id004
+      - *id005
     - name: import_source
       kind: function
       line_start: 43
@@ -416,10 +420,10 @@ source_catalog:
       - spawn_blocking
       parser: rust-pattern
       dependency_targets:
-      - *id002
       - *id003
       - *id004
       - *id005
+      - *id006
     - name: list_sources
       kind: function
       line_start: 61
@@ -433,9 +437,9 @@ source_catalog:
       - map_err
       parser: rust-pattern
       dependency_targets:
-      - *id002
       - *id003
       - *id004
+      - *id005
   - path: src-tauri/src/domain/mod.rs
     analysis_version: 1
     language: rust
@@ -606,6 +610,7 @@ source_catalog:
         symbol: list_captures
       - path: src-tauri/src/services/capture_catalog_service.rs
         symbol: list_captures
+      - *id001
   - path: src/domain/types.ts
     analysis_version: 1
     language: typescript
