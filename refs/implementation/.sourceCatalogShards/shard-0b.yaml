@@ -741,8 +741,6 @@ source_catalog:
       dependency_targets:
       - *id013
       - *id005
-      - path: src-tauri/src/services/brave_search_provider.rs
-        symbol: is_http_url
       - path: src-tauri/src/services/seeded_discovery_provider.rs
         symbol: is_http_url
       - *id006
@@ -1576,7 +1574,7 @@ source_catalog:
   - path: src/components/ProviderSettingsPanel.tsx
     analysis_version: 1
     language: typescript
-    content_hash: aa58d30a8f5f7fd172a610108a2bf4d94e2ac80d
+    content_hash: 4a31d6882213c0674a3fbbe6f700021d602b21da
     dependencies:
     - ../domain/types
     - ../lib/workloreApi
@@ -1592,14 +1590,13 @@ source_catalog:
     symbols:
     - name: ProviderSettingsPanel
       kind: function
-      line_start: 27
-      line_end: 316
+      line_start: 25
+      line_end: 253
       signature: ProviderSettingsPanel()
       inputs: []
       output: unspecified
       dependencies:
       - async
-      - braveSearchApiKey.trim
       - errorMessage
       - geminiApiKey.trim
       - getProviderSettings
@@ -1612,9 +1609,7 @@ source_catalog:
       - save
       - saveMessage
       - selectProvider
-      - setBraveSearchApiKey
       - setBusy
-      - setClearBraveSearchApiKey
       - setClearGeminiApiKey
       - setClearOpenaiApiKey
       - setError
@@ -1622,6 +1617,9 @@ source_catalog:
       - setModels
       - setNotice
       - setOpenaiApiKey
+      - setSettings
+      - testConnection
+      - testProviderConnection
       parser: typescript-pattern
       dependency_targets:
       - &id026
@@ -1645,22 +1643,24 @@ source_catalog:
         symbol: saveMessage
       - path: src/components/ProviderSettingsPanel.tsx
         symbol: selectProvider
+      - path: src/components/ProviderSettingsPanel.tsx
+        symbol: testConnection
+      - &id031
+        path: src/lib/workloreApi.ts
+        symbol: testProviderConnection
     - name: save
       kind: function
-      line_start: 50
-      line_end: 85
+      line_start: 46
+      line_end: 77
       signature: save() -> Promise<ProviderSettings | null>
       inputs: []
       output: Promise<ProviderSettings | null>
       dependencies:
-      - braveSearchApiKey.trim
       - errorMessage
       - geminiApiKey.trim
       - openaiApiKey.trim
       - saveMessage
-      - setBraveSearchApiKey
       - setBusy
-      - setClearBraveSearchApiKey
       - setClearGeminiApiKey
       - setClearOpenaiApiKey
       - setError
@@ -1677,8 +1677,8 @@ source_catalog:
         symbol: updateProviderSettings
     - name: refreshModels
       kind: function
-      line_start: 86
-      line_end: 107
+      line_start: 78
+      line_end: 99
       signature: refreshModels()
       inputs: []
       output: unspecified
@@ -1699,8 +1699,8 @@ source_catalog:
       - *id030
     - name: testConnection
       kind: function
-      line_start: 108
-      line_end: 123
+      line_start: 100
+      line_end: 115
       signature: testConnection()
       inputs: []
       output: unspecified
@@ -1717,12 +1717,11 @@ source_catalog:
       - *id026
       - *id029
       - *id030
-      - path: src/lib/workloreApi.ts
-        symbol: testProviderConnection
+      - *id031
     - name: selectProvider
       kind: function
-      line_start: 124
-      line_end: 131
+      line_start: 116
+      line_end: 123
       signature: 'selectProvider(providerId: string)'
       inputs:
       - 'providerId: string'
@@ -1734,8 +1733,8 @@ source_catalog:
       dependency_targets: []
     - name: providerLabel
       kind: function
-      line_start: 392
-      line_end: 400
+      line_start: 329
+      line_end: 337
       signature: 'providerLabel(providerId: string) -> string'
       inputs:
       - 'providerId: string'
@@ -1745,8 +1744,8 @@ source_catalog:
       dependency_targets: []
     - name: saveMessage
       kind: function
-      line_start: 401
-      line_end: 417
+      line_start: 338
+      line_end: 354
       signature: 'saveMessage(settings: ProviderSettings) -> string'
       inputs:
       - 'settings: ProviderSettings'
@@ -1822,7 +1821,7 @@ source_catalog:
         symbol: listCaptureSources
       - path: src/lib/workloreApi.ts
         symbol: listStories
-      - &id031
+      - &id032
         path: src/components/StoryBankPanel.tsx
         symbol: resolveVaultPath
     - name: develop
@@ -1848,7 +1847,7 @@ source_catalog:
       - path: src/lib/workloreApi.ts
         symbol: classifyCaptureSource
       - *id026
-      - *id031
+      - *id032
     - name: handleStatusChange
       kind: function
       line_start: 82

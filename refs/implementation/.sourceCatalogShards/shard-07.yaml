@@ -629,7 +629,7 @@ source_catalog:
   - path: src-tauri/src/services/mod.rs
     analysis_version: 1
     language: rust
-    content_hash: d9d7091d563c255c6064def463f792193074928e
+    content_hash: 59c28a422c8e5d7b9f21c6e59d9325da6bca6633
     dependencies: []
     provides: []
     symbols: []

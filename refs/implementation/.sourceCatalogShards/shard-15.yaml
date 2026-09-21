@@ -389,7 +389,7 @@ source_catalog:
   - path: src-tauri/src/services/provider_registry.rs
     analysis_version: 1
     language: rust
-    content_hash: b68948154af47b3ce99fcae4d2071c14ea244d01
+    content_hash: cc284ce276e53b62a7642ce72783a141087ceed5
     dependencies:
     - "crate::{\n    domain::providers::{\n        ProviderConnectionView, ProviderModelView, ProviderSettingsView,\n    \
       \    UpdateProviderSettingsRequest, GEMINI_PROVIDER_ID, OLLAMA_PROVIDER_ID, OPENAI_PROVIDER_ID,\n    },\n    error::{ServiceResult,\
@@ -439,7 +439,7 @@ source_catalog:
     - name: update_settings
       kind: function
       line_start: 20
-      line_end: 55
+      line_end: 50
       signature: 'update_settings(request: UpdateProviderSettingsRequest) -> ServiceResult<ProviderSettingsView>'
       inputs:
       - 'request: UpdateProviderSettingsRequest'
@@ -451,7 +451,6 @@ source_catalog:
       - normalize_optional_secret
       - normalize_optional_text
       - normalize_provider_id
-      - request.brave_search_api_key.as_deref
       - request.gemini_api_key.as_deref
       - request.gemini_model_id.as_deref
       - request.ollama_model_id.as_deref
@@ -480,8 +479,8 @@ source_catalog:
         symbol: save_provider_settings
     - name: list_models
       kind: function
-      line_start: 56
-      line_end: 69
+      line_start: 51
+      line_end: 64
       signature: 'list_models(provider_id: &str) -> ServiceResult<Vec<ProviderModelView>>'
       inputs:
       - 'provider_id: &str'
@@ -507,8 +506,8 @@ source_catalog:
         symbol: require_selected_provider
     - name: test_connection
       kind: function
-      line_start: 70
-      line_end: 99
+      line_start: 65
+      line_end: 94
       signature: 'test_connection(provider_id: &str) -> ServiceResult<ProviderConnectionView>'
       inputs:
       - 'provider_id: &str'
@@ -532,8 +531,8 @@ source_catalog:
         symbol: provider_label
     - name: run_structured
       kind: function
-      line_start: 100
-      line_end: 123
+      line_start: 95
+      line_end: 118
       signature: 'run_structured(vault_path: &Path, provider_id: &str, mut request: StructuredProviderRequest) -> ServiceResult<StructuredProviderResponse>'
       inputs:
       - 'vault_path: &Path'
@@ -560,8 +559,8 @@ source_catalog:
         symbol: validate_requested_model
     - name: require_selected_provider
       kind: function
-      line_start: 124
-      line_end: 139
+      line_start: 119
+      line_end: 134
       signature: 'require_selected_provider(provider_id: &str) -> ServiceResult<ProviderSettingsView>'
       inputs:
       - 'provider_id: &str'
@@ -581,8 +580,8 @@ source_catalog:
       - *id012
     - name: validate_requested_model
       kind: function
-      line_start: 140
-      line_end: 163
+      line_start: 135
+      line_end: 158
       signature: 'validate_requested_model(settings: &ProviderSettingsView, model_id: &str) -> ServiceResult<String>'
       inputs:
       - 'settings: &ProviderSettingsView'
@@ -605,8 +604,8 @@ source_catalog:
       - *id012
     - name: require_api_key
       kind: function
-      line_start: 164
-      line_end: 169
+      line_start: 159
+      line_end: 164
       signature: 'require_api_key(provider_id: &str) -> ServiceResult<String>'
       inputs:
       - 'provider_id: &str'
@@ -622,8 +621,8 @@ source_catalog:
       - *id012
     - name: sanitize_loaded_settings
       kind: function
-      line_start: 170
-      line_end: 182
+      line_start: 165
+      line_end: 177
       signature: 'sanitize_loaded_settings(mut settings: ProviderSettingsView) -> ProviderSettingsView'
       inputs:
       - 'mut settings: ProviderSettingsView'
@@ -640,8 +639,8 @@ source_catalog:
       - *id017
     - name: normalize_provider_id
       kind: function
-      line_start: 183
-      line_end: 194
+      line_start: 178
+      line_end: 189
       signature: 'normalize_provider_id(value: Option<&str>) -> ServiceResult<Option<String>>'
       inputs:
       - 'value: Option<&str>'
@@ -662,8 +661,8 @@ source_catalog:
       - *id012
     - name: normalize_optional_text
       kind: function
-      line_start: 195
-      line_end: 201
+      line_start: 190
+      line_end: 196
       signature: 'normalize_optional_text(value: Option<&str>) -> Option<String>'
       inputs:
       - 'value: Option<&str>'
@@ -676,8 +675,8 @@ source_catalog:
       dependency_targets: []
     - name: normalize_optional_secret
       kind: function
-      line_start: 202
-      line_end: 205
+      line_start: 197
+      line_end: 200
       signature: 'normalize_optional_secret(value: Option<&str>) -> Option<String>'
       inputs:
       - 'value: Option<&str>'
@@ -689,8 +688,8 @@ source_catalog:
       - *id017
     - name: provider_not_configured
       kind: function
-      line_start: 206
-      line_end: 212
+      line_start: 201
+      line_end: 207
       signature: 'provider_not_configured(message: impl Into<String>) -> WorkLoreError'
       inputs:
       - 'message: impl Into<String>'
@@ -701,8 +700,8 @@ source_catalog:
       dependency_targets: []
     - name: settings
       kind: function
-      line_start: 217
-      line_end: 229
+      line_start: 212
+      line_end: 223
       signature: 'settings(provider_id: &str, model_id: &str) -> ProviderSettingsView'
       inputs:
       - 'provider_id: &str'
@@ -718,8 +717,8 @@ source_catalog:
       dependency_targets: []
     - name: provider_selection_is_explicit_and_does_not_fallback
       kind: function
-      line_start: 232
-      line_end: 247
+      line_start: 226
+      line_end: 241
       signature: provider_selection_is_explicit_and_does_not_fallback()
       inputs: []
       output: unspecified
@@ -734,8 +733,8 @@ source_catalog:
       - *id018
     - name: requested_model_must_match_the_selected_provider_configuration
       kind: function
-      line_start: 250
-      line_end: 259
+      line_start: 244
+      line_end: 253
       signature: requested_model_must_match_the_selected_provider_configuration()
       inputs: []
       output: unspecified
@@ -752,8 +751,8 @@ source_catalog:
       - *id019
     - name: selected_provider_can_be_saved_before_a_model_is_selected
       kind: function
-      line_start: 262
-      line_end: 270
+      line_start: 256
+      line_end: 264
       signature: selected_provider_can_be_saved_before_a_model_is_selected()
       inputs: []
       output: unspecified

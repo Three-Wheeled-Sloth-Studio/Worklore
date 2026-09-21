@@ -16,7 +16,6 @@ impl DiscoveryFreshness {
             Self::Month => "month",
         }
     }
-
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]

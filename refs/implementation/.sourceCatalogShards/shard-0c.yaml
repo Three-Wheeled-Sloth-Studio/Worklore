@@ -609,15 +609,15 @@ source_catalog:
   - path: src/domain/types.ts
     analysis_version: 1
     language: typescript
-    content_hash: 5f901f1101855541dd0be84117da3d901231dec1
+    content_hash: e4d45a4bb4dd5b5077dad666ebcc9e843abb2266
     dependencies: []
     provides:
     - errorMessage
     symbols:
     - name: errorMessage
       kind: function
-      line_start: 882
-      line_end: 899
+      line_start: 879
+      line_end: 896
       signature: 'errorMessage(error: unknown) -> string'
       inputs:
       - 'error: unknown'
