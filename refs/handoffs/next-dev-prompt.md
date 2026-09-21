@@ -1,9 +1,9 @@
 ---
 type: Handoff Prompt
 title: Next WorkLore Development Slice
-description: Resume runtime QA from the accepted v0.1.4 checkpoint using Agent Academy bounded source discovery.
+description: Runtime-smoke and evidence-driven tuning for v0.1.9 open-ended timely-topic discovery.
 status: draft
-tags: [handoff, next-slice]
+tags: [handoff, next-slice, discovery]
 ---
 # Next Dev Prompt
 
@@ -17,75 +17,96 @@ Draft PR #1 remains `dev -> qa`. Leave it draft.
 
 ## Starting State
 
-The governing loop remains:
+Version: `0.1.9`
 
-`Capture -> Understand -> Develop -> Connect -> Draft -> Challenge -> Publish manually -> Measure -> Learn`
+The current discovery implementation includes:
 
-The last fully green product implementation checkpoint is:
-
-`f38e75618b5967177b37ba1040aab68a27c177d1`
-
-Validation for that checkpoint:
-
-- Actions `35016169532`, run 330
-- Job `104540027121`
-- 11 frontend tests passed
-- production frontend build green
-- 133 Rust tests passed
-- warnings-denied Clippy green
-- rustfmt green
-- refs/OKF/path-safety, build-layout, case-collision, bounded agent context, and source-only checks green
-
-QA build version is `0.1.4`.
-
-Agent Academy bounded implementation discovery is now part of the WorkLore harness. Source discovery should use the deterministic catalog and targeted symbol/range reads rather than broad repository loading.
+- manual Brave Search BYOK retrieval;
+- 24-hour / 7-day / 31-day freshness;
+- privacy preflight on every outgoing search query;
+- blank-Focus bounded exploration with no Theme prerequisite;
+- explicit-Focus narrowed exploration;
+- optional public-safe Theme / Target Context / prior Good-candidate signals;
+- no Story or Proof Point body text in query-plan inputs;
+- bounded total retrieval budget across at most four exploration searches;
+- cross-query URL deduplication and headline clustering;
+- existing qualification against Themes, standing, Target Context, recent Topics, and prior discovery feedback;
+- separate treatment of Good candidate / Not now / Not for me;
+- explicit user summary required before Develop Topic;
+- external source provenance retained through Inspiration creation;
+- discovery learning remains separate from canonical Voice.
 
 ## Start With Bounded Re-entry
 
-Do not reread repository history or implementation source broadly.
+Do not reread repository history.
 
 First run:
 
 ```powershell
-python refs/tools/generate_agent_context.py --focus "WorkLore structured Ollama model routing JSON contract approved writing voice analysis actual model provenance"
+python refs/tools/generate_agent_context.py --focus "WorkLore v0.1.9 open-ended discovery runtime smoke query diversity Brave Search blank Focus"
 ```
 
-Treat the packet as derived orientation, not source of truth. Follow `Required Reads For Next Slice` and source-catalog matches first.
+Treat the packet as derived orientation, not source of truth. Follow its source-catalog matches and the Required Reads below.
 
-If source detail is still needed, query:
+## Immediate Objective
 
-```powershell
-python refs/tools/generate_source_catalog.py --query "<observed behavior or symbol>"
-```
+Run runtime smoke before adding another product feature.
 
-Read only the returned symbols/ranges and concrete dependencies unless the task genuinely crosses a broader boundary.
+1. Confirm the shell reports v0.1.9.
+2. Use a vault with no active Themes.
+3. Run Find timely topics with blank Focus and 7-day freshness.
+4. Confirm the scan succeeds and indicates multiple bounded search areas.
+5. Confirm opportunities are a small qualified set rather than a feed.
+6. Run a second scan with an explicit Focus and confirm retrieval narrows to it.
+7. Inspect external-query provenance and confirm private Story/Proof Point bodies and private entity names are absent.
+8. Save one opportunity as Inspiration and confirm source provenance.
+9. Attempt Develop Topic without a summary and confirm it is blocked; then add a user-written summary and confirm Topic creation.
+10. Record Good candidate, Not now, and Not for me feedback on suitable synthetic/real candidates and confirm later explanations preserve their distinct meanings.
 
-Where the environment supports sub-agents, delegate bounded independent search, test inspection, diagnostics, or documentation checks when that reduces parent context or enables useful parallel work. Use the least expensive capable agent/model. Keep overlapping writes and final integration/validation with the parent.
+Stop on the first concrete correctness, privacy, provenance, recoverability, or blocking UX defect.
 
-## Immediate Objective: Resume Runtime QA
+## Next Implementation Only If Runtime Evidence Supports It
 
-Focus first on the v0.1.4 defect:
+If the smoke is correct but candidate quality is weak, tune query-plan diversity narrowly. Examples of evidence that justify a change:
 
-1. Confirm the sidebar reports `v0.1.4`.
-2. Run `Analyze approved writing` with the existing configured Ollama model.
-3. If that model cannot produce valid structured JSON, confirm WorkLore retries another installed local text-generation model and completes without requiring Settings changes.
-4. Confirm suggestions remain separated into Core Voice traits and Writing Rules.
-5. Confirm the actual model used is retained in provenance/audit rather than falsely recording the configured model.
-6. Confirm a genuine provider failure, such as stopping Ollama, fails directly rather than retrying every model.
-7. Continue the accepted QA path: Story Seed readability, Voice action ordering, explicit trait/rule acceptance, discard behavior, and restart/reopen persistence.
+- one exploration query dominates most stored opportunities;
+- several queries repeatedly surface the same domains or topic family;
+- public-safe Theme or Target Context signals crowd out broad exploration;
+- broad exploration is too generic to produce useful professional angles;
+- Good-candidate reuse creates excessive repetition.
 
-Continue beyond this only when runtime QA exposes another concrete correctness, provenance, privacy, recoverability, or blocking UX defect.
+Prefer deterministic, provider-independent planning. Do not add LLM-dependent retrieval.
 
-## Required Reads For Next Slice
+## Required Reads
 
-- `refs/handoffs/currentHandoff.md` - accepted checkpoint, current QA focus, and locked boundaries.
-- `refs/agents.yaml` - bounded discovery/delegation rules.
-- Do not pre-read implementation source. Let observed runtime behavior drive a source-catalog query.
-- `refs/testing/validationCommands.yaml` - read before finalizing any code change.
+- `refs/handoffs/currentHandoff.md`
+- `refs/handoffs/next-dev-prompt.md`
+- `src-tauri/src/services/discovery_query_plan.rs`
+- source-catalog matches for the observed behavior
+- `src-tauri/src/services/discovery_service.rs` only as needed
+- `src/components/DiscoveryPanel.tsx` only for UI defects
+- `refs/testing/validationCommands.yaml`
+
+## Locked Constraints
+
+- local-first canonical storage;
+- no WorkLore-hosted account/backend/proprietary sync;
+- no automatic publication or scheduling;
+- no background discovery monitoring, notifications, or subscriptions;
+- no LLM-dependent retrieval requirement;
+- retrieval remains separate from inference;
+- every external query is privacy-preflighted;
+- Story/Proof Point bodies and private canonical narrative material are not search-plan inputs;
+- raw feedback remains locally authoritative;
+- Not now remains timing-only, not topic rejection;
+- discovery learning never modifies Voice;
+- Develop Topic requires explicit user author intent;
+- do not hand-edit generated source catalog or OKF indexes;
+- do not promote `qa` or `main`.
 
 ## Validation After Any Change
 
-Run the normal validation path, including source-catalog freshness:
+Run the normal validation path:
 
 ```powershell
 python scripts/check-case-collisions.py
@@ -101,34 +122,4 @@ cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -
 ./scripts/assert-repo-clean.ps1
 ```
 
-If implementation source changes, regenerate the catalog before checking it:
-
-```powershell
-python refs/tools/generate_source_catalog.py
-```
-
-Do not hand-edit source-catalog or OKF index output.
-
-## Locked Constraints
-
-- standalone Windows-first and local canonical storage;
-- no WorkLore-hosted backend/account/proprietary sync;
-- no automatic publication or scheduling;
-- no silent provider or local-to-cloud fallback;
-- bounded model routing may occur only within the explicitly selected local Ollama provider for operations requiring structured output;
-- raw AI drafts never train canonical voice;
-- inferred voice traits and writing rules are review-only until explicitly accepted;
-- accepted Writing Rule suggestions remain proposed until separately activated;
-- preserve immutable Revision authorship/provenance, including the actual provider/model used;
-- preserve Evidence/Inspiration/Target Context/Voice Evidence distinctions;
-- preserve Private Entity Registry as privacy source of truth;
-- no fake human-vs-AI probability or opaque quality score;
-- public fixtures remain synthetic;
-- keep build/dev/QA output outside the repository;
-- prefer cohesive, bounded source modules over expanding large mixed-purpose files;
-- do not hand-edit generated OKF indexes or source-catalog files;
-- do not promote `qa` or `main`.
-
-## Stop Point
-
-Stop after the next observed blocker is reproduced, fixed, tested, documented, and handed back for QA. Do not convert unobserved behavior into an accepted claim.
+If implementation source changes, regenerate the catalog through `refs/tools/generate_source_catalog.py` before checking it.
