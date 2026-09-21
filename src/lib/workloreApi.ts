@@ -1,5 +1,15 @@
 import { invoke } from "@tauri-apps/api/core";
 import type {
+  DevelopDiscoveryTopicRequest,
+  DevelopDiscoveryTopicResult,
+  DiscoveryFeedback,
+  DiscoveryOpportunity,
+  DiscoveryScanResult,
+  RecordDiscoveryFeedbackRequest,
+  SaveDiscoveryInspirationResult,
+  ScanDiscoveryRequest,
+} from "../domain/discovery";
+import type {
   CandidateStatus,
   CandidateSummary,
   CaptureClassificationResult,
@@ -110,6 +120,66 @@ export async function lintDraft(
   request: LintDraftRequest,
 ): Promise<LintDraftResult> {
   return invoke<LintDraftResult>("lint_draft", { vaultPath, request });
+}
+
+export async function openExternalUrl(url: string): Promise<void> {
+  return invoke<void>("open_external_url", { url });
+}
+
+export async function scanDiscovery(
+  vaultPath: string,
+  request: ScanDiscoveryRequest,
+): Promise<DiscoveryScanResult> {
+  return invoke<DiscoveryScanResult>("scan_discovery", { vaultPath, request });
+}
+
+export async function listDiscoveryOpportunities(
+  vaultPath: string,
+  limit = 20,
+): Promise<DiscoveryOpportunity[]> {
+  return invoke<DiscoveryOpportunity[]>("list_discovery_opportunities", { vaultPath, limit });
+}
+
+export async function recordDiscoveryFeedback(
+  vaultPath: string,
+  request: RecordDiscoveryFeedbackRequest,
+): Promise<DiscoveryFeedback> {
+  return invoke<DiscoveryFeedback>("record_discovery_feedback", { vaultPath, request });
+}
+
+export async function saveDiscoveryInspiration(
+  vaultPath: string,
+  opportunityId: string,
+): Promise<SaveDiscoveryInspirationResult> {
+  return invoke<SaveDiscoveryInspirationResult>("save_discovery_inspiration", {
+    vaultPath,
+    opportunityId,
+  });
+}
+
+export async function developDiscoveryTopic(
+  vaultPath: string,
+  request: DevelopDiscoveryTopicRequest,
+): Promise<DevelopDiscoveryTopicResult> {
+  return invoke<DevelopDiscoveryTopicResult>("develop_discovery_topic", { vaultPath, request });
+}
+
+export async function dismissDiscoveryOpportunity(
+  vaultPath: string,
+  opportunityId: string,
+): Promise<DiscoveryOpportunity> {
+  return invoke<DiscoveryOpportunity>("dismiss_discovery_opportunity", {
+    vaultPath,
+    opportunityId,
+  });
+}
+
+export async function openDiscoverySource(
+  vaultPath: string,
+  opportunityId: string,
+  url: string,
+): Promise<void> {
+  return invoke<void>("open_discovery_source", { vaultPath, opportunityId, url });
 }
 
 export async function getProviderSettings(): Promise<ProviderSettings> {
