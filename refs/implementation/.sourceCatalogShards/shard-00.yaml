@@ -7,7 +7,7 @@ source_catalog:
   - path: src-tauri/src/domain/providers.rs
     analysis_version: 1
     language: rust
-    content_hash: 247b713f9d10c509c38baf06885a9418916c39fb
+    content_hash: 6b5cff4b308e7817a6d4570b85c2955aac0a8245
     dependencies:
     - serde::{Deserialize, Serialize}
     provides: []

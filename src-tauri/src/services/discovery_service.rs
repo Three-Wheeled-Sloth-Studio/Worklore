@@ -14,9 +14,9 @@ use uuid::Uuid;
 use crate::{
     domain::discovery::{
         DevelopDiscoveryTopicRequest, DevelopDiscoveryTopicResult, DiscoveryFeedbackView,
-        DiscoveryMatchView, DiscoveryOpportunityStatus,
-        DiscoveryOpportunityView, DiscoveryScanResult, DiscoverySourceView,
-        RecordDiscoveryFeedbackRequest, SaveDiscoveryInspirationResult, ScanDiscoveryRequest,
+        DiscoveryMatchView, DiscoveryOpportunityStatus, DiscoveryOpportunityView,
+        DiscoveryScanResult, DiscoverySourceView, RecordDiscoveryFeedbackRequest,
+        SaveDiscoveryInspirationResult, ScanDiscoveryRequest,
     },
     error::{ServiceResult, WorkLoreError},
     services::{
@@ -83,9 +83,13 @@ pub async fn scan(
         .max_results
         .unwrap_or(DEFAULT_SEARCH_RESULTS)
         .clamp(5, 20);
-    let results =
-        brave_search_provider::search(&api_key, &external_query, request.freshness, requested_count)
-            .await?;
+    let results = brave_search_provider::search(
+        &api_key,
+        &external_query,
+        request.freshness,
+        requested_count,
+    )
+    .await?;
 
     let connection = open_connection(vault_path)?;
     let themes = load_theme_signals(&connection)?;
@@ -137,11 +141,7 @@ pub async fn scan(
     )?;
 
     for (rank_position, opportunity) in ranked.iter().enumerate() {
-        persist_opportunity(
-            &connection,
-            opportunity,
-            rank_position,
-        )?;
+        persist_opportunity(&connection, opportunity, rank_position)?;
     }
 
     let opportunities = ranked.into_iter().map(|item| item.view).collect();
@@ -298,7 +298,12 @@ pub fn develop_topic(
             _ => None,
         };
         if let Some(relation) = relation {
-            topic_service::add_topic_relationship(vault_path, &topic.topic_id, relation, &item.record_id)?;
+            topic_service::add_topic_relationship(
+                vault_path,
+                &topic.topic_id,
+                relation,
+                &item.record_id,
+            )?;
         }
     }
 
@@ -399,8 +404,9 @@ fn ensure_inspiration(vault_path: &Path, opportunity_id: &str) -> ServiceResult<
         "{}\n\n{}\n\n{}",
         primary_source.title, primary_source.description, primary_source.url
     );
-    let byte_size = i64::try_from(captured_text.len())
-        .map_err(|_| WorkLoreError::InvalidVault("Discovery source text is too large.".to_string()))?;
+    let byte_size = i64::try_from(captured_text.len()).map_err(|_| {
+        WorkLoreError::InvalidVault("Discovery source text is too large.".to_string())
+    })?;
     let content_hash = hex::encode(Sha256::digest(captured_text.as_bytes()));
     let extraction = json!({
         "status": "complete",
@@ -579,7 +585,8 @@ fn qualify_cluster(
     } else if let Some(age) = sources.first().and_then(|source| source.age.as_deref()) {
         format!("A current source surfaced this discussion ({age}).")
     } else {
-        "A current source surfaced this discussion within the selected freshness window.".to_string()
+        "A current source surfaced this discussion within the selected freshness window."
+            .to_string()
     };
 
     let possible_angle = if let Some(item) = standing_matches.first() {
@@ -620,7 +627,8 @@ fn qualify_cluster(
         ));
     }
     if negative > positive {
-        concerns.push("Prior discovery feedback suggests this may be a poor personal fit.".to_string());
+        concerns
+            .push("Prior discovery feedback suggests this may be a poor personal fit.".to_string());
     }
 
     let view = DiscoveryOpportunityView {
@@ -654,9 +662,27 @@ fn compare_ranked(left: &RankedOpportunity, right: &RankedOpportunity) -> Orderi
     right
         .feedback_bias
         .cmp(&left.feedback_bias)
-        .then_with(|| right.view.standing_matches.len().cmp(&left.view.standing_matches.len()))
-        .then_with(|| right.view.theme_matches.len().cmp(&left.view.theme_matches.len()))
-        .then_with(|| right.view.audience_matches.len().cmp(&left.view.audience_matches.len()))
+        .then_with(|| {
+            right
+                .view
+                .standing_matches
+                .len()
+                .cmp(&left.view.standing_matches.len())
+        })
+        .then_with(|| {
+            right
+                .view
+                .theme_matches
+                .len()
+                .cmp(&left.view.theme_matches.len())
+        })
+        .then_with(|| {
+            right
+                .view
+                .audience_matches
+                .len()
+                .cmp(&left.view.audience_matches.len())
+        })
         .then_with(|| left.recent_overlap.cmp(&right.recent_overlap))
         .then_with(|| right.view.sources.len().cmp(&left.view.sources.len()))
         .then_with(|| left.provider_position.cmp(&right.provider_position))
@@ -749,10 +775,7 @@ fn load_opportunity(
         concerns: serde_json::from_str(&raw.10)?,
         feedback_adjustment: raw.11,
         status: DiscoveryOpportunityStatus::parse(&raw.12).ok_or_else(|| {
-            WorkLoreError::InvalidVault(format!(
-                "Unknown discovery opportunity status {}.",
-                raw.12
-            ))
+            WorkLoreError::InvalidVault(format!("Unknown discovery opportunity status {}.", raw.12))
         })?,
         topic_id: raw.13,
         inspiration_id: raw.14,

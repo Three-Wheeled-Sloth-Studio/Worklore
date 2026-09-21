@@ -167,7 +167,7 @@ source_catalog:
       - validate_requested_model
       parser: rust-pattern
       dependency_targets:
-      - &id005
+      - &id001
         path: src-tauri/src/services/post_generation_service.rs
         symbol: build_user_prompt
       - path: src-tauri/src/commands/posts.rs
@@ -178,18 +178,6 @@ source_catalog:
         symbol: link_supporting_material
       - path: src-tauri/src/services/topic_service.rs
         symbol: load_topic
-      - &id001
-        path: src-tauri/src/services/ollama_provider.rs
-        symbol: provider_error
-      - &id002
-        path: src-tauri/src/services/openai_compatible_provider.rs
-        symbol: provider_error
-      - &id003
-        path: src-tauri/src/services/post_generation_service.rs
-        symbol: provider_error
-      - &id004
-        path: src-tauri/src/services/voice_analysis_service.rs
-        symbol: provider_error
       - path: src-tauri/src/services/provider_registry.rs
         symbol: require_selected_provider
       - path: src-tauri/src/services/post_generation_service.rs
@@ -202,10 +190,10 @@ source_catalog:
         symbol: run_structured
       - path: src-tauri/src/services/provider_registry.rs
         symbol: run_structured
-      - &id006
+      - &id002
         path: src-tauri/src/services/post_generation_service.rs
         symbol: support_role
-      - &id008
+      - &id004
         path: src-tauri/src/services/post_generation_service.rs
         symbol: validate_generated_output
       - path: src-tauri/src/services/provider_registry.rs
@@ -275,13 +263,9 @@ source_catalog:
       - title.is_empty
       parser: rust-pattern
       dependency_targets:
-      - &id007
+      - &id003
         path: src-tauri/src/services/post_generation_service.rs
         symbol: cleanup_generated_text
-      - *id001
-      - *id002
-      - *id003
-      - *id004
     - name: cleanup_generated_text
       kind: function
       line_start: 260
@@ -408,7 +392,7 @@ source_catalog:
       - vault
       parser: rust-pattern
       dependency_targets:
-      - *id005
+      - *id001
       - path: src-tauri/src/commands/topics.rs
         symbol: create_topic
       - path: src-tauri/src/services/topic_service.rs
@@ -424,7 +408,7 @@ source_catalog:
       - support_role
       parser: rust-pattern
       dependency_targets:
-      - *id006
+      - *id002
     - name: provider_prose_cleanup_removes_markdown_and_nonstandard_punctuation
       kind: function
       line_start: 421
@@ -436,7 +420,7 @@ source_catalog:
       - cleanup_generated_text
       parser: rust-pattern
       dependency_targets:
-      - *id007
+      - *id003
     - name: structured_output_requires_substantive_bounded_draft
       kind: function
       line_start: 427
@@ -453,7 +437,7 @@ source_catalog:
       - validate_generated_output
       parser: rust-pattern
       dependency_targets:
-      - *id008
+      - *id004
   - path: src-tauri/src/services/provider_secret_service.rs
     analysis_version: 1
     language: rust
@@ -497,10 +481,10 @@ source_catalog:
       - try_from
       parser: rust-pattern
       dependency_targets:
-      - &id009
+      - &id005
         path: src-tauri/src/services/provider_secret_service.rs
         symbol: copy_and_free
-      - &id010
+      - &id006
         path: src-tauri/src/services/provider_secret_service.rs
         symbol: secret_error
     - name: unprotect_secret
@@ -527,8 +511,8 @@ source_catalog:
       - try_from
       parser: rust-pattern
       dependency_targets:
-      - *id009
-      - *id010
+      - *id005
+      - *id006
     - name: copy_and_free
       kind: function
       line_start: 122
@@ -547,7 +531,7 @@ source_catalog:
       - to_vec
       parser: rust-pattern
       dependency_targets:
-      - *id010
+      - *id006
     - name: windows_user_secret_round_trips_without_plaintext_storage
       kind: function
       line_start: 139
@@ -579,7 +563,7 @@ source_catalog:
       - secret_error
       parser: rust-pattern
       dependency_targets:
-      - *id010
+      - *id006
     - name: unprotect_secret
       kind: function
       line_start: 158
@@ -593,7 +577,7 @@ source_catalog:
       - secret_error
       parser: rust-pattern
       dependency_targets:
-      - *id010
+      - *id006
     - name: secret_error
       kind: function
       line_start: 167
@@ -664,7 +648,7 @@ source_catalog:
       - setSnapshot
       parser: typescript-pattern
       dependency_targets:
-      - &id011
+      - &id007
         path: src/domain/types.ts
         symbol: errorMessage
       - path: src/lib/feedbackApi.ts
@@ -695,21 +679,9 @@ source_catalog:
       dependency_targets:
       - path: src/components/InsightsWorkspace.tsx
         symbol: defaultPublicationTime
-      - *id011
+      - *id007
       - path: src/lib/feedbackApi.ts
         symbol: markPostPublished
-      - &id012
-        path: src/components/InsightsWorkspace.tsx
-        symbol: refresh
-      - &id013
-        path: src/components/StoryBankPanel.tsx
-        symbol: refresh
-      - &id014
-        path: src/components/TopicsWorkspace.tsx
-        symbol: refresh
-      - &id015
-        path: src/components/VoiceWorkspace.tsx
-        symbol: refresh
     - name: savePerformance
       kind: function
       line_start: 154
@@ -727,15 +699,11 @@ source_catalog:
       - setNotice
       parser: typescript-pattern
       dependency_targets:
-      - *id011
+      - *id007
       - path: src/components/InsightsWorkspace.tsx
         symbol: formToMetrics
       - path: src/lib/feedbackApi.ts
         symbol: recordPostPerformance
-      - *id012
-      - *id013
-      - *id014
-      - *id015
     - name: MetricField
       kind: function
       line_start: 346

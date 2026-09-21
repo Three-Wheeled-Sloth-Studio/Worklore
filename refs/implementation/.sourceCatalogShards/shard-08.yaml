@@ -4,6 +4,153 @@ source_catalog:
   format_version: 1
   bucket: 08
   files:
+  - path: src-tauri/src/services/brave_search_provider.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 36299025072486f35ae36d08e823a943cba02ae7
+    dependencies:
+    - "crate::{\n    domain::discovery::{DiscoveryFreshness, DiscoverySourceView},\n    error::{ServiceResult, WorkLoreError},\n\
+      }"
+    - serde::Deserialize
+    - super::*
+    provides:
+    - search
+    - is_http_url
+    - domain_from_url
+    - provider_error
+    - freshness_values_match_brave_contract
+    - only_http_sources_are_openable
+    - domain_extraction_is_display_only
+    symbols:
+    - name: search
+      kind: function
+      line_start: 33
+      line_end: 120
+      signature: 'search(api_key: &str, query: &str, freshness: DiscoveryFreshness, count: usize) -> ServiceResult<Vec<DiscoverySourceView>>'
+      inputs:
+      - 'api_key: &str'
+      - 'query: &str'
+      - 'freshness: DiscoveryFreshness'
+      - 'count: usize'
+      output: ServiceResult<Vec<DiscoverySourceView>>
+      dependencies:
+      - Err
+      - Ok
+      - api_key.trim
+      - await.map_err
+      - collect
+      - count
+      - count.clamp
+      - domain_from_url
+      - filter
+      - freshness.brave_value
+      - get
+      - header
+      - into_iter
+      - is_empty
+      - is_http_url
+      - map
+      - map_err
+      - new
+      - provider_error
+      - query
+      - query.chars
+      - query.is_empty
+      - query.to_string
+      - query.trim
+      parser: rust-pattern
+      dependency_targets:
+      - &id003
+        path: src-tauri/src/services/brave_search_provider.rs
+        symbol: domain_from_url
+      - &id001
+        path: src-tauri/src/domain/discovery.rs
+        symbol: brave_value
+      - &id002
+        path: src-tauri/src/services/brave_search_provider.rs
+        symbol: is_http_url
+    - name: is_http_url
+      kind: function
+      line_start: 121
+      line_end: 124
+      signature: 'is_http_url(url: &str) -> bool'
+      inputs:
+      - 'url: &str'
+      output: bool
+      dependencies:
+      - url.starts_with
+      parser: rust-pattern
+      dependency_targets: []
+    - name: domain_from_url
+      kind: function
+      line_start: 125
+      line_end: 135
+      signature: 'domain_from_url(url: &str) -> String'
+      inputs:
+      - 'url: &str'
+      output: String
+      dependencies:
+      - map
+      - next
+      - split
+      - to_string
+      - trim_start_matches
+      - unwrap_or
+      - url.split_once
+      parser: rust-pattern
+      dependency_targets: []
+    - name: provider_error
+      kind: function
+      line_start: 136
+      line_end: 142
+      signature: 'provider_error(code: &''static str, message: impl Into<String>) -> WorkLoreError'
+      inputs:
+      - 'code: &''static str'
+      - 'message: impl Into<String>'
+      output: WorkLoreError
+      dependencies:
+      - message.into
+      parser: rust-pattern
+      dependency_targets: []
+    - name: freshness_values_match_brave_contract
+      kind: function
+      line_start: 149
+      line_end: 153
+      signature: freshness_values_match_brave_contract()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Day.brave_value
+      - Month.brave_value
+      - Week.brave_value
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+    - name: only_http_sources_are_openable
+      kind: function
+      line_start: 156
+      line_end: 161
+      signature: only_http_sources_are_openable()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - alert
+      - is_http_url
+      parser: rust-pattern
+      dependency_targets:
+      - *id002
+    - name: domain_extraction_is_display_only
+      kind: function
+      line_start: 164
+      line_end: 170
+      signature: domain_extraction_is_display_only()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - domain_from_url
+      parser: rust-pattern
+      dependency_targets:
+      - *id003
   - path: src-tauri/src/services/contextual_entity_scan.rs
     analysis_version: 1
     language: rust
@@ -80,7 +227,7 @@ source_catalog:
         symbol: add_occurrence
       - path: src-tauri/src/services/contextual_entity_scan.rs
         symbol: create_provisional_project
-      - &id005
+      - &id008
         path: src-tauri/src/services/contextual_entity_scan.rs
         symbol: detect_named_projects
       - path: src-tauri/src/services/contextual_entity_scan.rs
@@ -121,16 +268,16 @@ source_catalog:
         symbol: is_plausible_project_name
       - path: src-tauri/src/services/performance_service.rs
         symbol: start
-      - &id001
+      - &id004
         path: src-tauri/src/services/contextual_entity_scan.rs
         symbol: normalize
-      - &id002
+      - &id005
         path: src-tauri/src/services/entity_scan.rs
         symbol: normalize
-      - &id003
+      - &id006
         path: src-tauri/src/services/role_service.rs
         symbol: normalize
-      - &id004
+      - &id007
         path: src-tauri/src/services/story_service.rs
         symbol: normalize
     - name: is_plausible_project_name
@@ -186,7 +333,7 @@ source_catalog:
       - unwrap_or
       parser: rust-pattern
       dependency_targets:
-      - &id006
+      - &id009
         path: src-tauri/src/services/contextual_entity_scan.rs
         symbol: meaningful_tokens
     - name: meaningful_tokens
@@ -287,10 +434,10 @@ source_catalog:
       - position
       parser: rust-pattern
       dependency_targets:
-      - *id001
-      - *id002
-      - *id003
       - *id004
+      - *id005
+      - *id006
+      - *id007
     - name: occurrence_already_exists
       kind: function
       line_start: 394
@@ -362,7 +509,7 @@ source_catalog:
       - detections.len
       parser: rust-pattern
       dependency_targets:
-      - *id005
+      - *id008
     - name: does_not_treat_role_and_skill_words_as_project_names
       kind: function
       line_start: 445
@@ -375,7 +522,7 @@ source_catalog:
       - is_empty
       parser: rust-pattern
       dependency_targets:
-      - *id005
+      - *id008
     - name: loose_built_and_product_cues_do_not_create_entities
       kind: function
       line_start: 451
@@ -388,7 +535,7 @@ source_catalog:
       - is_empty
       parser: rust-pattern
       dependency_targets:
-      - *id005
+      - *id008
     - name: explicit_named_tool_is_detected
       kind: function
       line_start: 457
@@ -401,7 +548,7 @@ source_catalog:
       - detections.len
       parser: rust-pattern
       dependency_targets:
-      - *id005
+      - *id008
     - name: lexical_candidate_score_requires_real_overlap
       kind: function
       line_start: 465
@@ -414,7 +561,7 @@ source_catalog:
       - tokens.contains
       parser: rust-pattern
       dependency_targets:
-      - *id006
+      - *id009
   - path: src/voiceWorkspaceQueue.test.ts
     analysis_version: 1
     language: typescript

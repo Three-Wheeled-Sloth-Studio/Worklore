@@ -608,7 +608,7 @@ source_catalog:
       parser: rust-pattern
       dependency_targets:
       - *id010
-      - &id032
+      - &id028
         path: src-tauri/src/io_utils.rs
         symbol: write_json_atomic
     - name: ensure_vault
@@ -790,19 +790,7 @@ source_catalog:
       - Ok
       - provider_error
       parser: rust-pattern
-      dependency_targets:
-      - &id011
-        path: src-tauri/src/services/ollama_provider.rs
-        symbol: provider_error
-      - &id012
-        path: src-tauri/src/services/openai_compatible_provider.rs
-        symbol: provider_error
-      - &id013
-        path: src-tauri/src/services/post_generation_service.rs
-        symbol: provider_error
-      - &id014
-        path: src-tauri/src/services/voice_analysis_service.rs
-        symbol: provider_error
+      dependency_targets: []
     - name: provider_label
       kind: function
       line_start: 53
@@ -850,38 +838,34 @@ source_catalog:
       - response.json
       parser: rust-pattern
       dependency_targets:
+      - &id011
+        path: src-tauri/src/services/ollama_provider.rs
+        symbol: client
+      - &id012
+        path: src-tauri/src/services/openai_compatible_provider.rs
+        symbol: client
+      - &id013
+        path: src-tauri/src/services/ollama_provider.rs
+        symbol: map_status
+      - &id014
+        path: src-tauri/src/services/openai_compatible_provider.rs
+        symbol: map_status
       - &id015
         path: src-tauri/src/services/ollama_provider.rs
-        symbol: client
+        symbol: map_transport_error
       - &id016
         path: src-tauri/src/services/openai_compatible_provider.rs
-        symbol: client
+        symbol: map_transport_error
       - &id017
-        path: src-tauri/src/services/ollama_provider.rs
-        symbol: map_status
-      - &id018
-        path: src-tauri/src/services/openai_compatible_provider.rs
-        symbol: map_status
-      - &id019
-        path: src-tauri/src/services/ollama_provider.rs
-        symbol: map_transport_error
-      - &id020
-        path: src-tauri/src/services/openai_compatible_provider.rs
-        symbol: map_transport_error
-      - &id021
         path: src-tauri/src/services/openai_compatible_provider.rs
         symbol: provider_base_url
-      - *id011
-      - *id012
-      - *id013
-      - *id014
-      - &id022
+      - &id018
         path: src-tauri/src/services/openai_compatible_provider.rs
         symbol: provider_label
-      - &id023
+      - &id019
         path: src-tauri/src/services/openai_compatible_provider.rs
         symbol: require_api_key
-      - &id024
+      - &id020
         path: src-tauri/src/services/provider_registry.rs
         symbol: require_api_key
     - name: run_structured
@@ -921,20 +905,16 @@ source_catalog:
       - response.json
       parser: rust-pattern
       dependency_targets:
+      - *id011
+      - *id012
+      - *id013
+      - *id014
       - *id015
       - *id016
       - *id017
       - *id018
       - *id019
       - *id020
-      - *id021
-      - *id011
-      - *id012
-      - *id013
-      - *id014
-      - *id022
-      - *id023
-      - *id024
     - name: schema_for_provider
       kind: function
       line_start: 181
@@ -980,11 +960,7 @@ source_catalog:
       - api_key.trim
       - provider_error
       parser: rust-pattern
-      dependency_targets:
-      - *id011
-      - *id012
-      - *id013
-      - *id014
+      dependency_targets: []
     - name: client
       kind: function
       line_start: 219
@@ -1001,11 +977,7 @@ source_catalog:
       - provider_error
       - timeout
       parser: rust-pattern
-      dependency_targets:
-      - *id011
-      - *id012
-      - *id013
-      - *id014
+      dependency_targets: []
     - name: map_transport_error
       kind: function
       line_start: 227
@@ -1022,11 +994,7 @@ source_catalog:
       - provider_label
       parser: rust-pattern
       dependency_targets:
-      - *id011
-      - *id012
-      - *id013
-      - *id014
-      - *id022
+      - *id018
     - name: map_status
       kind: function
       line_start: 249
@@ -1043,11 +1011,7 @@ source_catalog:
       - status.as_u16
       parser: rust-pattern
       dependency_targets:
-      - *id011
-      - *id012
-      - *id013
-      - *id014
-      - *id022
+      - *id018
     - name: provider_error
       kind: function
       line_start: 280
@@ -1074,7 +1038,7 @@ source_catalog:
       - unwrap
       parser: rust-pattern
       dependency_targets:
-      - *id021
+      - *id017
     - name: gemini_schema_removes_keywords_outside_its_compatibility_subset
       kind: function
       line_start: 306
@@ -1102,8 +1066,8 @@ source_catalog:
       - map_status
       parser: rust-pattern
       dependency_targets:
-      - *id017
-      - *id018
+      - *id013
+      - *id014
   - path: src-tauri/src/services/performance_service.rs
     analysis_version: 1
     language: rust
@@ -1161,10 +1125,10 @@ source_catalog:
       - write_active
       parser: rust-pattern
       dependency_targets:
-      - &id027
+      - &id023
         path: src-tauri/src/services/performance_service.rs
         symbol: ensure_directories
-      - &id025
+      - &id021
         path: src-tauri/src/services/performance_service.rs
         symbol: write_active
     - name: set_phase
@@ -1185,10 +1149,10 @@ source_catalog:
       - write_active
       parser: rust-pattern
       dependency_targets:
-      - &id026
+      - &id022
         path: src-tauri/src/services/performance_service.rs
         symbol: duration_ms
-      - *id025
+      - *id021
     - name: finish
       kind: function
       line_start: 99
@@ -1219,11 +1183,11 @@ source_catalog:
       - to_string
       parser: rust-pattern
       dependency_targets:
-      - &id028
+      - &id024
         path: src-tauri/src/services/performance_service.rs
         symbol: append_metric
-      - *id026
-      - &id030
+      - *id022
+      - &id026
         path: src-tauri/src/services/performance_service.rs
         symbol: remove_active
     - name: snapshot
@@ -1244,13 +1208,13 @@ source_catalog:
       - refresh_elapsed_times
       parser: rust-pattern
       dependency_targets:
-      - *id027
-      - &id029
+      - *id023
+      - &id025
         path: src-tauri/src/services/performance_service.rs
         symbol: list_active
       - path: src-tauri/src/services/performance_service.rs
         symbol: list_recent_metrics
-      - &id034
+      - &id030
         path: src-tauri/src/services/performance_service.rs
         symbol: refresh_elapsed_times
     - name: recover_interrupted
@@ -1282,10 +1246,10 @@ source_catalog:
       - value.with_timezone
       parser: rust-pattern
       dependency_targets:
-      - *id028
-      - *id027
-      - *id029
-      - *id030
+      - *id024
+      - *id023
+      - *id025
+      - *id026
     - name: refresh_elapsed_times
       kind: function
       line_start: 189
@@ -1319,7 +1283,7 @@ source_catalog:
       - metrics_root
       parser: rust-pattern
       dependency_targets:
-      - &id031
+      - &id027
         path: src-tauri/src/services/performance_service.rs
         symbol: metrics_root
     - name: metrics_root
@@ -1348,7 +1312,7 @@ source_catalog:
       - metrics_root
       parser: rust-pattern
       dependency_targets:
-      - *id031
+      - *id027
     - name: write_active
       kind: function
       line_start: 216
@@ -1363,10 +1327,10 @@ source_catalog:
       - write_json_atomic
       parser: rust-pattern
       dependency_targets:
-      - &id033
+      - &id029
         path: src-tauri/src/services/performance_service.rs
         symbol: active_path
-      - *id032
+      - *id028
     - name: remove_active
       kind: function
       line_start: 220
@@ -1383,7 +1347,7 @@ source_catalog:
       - remove_file
       parser: rust-pattern
       dependency_targets:
-      - *id033
+      - *id029
     - name: append_metric
       kind: function
       line_start: 228
@@ -1409,8 +1373,8 @@ source_catalog:
       dependency_targets:
       - path: src-tauri/src/services/confidentiality_service.rs
         symbol: create
+      - *id023
       - *id027
-      - *id031
     - name: list_active
       kind: function
       line_start: 238
@@ -1439,7 +1403,7 @@ source_catalog:
       - value.to_str
       parser: rust-pattern
       dependency_targets:
-      - *id031
+      - *id027
       - *id010
     - name: list_recent_metrics
       kind: function
@@ -1465,7 +1429,7 @@ source_catalog:
       - path.is_file
       parser: rust-pattern
       dependency_targets:
-      - *id031
+      - *id027
     - name: duration_ms
       kind: function
       line_start: 275
@@ -1495,7 +1459,7 @@ source_catalog:
       - from_millis
       parser: rust-pattern
       dependency_targets:
-      - *id026
+      - *id022
     - name: metric_limit_is_bounded_by_snapshot_caller
       kind: function
       line_start: 290
@@ -1524,7 +1488,7 @@ source_catalog:
       - to_string
       parser: rust-pattern
       dependency_targets:
-      - *id034
+      - *id030
   - path: src-tauri/src/services/voice_evidence_service.rs
     analysis_version: 1
     language: rust
@@ -1700,19 +1664,19 @@ source_catalog:
       - with_capacity
       parser: rust-pattern
       dependency_targets:
-      - &id035
+      - &id031
         path: src-tauri/src/services/canonical_store.rs
         symbol: initialize
-      - &id036
+      - &id032
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: is_target_context_source
-      - &id037
+      - &id033
         path: src-tauri/src/services/target_context_service.rs
         symbol: load_source_text
-      - &id038
+      - &id034
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: load_source_text
-      - &id044
+      - &id040
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: preview
     - name: load_eligible_voice_evidence_material
@@ -1747,7 +1711,7 @@ source_catalog:
       - with_capacity
       parser: rust-pattern
       dependency_targets:
-      - *id035
+      - *id031
     - name: create_voice_evidence_from_source
       kind: function
       line_start: 304
@@ -1784,29 +1748,29 @@ source_catalog:
       - to_string
       parser: rust-pattern
       dependency_targets:
-      - &id040
+      - &id036
         path: src-tauri/src/services/edit_learning_service.rs
         symbol: audit_tx
-      - &id041
+      - &id037
         path: src-tauri/src/services/post_lineage_service.rs
         symbol: audit_tx
-      - &id042
+      - &id038
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: audit_tx
-      - &id043
+      - &id039
         path: src-tauri/src/services/voice_profile_service.rs
         symbol: audit_tx
       - path: src-tauri/src/services/voice_evidence_service.rs
         symbol: hash_text
-      - *id035
-      - *id036
-      - &id039
+      - *id031
+      - *id032
+      - &id035
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: load_from_connection
       - path: src-tauri/src/services/voice_evidence_service.rs
         symbol: load_source
-      - *id037
-      - *id038
+      - *id033
+      - *id034
     - name: load_voice_evidence
       kind: function
       line_start: 397
@@ -1822,8 +1786,8 @@ source_catalog:
       - open_connection
       parser: rust-pattern
       dependency_targets:
+      - *id031
       - *id035
-      - *id039
     - name: list_voice_evidence
       kind: function
       line_start: 406
@@ -1843,8 +1807,8 @@ source_catalog:
       - query_map
       parser: rust-pattern
       dependency_targets:
+      - *id031
       - *id035
-      - *id039
     - name: review_voice_evidence
       kind: function
       line_start: 420
@@ -1881,16 +1845,16 @@ source_catalog:
       - to_rfc3339
       parser: rust-pattern
       dependency_targets:
-      - *id040
-      - *id041
-      - *id042
-      - *id043
+      - *id036
+      - *id037
+      - *id038
+      - *id039
       - path: src-tauri/src/services/voice_evidence_service.rs
         symbol: is_eligible_authorship
       - path: src-tauri/src/services/voice_evidence_service.rs
         symbol: is_permanently_prohibited
+      - *id031
       - *id035
-      - *id039
     - name: load_from_connection
       kind: function
       line_start: 551
@@ -1910,7 +1874,7 @@ source_catalog:
       - voice_evidence_not_found
       parser: rust-pattern
       dependency_targets:
-      - *id044
+      - *id040
       - path: src-tauri/src/services/voice_evidence_service.rs
         symbol: voice_evidence_not_found
     - name: load_source
@@ -2128,32 +2092,32 @@ source_catalog:
       - writing_source
       parser: rust-pattern
       dependency_targets:
-      - &id045
+      - &id041
         path: src-tauri/src/commands/voice.rs
         symbol: create_voice_evidence_from_source
-      - &id046
+      - &id042
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: create_voice_evidence_from_source
-      - &id055
+      - &id051
         path: src-tauri/src/services/confidentiality_service.rs
         symbol: drop
-      - *id035
-      - &id053
+      - *id031
+      - &id049
         path: src-tauri/src/commands/voice.rs
         symbol: list_voice_source_candidates
-      - &id054
+      - &id050
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: list_voice_source_candidates
-      - &id047
+      - &id043
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: load_voice_evidence
-      - &id048
+      - &id044
         path: src-tauri/src/commands/voice.rs
         symbol: review_voice_evidence
-      - &id049
+      - &id045
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: review_voice_evidence
-      - &id050
+      - &id046
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: writing_source
     - name: raw_model_origin_is_rejected_and_cannot_be_rewritten_as_user_authored
@@ -2176,12 +2140,12 @@ source_catalog:
       - writing_source
       parser: rust-pattern
       dependency_targets:
+      - *id041
+      - *id042
+      - *id043
+      - *id044
       - *id045
       - *id046
-      - *id047
-      - *id048
-      - *id049
-      - *id050
     - name: inspiration_link_does_not_silently_make_writing_voice_evidence
       kind: function
       line_start: 830
@@ -2198,15 +2162,15 @@ source_catalog:
       - writing_source
       parser: rust-pattern
       dependency_targets:
-      - &id051
+      - &id047
         path: src-tauri/src/commands/capture.rs
         symbol: classify_capture_source
-      - &id052
+      - &id048
         path: src-tauri/src/services/capture_service.rs
         symbol: classify_capture_source
-      - *id045
+      - *id041
+      - *id042
       - *id046
-      - *id050
     - name: target_context_source_is_blocked_from_voice_evidence
       kind: function
       line_start: 852
@@ -2227,13 +2191,13 @@ source_catalog:
       - writing_source
       parser: rust-pattern
       dependency_targets:
-      - *id051
-      - *id052
-      - *id045
-      - *id046
-      - *id053
-      - *id054
+      - *id047
+      - *id048
+      - *id041
+      - *id042
+      - *id049
       - *id050
+      - *id046
     - name: retiring_eligibility_preserves_source_and_records_revisioned_audit
       kind: function
       line_start: 875
@@ -2258,12 +2222,12 @@ source_catalog:
       - writing_source
       parser: rust-pattern
       dependency_targets:
+      - *id041
+      - *id042
+      - *id051
+      - *id044
       - *id045
       - *id046
-      - *id055
-      - *id048
-      - *id049
-      - *id050
   - path: src/components/HelpLauncher.tsx
     analysis_version: 1
     language: typescript

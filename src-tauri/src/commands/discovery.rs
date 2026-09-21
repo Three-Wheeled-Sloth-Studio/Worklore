@@ -72,12 +72,9 @@ pub fn open_discovery_source(
     opportunity_id: String,
     url: String,
 ) -> CommandResult<()> {
-    let approved = discovery_service::validate_source_url(
-        &PathBuf::from(vault_path),
-        &opportunity_id,
-        &url,
-    )
-    .map_err(CommandError::from)?;
+    let approved =
+        discovery_service::validate_source_url(&PathBuf::from(vault_path), &opportunity_id, &url)
+            .map_err(CommandError::from)?;
     external::open_system_browser(&approved).map_err(|message| CommandError {
         code: "external_link_failed".to_string(),
         message,

@@ -1585,18 +1585,6 @@ source_catalog:
       parser: typescript-pattern
       dependency_targets:
       - *id018
-      - &id024
-        path: src/components/InsightsWorkspace.tsx
-        symbol: refresh
-      - &id025
-        path: src/components/StoryBankPanel.tsx
-        symbol: refresh
-      - &id026
-        path: src/components/TopicsWorkspace.tsx
-        symbol: refresh
-      - &id027
-        path: src/components/VoiceWorkspace.tsx
-        symbol: refresh
       - *id023
     - name: acceptWritingRuleProposal
       kind: function
@@ -1617,14 +1605,10 @@ source_catalog:
       - setNotice
       parser: typescript-pattern
       dependency_targets:
-      - &id028
+      - &id024
         path: src/lib/workloreApi.ts
         symbol: createWritingRule
       - *id018
-      - *id024
-      - *id025
-      - *id026
-      - *id027
     - name: discardVoiceProposal
       kind: function
       line_start: 390
@@ -1759,7 +1743,7 @@ source_catalog:
       - setRuleName
       parser: typescript-pattern
       dependency_targets:
-      - *id028
+      - *id024
       - *id022
     - name: setRuleStatus
       kind: function
@@ -1802,6 +1786,13 @@ source_catalog:
         symbol: review
       - path: src/voiceEvidencePolicy.ts
         symbol: voiceEligibilityReasonLabel
+  - path: src/domain/discovery.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: 560c6a01066aa34017062971438d0bd0571d1c7e
+    dependencies: []
+    provides: []
+    symbols: []
   - path: src/domain/posts.ts
     analysis_version: 1
     language: typescript

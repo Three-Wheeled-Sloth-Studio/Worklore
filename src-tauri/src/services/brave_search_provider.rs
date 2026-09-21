@@ -162,7 +162,10 @@ mod tests {
 
     #[test]
     fn domain_extraction_is_display_only() {
-        assert_eq!(domain_from_url("https://www.example.com/path"), "example.com");
+        assert_eq!(
+            domain_from_url("https://www.example.com/path"),
+            "example.com"
+        );
         assert_eq!(domain_from_url("http://sub.example.com"), "sub.example.com");
     }
 }

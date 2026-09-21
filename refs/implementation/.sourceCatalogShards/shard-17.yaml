@@ -4,6 +4,88 @@ source_catalog:
   format_version: 1
   bucket: '17'
   files:
+  - path: src-tauri/src/domain/discovery.rs
+    analysis_version: 1
+    language: rust
+    content_hash: b3adb437585162722f2f0202ddabe4f2555b82a7
+    dependencies:
+    - serde::{Deserialize, Serialize}
+    provides:
+    - as_str
+    - parse
+    - brave_value
+    - as_str
+    - parse
+    - as_str
+    symbols:
+    - name: as_str
+      kind: function
+      line_start: 12
+      line_end: 18
+      signature: as_str(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: parse
+      kind: function
+      line_start: 19
+      line_end: 27
+      signature: 'parse(value: &str) -> Option<Self>'
+      inputs:
+      - 'value: &str'
+      output: Option<Self>
+      dependencies:
+      - Some
+      parser: rust-pattern
+      dependency_targets: []
+    - name: brave_value
+      kind: function
+      line_start: 28
+      line_end: 35
+      signature: brave_value(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: as_str
+      kind: function
+      line_start: 48
+      line_end: 55
+      signature: as_str(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: parse
+      kind: function
+      line_start: 56
+      line_end: 65
+      signature: 'parse(value: &str) -> Option<Self>'
+      inputs:
+      - 'value: &str'
+      output: Option<Self>
+      dependencies:
+      - Some
+      parser: rust-pattern
+      dependency_targets: []
+    - name: as_str
+      kind: function
+      line_start: 77
+      line_end: 83
+      signature: as_str(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
   - path: src-tauri/src/services/privacy_scan_migration.rs
     analysis_version: 1
     language: rust

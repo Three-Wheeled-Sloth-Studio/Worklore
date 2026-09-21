@@ -286,7 +286,7 @@ source_catalog:
   - path: src-tauri/src/services/topic_service.rs
     analysis_version: 1
     language: rust
-    content_hash: 5645dff6bbd42bd3d5a17f20be6d54d4c3ccd7f4
+    content_hash: ce3fa18a929294c1998941772cc179e4d85ee44d
     dependencies:
     - chrono::Utc
     - "crate::{\n        domain::models::SourceType,\n        services::{capture_service, vault_service},\n    }"
@@ -487,33 +487,24 @@ source_catalog:
       parser: rust-pattern
       dependency_targets:
       - &id006
-        path: src-tauri/src/services/inspiration_service.rs
+        path: src-tauri/src/services/discovery_service.rs
         symbol: audit
       - &id007
-        path: src-tauri/src/services/target_context_service.rs
+        path: src-tauri/src/services/inspiration_service.rs
         symbol: audit
       - &id008
+        path: src-tauri/src/services/target_context_service.rs
+        symbol: audit
+      - &id009
         path: src-tauri/src/services/topic_service.rs
         symbol: audit
       - &id004
         path: src-tauri/src/services/canonical_store.rs
         symbol: initialize
-      - &id009
+      - &id010
         path: src-tauri/src/services/topic_service.rs
         symbol: load_topic
-      - &id010
-        path: src-tauri/src/services/inspiration_service.rs
-        symbol: required_text
       - &id011
-        path: src-tauri/src/services/target_context_service.rs
-        symbol: required_text
-      - &id012
-        path: src-tauri/src/services/topic_service.rs
-        symbol: required_text
-      - &id013
-        path: src-tauri/src/services/voice_profile_service.rs
-        symbol: required_text
-      - &id014
         path: src-tauri/src/services/topic_service.rs
         symbol: timing_fields
     - name: load_topic
@@ -592,15 +583,12 @@ source_catalog:
       - *id006
       - *id007
       - *id008
-      - *id004
       - *id009
-      - *id005
+      - *id004
       - *id010
+      - *id005
       - *id011
-      - *id012
-      - *id013
-      - *id014
-      - &id022
+      - &id019
         path: src-tauri/src/services/topic_service.rs
         symbol: topic_not_found
     - name: create_theme
@@ -631,14 +619,11 @@ source_catalog:
       - *id006
       - *id007
       - *id008
+      - *id009
       - *id004
-      - &id015
+      - &id012
         path: src-tauri/src/services/topic_service.rs
         symbol: load_theme
-      - *id010
-      - *id011
-      - *id012
-      - *id013
     - name: load_theme
       kind: function
       line_start: 400
@@ -655,7 +640,7 @@ source_catalog:
       parser: rust-pattern
       dependency_targets:
       - *id004
-      - &id016
+      - &id013
         path: src-tauri/src/services/topic_service.rs
         symbol: load_theme_from_connection
     - name: list_themes
@@ -710,14 +695,11 @@ source_catalog:
       - *id006
       - *id007
       - *id008
+      - *id009
       - *id004
-      - *id015
-      - *id016
-      - *id010
-      - *id011
       - *id012
       - *id013
-      - &id023
+      - &id020
         path: src-tauri/src/services/topic_service.rs
         symbol: theme_not_found
     - name: add_topic_relationship
@@ -760,26 +742,27 @@ source_catalog:
       - *id006
       - *id007
       - *id008
-      - &id017
+      - *id009
+      - &id014
         path: src-tauri/src/services/topic_service.rs
         symbol: ensure_topic_exists
       - *id004
-      - &id024
+      - &id021
         path: src-tauri/src/services/topic_service.rs
         symbol: lookup_target
-      - &id025
+      - &id022
         path: src-tauri/src/services/topic_service.rs
         symbol: category
-      - &id018
+      - &id015
         path: src-tauri/src/domain/posts.rs
         symbol: relationship_type
-      - &id019
+      - &id016
         path: src-tauri/src/services/capture_service.rs
         symbol: relationship_type
-      - &id020
+      - &id017
         path: src-tauri/src/services/inspiration_service.rs
         symbol: relationship_type
-      - &id021
+      - &id018
         path: src-tauri/src/services/topic_service.rs
         symbol: relationship_type
     - name: remove_topic_relationship
@@ -814,12 +797,13 @@ source_catalog:
       - *id006
       - *id007
       - *id008
-      - *id017
+      - *id009
+      - *id014
       - *id004
+      - *id015
+      - *id016
+      - *id017
       - *id018
-      - *id019
-      - *id020
-      - *id021
     - name: list_topic_link_targets
       kind: function
       line_start: 568
@@ -864,7 +848,7 @@ source_catalog:
         symbol: load_relationships
       - path: src-tauri/src/services/topic_service.rs
         symbol: load_relationships
-      - *id022
+      - *id019
     - name: load_theme_from_connection
       kind: function
       line_start: 645
@@ -883,7 +867,7 @@ source_catalog:
       - theme_not_found
       parser: rust-pattern
       dependency_targets:
-      - *id023
+      - *id020
     - name: load_relationships
       kind: function
       line_start: 684
@@ -911,8 +895,8 @@ source_catalog:
       dependency_targets:
       - path: src-tauri/src/services/topic_service.rs
         symbol: from_relationship_type
-      - *id024
-      - *id025
+      - *id021
+      - *id022
     - name: lookup_target
       kind: function
       line_start: 730
@@ -948,7 +932,7 @@ source_catalog:
       - topic_not_found
       parser: rust-pattern
       dependency_targets:
-      - *id022
+      - *id019
     - name: open_connection
       kind: function
       line_start: 768
@@ -1100,16 +1084,16 @@ source_catalog:
       - unwrap
       parser: rust-pattern
       dependency_targets:
-      - &id026
+      - &id023
         path: src-tauri/src/commands/capture.rs
         symbol: classify_capture_source
-      - &id027
+      - &id024
         path: src-tauri/src/services/capture_service.rs
         symbol: classify_capture_source
-      - &id028
+      - &id025
         path: src-tauri/src/commands/capture.rs
         symbol: create_capture_source
-      - &id029
+      - &id026
         path: src-tauri/src/services/capture_service.rs
         symbol: create_capture_source
     - name: capture_proof
@@ -1127,10 +1111,10 @@ source_catalog:
       - unwrap
       parser: rust-pattern
       dependency_targets:
+      - *id023
+      - *id024
+      - *id025
       - *id026
-      - *id027
-      - *id028
-      - *id029
     - name: captured_topic_survives_reopen_and_timing_updates_preserve_identity
       kind: function
       line_start: 879
@@ -1161,7 +1145,7 @@ source_catalog:
       - vault
       parser: rust-pattern
       dependency_targets:
-      - &id030
+      - &id027
         path: src-tauri/src/services/topic_service.rs
         symbol: capture_topic
       - path: src-tauri/src/services/canonical_store.rs
@@ -1170,7 +1154,7 @@ source_catalog:
         symbol: list_topics
       - path: src-tauri/src/services/topic_service.rs
         symbol: list_topics
-      - *id009
+      - *id010
       - path: src-tauri/src/services/canonical_store.rs
         symbol: schema_version
       - path: src-tauri/src/commands/topics.rs
@@ -1217,7 +1201,7 @@ source_catalog:
         symbol: add_topic_relationship
       - path: src-tauri/src/services/topic_service.rs
         symbol: capture_proof
-      - *id030
+      - *id027
       - path: src-tauri/src/services/canonical_store.rs
         symbol: create_inspiration
       - path: src-tauri/src/services/canonical_store.rs
@@ -1240,5 +1224,5 @@ source_catalog:
         symbol: list_topic_link_targets
       - path: src-tauri/src/services/canonical_store.rs
         symbol: load_story
-      - *id015
-      - *id009
+      - *id012
+      - *id010

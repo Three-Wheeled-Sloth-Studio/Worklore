@@ -4,6 +4,179 @@ source_catalog:
   format_version: 1
   bucket: 0a
   files:
+  - path: src-tauri/src/commands/discovery.rs
+    analysis_version: 1
+    language: rust
+    content_hash: ff5aa6ec55f9d50052e717c564241ce4b175c95a
+    dependencies:
+    - "crate::{\n    commands::external,\n    domain::discovery::{\n        DevelopDiscoveryTopicRequest, DevelopDiscoveryTopicResult,\
+      \ DiscoveryFeedbackView,\n        DiscoveryOpportunityView, DiscoveryScanResult, RecordDiscoveryFeedbackRequest,\n \
+      \       SaveDiscoveryInspirationResult, ScanDiscoveryRequest,\n    },\n    error::{CommandError, CommandResult},\n \
+      \   services::discovery_service,\n}"
+    - std::path::PathBuf
+    provides:
+    - scan_discovery
+    - list_discovery_opportunities
+    - record_discovery_feedback
+    - save_discovery_inspiration
+    - develop_discovery_topic
+    - dismiss_discovery_opportunity
+    - open_discovery_source
+    symbols:
+    - name: scan_discovery
+      kind: function
+      line_start: 15
+      line_end: 22
+      signature: 'scan_discovery(vault_path: String, request: ScanDiscoveryRequest) -> CommandResult<DiscoveryScanResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: ScanDiscoveryRequest'
+      output: CommandResult<DiscoveryScanResult>
+      dependencies:
+      - from
+      - map_err
+      - scan
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/domain/candidates.rs
+        symbol: from
+      - &id002
+        path: src-tauri/src/domain/models.rs
+        symbol: from
+      - &id003
+        path: src-tauri/src/error.rs
+        symbol: from
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: scan
+      - path: src/components/DiscoveryPanel.tsx
+        symbol: scan
+    - name: list_discovery_opportunities
+      kind: function
+      line_start: 25
+      line_end: 31
+      signature: 'list_discovery_opportunities(vault_path: String, limit: Option<usize>) -> CommandResult<Vec<DiscoveryOpportunityView>>'
+      inputs:
+      - 'vault_path: String'
+      - 'limit: Option<usize>'
+      output: CommandResult<Vec<DiscoveryOpportunityView>>
+      dependencies:
+      - from
+      - limit.unwrap_or
+      - list_opportunities
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: list_opportunities
+    - name: record_discovery_feedback
+      kind: function
+      line_start: 34
+      line_end: 40
+      signature: 'record_discovery_feedback(vault_path: String, request: RecordDiscoveryFeedbackRequest) -> CommandResult<DiscoveryFeedbackView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: RecordDiscoveryFeedbackRequest'
+      output: CommandResult<DiscoveryFeedbackView>
+      dependencies:
+      - from
+      - map_err
+      - record_feedback
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: record_feedback
+    - name: save_discovery_inspiration
+      kind: function
+      line_start: 43
+      line_end: 49
+      signature: 'save_discovery_inspiration(vault_path: String, opportunity_id: String) -> CommandResult<SaveDiscoveryInspirationResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'opportunity_id: String'
+      output: CommandResult<SaveDiscoveryInspirationResult>
+      dependencies:
+      - from
+      - map_err
+      - save_as_inspiration
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: save_as_inspiration
+    - name: develop_discovery_topic
+      kind: function
+      line_start: 52
+      line_end: 58
+      signature: 'develop_discovery_topic(vault_path: String, request: DevelopDiscoveryTopicRequest) -> CommandResult<DevelopDiscoveryTopicResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: DevelopDiscoveryTopicRequest'
+      output: CommandResult<DevelopDiscoveryTopicResult>
+      dependencies:
+      - develop_topic
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: develop_topic
+      - *id001
+      - *id002
+      - *id003
+    - name: dismiss_discovery_opportunity
+      kind: function
+      line_start: 61
+      line_end: 67
+      signature: 'dismiss_discovery_opportunity(vault_path: String, opportunity_id: String) -> CommandResult<DiscoveryOpportunityView>'
+      inputs:
+      - 'vault_path: String'
+      - 'opportunity_id: String'
+      output: CommandResult<DiscoveryOpportunityView>
+      dependencies:
+      - dismiss_opportunity
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: dismiss_opportunity
+      - *id001
+      - *id002
+      - *id003
+    - name: open_discovery_source
+      kind: function
+      line_start: 70
+      line_end: 83
+      signature: 'open_discovery_source(vault_path: String, opportunity_id: String, url: String) -> CommandResult<()>'
+      inputs:
+      - 'vault_path: String'
+      - 'opportunity_id: String'
+      - 'url: String'
+      output: CommandResult<()>
+      dependencies:
+      - from
+      - map_err
+      - open_system_browser
+      - to_string
+      - validate_source_url
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - path: src-tauri/src/commands/mod.rs
+        symbol: open_system_browser
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: validate_source_url
   - path: src-tauri/src/domain/edit_learning.rs
     analysis_version: 1
     language: rust
@@ -173,13 +346,15 @@ source_catalog:
   - path: src-tauri/src/lib.rs
     analysis_version: 1
     language: rust
-    content_hash: 41e5d065470d0f0bf85a130faeafb995ce28900a
+    content_hash: a35a42933dadec64abc0450c3eae7e873f09cdcb
     dependencies:
     - "commands::{\n    candidates::{extract_resume_candidates, list_story_candidates, set_story_candidate_status},\n    capture::{\n\
       \        classify_capture_source, create_capture_source, get_capture_source, list_captures,\n        list_unclassified_captures,\
       \ update_capture_source_type,\n    },\n    development::{\n        create_story_from_seed_development, start_story_seed_development,\n\
-      \        submit_story_seed_development_response,\n    },\n    external::open_external_url,\n    feedback::{get_feedback_snapshot,\
-      \ mark_post_published, record_post_performance},\n    inspirations::{\n        add_inspiration_relationship, create_inspiration_from_source,\
+      \        submit_story_seed_development_response,\n    },\n    discovery::{\n        develop_discovery_topic, dismiss_discovery_opportunity,\
+      \ list_discovery_opportunities,\n        open_discovery_source, record_discovery_feedback, save_discovery_inspiration,\n\
+      \        scan_discovery,\n    },\n    external::open_external_url,\n    feedback::{get_feedback_snapshot, mark_post_published,\
+      \ record_post_performance},\n    inspirations::{\n        add_inspiration_relationship, create_inspiration_from_source,\
       \ get_inspiration,\n        list_inspiration_link_targets, list_inspirations, remove_inspiration_relationship,\n   \
       \     update_inspiration,\n    },\n    interviews::{\n        list_guided_interviews, resume_guided_interview, start_guided_interview,\n\
       \        submit_guided_interview_response,\n    },\n    performance::get_performance_snapshot,\n    posts::{\n     \
@@ -205,8 +380,8 @@ source_catalog:
     symbols:
     - name: run
       kind: function
-      line_start: 73
-      line_end: 183
+      line_start: 78
+      line_end: 195
       signature: run()
       inputs: []
       output: unspecified
@@ -358,10 +533,10 @@ source_catalog:
       - setTopics
       parser: typescript-pattern
       dependency_targets:
-      - &id002
+      - &id005
         path: src/domain/types.ts
         symbol: errorMessage
-      - &id001
+      - &id004
         path: src/lib/postApi.ts
         symbol: listPosts
       - path: src/lib/workloreApi.ts
@@ -382,7 +557,7 @@ source_catalog:
       - setSelectedPostId
       parser: typescript-pattern
       dependency_targets:
-      - *id001
+      - *id004
     - name: openPost
       kind: function
       line_start: 102
@@ -403,7 +578,7 @@ source_catalog:
       - setSelectedPostId
       parser: typescript-pattern
       dependency_targets:
-      - *id002
+      - *id005
       - path: src/lib/postApi.ts
         symbol: getPostLineage
     - name: generateFromTopic
@@ -429,12 +604,12 @@ source_catalog:
       - setSelectedPostId
       parser: typescript-pattern
       dependency_targets:
-      - *id002
+      - *id005
       - path: src/lib/postApi.ts
         symbol: generatePostFromTopic
       - path: src/lib/workloreApi.ts
         symbol: getProviderSettings
-      - &id003
+      - &id006
         path: src/components/PostWorkspace.tsx
         symbol: refreshPosts
     - name: saveRevision
@@ -459,8 +634,8 @@ source_catalog:
       dependency_targets:
       - path: src/lib/postApi.ts
         symbol: appendPostRevision
-      - *id002
-      - *id003
+      - *id005
+      - *id006
     - name: challengeDraft
       kind: function
       line_start: 195
@@ -480,7 +655,7 @@ source_catalog:
       - transformConfidentialityForPublicUse
       parser: typescript-pattern
       dependency_targets:
-      - *id002
+      - *id005
       - path: src/lib/workloreApi.ts
         symbol: lintDraft
       - path: src/lib/confidentialityApi.ts
@@ -504,8 +679,8 @@ source_catalog:
       dependency_targets:
       - path: src/lib/postApi.ts
         symbol: approvePostRevision
-      - *id002
-      - *id003
+      - *id005
+      - *id006
     - name: loadPublicSafeText
       kind: function
       line_start: 240

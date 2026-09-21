@@ -77,7 +77,7 @@ source_catalog:
   - path: src-tauri/src/services/canonical_store.rs
     analysis_version: 1
     language: rust
-    content_hash: 8f434ba7cace920e76681bf4986c741634329d5e
+    content_hash: 28513fa5f8ee7a9f642442681bf9958374e24b7d
     dependencies:
     - chrono::Utc
     - "crate::{\n        domain::{\n            candidates::{CandidateContext, CandidateSourceRef, CandidateType},\n     \
@@ -136,8 +136,8 @@ source_catalog:
     symbols:
     - name: database_path
       kind: function
-      line_start: 331
-      line_end: 334
+      line_start: 387
+      line_end: 390
       signature: 'database_path(vault_path: &Path) -> PathBuf'
       inputs:
       - 'vault_path: &Path'
@@ -148,8 +148,8 @@ source_catalog:
       dependency_targets: []
     - name: initialize_and_migrate
       kind: function
-      line_start: 335
-      line_end: 339
+      line_start: 391
+      line_end: 395
       signature: 'initialize_and_migrate(vault_path: &Path) -> ServiceResult<PrototypeMigrationSummary>'
       inputs:
       - 'vault_path: &Path'
@@ -167,8 +167,8 @@ source_catalog:
         symbol: migrate_prototype
     - name: initialize
       kind: function
-      line_start: 340
-      line_end: 345
+      line_start: 396
+      line_end: 401
       signature: 'initialize(vault_path: &Path) -> ServiceResult<()>'
       inputs:
       - 'vault_path: &Path'
@@ -184,8 +184,8 @@ source_catalog:
         symbol: migrate_schema
     - name: schema_version
       kind: function
-      line_start: 348
-      line_end: 356
+      line_start: 404
+      line_end: 412
       signature: 'schema_version(vault_path: &Path) -> ServiceResult<i64>'
       inputs:
       - 'vault_path: &Path'
@@ -203,8 +203,8 @@ source_catalog:
       - *id004
     - name: create_story_seed
       kind: function
-      line_start: 359
-      line_end: 381
+      line_start: 415
+      line_end: 437
       signature: 'create_story_seed(vault_path: &Path, title: &str, summary: &str) -> ServiceResult<StorySeedRecord>'
       inputs:
       - 'vault_path: &Path'
@@ -235,8 +235,8 @@ source_catalog:
         symbol: normalized_title
     - name: load_story_seed
       kind: function
-      line_start: 384
-      line_end: 403
+      line_start: 440
+      line_end: 459
       signature: 'load_story_seed(vault_path: &Path, seed_id: &str) -> ServiceResult<StorySeedRecord>'
       inputs:
       - 'vault_path: &Path'
@@ -256,8 +256,8 @@ source_catalog:
       - *id004
     - name: create_story
       kind: function
-      line_start: 406
-      line_end: 430
+      line_start: 462
+      line_end: 486
       signature: 'create_story(vault_path: &Path, title: &str, summary: &str) -> ServiceResult<CanonicalStoryRecord>'
       inputs:
       - 'vault_path: &Path'
@@ -284,8 +284,8 @@ source_catalog:
       - *id006
     - name: load_story
       kind: function
-      line_start: 433
-      line_end: 441
+      line_start: 489
+      line_end: 497
       signature: 'load_story(vault_path: &Path, story_id: &str) -> ServiceResult<CanonicalStoryRecord>'
       inputs:
       - 'vault_path: &Path'
@@ -304,8 +304,8 @@ source_catalog:
       - *id004
     - name: create_evidence
       kind: function
-      line_start: 444
-      line_end: 455
+      line_start: 500
+      line_end: 511
       signature: 'create_evidence(vault_path: &Path, text: &str) -> ServiceResult<String>'
       inputs:
       - 'vault_path: &Path'
@@ -328,8 +328,8 @@ source_catalog:
       - *id004
     - name: create_inspiration
       kind: function
-      line_start: 458
-      line_end: 469
+      line_start: 514
+      line_end: 525
       signature: 'create_inspiration(vault_path: &Path, title: &str) -> ServiceResult<String>'
       inputs:
       - 'vault_path: &Path'
@@ -354,8 +354,8 @@ source_catalog:
       - *id006
     - name: create_target_context
       kind: function
-      line_start: 472
-      line_end: 488
+      line_start: 528
+      line_end: 544
       signature: 'create_target_context(vault_path: &Path, context_type: &str, title: &str) -> ServiceResult<String>'
       inputs:
       - 'vault_path: &Path'
@@ -382,8 +382,8 @@ source_catalog:
       - *id006
     - name: migrate_prototype
       kind: function
-      line_start: 489
-      line_end: 527
+      line_start: 545
+      line_end: 583
       signature: 'migrate_prototype(vault_path: &Path) -> ServiceResult<PrototypeMigrationSummary>'
       inputs:
       - 'vault_path: &Path'
@@ -422,8 +422,8 @@ source_catalog:
         symbol: migrate_story
     - name: open_connection
       kind: function
-      line_start: 528
-      line_end: 535
+      line_start: 584
+      line_end: 591
       signature: 'open_connection(vault_path: &Path) -> ServiceResult<Connection>'
       inputs:
       - 'vault_path: &Path'
@@ -444,8 +444,8 @@ source_catalog:
         symbol: database_path
     - name: migrate_schema
       kind: function
-      line_start: 536
-      line_end: 632
+      line_start: 592
+      line_end: 698
       signature: 'migrate_schema(connection: &mut Connection) -> ServiceResult<()>'
       inputs:
       - 'connection: &mut Connection'
@@ -471,8 +471,8 @@ source_catalog:
       dependency_targets: []
     - name: migrate_source
       kind: function
-      line_start: 633
-      line_end: 654
+      line_start: 699
+      line_end: 720
       signature: 'migrate_source(tx: &Transaction<''_>, source: &SourceDocument) -> ServiceResult<()>'
       inputs:
       - 'tx: &Transaction<''_>'
@@ -502,8 +502,8 @@ source_catalog:
         symbol: validate_relative
     - name: migrate_job_target
       kind: function
-      line_start: 655
-      line_end: 673
+      line_start: 721
+      line_end: 739
       signature: 'migrate_job_target(tx: &Transaction<''_>, source: &SourceDocument) -> ServiceResult<()>'
       inputs:
       - 'tx: &Transaction<''_>'
@@ -524,8 +524,8 @@ source_catalog:
         symbol: transformed_id
     - name: migrate_role
       kind: function
-      line_start: 674
-      line_end: 696
+      line_start: 740
+      line_end: 762
       signature: 'migrate_role(tx: &Transaction<''_>, role: &RoleRecord) -> ServiceResult<()>'
       inputs:
       - 'tx: &Transaction<''_>'
@@ -548,8 +548,8 @@ source_catalog:
         symbol: relationship
     - name: migrate_candidate
       kind: function
-      line_start: 697
-      line_end: 728
+      line_start: 763
+      line_end: 794
       signature: 'migrate_candidate(tx: &Transaction<''_>, candidate: &StoryCandidate) -> ServiceResult<String>'
       inputs:
       - 'tx: &Transaction<''_>'
@@ -578,8 +578,8 @@ source_catalog:
       - *id010
     - name: migrate_story
       kind: function
-      line_start: 729
-      line_end: 774
+      line_start: 795
+      line_end: 840
       signature: 'migrate_story(tx: &Transaction<''_>, story: &StoryRecord) -> ServiceResult<usize>'
       inputs:
       - 'tx: &Transaction<''_>'
@@ -607,8 +607,8 @@ source_catalog:
         symbol: story_states
     - name: migrate_interview
       kind: function
-      line_start: 775
-      line_end: 795
+      line_start: 841
+      line_end: 861
       signature: 'migrate_interview(tx: &Transaction<''_>, interview: &InterviewSession) -> ServiceResult<()>'
       inputs:
       - 'tx: &Transaction<''_>'
@@ -640,8 +640,8 @@ source_catalog:
       - *id010
     - name: relationship
       kind: function
-      line_start: 796
-      line_end: 809
+      line_start: 862
+      line_end: 875
       signature: 'relationship(tx: &Transaction<''_>, from_type: &str, from_id: &str, kind: &str, to_type: &str, to_id: &str)
         -> ServiceResult<()>'
       inputs:
@@ -665,8 +665,8 @@ source_catalog:
       dependency_targets: []
     - name: preserve_id
       kind: function
-      line_start: 810
-      line_end: 825
+      line_start: 876
+      line_end: 891
       signature: 'preserve_id(tx: &Transaction<''_>, legacy_type: &str, id: &str, canonical_type: &str) -> ServiceResult<()>'
       inputs:
       - 'tx: &Transaction<''_>'
@@ -684,8 +684,8 @@ source_catalog:
         symbol: lineage
     - name: transformed_id
       kind: function
-      line_start: 826
-      line_end: 846
+      line_start: 892
+      line_end: 912
       signature: 'transformed_id(tx: &Transaction<''_>, legacy_type: &str, legacy_id: &str, canonical_type: &str, prefix:
         &str) -> ServiceResult<String>'
       inputs:
@@ -709,8 +709,8 @@ source_catalog:
       - *id012
     - name: lineage
       kind: function
-      line_start: 847
-      line_end: 867
+      line_start: 913
+      line_end: 933
       signature: 'lineage(tx: &Transaction<''_>, legacy_type: &str, legacy_id: &str, canonical_type: &str, canonical_id: &str,
         details: String) -> ServiceResult<()>'
       inputs:
@@ -735,8 +735,8 @@ source_catalog:
       dependency_targets: []
     - name: read_records
       kind: function
-      line_start: 868
-      line_end: 883
+      line_start: 934
+      line_end: 949
       signature: 'read_records(directory: &Path) -> ServiceResult<Vec<T>>'
       inputs:
       - 'directory: &Path'
@@ -760,8 +760,8 @@ source_catalog:
       dependency_targets: []
     - name: validate_relative
       kind: function
-      line_start: 884
-      line_end: 894
+      line_start: 950
+      line_end: 960
       signature: 'validate_relative(value: &str) -> ServiceResult<()>'
       inputs:
       - 'value: &str'
@@ -780,8 +780,8 @@ source_catalog:
       dependency_targets: []
     - name: enum_text
       kind: function
-      line_start: 895
-      line_end: 903
+      line_start: 961
+      line_end: 969
       signature: 'enum_text(value: &T) -> ServiceResult<String>'
       inputs:
       - 'value: &T'
@@ -797,8 +797,8 @@ source_catalog:
       dependency_targets: []
     - name: normalized_title
       kind: function
-      line_start: 905
-      line_end: 912
+      line_start: 971
+      line_end: 978
       signature: 'normalized_title(value: &str, fallback: &str) -> String'
       inputs:
       - 'value: &str'
@@ -813,8 +813,8 @@ source_catalog:
       dependency_targets: []
     - name: compact
       kind: function
-      line_start: 913
-      line_end: 922
+      line_start: 979
+      line_end: 988
       signature: 'compact(value: &str, max: usize) -> String'
       inputs:
       - 'value: &str'
@@ -832,8 +832,8 @@ source_catalog:
       dependency_targets: []
     - name: candidate_status
       kind: function
-      line_start: 923
-      line_end: 931
+      line_start: 989
+      line_end: 997
       signature: 'candidate_status(status: CandidateStatus) -> &''static str'
       inputs:
       - 'status: CandidateStatus'
@@ -843,8 +843,8 @@ source_catalog:
       dependency_targets: []
     - name: story_states
       kind: function
-      line_start: 932
-      line_end: 939
+      line_start: 998
+      line_end: 1005
       signature: 'story_states(status: StoryStatus) -> (&''static str, &''static str)'
       inputs:
       - 'status: StoryStatus'
@@ -854,8 +854,8 @@ source_catalog:
       dependency_targets: []
     - name: ensure_vault
       kind: function
-      line_start: 940
-      line_end: 946
+      line_start: 1006
+      line_end: 1012
       signature: 'ensure_vault(vault_path: &Path) -> ServiceResult<()>'
       inputs:
       - 'vault_path: &Path'
@@ -869,8 +869,8 @@ source_catalog:
       dependency_targets: []
     - name: vault
       kind: function
-      line_start: 966
-      line_end: 971
+      line_start: 1032
+      line_end: 1037
       signature: vault() -> PathBuf
       inputs: []
       output: PathBuf
@@ -888,8 +888,8 @@ source_catalog:
         symbol: create_vault
     - name: initializes_database
       kind: function
-      line_start: 974
-      line_end: 979
+      line_start: 1040
+      line_end: 1045
       signature: initializes_database()
       inputs: []
       output: unspecified
@@ -907,8 +907,8 @@ source_catalog:
         symbol: schema_version
     - name: seed_survives_reopen_without_resume
       kind: function
-      line_start: 981
-      line_end: 987
+      line_start: 1047
+      line_end: 1053
       signature: seed_survives_reopen_without_resume()
       inputs: []
       output: unspecified
@@ -929,8 +929,8 @@ source_catalog:
         symbol: load_story_seed
     - name: story_does_not_require_role
       kind: function
-      line_start: 989
-      line_end: 999
+      line_start: 1055
+      line_end: 1065
       signature: story_does_not_require_role()
       inputs: []
       output: unspecified
@@ -956,8 +956,8 @@ source_catalog:
         symbol: load_story
     - name: semantic_roles_are_separate
       kind: function
-      line_start: 1001
-      line_end: 1019
+      line_start: 1067
+      line_end: 1085
       signature: semantic_roles_are_separate()
       inputs: []
       output: unspecified
@@ -984,8 +984,8 @@ source_catalog:
       - *id014
     - name: migration_preserves_ids_and_uses_new_seed_id
       kind: function
-      line_start: 1022
-      line_end: 1176
+      line_start: 1088
+      line_end: 1242
       signature: migration_preserves_ids_and_uses_new_seed_id()
       inputs: []
       output: unspecified

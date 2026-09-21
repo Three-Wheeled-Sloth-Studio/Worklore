@@ -142,8 +142,7 @@ pub fn save_provider_settings(
 ) -> ServiceResult<()> {
     let protected_openai = protect_optional_secret(secrets.openai_api_key.as_deref())?;
     let protected_gemini = protect_optional_secret(secrets.gemini_api_key.as_deref())?;
-    let protected_brave =
-        protect_optional_secret(secrets.brave_search_api_key.as_deref())?;
+    let protected_brave = protect_optional_secret(secrets.brave_search_api_key.as_deref())?;
     update_preferences(|preferences| {
         preferences.schema_version = 4;
         preferences.selected_provider_id = settings.selected_provider_id.clone();

@@ -73,10 +73,10 @@ source_catalog:
       dependency_targets:
       - path: src-tauri/src/services/voice_analysis_service.rs
         symbol: analyze_inner
-      - &id007
+      - &id003
         path: src-tauri/src/services/post_generation_service.rs
         symbol: audit_provider_run
-      - &id008
+      - &id004
         path: src-tauri/src/services/voice_analysis_service.rs
         symbol: audit_provider_run
       - path: src-tauri/src/services/canonical_store.rs
@@ -121,18 +121,6 @@ source_catalog:
       dependency_targets:
       - path: src-tauri/src/services/voice_evidence_service.rs
         symbol: load_eligible_voice_evidence_material
-      - &id001
-        path: src-tauri/src/services/ollama_provider.rs
-        symbol: provider_error
-      - &id002
-        path: src-tauri/src/services/openai_compatible_provider.rs
-        symbol: provider_error
-      - &id003
-        path: src-tauri/src/services/post_generation_service.rs
-        symbol: provider_error
-      - &id004
-        path: src-tauri/src/services/voice_analysis_service.rs
-        symbol: provider_error
       - path: src-tauri/src/services/provider_registry.rs
         symbol: require_selected_provider
       - path: src-tauri/src/services/post_generation_service.rs
@@ -145,7 +133,7 @@ source_catalog:
         symbol: run_structured
       - path: src-tauri/src/services/provider_registry.rs
         symbol: run_structured
-      - &id005
+      - &id001
         path: src-tauri/src/services/voice_analysis_service.rs
         symbol: validate_analysis_output
       - path: src-tauri/src/services/provider_registry.rs
@@ -188,10 +176,6 @@ source_catalog:
       - validate_evidence_ids
       parser: rust-pattern
       dependency_targets:
-      - *id001
-      - *id002
-      - *id003
-      - *id004
       - path: src-tauri/src/services/voice_analysis_service.rs
         symbol: required_trimmed
       - path: src-tauri/src/services/voice_analysis_service.rs
@@ -223,11 +207,7 @@ source_catalog:
       - value.is_empty
       - value.trim
       parser: rust-pattern
-      dependency_targets:
-      - *id001
-      - *id002
-      - *id003
-      - *id004
+      dependency_targets: []
     - name: required_trimmed
       kind: function
       line_start: 322
@@ -245,11 +225,7 @@ source_catalog:
       - value.to_string
       - value.trim
       parser: rust-pattern
-      dependency_targets:
-      - *id001
-      - *id002
-      - *id003
-      - *id004
+      dependency_targets: []
     - name: provider_error
       kind: function
       line_start: 333
@@ -335,10 +311,10 @@ source_catalog:
       - validate_analysis_output
       parser: rust-pattern
       dependency_targets:
-      - &id006
+      - &id002
         path: src-tauri/src/services/voice_analysis_service.rs
         symbol: selected
-      - *id005
+      - *id001
     - name: structured_output_rejects_missing_evidence_and_duplicates
       kind: function
       line_start: 423
@@ -352,8 +328,8 @@ source_catalog:
       - validate_analysis_output
       parser: rust-pattern
       dependency_targets:
-      - *id006
-      - *id005
+      - *id002
+      - *id001
     - name: valid_proposals_are_transient_and_do_not_mutate_core_voice
       kind: function
       line_start: 459
@@ -378,8 +354,8 @@ source_catalog:
         symbol: list_core_voices
       - path: src-tauri/src/services/voice_profile_service.rs
         symbol: list_core_voices
-      - *id006
-      - *id005
+      - *id002
+      - *id001
     - name: provider_audit_metadata_excludes_prompt_and_response_bodies
       kind: function
       line_start: 490
@@ -400,8 +376,8 @@ source_catalog:
       - vault
       parser: rust-pattern
       dependency_targets:
-      - *id007
-      - *id008
+      - *id003
+      - *id004
       - path: src-tauri/src/services/confidentiality_service.rs
         symbol: drop
   - path: src/components/HomeWorkspace.tsx
@@ -436,16 +412,17 @@ source_catalog:
       dependency_targets:
       - path: src/lib/workloreApi.ts
         symbol: createCaptureSource
-      - &id009
+      - &id005
         path: src/domain/types.ts
         symbol: errorMessage
   - path: src/components/TopicsWorkspace.tsx
     analysis_version: 1
     language: typescript
-    content_hash: 9aa55c3e027385911634f8ad40b959c63dfbacef
+    content_hash: 7dcbc4590d8b689eebd0074d4fefbb7435096315
     dependencies:
     - ../domain/types
     - ../lib/workloreApi
+    - ./DiscoveryPanel
     - ./InfoButton
     - ./TopicPanel
     - react
@@ -456,8 +433,8 @@ source_catalog:
     symbols:
     - name: refresh
       kind: function
-      line_start: 25
-      line_end: 32
+      line_start: 27
+      line_end: 34
       signature: refresh()
       inputs: []
       output: unspecified
@@ -468,13 +445,13 @@ source_catalog:
       - setTopics
       parser: typescript-pattern
       dependency_targets:
-      - *id009
+      - *id005
       - path: src/lib/workloreApi.ts
         symbol: listTopics
     - name: createNewTopic
       kind: function
-      line_start: 33
-      line_end: 52
+      line_start: 35
+      line_end: 54
       signature: createNewTopic()
       inputs: []
       output: unspecified
@@ -489,21 +466,15 @@ source_catalog:
       - setSelectedTopicId
       parser: typescript-pattern
       dependency_targets:
+      - path: src/components/DiscoveryPanel.tsx
+        symbol: createTopic
       - path: src/lib/workloreApi.ts
         symbol: createTopic
-      - *id009
-      - path: src/components/InsightsWorkspace.tsx
-        symbol: refresh
-      - path: src/components/StoryBankPanel.tsx
-        symbol: refresh
-      - path: src/components/TopicsWorkspace.tsx
-        symbol: refresh
-      - path: src/components/VoiceWorkspace.tsx
-        symbol: refresh
+      - *id005
     - name: PlusIcon
       kind: function
-      line_start: 117
-      line_end: 120
+      line_start: 138
+      line_end: 141
       signature: PlusIcon()
       inputs: []
       output: unspecified
@@ -513,8 +484,9 @@ source_catalog:
   - path: src/lib/workloreApi.ts
     analysis_version: 1
     language: typescript
-    content_hash: e0b3ad1c4f5b7f5e3237006cd98543dc7db768c0
+    content_hash: 4fbb9c8cc106b094719a9ace06e185191fd80275
     dependencies:
+    - ../domain/discovery
     - ../domain/types
     - '@tauri-apps/api/core'
     provides:
@@ -527,6 +499,14 @@ source_catalog:
     - getLastImportDirectory
     - rememberLastImportFile
     - lintDraft
+    - openExternalUrl
+    - scanDiscovery
+    - listDiscoveryOpportunities
+    - recordDiscoveryFeedback
+    - saveDiscoveryInspiration
+    - developDiscoveryTopic
+    - dismissDiscoveryOpportunity
+    - openDiscoverySource
     - getProviderSettings
     - updateProviderSettings
     - listProviderModels
@@ -604,8 +584,8 @@ source_catalog:
     symbols:
     - name: createDefaultVault
       kind: function
-      line_start: 75
-      line_end: 78
+      line_start: 85
+      line_end: 88
       signature: 'createDefaultVault(name: string) -> Promise<VaultSummary>'
       inputs:
       - 'name: string'
@@ -615,8 +595,8 @@ source_catalog:
       dependency_targets: []
     - name: openVault
       kind: function
-      line_start: 79
-      line_end: 82
+      line_start: 89
+      line_end: 92
       signature: 'openVault(path: string) -> Promise<VaultSummary>'
       inputs:
       - 'path: string'
@@ -626,8 +606,8 @@ source_catalog:
       dependency_targets: []
     - name: getLastVaultPath
       kind: function
-      line_start: 83
-      line_end: 86
+      line_start: 93
+      line_end: 96
       signature: getLastVaultPath() -> Promise<string | null>
       inputs: []
       output: Promise<string | null>
@@ -636,8 +616,8 @@ source_catalog:
       dependency_targets: []
     - name: rememberLastVault
       kind: function
-      line_start: 87
-      line_end: 90
+      line_start: 97
+      line_end: 100
       signature: 'rememberLastVault(vaultPath: string) -> Promise<void>'
       inputs:
       - 'vaultPath: string'
@@ -647,8 +627,8 @@ source_catalog:
       dependency_targets: []
     - name: clearLastVault
       kind: function
-      line_start: 91
-      line_end: 94
+      line_start: 101
+      line_end: 104
       signature: clearLastVault() -> Promise<void>
       inputs: []
       output: Promise<void>
@@ -657,8 +637,8 @@ source_catalog:
       dependency_targets: []
     - name: getDefaultVaultRoot
       kind: function
-      line_start: 95
-      line_end: 98
+      line_start: 105
+      line_end: 108
       signature: getDefaultVaultRoot() -> Promise<string>
       inputs: []
       output: Promise<string>
@@ -667,8 +647,8 @@ source_catalog:
       dependency_targets: []
     - name: getLastImportDirectory
       kind: function
-      line_start: 99
-      line_end: 102
+      line_start: 109
+      line_end: 112
       signature: getLastImportDirectory() -> Promise<string | null>
       inputs: []
       output: Promise<string | null>
@@ -677,8 +657,8 @@ source_catalog:
       dependency_targets: []
     - name: rememberLastImportFile
       kind: function
-      line_start: 103
-      line_end: 106
+      line_start: 113
+      line_end: 116
       signature: 'rememberLastImportFile(filePath: string) -> Promise<string>'
       inputs:
       - 'filePath: string'
@@ -688,8 +668,8 @@ source_catalog:
       dependency_targets: []
     - name: lintDraft
       kind: function
-      line_start: 107
-      line_end: 113
+      line_start: 117
+      line_end: 123
       signature: 'lintDraft(vaultPath: string, request: LintDraftRequest) -> Promise<LintDraftResult>'
       inputs:
       - 'vaultPath: string'
@@ -698,10 +678,106 @@ source_catalog:
       dependencies: []
       parser: typescript-pattern
       dependency_targets: []
+    - name: openExternalUrl
+      kind: function
+      line_start: 124
+      line_end: 127
+      signature: 'openExternalUrl(url: string) -> Promise<void>'
+      inputs:
+      - 'url: string'
+      output: Promise<void>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: scanDiscovery
+      kind: function
+      line_start: 128
+      line_end: 134
+      signature: 'scanDiscovery(vaultPath: string, request: ScanDiscoveryRequest) -> Promise<DiscoveryScanResult>'
+      inputs:
+      - 'vaultPath: string'
+      - 'request: ScanDiscoveryRequest'
+      output: Promise<DiscoveryScanResult>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: listDiscoveryOpportunities
+      kind: function
+      line_start: 135
+      line_end: 141
+      signature: 'listDiscoveryOpportunities(vaultPath: string, limit) -> Promise<DiscoveryOpportunity[]>'
+      inputs:
+      - 'vaultPath: string'
+      - limit
+      output: Promise<DiscoveryOpportunity[]>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: recordDiscoveryFeedback
+      kind: function
+      line_start: 142
+      line_end: 148
+      signature: 'recordDiscoveryFeedback(vaultPath: string, request: RecordDiscoveryFeedbackRequest) -> Promise<DiscoveryFeedback>'
+      inputs:
+      - 'vaultPath: string'
+      - 'request: RecordDiscoveryFeedbackRequest'
+      output: Promise<DiscoveryFeedback>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: saveDiscoveryInspiration
+      kind: function
+      line_start: 149
+      line_end: 158
+      signature: 'saveDiscoveryInspiration(vaultPath: string, opportunityId: string) -> Promise<SaveDiscoveryInspirationResult>'
+      inputs:
+      - 'vaultPath: string'
+      - 'opportunityId: string'
+      output: Promise<SaveDiscoveryInspirationResult>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: developDiscoveryTopic
+      kind: function
+      line_start: 159
+      line_end: 165
+      signature: 'developDiscoveryTopic(vaultPath: string, request: DevelopDiscoveryTopicRequest) -> Promise<DevelopDiscoveryTopicResult>'
+      inputs:
+      - 'vaultPath: string'
+      - 'request: DevelopDiscoveryTopicRequest'
+      output: Promise<DevelopDiscoveryTopicResult>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: dismissDiscoveryOpportunity
+      kind: function
+      line_start: 166
+      line_end: 175
+      signature: 'dismissDiscoveryOpportunity(vaultPath: string, opportunityId: string) -> Promise<DiscoveryOpportunity>'
+      inputs:
+      - 'vaultPath: string'
+      - 'opportunityId: string'
+      output: Promise<DiscoveryOpportunity>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: openDiscoverySource
+      kind: function
+      line_start: 176
+      line_end: 183
+      signature: 'openDiscoverySource(vaultPath: string, opportunityId: string, url: string) -> Promise<void>'
+      inputs:
+      - 'vaultPath: string'
+      - 'opportunityId: string'
+      - 'url: string'
+      output: Promise<void>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
     - name: getProviderSettings
       kind: function
-      line_start: 114
-      line_end: 117
+      line_start: 184
+      line_end: 187
       signature: getProviderSettings() -> Promise<ProviderSettings>
       inputs: []
       output: Promise<ProviderSettings>
@@ -710,8 +786,8 @@ source_catalog:
       dependency_targets: []
     - name: updateProviderSettings
       kind: function
-      line_start: 118
-      line_end: 123
+      line_start: 188
+      line_end: 193
       signature: 'updateProviderSettings(request: UpdateProviderSettingsRequest) -> Promise<ProviderSettings>'
       inputs:
       - 'request: UpdateProviderSettingsRequest'
@@ -721,8 +797,8 @@ source_catalog:
       dependency_targets: []
     - name: listProviderModels
       kind: function
-      line_start: 124
-      line_end: 127
+      line_start: 194
+      line_end: 197
       signature: 'listProviderModels(providerId: string) -> Promise<ProviderModel[]>'
       inputs:
       - 'providerId: string'
@@ -732,8 +808,8 @@ source_catalog:
       dependency_targets: []
     - name: testProviderConnection
       kind: function
-      line_start: 128
-      line_end: 133
+      line_start: 198
+      line_end: 203
       signature: 'testProviderConnection(providerId: string) -> Promise<ProviderConnection>'
       inputs:
       - 'providerId: string'
@@ -743,8 +819,8 @@ source_catalog:
       dependency_targets: []
     - name: analyzeVoiceEvidence
       kind: function
-      line_start: 134
-      line_end: 140
+      line_start: 204
+      line_end: 210
       signature: 'analyzeVoiceEvidence(vaultPath: string, request: AnalyzeVoiceEvidenceRequest) -> Promise<VoiceAnalysisProposalSet>'
       inputs:
       - 'vaultPath: string'
@@ -755,8 +831,8 @@ source_catalog:
       dependency_targets: []
     - name: importSource
       kind: function
-      line_start: 141
-      line_end: 152
+      line_start: 211
+      line_end: 222
       signature: 'importSource(vaultPath: string, sourcePath: string, sourceType: SourceType) -> Promise<ImportSourceResult>'
       inputs:
       - 'vaultPath: string'
@@ -768,8 +844,8 @@ source_catalog:
       dependency_targets: []
     - name: listSources
       kind: function
-      line_start: 153
-      line_end: 156
+      line_start: 223
+      line_end: 226
       signature: 'listSources(vaultPath: string) -> Promise<SourceSummary[]>'
       inputs:
       - 'vaultPath: string'
@@ -779,8 +855,8 @@ source_catalog:
       dependency_targets: []
     - name: createCaptureSource
       kind: function
-      line_start: 157
-      line_end: 165
+      line_start: 227
+      line_end: 235
       signature: 'createCaptureSource(vaultPath: string, text: string, sourceType: SourceType) -> Promise<CaptureSource>'
       inputs:
       - 'vaultPath: string'
@@ -792,8 +868,8 @@ source_catalog:
       dependency_targets: []
     - name: getCaptureSource
       kind: function
-      line_start: 166
-      line_end: 172
+      line_start: 236
+      line_end: 242
       signature: 'getCaptureSource(vaultPath: string, sourceId: string) -> Promise<CaptureSource>'
       inputs:
       - 'vaultPath: string'
@@ -804,8 +880,8 @@ source_catalog:
       dependency_targets: []
     - name: listUnclassifiedCaptures
       kind: function
-      line_start: 173
-      line_end: 179
+      line_start: 243
+      line_end: 249
       signature: 'listUnclassifiedCaptures(vaultPath: string, limit) -> Promise<CaptureSource[]>'
       inputs:
       - 'vaultPath: string'
@@ -816,8 +892,8 @@ source_catalog:
       dependency_targets: []
     - name: classifyCaptureSource
       kind: function
-      line_start: 180
-      line_end: 191
+      line_start: 250
+      line_end: 261
       signature: 'classifyCaptureSource(vaultPath: string, sourceId: string, role: CaptureRole) -> Promise<CaptureClassificationResult>'
       inputs:
       - 'vaultPath: string'
@@ -829,8 +905,8 @@ source_catalog:
       dependency_targets: []
     - name: createTopic
       kind: function
-      line_start: 192
-      line_end: 198
+      line_start: 262
+      line_end: 268
       signature: 'createTopic(vaultPath: string, request: CreateTopicRequest) -> Promise<TopicRecord>'
       inputs:
       - 'vaultPath: string'
@@ -841,8 +917,8 @@ source_catalog:
       dependency_targets: []
     - name: getTopic
       kind: function
-      line_start: 199
-      line_end: 202
+      line_start: 269
+      line_end: 272
       signature: 'getTopic(vaultPath: string, topicId: string) -> Promise<TopicRecord>'
       inputs:
       - 'vaultPath: string'
@@ -853,8 +929,8 @@ source_catalog:
       dependency_targets: []
     - name: listTopics
       kind: function
-      line_start: 203
-      line_end: 206
+      line_start: 273
+      line_end: 276
       signature: 'listTopics(vaultPath: string) -> Promise<TopicRecord[]>'
       inputs:
       - 'vaultPath: string'
@@ -864,8 +940,8 @@ source_catalog:
       dependency_targets: []
     - name: updateTopic
       kind: function
-      line_start: 207
-      line_end: 213
+      line_start: 277
+      line_end: 283
       signature: 'updateTopic(vaultPath: string, request: UpdateTopicRequest) -> Promise<TopicRecord>'
       inputs:
       - 'vaultPath: string'
@@ -876,8 +952,8 @@ source_catalog:
       dependency_targets: []
     - name: createTheme
       kind: function
-      line_start: 214
-      line_end: 220
+      line_start: 284
+      line_end: 290
       signature: 'createTheme(vaultPath: string, request: CreateThemeRequest) -> Promise<ThemeRecord>'
       inputs:
       - 'vaultPath: string'
@@ -888,8 +964,8 @@ source_catalog:
       dependency_targets: []
     - name: getTheme
       kind: function
-      line_start: 221
-      line_end: 224
+      line_start: 291
+      line_end: 294
       signature: 'getTheme(vaultPath: string, themeId: string) -> Promise<ThemeRecord>'
       inputs:
       - 'vaultPath: string'
@@ -900,8 +976,8 @@ source_catalog:
       dependency_targets: []
     - name: listThemes
       kind: function
-      line_start: 225
-      line_end: 228
+      line_start: 295
+      line_end: 298
       signature: 'listThemes(vaultPath: string) -> Promise<ThemeRecord[]>'
       inputs:
       - 'vaultPath: string'
@@ -911,8 +987,8 @@ source_catalog:
       dependency_targets: []
     - name: updateTheme
       kind: function
-      line_start: 229
-      line_end: 235
+      line_start: 299
+      line_end: 305
       signature: 'updateTheme(vaultPath: string, request: UpdateThemeRequest) -> Promise<ThemeRecord>'
       inputs:
       - 'vaultPath: string'
@@ -923,8 +999,8 @@ source_catalog:
       dependency_targets: []
     - name: addTopicRelationship
       kind: function
-      line_start: 236
-      line_end: 249
+      line_start: 306
+      line_end: 319
       signature: 'addTopicRelationship(vaultPath: string, topicId: string, relationKind: TopicRelationKind, targetId: string)
         -> Promise<TopicRelationshipMutationResult>'
       inputs:
@@ -938,8 +1014,8 @@ source_catalog:
       dependency_targets: []
     - name: removeTopicRelationship
       kind: function
-      line_start: 250
-      line_end: 263
+      line_start: 320
+      line_end: 333
       signature: 'removeTopicRelationship(vaultPath: string, topicId: string, relationKind: TopicRelationKind, targetId: string)
         -> Promise<TopicRelationshipMutationResult>'
       inputs:
@@ -953,8 +1029,8 @@ source_catalog:
       dependency_targets: []
     - name: listTopicLinkTargets
       kind: function
-      line_start: 264
-      line_end: 270
+      line_start: 334
+      line_end: 340
       signature: 'listTopicLinkTargets(vaultPath: string, relationKind: TopicRelationKind) -> Promise<TopicLinkTarget[]>'
       inputs:
       - 'vaultPath: string'
@@ -965,8 +1041,8 @@ source_catalog:
       dependency_targets: []
     - name: createInspirationFromSource
       kind: function
-      line_start: 271
-      line_end: 281
+      line_start: 341
+      line_end: 351
       signature: 'createInspirationFromSource(vaultPath: string, sourceId: string) -> Promise<CreateInspirationResult>'
       inputs:
       - 'vaultPath: string'
@@ -977,8 +1053,8 @@ source_catalog:
       dependency_targets: []
     - name: getInspiration
       kind: function
-      line_start: 282
-      line_end: 288
+      line_start: 352
+      line_end: 358
       signature: 'getInspiration(vaultPath: string, inspirationId: string) -> Promise<InspirationRecord>'
       inputs:
       - 'vaultPath: string'
@@ -989,8 +1065,8 @@ source_catalog:
       dependency_targets: []
     - name: listInspirations
       kind: function
-      line_start: 289
-      line_end: 292
+      line_start: 359
+      line_end: 362
       signature: 'listInspirations(vaultPath: string) -> Promise<InspirationRecord[]>'
       inputs:
       - 'vaultPath: string'
@@ -1000,8 +1076,8 @@ source_catalog:
       dependency_targets: []
     - name: updateInspiration
       kind: function
-      line_start: 293
-      line_end: 299
+      line_start: 363
+      line_end: 369
       signature: 'updateInspiration(vaultPath: string, request: UpdateInspirationRequest) -> Promise<InspirationRecord>'
       inputs:
       - 'vaultPath: string'
@@ -1012,8 +1088,8 @@ source_catalog:
       dependency_targets: []
     - name: addInspirationRelationship
       kind: function
-      line_start: 300
-      line_end: 313
+      line_start: 370
+      line_end: 383
       signature: 'addInspirationRelationship(vaultPath: string, inspirationId: string, relationKind: InspirationRelationKind,
         targetId: string) -> Promise<InspirationRelationshipMutationResult>'
       inputs:
@@ -1027,8 +1103,8 @@ source_catalog:
       dependency_targets: []
     - name: removeInspirationRelationship
       kind: function
-      line_start: 314
-      line_end: 327
+      line_start: 384
+      line_end: 397
       signature: 'removeInspirationRelationship(vaultPath: string, inspirationId: string, relationKind: InspirationRelationKind,
         targetId: string) -> Promise<InspirationRelationshipMutationResult>'
       inputs:
@@ -1042,8 +1118,8 @@ source_catalog:
       dependency_targets: []
     - name: listInspirationLinkTargets
       kind: function
-      line_start: 328
-      line_end: 337
+      line_start: 398
+      line_end: 407
       signature: 'listInspirationLinkTargets(vaultPath: string, relationKind: InspirationRelationKind) -> Promise<InspirationLinkTarget[]>'
       inputs:
       - 'vaultPath: string'
@@ -1054,8 +1130,8 @@ source_catalog:
       dependency_targets: []
     - name: createTargetContextFromSource
       kind: function
-      line_start: 338
-      line_end: 348
+      line_start: 408
+      line_end: 418
       signature: 'createTargetContextFromSource(vaultPath: string, sourceId: string) -> Promise<CreateTargetContextResult>'
       inputs:
       - 'vaultPath: string'
@@ -1066,8 +1142,8 @@ source_catalog:
       dependency_targets: []
     - name: getTargetContext
       kind: function
-      line_start: 349
-      line_end: 355
+      line_start: 419
+      line_end: 425
       signature: 'getTargetContext(vaultPath: string, targetId: string) -> Promise<TargetContextRecord>'
       inputs:
       - 'vaultPath: string'
@@ -1078,8 +1154,8 @@ source_catalog:
       dependency_targets: []
     - name: listTargetContexts
       kind: function
-      line_start: 356
-      line_end: 359
+      line_start: 426
+      line_end: 429
       signature: 'listTargetContexts(vaultPath: string) -> Promise<TargetContextRecord[]>'
       inputs:
       - 'vaultPath: string'
@@ -1089,8 +1165,8 @@ source_catalog:
       dependency_targets: []
     - name: updateTargetContext
       kind: function
-      line_start: 360
-      line_end: 366
+      line_start: 430
+      line_end: 436
       signature: 'updateTargetContext(vaultPath: string, request: UpdateTargetContextRequest) -> Promise<TargetContextRecord>'
       inputs:
       - 'vaultPath: string'
@@ -1101,8 +1177,8 @@ source_catalog:
       dependency_targets: []
     - name: extractTargetContextSignals
       kind: function
-      line_start: 367
-      line_end: 376
+      line_start: 437
+      line_end: 446
       signature: 'extractTargetContextSignals(vaultPath: string, targetId: string) -> Promise<TargetContextExtractionResult>'
       inputs:
       - 'vaultPath: string'
@@ -1113,8 +1189,8 @@ source_catalog:
       dependency_targets: []
     - name: addTargetContextRelationship
       kind: function
-      line_start: 377
-      line_end: 390
+      line_start: 447
+      line_end: 460
       signature: 'addTargetContextRelationship(vaultPath: string, targetContextId: string, relationKind: TargetContextRelationKind,
         targetId: string) -> Promise<TargetContextRelationshipMutationResult>'
       inputs:
@@ -1128,8 +1204,8 @@ source_catalog:
       dependency_targets: []
     - name: removeTargetContextRelationship
       kind: function
-      line_start: 391
-      line_end: 404
+      line_start: 461
+      line_end: 474
       signature: 'removeTargetContextRelationship(vaultPath: string, targetContextId: string, relationKind: TargetContextRelationKind,
         targetId: string) -> Promise<TargetContextRelationshipMutationResult>'
       inputs:
@@ -1143,8 +1219,8 @@ source_catalog:
       dependency_targets: []
     - name: listTargetContextLinkTargets
       kind: function
-      line_start: 405
-      line_end: 414
+      line_start: 475
+      line_end: 484
       signature: 'listTargetContextLinkTargets(vaultPath: string, relationKind: TargetContextRelationKind) -> Promise<TargetContextLinkTarget[]>'
       inputs:
       - 'vaultPath: string'
@@ -1155,8 +1231,8 @@ source_catalog:
       dependency_targets: []
     - name: listVoiceSourceCandidates
       kind: function
-      line_start: 415
-      line_end: 422
+      line_start: 485
+      line_end: 492
       signature: 'listVoiceSourceCandidates(vaultPath: string) -> Promise<VoiceSourceCandidate[]>'
       inputs:
       - 'vaultPath: string'
@@ -1166,8 +1242,8 @@ source_catalog:
       dependency_targets: []
     - name: createVoiceEvidenceFromSource
       kind: function
-      line_start: 423
-      line_end: 432
+      line_start: 493
+      line_end: 502
       signature: 'createVoiceEvidenceFromSource(vaultPath: string, sourceId: string) -> Promise<CreateVoiceEvidenceResult>'
       inputs:
       - 'vaultPath: string'
@@ -1178,8 +1254,8 @@ source_catalog:
       dependency_targets: []
     - name: getVoiceEvidence
       kind: function
-      line_start: 433
-      line_end: 439
+      line_start: 503
+      line_end: 509
       signature: 'getVoiceEvidence(vaultPath: string, voiceEvidenceId: string) -> Promise<VoiceEvidenceRecord>'
       inputs:
       - 'vaultPath: string'
@@ -1190,8 +1266,8 @@ source_catalog:
       dependency_targets: []
     - name: listVoiceEvidence
       kind: function
-      line_start: 440
-      line_end: 443
+      line_start: 510
+      line_end: 513
       signature: 'listVoiceEvidence(vaultPath: string) -> Promise<VoiceEvidenceRecord[]>'
       inputs:
       - 'vaultPath: string'
@@ -1201,8 +1277,8 @@ source_catalog:
       dependency_targets: []
     - name: reviewVoiceEvidence
       kind: function
-      line_start: 444
-      line_end: 450
+      line_start: 514
+      line_end: 520
       signature: 'reviewVoiceEvidence(vaultPath: string, request: ReviewVoiceEvidenceRequest) -> Promise<VoiceEvidenceRecord>'
       inputs:
       - 'vaultPath: string'
@@ -1213,8 +1289,8 @@ source_catalog:
       dependency_targets: []
     - name: listCoreVoices
       kind: function
-      line_start: 451
-      line_end: 454
+      line_start: 521
+      line_end: 524
       signature: 'listCoreVoices(vaultPath: string) -> Promise<CoreVoiceRecord[]>'
       inputs:
       - 'vaultPath: string'
@@ -1224,8 +1300,8 @@ source_catalog:
       dependency_targets: []
     - name: createCoreVoice
       kind: function
-      line_start: 455
-      line_end: 461
+      line_start: 525
+      line_end: 531
       signature: 'createCoreVoice(vaultPath: string, request: CreateCoreVoiceRequest) -> Promise<CoreVoiceRecord>'
       inputs:
       - 'vaultPath: string'
@@ -1236,8 +1312,8 @@ source_catalog:
       dependency_targets: []
     - name: saveCoreVoiceTrait
       kind: function
-      line_start: 462
-      line_end: 468
+      line_start: 532
+      line_end: 538
       signature: 'saveCoreVoiceTrait(vaultPath: string, request: SaveCoreVoiceTraitRequest) -> Promise<CoreVoiceRecord>'
       inputs:
       - 'vaultPath: string'
@@ -1248,8 +1324,8 @@ source_catalog:
       dependency_targets: []
     - name: deleteCoreVoiceTrait
       kind: function
-      line_start: 469
-      line_end: 476
+      line_start: 539
+      line_end: 546
       signature: 'deleteCoreVoiceTrait(vaultPath: string, voiceId: string, traitId: string) -> Promise<CoreVoiceRecord>'
       inputs:
       - 'vaultPath: string'
@@ -1261,8 +1337,8 @@ source_catalog:
       dependency_targets: []
     - name: activateCoreVoice
       kind: function
-      line_start: 477
-      line_end: 483
+      line_start: 547
+      line_end: 553
       signature: 'activateCoreVoice(vaultPath: string, voiceId: string) -> Promise<CoreVoiceRecord>'
       inputs:
       - 'vaultPath: string'
@@ -1273,8 +1349,8 @@ source_catalog:
       dependency_targets: []
     - name: listToneModes
       kind: function
-      line_start: 484
-      line_end: 487
+      line_start: 554
+      line_end: 557
       signature: 'listToneModes(vaultPath: string) -> Promise<ToneModeRecord[]>'
       inputs:
       - 'vaultPath: string'
@@ -1284,8 +1360,8 @@ source_catalog:
       dependency_targets: []
     - name: createToneMode
       kind: function
-      line_start: 488
-      line_end: 494
+      line_start: 558
+      line_end: 564
       signature: 'createToneMode(vaultPath: string, request: CreateToneModeRequest) -> Promise<ToneModeRecord>'
       inputs:
       - 'vaultPath: string'
@@ -1296,8 +1372,8 @@ source_catalog:
       dependency_targets: []
     - name: updateToneMode
       kind: function
-      line_start: 495
-      line_end: 501
+      line_start: 565
+      line_end: 571
       signature: 'updateToneMode(vaultPath: string, request: UpdateToneModeRequest) -> Promise<ToneModeRecord>'
       inputs:
       - 'vaultPath: string'
@@ -1308,8 +1384,8 @@ source_catalog:
       dependency_targets: []
     - name: listVoiceDirections
       kind: function
-      line_start: 502
-      line_end: 505
+      line_start: 572
+      line_end: 575
       signature: 'listVoiceDirections(vaultPath: string) -> Promise<VoiceDirectionRecord[]>'
       inputs:
       - 'vaultPath: string'
@@ -1319,8 +1395,8 @@ source_catalog:
       dependency_targets: []
     - name: createVoiceDirection
       kind: function
-      line_start: 506
-      line_end: 512
+      line_start: 576
+      line_end: 582
       signature: 'createVoiceDirection(vaultPath: string, request: CreateVoiceDirectionRequest) -> Promise<VoiceDirectionRecord>'
       inputs:
       - 'vaultPath: string'
@@ -1331,8 +1407,8 @@ source_catalog:
       dependency_targets: []
     - name: setVoiceDirectionStatus
       kind: function
-      line_start: 513
-      line_end: 519
+      line_start: 583
+      line_end: 589
       signature: 'setVoiceDirectionStatus(vaultPath: string, request: SetVoiceDirectionStatusRequest) -> Promise<VoiceDirectionRecord>'
       inputs:
       - 'vaultPath: string'
@@ -1343,8 +1419,8 @@ source_catalog:
       dependency_targets: []
     - name: listWritingRules
       kind: function
-      line_start: 520
-      line_end: 523
+      line_start: 590
+      line_end: 593
       signature: 'listWritingRules(vaultPath: string) -> Promise<WritingRuleRecord[]>'
       inputs:
       - 'vaultPath: string'
@@ -1354,8 +1430,8 @@ source_catalog:
       dependency_targets: []
     - name: createWritingRule
       kind: function
-      line_start: 524
-      line_end: 530
+      line_start: 594
+      line_end: 600
       signature: 'createWritingRule(vaultPath: string, request: CreateWritingRuleRequest) -> Promise<WritingRuleRecord>'
       inputs:
       - 'vaultPath: string'
@@ -1366,8 +1442,8 @@ source_catalog:
       dependency_targets: []
     - name: updateWritingRule
       kind: function
-      line_start: 531
-      line_end: 537
+      line_start: 601
+      line_end: 607
       signature: 'updateWritingRule(vaultPath: string, request: UpdateWritingRuleRequest) -> Promise<WritingRuleRecord>'
       inputs:
       - 'vaultPath: string'
@@ -1378,8 +1454,8 @@ source_catalog:
       dependency_targets: []
     - name: startStorySeedDevelopment
       kind: function
-      line_start: 538
-      line_end: 547
+      line_start: 608
+      line_end: 617
       signature: 'startStorySeedDevelopment(vaultPath: string, seedId: string) -> Promise<StorySeedDevelopmentSummary>'
       inputs:
       - 'vaultPath: string'
@@ -1390,8 +1466,8 @@ source_catalog:
       dependency_targets: []
     - name: submitStorySeedDevelopmentResponse
       kind: function
-      line_start: 548
-      line_end: 557
+      line_start: 618
+      line_end: 627
       signature: 'submitStorySeedDevelopmentResponse(vaultPath: string, request: SubmitInterviewResponseRequest) -> Promise<StorySeedDevelopmentSummary>'
       inputs:
       - 'vaultPath: string'
@@ -1402,8 +1478,8 @@ source_catalog:
       dependency_targets: []
     - name: createStoryFromSeedDevelopment
       kind: function
-      line_start: 558
-      line_end: 567
+      line_start: 628
+      line_end: 637
       signature: 'createStoryFromSeedDevelopment(vaultPath: string, interviewId: string) -> Promise<StorySeedDevelopmentStoryResult>'
       inputs:
       - 'vaultPath: string'
@@ -1414,8 +1490,8 @@ source_catalog:
       dependency_targets: []
     - name: updateCloudIdentifierMode
       kind: function
-      line_start: 568
-      line_end: 577
+      line_start: 638
+      line_end: 647
       signature: 'updateCloudIdentifierMode(vaultPath: string, mode: CloudIdentifierMode) -> Promise<VaultSummary>'
       inputs:
       - 'vaultPath: string'
@@ -1426,8 +1502,8 @@ source_catalog:
       dependency_targets: []
     - name: listEntityReviews
       kind: function
-      line_start: 578
-      line_end: 587
+      line_start: 648
+      line_end: 657
       signature: 'listEntityReviews(vaultPath: string, pendingOnly) -> Promise<EntityReviewView[]>'
       inputs:
       - 'vaultPath: string'
@@ -1438,8 +1514,8 @@ source_catalog:
       dependency_targets: []
     - name: resolveEntityReview
       kind: function
-      line_start: 588
-      line_end: 597
+      line_start: 658
+      line_end: 667
       signature: 'resolveEntityReview(vaultPath: string, request: ResolveEntityReviewRequest) -> Promise<ResolveEntityReviewResult>'
       inputs:
       - 'vaultPath: string'
@@ -1450,8 +1526,8 @@ source_catalog:
       dependency_targets: []
     - name: extractResumeCandidates
       kind: function
-      line_start: 598
-      line_end: 607
+      line_start: 668
+      line_end: 677
       signature: 'extractResumeCandidates(vaultPath: string, sourceId: string) -> Promise<ExtractCandidatesResult>'
       inputs:
       - 'vaultPath: string'
@@ -1462,8 +1538,8 @@ source_catalog:
       dependency_targets: []
     - name: listStoryCandidates
       kind: function
-      line_start: 608
-      line_end: 611
+      line_start: 678
+      line_end: 681
       signature: 'listStoryCandidates(vaultPath: string) -> Promise<CandidateSummary[]>'
       inputs:
       - 'vaultPath: string'
@@ -1473,8 +1549,8 @@ source_catalog:
       dependency_targets: []
     - name: setStoryCandidateStatus
       kind: function
-      line_start: 612
-      line_end: 623
+      line_start: 682
+      line_end: 693
       signature: 'setStoryCandidateStatus(vaultPath: string, candidateId: string, status: CandidateStatus) -> Promise<CandidateSummary>'
       inputs:
       - 'vaultPath: string'
@@ -1486,8 +1562,8 @@ source_catalog:
       dependency_targets: []
     - name: startGuidedInterview
       kind: function
-      line_start: 624
-      line_end: 633
+      line_start: 694
+      line_end: 703
       signature: 'startGuidedInterview(vaultPath: string, candidateId: string) -> Promise<InterviewSummary>'
       inputs:
       - 'vaultPath: string'
@@ -1498,8 +1574,8 @@ source_catalog:
       dependency_targets: []
     - name: listGuidedInterviews
       kind: function
-      line_start: 634
-      line_end: 637
+      line_start: 704
+      line_end: 707
       signature: 'listGuidedInterviews(vaultPath: string) -> Promise<InterviewSummary[]>'
       inputs:
       - 'vaultPath: string'
@@ -1509,8 +1585,8 @@ source_catalog:
       dependency_targets: []
     - name: submitGuidedInterviewResponse
       kind: function
-      line_start: 638
-      line_end: 647
+      line_start: 708
+      line_end: 717
       signature: 'submitGuidedInterviewResponse(vaultPath: string, request: SubmitInterviewResponseRequest) -> Promise<InterviewSummary>'
       inputs:
       - 'vaultPath: string'
@@ -1521,8 +1597,8 @@ source_catalog:
       dependency_targets: []
     - name: resumeGuidedInterview
       kind: function
-      line_start: 648
-      line_end: 657
+      line_start: 718
+      line_end: 727
       signature: 'resumeGuidedInterview(vaultPath: string, interviewId: string) -> Promise<InterviewSummary>'
       inputs:
       - 'vaultPath: string'
@@ -1533,8 +1609,8 @@ source_catalog:
       dependency_targets: []
     - name: createManualWorkspace
       kind: function
-      line_start: 658
-      line_end: 667
+      line_start: 728
+      line_end: 737
       signature: 'createManualWorkspace(vaultPath: string, request: CreateManualWorkspaceRequest) -> Promise<ManualWorkspaceResult>'
       inputs:
       - 'vaultPath: string'
@@ -1545,8 +1621,8 @@ source_catalog:
       dependency_targets: []
     - name: importStoryResponse
       kind: function
-      line_start: 668
-      line_end: 677
+      line_start: 738
+      line_end: 747
       signature: 'importStoryResponse(vaultPath: string, request: ImportStoryResponseRequest) -> Promise<ImportStoryResponseResult>'
       inputs:
       - 'vaultPath: string'
@@ -1557,8 +1633,8 @@ source_catalog:
       dependency_targets: []
     - name: listStories
       kind: function
-      line_start: 678
-      line_end: 681
+      line_start: 748
+      line_end: 751
       signature: 'listStories(vaultPath: string) -> Promise<StorySummary[]>'
       inputs:
       - 'vaultPath: string'
@@ -1568,8 +1644,8 @@ source_catalog:
       dependency_targets: []
     - name: setStoryStatus
       kind: function
-      line_start: 682
-      line_end: 693
+      line_start: 752
+      line_end: 763
       signature: 'setStoryStatus(vaultPath: string, storyId: string, status: StoryStatus) -> Promise<StorySummary>'
       inputs:
       - 'vaultPath: string'
@@ -1581,8 +1657,8 @@ source_catalog:
       dependency_targets: []
     - name: getPerformanceSnapshot
       kind: function
-      line_start: 694
-      line_end: 703
+      line_start: 764
+      line_end: 773
       signature: 'getPerformanceSnapshot(vaultPath: string, limit) -> Promise<PerformanceSnapshot>'
       inputs:
       - 'vaultPath: string'

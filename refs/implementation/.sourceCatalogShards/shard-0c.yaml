@@ -78,7 +78,7 @@ source_catalog:
   - path: src-tauri/src/commands/mod.rs
     analysis_version: 1
     language: rust
-    content_hash: 8f39775ba94f0a22726cb006c8819c95a88449ea
+    content_hash: aba2f778bba0d43ac91635acabb4788fea9acea4
     dependencies:
     - std::process::Command
     - super::{validate_external_url, LICENSE_URL, SUPPORT_URL}
@@ -87,14 +87,15 @@ source_catalog:
     - open_with_system_browser
     - open_with_system_browser
     - open_with_system_browser
+    - open_system_browser
     - open_external_url
     - approved_external_links_are_allowed
     - arbitrary_external_links_are_rejected
     symbols:
     - name: validate_external_url
       kind: function
-      line_start: 26
-      line_end: 34
+      line_start: 27
+      line_end: 35
       signature: 'validate_external_url(url: &str) -> Result<(), String>'
       inputs:
       - 'url: &str'
@@ -107,8 +108,8 @@ source_catalog:
       dependency_targets: []
     - name: open_with_system_browser
       kind: function
-      line_start: 37
-      line_end: 42
+      line_start: 38
+      line_end: 43
       signature: 'open_with_system_browser(url: &str) -> std::io::Result<std::process::ExitStatus>'
       inputs:
       - 'url: &str'
@@ -121,8 +122,8 @@ source_catalog:
       dependency_targets: []
     - name: open_with_system_browser
       kind: function
-      line_start: 45
-      line_end: 47
+      line_start: 46
+      line_end: 48
       signature: 'open_with_system_browser(url: &str) -> std::io::Result<std::process::ExitStatus>'
       inputs:
       - 'url: &str'
@@ -135,8 +136,8 @@ source_catalog:
       dependency_targets: []
     - name: open_with_system_browser
       kind: function
-      line_start: 50
-      line_end: 52
+      line_start: 51
+      line_end: 53
       signature: 'open_with_system_browser(url: &str) -> std::io::Result<std::process::ExitStatus>'
       inputs:
       - 'url: &str'
@@ -147,33 +148,48 @@ source_catalog:
       - status
       parser: rust-pattern
       dependency_targets: []
-    - name: open_external_url
+    - name: open_system_browser
       kind: function
-      line_start: 55
-      line_end: 64
-      signature: 'open_external_url(url: String) -> Result<(), String>'
+      line_start: 54
+      line_end: 63
+      signature: 'open_system_browser(url: &str) -> Result<(), String>'
       inputs:
-      - 'url: String'
+      - 'url: &str'
       output: Result<(), String>
       dependencies:
       - Err
       - Ok
       - map_err
       - open_with_system_browser
+      - pub
       - status.success
       - to_string
-      - validate_external_url
       parser: rust-pattern
       dependency_targets:
       - path: src-tauri/src/commands/mod.rs
         symbol: open_with_system_browser
+    - name: open_external_url
+      kind: function
+      line_start: 66
+      line_end: 69
+      signature: 'open_external_url(url: String) -> Result<(), String>'
+      inputs:
+      - 'url: String'
+      output: Result<(), String>
+      dependencies:
+      - open_system_browser
+      - validate_external_url
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/commands/mod.rs
+        symbol: open_system_browser
       - &id001
         path: src-tauri/src/commands/mod.rs
         symbol: validate_external_url
     - name: approved_external_links_are_allowed
       kind: function
-      line_start: 71
-      line_end: 74
+      line_start: 76
+      line_end: 79
       signature: approved_external_links_are_allowed()
       inputs: []
       output: unspecified
@@ -185,8 +201,8 @@ source_catalog:
       - *id001
     - name: arbitrary_external_links_are_rejected
       kind: function
-      line_start: 77
-      line_end: 80
+      line_start: 82
+      line_end: 85
       signature: arbitrary_external_links_are_rejected()
       inputs: []
       output: unspecified
@@ -423,7 +439,7 @@ source_catalog:
   - path: src-tauri/src/domain/mod.rs
     analysis_version: 1
     language: rust
-    content_hash: 8121ad2c41bd4c997982c5a49976a22b9883d598
+    content_hash: 6364d42401a45442f902fdcde6e50bc2a56843e8
     dependencies: []
     provides: []
     symbols: []
@@ -593,15 +609,15 @@ source_catalog:
   - path: src/domain/types.ts
     analysis_version: 1
     language: typescript
-    content_hash: e4d45a4bb4dd5b5077dad666ebcc9e843abb2266
+    content_hash: 5f901f1101855541dd0be84117da3d901231dec1
     dependencies: []
     provides:
     - errorMessage
     symbols:
     - name: errorMessage
       kind: function
-      line_start: 879
-      line_end: 896
+      line_start: 882
+      line_end: 899
       signature: 'errorMessage(error: unknown) -> string'
       inputs:
       - 'error: unknown'

@@ -64,19 +64,7 @@ source_catalog:
       - unwrap_or_default
       - value.trim
       parser: rust-pattern
-      dependency_targets:
-      - &id001
-        path: src-tauri/src/services/ollama_provider.rs
-        symbol: provider_error
-      - &id002
-        path: src-tauri/src/services/openai_compatible_provider.rs
-        symbol: provider_error
-      - &id003
-        path: src-tauri/src/services/post_generation_service.rs
-        symbol: provider_error
-      - &id004
-        path: src-tauri/src/services/voice_analysis_service.rs
-        symbol: provider_error
+      dependency_targets: []
     - name: list_models
       kind: function
       line_start: 91
@@ -106,25 +94,21 @@ source_catalog:
       - send
       parser: rust-pattern
       dependency_targets:
-      - &id006
+      - &id002
         path: src-tauri/src/services/ollama_provider.rs
         symbol: client
-      - &id007
+      - &id003
         path: src-tauri/src/services/openai_compatible_provider.rs
         symbol: client
-      - &id008
+      - &id004
         path: src-tauri/src/services/ollama_provider.rs
-        symbol: map_status
-      - &id009
-        path: src-tauri/src/services/openai_compatible_provider.rs
         symbol: map_status
       - &id005
+        path: src-tauri/src/services/openai_compatible_provider.rs
+        symbol: map_status
+      - &id001
         path: src-tauri/src/services/ollama_provider.rs
         symbol: normalize_base_url
-      - *id001
-      - *id002
-      - *id003
-      - *id004
     - name: run_structured
       kind: function
       line_start: 121
@@ -155,24 +139,20 @@ source_catalog:
       - take
       parser: rust-pattern
       dependency_targets:
-      - &id012
+      - &id008
         path: src-tauri/src/services/ollama_provider.rs
         symbol: list_models
-      - &id013
+      - &id009
         path: src-tauri/src/services/openai_compatible_provider.rs
         symbol: list_models
-      - &id014
+      - &id010
         path: src-tauri/src/services/provider_registry.rs
         symbol: list_models
-      - *id005
-      - &id010
+      - *id001
+      - &id006
         path: src-tauri/src/services/ollama_provider.rs
         symbol: ordered_structured_model_ids
-      - *id001
-      - *id002
-      - *id003
-      - *id004
-      - &id011
+      - &id007
         path: src-tauri/src/services/ollama_provider.rs
         symbol: retryable_structured_model_failure
       - path: src-tauri/src/services/ollama_provider.rs
@@ -203,14 +183,10 @@ source_catalog:
       - send
       parser: rust-pattern
       dependency_targets:
-      - *id006
-      - *id007
-      - *id008
-      - *id009
-      - *id001
       - *id002
       - *id003
       - *id004
+      - *id005
     - name: ordered_structured_model_ids
       kind: function
       line_start: 203
@@ -300,11 +276,7 @@ source_catalog:
       - provider_error
       - timeout
       parser: rust-pattern
-      dependency_targets:
-      - *id001
-      - *id002
-      - *id003
-      - *id004
+      dependency_targets: []
     - name: map_transport_error
       kind: function
       line_start: 290
@@ -318,11 +290,7 @@ source_catalog:
       - error.is_timeout
       - provider_error
       parser: rust-pattern
-      dependency_targets:
-      - *id001
-      - *id002
-      - *id003
-      - *id004
+      dependency_targets: []
     - name: map_status
       kind: function
       line_start: 303
@@ -336,11 +304,7 @@ source_catalog:
       - provider_error
       - status.as_u16
       parser: rust-pattern
-      dependency_targets:
-      - *id001
-      - *id002
-      - *id003
-      - *id004
+      dependency_targets: []
     - name: provider_error
       kind: function
       line_start: 329
@@ -379,7 +343,7 @@ source_catalog:
       - unwrap
       parser: rust-pattern
       dependency_targets:
-      - *id005
+      - *id001
     - name: http_statuses_map_to_normalized_provider_errors
       kind: function
       line_start: 366
@@ -391,8 +355,8 @@ source_catalog:
       - map_status
       parser: rust-pattern
       dependency_targets:
-      - *id008
-      - *id009
+      - *id004
+      - *id005
     - name: structured_candidates_keep_configured_model_first_then_rank_local_alternatives
       kind: function
       line_start: 380
@@ -405,10 +369,10 @@ source_catalog:
       - ordered_structured_model_ids
       parser: rust-pattern
       dependency_targets:
-      - &id015
+      - &id011
         path: src-tauri/src/services/ollama_provider.rs
         symbol: model
-      - *id010
+      - *id006
     - name: structured_retry_is_limited_to_model_specific_contract_failures
       kind: function
       line_start: 403
@@ -421,15 +385,11 @@ source_catalog:
       - retryable_structured_model_failure
       parser: rust-pattern
       dependency_targets:
-      - *id001
-      - *id002
-      - *id003
-      - *id004
-      - *id011
+      - *id007
   - path: src-tauri/src/services/provider_registry.rs
     analysis_version: 1
     language: rust
-    content_hash: cc284ce276e53b62a7642ce72783a141087ceed5
+    content_hash: b68948154af47b3ce99fcae4d2071c14ea244d01
     dependencies:
     - "crate::{\n    domain::providers::{\n        ProviderConnectionView, ProviderModelView, ProviderSettingsView,\n    \
       \    UpdateProviderSettingsRequest, GEMINI_PROVIDER_ID, OLLAMA_PROVIDER_ID, OPENAI_PROVIDER_ID,\n    },\n    error::{ServiceResult,\
@@ -479,7 +439,7 @@ source_catalog:
     - name: update_settings
       kind: function
       line_start: 20
-      line_end: 50
+      line_end: 55
       signature: 'update_settings(request: UpdateProviderSettingsRequest) -> ServiceResult<ProviderSettingsView>'
       inputs:
       - 'request: UpdateProviderSettingsRequest'
@@ -491,6 +451,7 @@ source_catalog:
       - normalize_optional_secret
       - normalize_optional_text
       - normalize_provider_id
+      - request.brave_search_api_key.as_deref
       - request.gemini_api_key.as_deref
       - request.gemini_model_id.as_deref
       - request.ollama_model_id.as_deref
@@ -503,24 +464,24 @@ source_catalog:
       - unwrap_or_else
       parser: rust-pattern
       dependency_targets:
-      - &id020
+      - &id016
         path: src-tauri/src/services/provider_registry.rs
         symbol: get_settings
-      - *id005
+      - *id001
       - path: src-tauri/src/services/provider_registry.rs
         symbol: normalize_optional_secret
-      - &id021
+      - &id017
         path: src-tauri/src/services/provider_registry.rs
         symbol: normalize_optional_text
-      - &id022
+      - &id018
         path: src-tauri/src/services/provider_registry.rs
         symbol: normalize_provider_id
       - path: src-tauri/src/services/app_preferences_service.rs
         symbol: save_provider_settings
     - name: list_models
       kind: function
-      line_start: 51
-      line_end: 64
+      line_start: 56
+      line_end: 69
       signature: 'list_models(provider_id: &str) -> ServiceResult<Vec<ProviderModelView>>'
       inputs:
       - 'provider_id: &str'
@@ -532,22 +493,22 @@ source_catalog:
       - require_selected_provider
       parser: rust-pattern
       dependency_targets:
-      - &id016
+      - &id012
         path: src-tauri/src/services/provider_registry.rs
         symbol: provider_not_configured
-      - &id017
+      - &id013
         path: src-tauri/src/services/openai_compatible_provider.rs
         symbol: require_api_key
-      - &id018
+      - &id014
         path: src-tauri/src/services/provider_registry.rs
         symbol: require_api_key
-      - &id019
+      - &id015
         path: src-tauri/src/services/provider_registry.rs
         symbol: require_selected_provider
     - name: test_connection
       kind: function
-      line_start: 65
-      line_end: 94
+      line_start: 70
+      line_end: 99
       signature: 'test_connection(provider_id: &str) -> ServiceResult<ProviderConnectionView>'
       inputs:
       - 'provider_id: &str'
@@ -563,16 +524,16 @@ source_catalog:
       - to_string
       parser: rust-pattern
       dependency_targets:
-      - *id012
-      - *id013
-      - *id014
-      - *id015
+      - *id008
+      - *id009
+      - *id010
+      - *id011
       - path: src-tauri/src/services/openai_compatible_provider.rs
         symbol: provider_label
     - name: run_structured
       kind: function
-      line_start: 95
-      line_end: 118
+      line_start: 100
+      line_end: 123
       signature: 'run_structured(vault_path: &Path, provider_id: &str, mut request: StructuredProviderRequest) -> ServiceResult<StructuredProviderResponse>'
       inputs:
       - 'vault_path: &Path'
@@ -588,19 +549,19 @@ source_catalog:
       - validate_requested_model
       parser: rust-pattern
       dependency_targets:
-      - *id016
+      - *id012
       - path: src-tauri/src/services/redaction_service.rs
         symbol: redact_for_external_use
-      - *id017
-      - *id018
-      - *id019
-      - &id023
+      - *id013
+      - *id014
+      - *id015
+      - &id019
         path: src-tauri/src/services/provider_registry.rs
         symbol: validate_requested_model
     - name: require_selected_provider
       kind: function
-      line_start: 119
-      line_end: 134
+      line_start: 124
+      line_end: 139
       signature: 'require_selected_provider(provider_id: &str) -> ServiceResult<ProviderSettingsView>'
       inputs:
       - 'provider_id: &str'
@@ -616,12 +577,12 @@ source_catalog:
       - settings.selected_provider_id.as_deref
       parser: rust-pattern
       dependency_targets:
-      - *id020
       - *id016
+      - *id012
     - name: validate_requested_model
       kind: function
-      line_start: 135
-      line_end: 158
+      line_start: 140
+      line_end: 163
       signature: 'validate_requested_model(settings: &ProviderSettingsView, model_id: &str) -> ServiceResult<String>'
       inputs:
       - 'settings: &ProviderSettingsView'
@@ -641,11 +602,11 @@ source_catalog:
       - settings.selected_provider_id.as_deref
       parser: rust-pattern
       dependency_targets:
-      - *id016
+      - *id012
     - name: require_api_key
       kind: function
-      line_start: 159
-      line_end: 164
+      line_start: 164
+      line_end: 169
       signature: 'require_api_key(provider_id: &str) -> ServiceResult<String>'
       inputs:
       - 'provider_id: &str'
@@ -658,11 +619,11 @@ source_catalog:
       dependency_targets:
       - path: src-tauri/src/services/app_preferences_service.rs
         symbol: get_provider_api_key
-      - *id016
+      - *id012
     - name: sanitize_loaded_settings
       kind: function
-      line_start: 165
-      line_end: 177
+      line_start: 170
+      line_end: 182
       signature: 'sanitize_loaded_settings(mut settings: ProviderSettingsView) -> ProviderSettingsView'
       inputs:
       - 'mut settings: ProviderSettingsView'
@@ -676,11 +637,11 @@ source_catalog:
       - settings.selected_provider_id.as_deref
       parser: rust-pattern
       dependency_targets:
-      - *id021
+      - *id017
     - name: normalize_provider_id
       kind: function
-      line_start: 178
-      line_end: 189
+      line_start: 183
+      line_end: 194
       signature: 'normalize_provider_id(value: Option<&str>) -> ServiceResult<Option<String>>'
       inputs:
       - 'value: Option<&str>'
@@ -698,11 +659,11 @@ source_catalog:
       - value.map
       parser: rust-pattern
       dependency_targets:
-      - *id016
+      - *id012
     - name: normalize_optional_text
       kind: function
-      line_start: 190
-      line_end: 196
+      line_start: 195
+      line_end: 201
       signature: 'normalize_optional_text(value: Option<&str>) -> Option<String>'
       inputs:
       - 'value: Option<&str>'
@@ -715,8 +676,8 @@ source_catalog:
       dependency_targets: []
     - name: normalize_optional_secret
       kind: function
-      line_start: 197
-      line_end: 200
+      line_start: 202
+      line_end: 205
       signature: 'normalize_optional_secret(value: Option<&str>) -> Option<String>'
       inputs:
       - 'value: Option<&str>'
@@ -725,11 +686,11 @@ source_catalog:
       - normalize_optional_text
       parser: rust-pattern
       dependency_targets:
-      - *id021
+      - *id017
     - name: provider_not_configured
       kind: function
-      line_start: 201
-      line_end: 207
+      line_start: 206
+      line_end: 212
       signature: 'provider_not_configured(message: impl Into<String>) -> WorkLoreError'
       inputs:
       - 'message: impl Into<String>'
@@ -740,8 +701,8 @@ source_catalog:
       dependency_targets: []
     - name: settings
       kind: function
-      line_start: 212
-      line_end: 223
+      line_start: 217
+      line_end: 229
       signature: 'settings(provider_id: &str, model_id: &str) -> ProviderSettingsView'
       inputs:
       - 'provider_id: &str'
@@ -757,8 +718,8 @@ source_catalog:
       dependency_targets: []
     - name: provider_selection_is_explicit_and_does_not_fallback
       kind: function
-      line_start: 226
-      line_end: 241
+      line_start: 232
+      line_end: 247
       signature: provider_selection_is_explicit_and_does_not_fallback()
       inputs: []
       output: unspecified
@@ -770,11 +731,11 @@ source_catalog:
       - unwrap
       parser: rust-pattern
       dependency_targets:
-      - *id022
+      - *id018
     - name: requested_model_must_match_the_selected_provider_configuration
       kind: function
-      line_start: 244
-      line_end: 253
+      line_start: 250
+      line_end: 259
       signature: requested_model_must_match_the_selected_provider_configuration()
       inputs: []
       output: unspecified
@@ -785,14 +746,14 @@ source_catalog:
       - validate_requested_model
       parser: rust-pattern
       dependency_targets:
-      - &id024
+      - &id020
         path: src-tauri/src/services/provider_registry.rs
         symbol: settings
-      - *id023
+      - *id019
     - name: selected_provider_can_be_saved_before_a_model_is_selected
       kind: function
-      line_start: 256
-      line_end: 264
+      line_start: 262
+      line_end: 270
       signature: selected_provider_can_be_saved_before_a_model_is_selected()
       inputs: []
       output: unspecified
@@ -804,8 +765,8 @@ source_catalog:
       - validate_requested_model
       parser: rust-pattern
       dependency_targets:
-      - *id024
-      - *id023
+      - *id020
+      - *id019
   - path: src-tauri/src/services/source_service.rs
     analysis_version: 1
     language: rust
@@ -869,23 +830,23 @@ source_catalog:
       - metadata.len
       parser: rust-pattern
       dependency_targets:
-      - &id026
+      - &id022
         path: src-tauri/src/services/source_service.rs
         symbol: empty_metadata
       - path: src-tauri/src/services/source_service.rs
         symbol: extract_and_scan
       - path: src-tauri/src/services/source_service.rs
         symbol: find_source_by_hash
-      - &id027
+      - &id023
         path: src-tauri/src/domain/candidates.rs
         symbol: from
-      - &id028
+      - &id024
         path: src-tauri/src/domain/models.rs
         symbol: from
-      - &id029
+      - &id025
         path: src-tauri/src/error.rs
         symbol: from
-      - &id030
+      - &id026
         path: src-tauri/src/services/source_service.rs
         symbol: media_type_for_extension
     - name: list_sources
@@ -906,7 +867,7 @@ source_catalog:
       - right.imported_at.cmp
       parser: rust-pattern
       dependency_targets:
-      - &id025
+      - &id021
         path: src-tauri/src/services/source_service.rs
         symbol: read_source_documents
     - name: read_source_documents
@@ -952,7 +913,7 @@ source_catalog:
       - read_source_documents
       parser: rust-pattern
       dependency_targets:
-      - *id025
+      - *id021
     - name: extract_and_scan
       kind: function
       line_start: 187
@@ -994,12 +955,12 @@ source_catalog:
       - to_vault_relative
       parser: rust-pattern
       dependency_targets:
-      - *id026
+      - *id022
       - path: src-tauri/src/services/document_extraction.rs
         symbol: extract
-      - *id027
-      - *id028
-      - *id029
+      - *id023
+      - *id024
+      - *id025
       - path: src-tauri/src/services/contextual_entity_scan.rs
         symbol: scan_named_projects
       - path: src-tauri/src/services/entity_scan.rs
@@ -1055,7 +1016,7 @@ source_catalog:
       - media_type_for_extension
       parser: rust-pattern
       dependency_targets:
-      - *id030
+      - *id026
   - path: src-tauri/src/services/voice_profile_service.rs
     analysis_version: 1
     language: rust
@@ -1181,10 +1142,10 @@ source_catalog:
       - query_map
       parser: rust-pattern
       dependency_targets:
-      - &id031
+      - &id027
         path: src-tauri/src/services/canonical_store.rs
         symbol: initialize
-      - &id032
+      - &id028
         path: src-tauri/src/services/voice_profile_service.rs
         symbol: load_core_voice_from_connection
     - name: create_core_voice
@@ -1217,32 +1178,20 @@ source_catalog:
       - tx.query_row
       parser: rust-pattern
       dependency_targets:
-      - &id033
+      - &id029
         path: src-tauri/src/services/edit_learning_service.rs
         symbol: audit_tx
-      - &id034
+      - &id030
         path: src-tauri/src/services/post_lineage_service.rs
         symbol: audit_tx
-      - &id035
+      - &id031
         path: src-tauri/src/services/voice_evidence_service.rs
         symbol: audit_tx
-      - &id036
+      - &id032
         path: src-tauri/src/services/voice_profile_service.rs
         symbol: audit_tx
-      - *id031
-      - *id032
-      - &id038
-        path: src-tauri/src/services/inspiration_service.rs
-        symbol: required_text
-      - &id039
-        path: src-tauri/src/services/target_context_service.rs
-        symbol: required_text
-      - &id040
-        path: src-tauri/src/services/topic_service.rs
-        symbol: required_text
-      - &id041
-        path: src-tauri/src/services/voice_profile_service.rs
-        symbol: required_text
+      - *id027
+      - *id028
     - name: save_core_voice_trait
       kind: function
       line_start: 287
@@ -1279,13 +1228,13 @@ source_catalog:
       - query_row
       parser: rust-pattern
       dependency_targets:
-      - *id033
-      - *id034
-      - *id035
-      - *id036
+      - *id029
+      - *id030
       - *id031
       - *id032
-      - &id046
+      - *id027
+      - *id028
+      - &id038
         path: src-tauri/src/services/voice_profile_service.rs
         symbol: optional_text
     - name: delete_core_voice_trait
@@ -1315,13 +1264,13 @@ source_catalog:
       - tx.execute
       parser: rust-pattern
       dependency_targets:
-      - *id033
-      - *id034
-      - *id035
-      - *id036
+      - *id029
+      - *id030
       - *id031
       - *id032
-      - &id037
+      - *id027
+      - *id028
+      - &id033
         path: src-tauri/src/services/voice_profile_service.rs
         symbol: require_proposed_voice
       - path: src-tauri/src/services/voice_profile_service.rs
@@ -1351,13 +1300,13 @@ source_catalog:
       - validate_voice_for_activation
       parser: rust-pattern
       dependency_targets:
-      - *id033
-      - *id034
-      - *id035
-      - *id036
+      - *id029
+      - *id030
       - *id031
       - *id032
-      - *id037
+      - *id027
+      - *id028
+      - *id033
       - path: src-tauri/src/services/voice_profile_service.rs
         symbol: validate_voice_for_activation
     - name: list_tone_modes
@@ -1376,7 +1325,7 @@ source_catalog:
       - query_map
       parser: rust-pattern
       dependency_targets:
-      - *id031
+      - *id027
     - name: create_tone_mode
       kind: function
       line_start: 480
@@ -1402,17 +1351,13 @@ source_catalog:
       - tone_modes
       parser: rust-pattern
       dependency_targets:
-      - &id042
+      - &id034
         path: src-tauri/src/services/voice_profile_service.rs
         symbol: audit_connection
-      - *id031
-      - &id043
+      - *id027
+      - &id035
         path: src-tauri/src/services/voice_profile_service.rs
         symbol: load_tone_mode
-      - *id038
-      - *id039
-      - *id040
-      - *id041
     - name: update_tone_mode
       kind: function
       line_start: 514
@@ -1438,13 +1383,9 @@ source_catalog:
       - to_string
       parser: rust-pattern
       dependency_targets:
-      - *id042
-      - *id031
-      - *id043
-      - *id038
-      - *id039
-      - *id040
-      - *id041
+      - *id034
+      - *id027
+      - *id035
     - name: list_voice_directions
       kind: function
       line_start: 553
@@ -1461,7 +1402,7 @@ source_catalog:
       - query_map
       parser: rust-pattern
       dependency_targets:
-      - *id031
+      - *id027
     - name: create_voice_direction
       kind: function
       line_start: 566
@@ -1487,15 +1428,11 @@ source_catalog:
       - voice_directions
       parser: rust-pattern
       dependency_targets:
-      - *id042
-      - *id031
-      - &id044
+      - *id034
+      - *id027
+      - &id036
         path: src-tauri/src/services/voice_profile_service.rs
         symbol: load_voice_direction
-      - *id038
-      - *id039
-      - *id040
-      - *id041
     - name: set_voice_direction_status
       kind: function
       line_start: 599
@@ -1525,9 +1462,9 @@ source_catalog:
       - valid_direction_transition
       parser: rust-pattern
       dependency_targets:
-      - *id042
-      - *id031
-      - *id044
+      - *id034
+      - *id027
+      - *id036
       - path: src-tauri/src/services/voice_profile_service.rs
         symbol: valid_direction_transition
     - name: list_writing_rules
@@ -1546,7 +1483,7 @@ source_catalog:
       - query_map
       parser: rust-pattern
       dependency_targets:
-      - *id031
+      - *id027
     - name: create_writing_rule
       kind: function
       line_start: 662
@@ -1571,15 +1508,11 @@ source_catalog:
       - writing_rules
       parser: rust-pattern
       dependency_targets:
-      - *id042
-      - *id031
-      - &id045
+      - *id034
+      - *id027
+      - &id037
         path: src-tauri/src/services/voice_profile_service.rs
         symbol: load_writing_rule
-      - *id038
-      - *id039
-      - *id040
-      - *id041
     - name: update_writing_rule
       kind: function
       line_start: 694
@@ -1605,13 +1538,9 @@ source_catalog:
       - valid_rule_transition
       parser: rust-pattern
       dependency_targets:
-      - *id042
-      - *id031
-      - *id045
-      - *id038
-      - *id039
-      - *id040
-      - *id041
+      - *id034
+      - *id027
+      - *id037
       - path: src-tauri/src/services/voice_profile_service.rs
         symbol: valid_rule_transition
     - name: open_connection
@@ -1734,7 +1663,7 @@ source_catalog:
       - tx.query_row
       parser: rust-pattern
       dependency_targets:
-      - *id046
+      - *id038
     - name: touch_voice
       kind: function
       line_start: 856
@@ -1800,7 +1729,7 @@ source_catalog:
       - to_string
       parser: rust-pattern
       dependency_targets:
-      - *id046
+      - *id038
     - name: map_tone_mode
       kind: function
       line_start: 975
@@ -2004,7 +1933,7 @@ source_catalog:
       - voice_evidence
       parser: rust-pattern
       dependency_targets:
-      - *id031
+      - *id027
     - name: core_voice_requires_attributable_provenance_and_supersedes_transactionally
       kind: function
       line_start: 1194
@@ -2032,31 +1961,31 @@ source_catalog:
       - voice_two.voice_id.clone
       parser: rust-pattern
       dependency_targets:
-      - &id052
+      - &id044
         path: src-tauri/src/commands/voice.rs
         symbol: activate_core_voice
-      - &id053
+      - &id045
         path: src-tauri/src/services/voice_profile_service.rs
         symbol: activate_core_voice
-      - &id047
+      - &id039
         path: src-tauri/src/services/voice_profile_service.rs
         symbol: add_voice_evidence
-      - &id048
+      - &id040
         path: src-tauri/src/commands/voice.rs
         symbol: create_core_voice
-      - &id049
+      - &id041
         path: src-tauri/src/services/voice_profile_service.rs
         symbol: create_core_voice
-      - &id054
+      - &id046
         path: src-tauri/src/commands/voice.rs
         symbol: list_core_voices
-      - &id055
+      - &id047
         path: src-tauri/src/services/voice_profile_service.rs
         symbol: list_core_voices
-      - &id050
+      - &id042
         path: src-tauri/src/commands/voice.rs
         symbol: save_core_voice_trait
-      - &id051
+      - &id043
         path: src-tauri/src/services/voice_profile_service.rs
         symbol: save_core_voice_trait
     - name: rejected_or_retired_voice_evidence_cannot_support_new_traits
@@ -2078,11 +2007,11 @@ source_catalog:
       - voice.voice_id.clone
       parser: rust-pattern
       dependency_targets:
-      - *id047
-      - *id048
-      - *id049
-      - *id050
-      - *id051
+      - *id039
+      - *id040
+      - *id041
+      - *id042
+      - *id043
     - name: later_evidence_retirement_surfaces_without_rewriting_historical_voice
       kind: function
       line_start: 1309
@@ -2110,18 +2039,18 @@ source_catalog:
       - voice.voice_id.clone
       parser: rust-pattern
       dependency_targets:
-      - *id052
-      - *id053
-      - *id047
-      - *id048
-      - *id049
+      - *id044
+      - *id045
+      - *id039
+      - *id040
+      - *id041
       - path: src-tauri/src/services/confidentiality_service.rs
         symbol: drop
-      - *id031
-      - *id054
-      - *id055
-      - *id050
-      - *id051
+      - *id027
+      - *id046
+      - *id047
+      - *id042
+      - *id043
     - name: tone_direction_and_rules_have_independent_lifecycles
       kind: function
       line_start: 1357
@@ -2160,8 +2089,8 @@ source_catalog:
         symbol: create_writing_rule
       - path: src-tauri/src/services/voice_profile_service.rs
         symbol: create_writing_rule
-      - *id054
-      - *id055
+      - *id046
+      - *id047
       - path: src-tauri/src/commands/voice.rs
         symbol: list_tone_modes
       - path: src-tauri/src/services/voice_profile_service.rs

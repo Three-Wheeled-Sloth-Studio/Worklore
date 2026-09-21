@@ -464,7 +464,7 @@ source_catalog:
   - path: src/App.tsx
     analysis_version: 1
     language: typescript
-    content_hash: 97812f134817e6b526b6ed34383e7cc6153bd31d
+    content_hash: 43ca715f17479b811cc57721793465c3eef9971d
     dependencies:
     - ./components/CapturePanel
     - ./components/GuidedInterviewPanel
@@ -519,8 +519,8 @@ source_catalog:
     symbols:
     - name: App
       kind: function
-      line_start: 76
-      line_end: 881
+      line_start: 77
+      line_end: 884
       signature: App()
       inputs: []
       output: unspecified
@@ -593,8 +593,8 @@ source_catalog:
         symbol: handleCreateVault
     - name: refreshWorkspace
       kind: function
-      line_start: 187
-      line_end: 229
+      line_start: 188
+      line_end: 230
       signature: 'refreshWorkspace(vaultPath: string, refreshVault: boolean)'
       inputs:
       - 'vaultPath: string'
@@ -642,8 +642,8 @@ source_catalog:
         symbol: openVault
     - name: refreshPerformance
       kind: function
-      line_start: 230
-      line_end: 239
+      line_start: 231
+      line_end: 240
       signature: 'refreshPerformance(vaultPath: string, reportError)'
       inputs:
       - 'vaultPath: string'
@@ -660,8 +660,8 @@ source_catalog:
       - *id015
     - name: activateVault
       kind: function
-      line_start: 240
-      line_end: 250
+      line_start: 241
+      line_end: 251
       signature: 'activateVault(nextVault: VaultSummary)'
       inputs:
       - 'nextVault: VaultSummary'
@@ -676,8 +676,8 @@ source_catalog:
         symbol: rememberLastVault
     - name: handleCreateVault
       kind: function
-      line_start: 251
-      line_end: 274
+      line_start: 252
+      line_end: 275
       signature: handleCreateVault()
       inputs: []
       output: unspecified
@@ -696,8 +696,8 @@ source_catalog:
       - *id014
     - name: handleChooseVaultLocation
       kind: function
-      line_start: 275
-      line_end: 288
+      line_start: 276
+      line_end: 289
       signature: handleChooseVaultLocation()
       inputs: []
       output: unspecified
@@ -710,8 +710,8 @@ source_catalog:
       dependency_targets: []
     - name: handleOpenVault
       kind: function
-      line_start: 289
-      line_end: 313
+      line_start: 290
+      line_end: 314
       signature: handleOpenVault()
       inputs: []
       output: unspecified
@@ -731,8 +731,8 @@ source_catalog:
       - *id018
     - name: handleCloseVault
       kind: function
-      line_start: 314
-      line_end: 327
+      line_start: 315
+      line_end: 328
       signature: handleCloseVault()
       inputs: []
       output: unspecified
@@ -749,8 +749,8 @@ source_catalog:
       - *id014
     - name: rememberFileLocation
       kind: function
-      line_start: 328
-      line_end: 335
+      line_start: 329
+      line_end: 336
       signature: 'rememberFileLocation(filePath: string)'
       inputs:
       - 'filePath: string'
@@ -764,8 +764,8 @@ source_catalog:
         symbol: rememberLastImportFile
     - name: handleImportSource
       kind: function
-      line_start: 336
-      line_end: 370
+      line_start: 337
+      line_end: 371
       signature: handleImportSource()
       inputs: []
       output: unspecified
@@ -798,8 +798,8 @@ source_catalog:
         symbol: sourceTypeLabel
     - name: handleExtractCandidates
       kind: function
-      line_start: 371
-      line_end: 387
+      line_start: 372
+      line_end: 388
       signature: 'handleExtractCandidates(sourceId: string)'
       inputs:
       - 'sourceId: string'
@@ -818,8 +818,8 @@ source_catalog:
       - *id021
     - name: handleStartInterview
       kind: function
-      line_start: 388
-      line_end: 408
+      line_start: 389
+      line_end: 409
       signature: 'handleStartInterview(candidateId: string)'
       inputs:
       - 'candidateId: string'
@@ -840,8 +840,8 @@ source_catalog:
         symbol: startGuidedInterview
     - name: handleInterviewResponse
       kind: function
-      line_start: 409
-      line_end: 441
+      line_start: 410
+      line_end: 442
       signature: 'handleInterviewResponse(interviewId: string, action: InterviewResponseAction, text: string, classification:
         AnswerClassification | null)'
       inputs:
@@ -866,8 +866,8 @@ source_catalog:
         symbol: submitGuidedInterviewResponse
     - name: handleExportWorkspace
       kind: function
-      line_start: 442
-      line_end: 475
+      line_start: 443
+      line_end: 476
       signature: 'handleExportWorkspace(interviewId: string, target: ManualWorkspaceTarget)'
       inputs:
       - 'interviewId: string'
@@ -891,8 +891,8 @@ source_catalog:
         symbol: refreshPerformance
     - name: handleImportStoryResponse
       kind: function
-      line_start: 476
-      line_end: 509
+      line_start: 477
+      line_end: 510
       signature: 'handleImportStoryResponse(interviewId: string)'
       inputs:
       - 'interviewId: string'
@@ -917,8 +917,8 @@ source_catalog:
       - *id023
     - name: handleCandidateStatusChange
       kind: function
-      line_start: 510
-      line_end: 530
+      line_start: 511
+      line_end: 531
       signature: 'handleCandidateStatusChange(candidateId: string, status: CandidateStatus)'
       inputs:
       - 'candidateId: string'
@@ -942,8 +942,8 @@ source_catalog:
         symbol: setStoryCandidateStatus
     - name: handleStoryStatusChange
       kind: function
-      line_start: 531
-      line_end: 548
+      line_start: 532
+      line_end: 549
       signature: 'handleStoryStatusChange(storyId: string, status: StoryStatus)'
       inputs:
       - 'storyId: string'
@@ -966,8 +966,8 @@ source_catalog:
         symbol: setStoryStatus
     - name: handlePrivacyModeChange
       kind: function
-      line_start: 549
-      line_end: 568
+      line_start: 550
+      line_end: 569
       signature: 'handlePrivacyModeChange(mode: CloudIdentifierMode)'
       inputs:
       - 'mode: CloudIdentifierMode'
@@ -986,8 +986,8 @@ source_catalog:
         symbol: updateCloudIdentifierMode
     - name: handleResolveReview
       kind: function
-      line_start: 569
-      line_end: 586
+      line_start: 570
+      line_end: 587
       signature: 'handleResolveReview(request: ResolveEntityReviewRequest)'
       inputs:
       - 'request: ResolveEntityReviewRequest'
@@ -1007,8 +1007,8 @@ source_catalog:
         symbol: resolveEntityReview
     - name: renderWorkspace
       kind: function
-      line_start: 587
-      line_end: 714
+      line_start: 588
+      line_end: 715
       signature: renderWorkspace()
       inputs: []
       output: unspecified
@@ -1032,8 +1032,8 @@ source_catalog:
       - *id021
     - name: StatusItem
       kind: function
-      line_start: 882
-      line_end: 887
+      line_start: 885
+      line_end: 890
       signature: StatusItem({ value, label, attention)
       inputs:
       - '{ value, label, attention'
@@ -1043,8 +1043,8 @@ source_catalog:
       dependency_targets: []
     - name: StatusPill
       kind: function
-      line_start: 899
-      line_end: 900
+      line_start: 902
+      line_end: 903
       signature: StatusPill({ label, attention)
       inputs:
       - '{ label, attention'
@@ -1054,8 +1054,8 @@ source_catalog:
       dependency_targets: []
     - name: Feedback
       kind: function
-      line_start: 903
-      line_end: 904
+      line_start: 906
+      line_end: 907
       signature: 'Feedback({ notice, error }: { notice: string | null; error: string | null })'
       inputs:
       - '{ notice, error }: { notice: string | null; error: string | null }'
@@ -1065,8 +1065,8 @@ source_catalog:
       dependency_targets: []
     - name: BusyLayer
       kind: function
-      line_start: 914
-      line_end: 918
+      line_start: 917
+      line_end: 921
       signature: 'BusyLayer({ message, activeOperation, }: { message: string | null; activeOperation: ActiveOperation | null;
         })'
       inputs:
@@ -1077,8 +1077,8 @@ source_catalog:
       dependency_targets: []
     - name: sourceTypeLabel
       kind: function
-      line_start: 941
-      line_end: 944
+      line_start: 944
+      line_end: 947
       signature: 'sourceTypeLabel(sourceType: SourceType) -> string'
       inputs:
       - 'sourceType: SourceType'
@@ -1089,8 +1089,8 @@ source_catalog:
       dependency_targets: []
     - name: candidateStatusMessage
       kind: function
-      line_start: 945
-      line_end: 957
+      line_start: 948
+      line_end: 960
       signature: 'candidateStatusMessage(status: CandidateStatus) -> string'
       inputs:
       - 'status: CandidateStatus'
@@ -1100,8 +1100,8 @@ source_catalog:
       dependency_targets: []
     - name: displayVaultPath
       kind: function
-      line_start: 958
-      line_end: 963
+      line_start: 961
+      line_end: 966
       signature: 'displayVaultPath(parentPath: string, name: string) -> string'
       inputs:
       - 'parentPath: string'
@@ -1115,8 +1115,8 @@ source_catalog:
       dependency_targets: []
     - name: formatDate
       kind: function
-      line_start: 964
-      line_end: 971
+      line_start: 967
+      line_end: 974
       signature: 'formatDate(value: string) -> string'
       inputs:
       - 'value: string'
@@ -1131,8 +1131,8 @@ source_catalog:
       dependency_targets: []
     - name: formatElapsed
       kind: function
-      line_start: 972
-      line_end: 979
+      line_start: 975
+      line_end: 982
       signature: 'formatElapsed(durationMs: number) -> string'
       inputs:
       - 'durationMs: number'
@@ -1145,8 +1145,8 @@ source_catalog:
       dependency_targets: []
     - name: humanize
       kind: function
-      line_start: 980
-      line_end: 983
+      line_start: 983
+      line_end: 986
       signature: 'humanize(value: string) -> string'
       inputs:
       - 'value: string'

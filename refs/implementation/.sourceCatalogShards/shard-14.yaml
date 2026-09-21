@@ -170,6 +170,214 @@ source_catalog:
         symbol: drop
       - *id005
       - *id006
+  - path: src/components/DiscoveryPanel.tsx
+    analysis_version: 1
+    language: typescript
+    content_hash: 008e621c5da40d4e63c131a5b03ea5945220ffbf
+    dependencies:
+    - ../domain/discovery
+    - ../domain/types
+    - ../lib/workloreApi
+    - react
+    provides:
+    - refresh
+    - scan
+    - saveInspiration
+    - dismiss
+    - toggleReason
+    - saveFeedback
+    - createTopic
+    - openSource
+    - Explanation
+    - MatchRow
+    - humanize
+    symbols:
+    - name: refresh
+      kind: function
+      line_start: 48
+      line_end: 55
+      signature: refresh()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - listDiscoveryOpportunities
+      - setError
+      - setOpportunities
+      parser: typescript-pattern
+      dependency_targets:
+      - &id007
+        path: src/domain/types.ts
+        symbol: errorMessage
+      - path: src/lib/workloreApi.ts
+        symbol: listDiscoveryOpportunities
+    - name: scan
+      kind: function
+      line_start: 56
+      line_end: 79
+      signature: scan()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - focus.trim
+      - refresh
+      - scanDiscovery
+      - setBusy
+      - setError
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - *id007
+      - path: src/lib/workloreApi.ts
+        symbol: scanDiscovery
+    - name: saveInspiration
+      kind: function
+      line_start: 80
+      line_end: 93
+      signature: 'saveInspiration(opportunityId: string)'
+      inputs:
+      - 'opportunityId: string'
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - refresh
+      - saveDiscoveryInspiration
+      - setBusy
+      - setError
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - *id007
+      - path: src/lib/workloreApi.ts
+        symbol: saveDiscoveryInspiration
+    - name: dismiss
+      kind: function
+      line_start: 94
+      line_end: 106
+      signature: 'dismiss(opportunityId: string)'
+      inputs:
+      - 'opportunityId: string'
+      output: unspecified
+      dependencies:
+      - dismissDiscoveryOpportunity
+      - errorMessage
+      - refresh
+      - setBusy
+      - setError
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/lib/workloreApi.ts
+        symbol: dismissDiscoveryOpportunity
+      - *id007
+    - name: toggleReason
+      kind: function
+      line_start: 221
+      line_end: 228
+      signature: 'toggleReason(reason: string)'
+      inputs:
+      - 'reason: string'
+      output: unspecified
+      dependencies:
+      - current.filter
+      - current.includes
+      - setReasons
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: saveFeedback
+      kind: function
+      line_start: 229
+      line_end: 251
+      signature: saveFeedback()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - feedbackNote.trim
+      - onBusy
+      - onError
+      - onNotice
+      - onRefresh
+      - recordDiscoveryFeedback
+      - setFeedbackNote
+      - setReasons
+      parser: typescript-pattern
+      dependency_targets:
+      - *id007
+      - path: src/lib/workloreApi.ts
+        symbol: recordDiscoveryFeedback
+    - name: createTopic
+      kind: function
+      line_start: 252
+      line_end: 273
+      signature: createTopic()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - developDiscoveryTopic
+      - errorMessage
+      - onBusy
+      - onError
+      - onNotice
+      - onTopicDeveloped
+      - topicSummary.trim
+      - topicTitle.trim
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/lib/workloreApi.ts
+        symbol: developDiscoveryTopic
+      - *id007
+    - name: openSource
+      kind: function
+      line_start: 274
+      line_end: 282
+      signature: 'openSource(url: string)'
+      inputs:
+      - 'url: string'
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - onError
+      - openDiscoverySource
+      parser: typescript-pattern
+      dependency_targets:
+      - *id007
+      - path: src/lib/workloreApi.ts
+        symbol: openDiscoverySource
+    - name: Explanation
+      kind: function
+      line_start: 478
+      line_end: 479
+      signature: 'Explanation({ title, body }: { title: string; body: string })'
+      inputs:
+      - '{ title, body }: { title: string; body: string }'
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: MatchRow
+      kind: function
+      line_start: 487
+      line_end: 488
+      signature: 'MatchRow({ label, values }: { label: string; values: string[] })'
+      inputs:
+      - '{ label, values }: { label: string; values: string[] }'
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: humanize
+      kind: function
+      line_start: 496
+      line_end: 499
+      signature: 'humanize(value: string) -> string'
+      inputs:
+      - 'value: string'
+      output: string
+      dependencies:
+      - value.replaceAll
+      parser: typescript-pattern
+      dependency_targets: []
   - path: src/domain/editLearning.ts
     analysis_version: 1
     language: typescript
