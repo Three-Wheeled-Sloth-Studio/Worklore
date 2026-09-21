@@ -1040,7 +1040,7 @@ mod tests {
     fn initializes_database() {
         let p = vault();
         assert!(database_path(&p).is_file());
-        assert_eq!(schema_version(&p).unwrap(), 8);
+        assert_eq!(schema_version(&p).unwrap(), 9);
         fs::remove_dir_all(p).unwrap();
     }
     #[test]
