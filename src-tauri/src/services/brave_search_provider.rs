@@ -41,7 +41,7 @@ pub async fn search(
     if query.is_empty() {
         return Err(provider_error(
             "invalid_request",
-            "Enter a discovery focus or create an active Theme before scanning.",
+            "The discovery search query cannot be empty.",
         ));
     }
     if query.chars().count() > MAX_QUERY_CHARACTERS {
