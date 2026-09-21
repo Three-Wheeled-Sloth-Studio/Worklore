@@ -186,7 +186,7 @@ pub fn record_feedback(
     let note_tokens = tokens(&note);
     let normalized_signals = json!({
         "verdict": request.verdict.as_str(),
-        "reasons": reasons,
+        "reasons": reasons.clone(),
         "opportunityTokens": opportunity_tokens.iter().cloned().collect::<Vec<_>>(),
         "noteTokens": note_tokens.iter().cloned().collect::<Vec<_>>()
     });
@@ -544,7 +544,11 @@ fn qualify_cluster(
             }
         }
     }
-    let feedback_bias = positive.cmp(&negative) as i8;
+    let feedback_bias = match positive.cmp(&negative) {
+        Ordering::Greater => 1,
+        Ordering::Equal => 0,
+        Ordering::Less => -1,
+    };
     let feedback_adjustment = if positive > negative {
         Some(format!(
             "Similar to {} prior opportunit{} you marked as a good candidate.",
@@ -868,20 +872,36 @@ fn signal_matches(left: &BTreeSet<String>, right: &BTreeSet<String>) -> bool {
 
 fn load_prior_feedback(connection: &Connection) -> ServiceResult<Vec<PriorFeedback>> {
     let mut statement = connection.prepare(
-        "SELECT f.feedback_id,f.verdict,o.feature_tokens_json
+        "SELECT f.feedback_id,f.verdict,f.normalized_signals_json
          FROM discovery_feedback f
-         JOIN discovery_opportunities o ON o.opportunity_id=f.opportunity_id
          ORDER BY f.created_at DESC LIMIT ?1",
     )?;
     let rows = statement.query_map(
         [i64::try_from(MAX_FEEDBACK_EXAMPLES).unwrap_or(40)],
         |row| {
-            let raw_tokens = row.get::<_, String>(2)?;
-            let parsed = serde_json::from_str::<Vec<String>>(&raw_tokens).unwrap_or_default();
+            let normalized = row.get::<_, String>(2)?;
+            let value = serde_json::from_str::<Value>(&normalized).unwrap_or_else(|_| json!({}));
+            let mut parsed = value
+                .get("opportunityTokens")
+                .and_then(Value::as_array)
+                .into_iter()
+                .flatten()
+                .filter_map(Value::as_str)
+                .map(ToOwned::to_owned)
+                .collect::<BTreeSet<_>>();
+            parsed.extend(
+                value
+                    .get("noteTokens")
+                    .and_then(Value::as_array)
+                    .into_iter()
+                    .flatten()
+                    .filter_map(Value::as_str)
+                    .map(ToOwned::to_owned),
+            );
             Ok(PriorFeedback {
                 feedback_id: row.get(0)?,
                 verdict: row.get(1)?,
-                tokens: parsed.into_iter().collect(),
+                tokens: parsed,
             })
         },
     )?;
