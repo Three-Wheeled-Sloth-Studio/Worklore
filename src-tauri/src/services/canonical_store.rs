@@ -22,7 +22,7 @@ use crate::{
 };
 
 pub const DATABASE_RELATIVE_PATH: &str = "data/worklore.sqlite";
-const CURRENT_SCHEMA_VERSION: i64 = 8;
+const CURRENT_SCHEMA_VERSION: i64 = 9;
 const MIGRATION_NAME: &str = "prototype_to_professional_memory_v1";
 
 const SCHEMA_V1: &str = r#"
@@ -295,6 +295,62 @@ CREATE TABLE post_revisions (
 );
 CREATE INDEX idx_post_revisions_post_sequence ON post_revisions(post_id, sequence);
 CREATE INDEX idx_post_revisions_parent ON post_revisions(parent_revision_id);
+"#;
+
+const SCHEMA_V9: &str = r#"
+CREATE TABLE discovery_runs (
+  run_id TEXT PRIMARY KEY,
+  provider_id TEXT NOT NULL,
+  focus_text TEXT NOT NULL,
+  external_query TEXT NOT NULL,
+  freshness TEXT NOT NULL CHECK (freshness IN ('day','week','month')),
+  requested_count INTEGER NOT NULL,
+  feedback_examples_used INTEGER NOT NULL,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX idx_discovery_runs_created ON discovery_runs(created_at DESC);
+
+CREATE TABLE discovery_opportunities (
+  opportunity_id TEXT PRIMARY KEY,
+  run_id TEXT NOT NULL,
+  title TEXT NOT NULL,
+  summary TEXT NOT NULL,
+  sources_json TEXT NOT NULL,
+  theme_matches_json TEXT NOT NULL,
+  standing_matches_json TEXT NOT NULL,
+  audience_matches_json TEXT NOT NULL,
+  why_now TEXT NOT NULL,
+  possible_angle TEXT NOT NULL,
+  concerns_json TEXT NOT NULL,
+  feedback_adjustment TEXT,
+  status TEXT NOT NULL CHECK (status IN ('candidate','inspiration_saved','topic_created','dismissed')),
+  feature_tokens_json TEXT NOT NULL,
+  rank_position INTEGER NOT NULL,
+  topic_id TEXT,
+  inspiration_id TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  FOREIGN KEY(run_id) REFERENCES discovery_runs(run_id) ON DELETE CASCADE
+);
+CREATE INDEX idx_discovery_opportunities_run_rank
+  ON discovery_opportunities(run_id, rank_position);
+CREATE INDEX idx_discovery_opportunities_created
+  ON discovery_opportunities(created_at DESC);
+
+CREATE TABLE discovery_feedback (
+  feedback_id TEXT PRIMARY KEY,
+  opportunity_id TEXT NOT NULL,
+  verdict TEXT NOT NULL CHECK (verdict IN ('good_candidate','not_for_me','not_now')),
+  reasons_json TEXT NOT NULL,
+  user_note TEXT NOT NULL,
+  normalized_signals_json TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  FOREIGN KEY(opportunity_id) REFERENCES discovery_opportunities(opportunity_id) ON DELETE CASCADE
+);
+CREATE INDEX idx_discovery_feedback_opportunity
+  ON discovery_feedback(opportunity_id, created_at DESC);
+CREATE INDEX idx_discovery_feedback_created
+  ON discovery_feedback(created_at DESC);
 "#;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -624,6 +680,16 @@ fn migrate_schema(connection: &mut Connection) -> ServiceResult<()> {
         tx.execute_batch(SCHEMA_V8)?;
         tx.execute(
             "INSERT INTO schema_migrations(version,name,applied_at) VALUES (8,'post_revision_lineage_v8',?1)",
+            [Utc::now().to_rfc3339()],
+        )?;
+        tx.commit()?;
+        version = 8;
+    }
+    if version == 8 {
+        let tx = connection.transaction()?;
+        tx.execute_batch(SCHEMA_V9)?;
+        tx.execute(
+            "INSERT INTO schema_migrations(version,name,applied_at) VALUES (9,'discovery_learning_v9',?1)",
             [Utc::now().to_rfc3339()],
         )?;
         tx.commit()?;
