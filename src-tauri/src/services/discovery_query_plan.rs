@@ -18,10 +18,6 @@ impl DiscoveryQueryPlan {
         &self.queries
     }
 
-    pub fn len(&self) -> usize {
-        self.queries.len()
-    }
-
     pub fn is_explicit_focus(&self) -> bool {
         self.explicit_focus
     }
@@ -100,7 +96,7 @@ mod tests {
     fn blank_focus_succeeds_without_themes_or_other_personal_signals() {
         let plan = build_query_plan("", &[], &[], &[]);
 
-        assert_eq!(plan.len(), MAX_DISCOVERY_QUERIES);
+        assert_eq!(plan.queries().len(), MAX_DISCOVERY_QUERIES);
         assert!(plan.queries().iter().all(|query| !query.is_empty()));
     }
 
@@ -113,13 +109,13 @@ mod tests {
             &["New agent workflow release".into()],
         );
 
-        assert_eq!(plan.len(), MAX_DISCOVERY_QUERIES);
+        assert_eq!(plan.queries().len(), MAX_DISCOVERY_QUERIES);
         let unique = plan
             .queries()
             .iter()
             .map(|query| query.to_ascii_lowercase())
             .collect::<std::collections::BTreeSet<_>>();
-        assert_eq!(unique.len(), plan.len());
+        assert_eq!(unique.len(), plan.queries().len());
     }
 
     #[test]
