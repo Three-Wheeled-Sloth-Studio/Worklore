@@ -248,14 +248,17 @@ export function ProviderSettingsPanel() {
         <p className="eyebrow">Web discovery</p>
         <h3 id="discovery-provider-heading">Timely-topic search</h3>
         <p className="provider-note">
-          Discovery is separate from the selected LLM provider. WorkLore uses Brave Search only when
-          you press Scan now, and privacy-preflights the search query before it leaves the machine.
+          Discovery is separate from the selected LLM provider. Scan now uses keyless seeded public
+          sources by default and applies your Focus locally after retrieval. A Brave key is optional
+          compatibility storage and is not required for the default discovery path.
         </p>
         <div className="provider-endpoint-row">
-          <span className="field-label">Search endpoint</span>
+          <span className="field-label">Optional Brave endpoint</span>
           <code>{BRAVE_SEARCH_ENDPOINT}</code>
         </div>
-        <label className="field-label" htmlFor="brave-search-api-key">Brave Search API key</label>
+        <label className="field-label" htmlFor="brave-search-api-key">
+          Optional Brave Search API key
+        </label>
         <input
           id="brave-search-api-key"
           type="password"
@@ -299,8 +302,9 @@ export function ProviderSettingsPanel() {
           ) : null}
         </div>
         <p className="provider-note">
-          The key uses the same Windows user-scoped protection as LLM BYOK credentials and is never
-          returned to the UI after saving.
+          This key is not used by the default seeded discovery path. If retained, it uses the same
+          Windows user-scoped protection as LLM BYOK credentials and is never returned to the UI
+          after saving.
         </p>
       </div>
 
