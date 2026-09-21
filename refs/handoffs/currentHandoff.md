@@ -33,7 +33,7 @@ Locked boundaries remain:
 
 Version: `0.1.10`
 
-The keyless seeded discovery slice replaces Brave as the default retrieval path. Final acceptance still requires the normal exact-head validation gate. Promoted branches remain unchanged until explicitly requested.
+The keyless seeded discovery slice replaces Brave as the default retrieval path and is accepted after the normal exact-head validation gate. Promoted branches remain unchanged until explicitly requested.
 
 What changed:
 
@@ -57,7 +57,7 @@ What changed:
 Generated source catalog after this slice:
 
 - 130 tracked source files;
-- 1,305 symbols;
+- 1,318 symbols;
 - 80 Rust source files;
 - 49 TypeScript source files;
 - 1 Python source file.
