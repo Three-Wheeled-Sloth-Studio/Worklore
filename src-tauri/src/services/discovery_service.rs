@@ -20,8 +20,8 @@ use crate::{
     },
     error::{ServiceResult, WorkLoreError},
     services::{
-        app_preferences_service, brave_search_provider, canonical_store, inspiration_service,
-        redaction_service, topic_service,
+        app_preferences_service, brave_search_provider, canonical_store, discovery_query_plan,
+        inspiration_service, redaction_service, topic_service,
     },
 };
 
@@ -65,21 +65,50 @@ struct QualificationContext<'a> {
     now: &'a str,
 }
 
+#[derive(Debug, Default, PartialEq, Eq)]
+struct FeedbackSummary {
+    positive: usize,
+    negative: usize,
+    not_now: usize,
+}
+
+impl FeedbackSummary {
+    fn bias(&self) -> i8 {
+        match self.positive.cmp(&self.negative) {
+            Ordering::Greater => 1,
+            Ordering::Equal => 0,
+            Ordering::Less => -1,
+        }
+    }
+}
+
+#[derive(Debug, Default)]
+struct QueryPlanSignals {
+    theme_labels: Vec<String>,
+    target_context_labels: Vec<String>,
+    good_candidate_titles: Vec<String>,
+}
+
 pub async fn scan(
     vault_path: &Path,
     request: ScanDiscoveryRequest,
 ) -> ServiceResult<DiscoveryScanResult> {
     canonical_store::initialize(vault_path)?;
     let connection = open_connection(vault_path)?;
-    let raw_query = discovery_query(&connection, &request.focus)?;
+    let plan_signals = load_query_plan_signals(&connection)?;
+    let query_plan = discovery_query_plan::build_query_plan(
+        &request.focus,
+        &plan_signals.theme_labels,
+        &plan_signals.target_context_labels,
+        &plan_signals.good_candidate_titles,
+    );
     drop(connection);
 
-    let redacted = redaction_service::redact_for_external_use(vault_path, &raw_query)?;
-    let external_query = redacted.text.trim().to_string();
-    if external_query.is_empty() {
+    let external_queries = privacy_safe_queries(vault_path, &query_plan)?;
+    if external_queries.is_empty() {
         return Err(discovery_error(
             "invalid_request",
-            "The discovery focus was empty after privacy preflight. Enter a broader public-safe focus.",
+            "No public-safe discovery queries remained after privacy preflight.",
         ));
     }
 
@@ -93,13 +122,16 @@ pub async fn scan(
         .max_results
         .unwrap_or(DEFAULT_SEARCH_RESULTS)
         .clamp(5, 20);
-    let results = brave_search_provider::search(
-        &api_key,
-        &external_query,
-        request.freshness,
-        requested_count,
-    )
-    .await?;
+    let query_count = external_queries.len();
+    let base_count = requested_count / query_count;
+    let remainder = requested_count % query_count;
+    let mut results = Vec::new();
+    for (index, query) in external_queries.iter().enumerate() {
+        let count = base_count + usize::from(index < remainder);
+        results.extend(
+            brave_search_provider::search(&api_key, query, request.freshness, count.max(1)).await?,
+        );
+    }
 
     let connection = open_connection(vault_path)?;
     let themes = load_theme_signals(&connection)?;
@@ -132,6 +164,7 @@ pub async fn scan(
     ranked.sort_by(compare_ranked);
     ranked.truncate(MAX_STORED_OPPORTUNITIES_PER_SCAN);
 
+    let external_query = external_queries.join(" || ");
     connection.execute(
         "INSERT INTO discovery_runs(
            run_id,provider_id,focus_text,external_query,freshness,requested_count,
@@ -156,6 +189,7 @@ pub async fn scan(
     Ok(DiscoveryScanResult {
         run_id,
         external_query,
+        external_queries,
         freshness: request.freshness,
         feedback_examples_used: used_feedback_ids.len(),
         opportunities,
@@ -538,42 +572,26 @@ fn qualify_cluster(
     let recent_matches = matching_signals(context.recent_topics, &feature_tokens);
     let recent_overlap = !recent_matches.is_empty();
 
-    let mut positive = 0usize;
-    let mut negative = 0usize;
-    let mut not_now = 0usize;
-    for feedback in context.prior_feedback {
-        if token_similarity(&feature_tokens, &feedback.tokens) {
-            used_feedback_ids.insert(feedback.feedback_id.clone());
-            match feedback.verdict.as_str() {
-                "good_candidate" => positive += 1,
-                "not_for_me" => negative += 1,
-                "not_now" => not_now += 1,
-                _ => {}
-            }
-        }
-    }
-    let feedback_bias = match positive.cmp(&negative) {
-        Ordering::Greater => 1,
-        Ordering::Equal => 0,
-        Ordering::Less => -1,
-    };
-    let feedback_adjustment = if positive > negative {
+    let feedback =
+        summarize_feedback(context.prior_feedback, &feature_tokens, used_feedback_ids);
+    let feedback_bias = feedback.bias();
+    let feedback_adjustment = if feedback.positive > feedback.negative {
         Some(format!(
             "Similar to {} prior opportunit{} you marked as a good candidate.",
-            positive,
-            if positive == 1 { "y" } else { "ies" }
+            feedback.positive,
+            if feedback.positive == 1 { "y" } else { "ies" }
         ))
-    } else if negative > positive {
+    } else if feedback.negative > feedback.positive {
         Some(format!(
             "Similar to {} prior opportunit{} you marked as not for you.",
-            negative,
-            if negative == 1 { "y" } else { "ies" }
+            feedback.negative,
+            if feedback.negative == 1 { "y" } else { "ies" }
         ))
-    } else if not_now > 0 {
+    } else if feedback.not_now > 0 {
         Some(format!(
             "Similar to {} prior opportunit{} you marked as not timely then; WorkLore is not treating that as a topic rejection.",
-            not_now,
-            if not_now == 1 { "y" } else { "ies" }
+            feedback.not_now,
+            if feedback.not_now == 1 { "y" } else { "ies" }
         ))
     } else {
         None
@@ -628,7 +646,7 @@ fn qualify_cluster(
             recent_matches[0].label
         ));
     }
-    if negative > positive {
+    if feedback.negative > feedback.positive {
         concerns
             .push("Prior discovery feedback suggests this may be a poor personal fit.".to_string());
     }
@@ -785,26 +803,62 @@ fn load_opportunity(
     })
 }
 
-fn discovery_query(connection: &Connection, focus: &str) -> ServiceResult<String> {
-    let focus = focus.trim();
-    if !focus.is_empty() {
-        return Ok(focus.to_string());
+fn privacy_safe_queries(
+    vault_path: &Path,
+    plan: &discovery_query_plan::DiscoveryQueryPlan,
+) -> ServiceResult<Vec<String>> {
+    let mut external_queries = Vec::new();
+    let mut seen = HashSet::new();
+    for query in plan.queries() {
+        let redacted = redaction_service::redact_for_external_use(vault_path, query)?;
+        let external_query = redacted.text.trim().to_string();
+        if external_query.is_empty() {
+            if plan.is_explicit_focus() {
+                return Err(discovery_error(
+                    "invalid_request",
+                    "The discovery focus was empty after privacy preflight. Enter a broader public-safe focus.",
+                ));
+            }
+            continue;
+        }
+        if seen.insert(external_query.to_ascii_lowercase()) {
+            external_queries.push(external_query);
+        }
     }
-    let mut statement = connection.prepare(
-        "SELECT name FROM themes WHERE status!='retired'
-         ORDER BY CASE status WHEN 'active' THEN 0 ELSE 1 END,updated_at DESC LIMIT 3",
-    )?;
-    let names = statement
+    Ok(external_queries)
+}
+
+fn load_query_plan_signals(connection: &Connection) -> ServiceResult<QueryPlanSignals> {
+    Ok(QueryPlanSignals {
+        theme_labels: load_string_column(
+            connection,
+            "SELECT name FROM themes WHERE status!='retired'
+             ORDER BY CASE status WHEN 'active' THEN 0 ELSE 1 END,updated_at DESC LIMIT 4",
+        )?,
+        target_context_labels: load_string_column(
+            connection,
+            "SELECT title FROM target_contexts WHERE status='active'
+             ORDER BY updated_at DESC LIMIT 4",
+        )?,
+        good_candidate_titles: load_string_column(
+            connection,
+            "SELECT o.title
+             FROM discovery_feedback f
+             JOIN discovery_opportunities o ON o.opportunity_id=f.opportunity_id
+             WHERE f.verdict='good_candidate'
+             ORDER BY f.created_at DESC LIMIT 4",
+        )?,
+    })
+}
+
+fn load_string_column(connection: &Connection, sql: &str) -> ServiceResult<Vec<String>> {
+    let mut statement = connection.prepare(sql)?;
+    let values = statement
         .query_map([], |row| row.get::<_, String>(0))?
         .collect::<Result<Vec<_>, _>>()?;
-    if names.is_empty() {
-        return Err(discovery_error(
-            "invalid_request",
-            "Enter a discovery focus or create an active Theme before scanning.",
-        ));
-    }
-    Ok(names.join(" OR "))
+    Ok(values)
 }
+
 
 fn load_theme_signals(connection: &Connection) -> ServiceResult<Vec<SignalRecord>> {
     load_signals(
@@ -933,6 +987,26 @@ fn load_prior_feedback(connection: &Connection) -> ServiceResult<Vec<PriorFeedba
     Ok(rows.collect::<Result<Vec<_>, _>>()?)
 }
 
+fn summarize_feedback(
+    prior_feedback: &[PriorFeedback],
+    feature_tokens: &BTreeSet<String>,
+    used_feedback_ids: &mut HashSet<String>,
+) -> FeedbackSummary {
+    let mut summary = FeedbackSummary::default();
+    for feedback in prior_feedback {
+        if token_similarity(feature_tokens, &feedback.tokens) {
+            used_feedback_ids.insert(feedback.feedback_id.clone());
+            match feedback.verdict.as_str() {
+                "good_candidate" => summary.positive += 1,
+                "not_for_me" => summary.negative += 1,
+                "not_now" => summary.not_now += 1,
+                _ => {}
+            }
+        }
+    }
+    summary
+}
+
 fn token_similarity(left: &BTreeSet<String>, right: &BTreeSet<String>) -> bool {
     let common = left.intersection(right).count();
     if common < 2 {
@@ -944,7 +1018,11 @@ fn token_similarity(left: &BTreeSet<String>, right: &BTreeSet<String>) -> bool {
 
 fn cluster_sources(results: Vec<DiscoverySourceView>) -> Vec<Vec<DiscoverySourceView>> {
     let mut clusters: Vec<(BTreeSet<String>, Vec<DiscoverySourceView>)> = Vec::new();
+    let mut seen_urls = HashSet::new();
     for source in results {
+        if !seen_urls.insert(source.url.clone()) {
+            continue;
+        }
         let source_tokens = tokens(&source.title);
         if let Some((cluster_tokens, cluster)) = clusters
             .iter_mut()
@@ -1106,5 +1184,228 @@ mod tests {
             ]),
             vec!["too_generic".to_string()]
         );
+    }
+
+    #[test]
+    fn duplicate_urls_from_exploration_queries_collapse_before_qualification() {
+        let results = vec![
+            DiscoverySourceView {
+                title: "Agent workflow tools expand".into(),
+                url: "https://example.com/same".into(),
+                description: "First result".into(),
+                age: None,
+                domain: "example.com".into(),
+            },
+            DiscoverySourceView {
+                title: "A differently worded duplicate result".into(),
+                url: "https://example.com/same".into(),
+                description: "Second query returned the same page".into(),
+                age: None,
+                domain: "example.com".into(),
+            },
+        ];
+
+        let clustered = cluster_sources(results);
+        assert_eq!(clustered.len(), 1);
+        assert_eq!(clustered[0].len(), 1);
+    }
+
+    #[test]
+    fn feedback_keeps_timing_separate_from_personal_fit() {
+        let feature_tokens = tokens("agent workflow product management");
+        let make_feedback = |id: &str, verdict: &str| PriorFeedback {
+            feedback_id: id.into(),
+            verdict: verdict.into(),
+            tokens: feature_tokens.clone(),
+        };
+
+        let mut used = HashSet::new();
+        let timing_only = summarize_feedback(
+            &[make_feedback("timing", "not_now")],
+            &feature_tokens,
+            &mut used,
+        );
+        assert_eq!(timing_only.bias(), 0);
+        assert_eq!(timing_only.not_now, 1);
+
+        let mut used = HashSet::new();
+        let positive = summarize_feedback(
+            &[make_feedback("good", "good_candidate")],
+            &feature_tokens,
+            &mut used,
+        );
+        assert_eq!(positive.bias(), 1);
+
+        let mut used = HashSet::new();
+        let negative = summarize_feedback(
+            &[make_feedback("no", "not_for_me")],
+            &feature_tokens,
+            &mut used,
+        );
+        assert_eq!(negative.bias(), -1);
+    }
+
+    #[test]
+    fn query_plan_inputs_exclude_story_and_proof_point_bodies() {
+        use crate::services::{topic_service, vault_service};
+        use std::fs;
+
+        let path =
+            std::env::temp_dir().join(format!("worklore-discovery-plan-{}", Uuid::now_v7()));
+        vault_service::create_vault(&path, "Discovery Plan Test").expect("create vault");
+        canonical_store::create_story(
+            &path,
+            "Private customer recovery",
+            "PROJECT NIGHTJAR confidential customer narrative",
+        )
+        .expect("create story");
+        let connection = open_connection(&path).expect("open database");
+        connection
+            .execute(
+                "INSERT INTO proof_points(
+                   proof_id,statement,status,provenance_json,created_at,updated_at,revision)
+                 VALUES ('proof_private','PRIVATE PROOF AMOUNT','active','{}','now','now',1)",
+                [],
+            )
+            .expect("insert proof point");
+        drop(connection);
+
+        topic_service::create_theme(
+            &path,
+            topic_service::CreateThemeRequest {
+                name: "Public professional theme".into(),
+                description: "Public-safe framing".into(),
+            },
+        )
+        .expect("create theme");
+
+        let connection = open_connection(&path).expect("open database");
+        let signals = load_query_plan_signals(&connection).expect("load plan signals");
+        let plan = discovery_query_plan::build_query_plan(
+            "",
+            &signals.theme_labels,
+            &signals.target_context_labels,
+            &signals.good_candidate_titles,
+        );
+        let rendered = plan.queries().join(" ");
+
+        assert!(rendered.contains("Public professional theme"));
+        assert!(!rendered.contains("PROJECT NIGHTJAR"));
+        assert!(!rendered.contains("PRIVATE PROOF AMOUNT"));
+        drop(connection);
+        fs::remove_dir_all(path).expect("cleanup");
+    }
+
+    #[test]
+    fn develop_topic_requires_explicit_user_summary() {
+        use crate::services::vault_service;
+        use std::fs;
+
+        let path =
+            std::env::temp_dir().join(format!("worklore-discovery-topic-{}", Uuid::now_v7()));
+        vault_service::create_vault(&path, "Discovery Topic Test").expect("create vault");
+
+        let error = develop_topic(
+            &path,
+            DevelopDiscoveryTopicRequest {
+                opportunity_id: "missing-opportunity".into(),
+                title: "Reviewed title".into(),
+                summary: "   ".into(),
+            },
+        )
+        .expect_err("blank summary must fail before topic creation");
+
+        assert!(error.to_string().contains("Topic summary cannot be empty"));
+        fs::remove_dir_all(path).expect("cleanup");
+    }
+
+    #[test]
+    fn saving_discovery_inspiration_preserves_external_source_provenance() {
+        use crate::services::vault_service;
+        use std::fs;
+
+        let path =
+            std::env::temp_dir().join(format!("worklore-discovery-source-{}", Uuid::now_v7()));
+        vault_service::create_vault(&path, "Discovery Source Test").expect("create vault");
+        let connection = open_connection(&path).expect("open database");
+        let run_id = "run_test";
+        connection
+            .execute(
+                "INSERT INTO discovery_runs(
+                   run_id,provider_id,focus_text,external_query,freshness,requested_count,
+                   feedback_examples_used,created_at)
+                 VALUES (?1,'brave_search','','technology digital work trends','week',5,0,'now')",
+                [run_id],
+            )
+            .expect("insert discovery run");
+
+        let source = DiscoverySourceView {
+            title: "Public source title".into(),
+            url: "https://example.com/source".into(),
+            description: "Public source description".into(),
+            age: Some("1 day ago".into()),
+            domain: "example.com".into(),
+        };
+        let ranked = RankedOpportunity {
+            view: DiscoveryOpportunityView {
+                opportunity_id: "opportunity_test".into(),
+                run_id: run_id.into(),
+                title: source.title.clone(),
+                summary: source.description.clone(),
+                sources: vec![source.clone()],
+                theme_matches: Vec::new(),
+                standing_matches: Vec::new(),
+                audience_matches: Vec::new(),
+                why_now: "Current source".into(),
+                possible_angle: "Explore it".into(),
+                concerns: Vec::new(),
+                feedback_adjustment: None,
+                status: DiscoveryOpportunityStatus::Candidate,
+                topic_id: None,
+                inspiration_id: None,
+                created_at: "now".into(),
+            },
+            feature_tokens: tokens("Public source title Public source description"),
+            provider_position: 0,
+            feedback_bias: 0,
+            recent_overlap: false,
+        };
+        persist_opportunity(&connection, &ranked, 0).expect("persist opportunity");
+        drop(connection);
+
+        let saved = save_as_inspiration(&path, "opportunity_test").expect("save inspiration");
+        let connection = open_connection(&path).expect("reopen database");
+        let (source_origin, provenance): (String, String) = connection
+            .query_row(
+                "SELECT source_origin,provenance_json FROM sources
+                 WHERE source_origin='discovery_external' LIMIT 1",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?)),
+            )
+            .expect("load discovery source");
+        let provenance: Value = serde_json::from_str(&provenance).expect("parse provenance");
+        let linked_inspiration: String = connection
+            .query_row(
+                "SELECT inspiration_id FROM discovery_opportunities
+                 WHERE opportunity_id='opportunity_test'",
+                [],
+                |row| row.get(0),
+            )
+            .expect("load inspiration link");
+
+        assert_eq!(source_origin, "discovery_external");
+        assert_eq!(
+            provenance.get("sourceUrl").and_then(Value::as_str),
+            Some(source.url.as_str())
+        );
+        assert_eq!(
+            provenance
+                .get("discoveryOpportunityId")
+                .and_then(Value::as_str),
+            Some("opportunity_test")
+        );
+        assert_eq!(linked_inspiration, saved.inspiration_id);
+        drop(connection);
+        fs::remove_dir_all(path).expect("cleanup");
     }
 }
