@@ -524,7 +524,6 @@ export interface ProviderSettings {
   openaiApiKeyConfigured: boolean;
   geminiModelId: string | null;
   geminiApiKeyConfigured: boolean;
-  braveSearchApiKeyConfigured: boolean;
 }
 
 export interface UpdateProviderSettingsRequest {
@@ -537,8 +536,6 @@ export interface UpdateProviderSettingsRequest {
   geminiModelId: string | null;
   geminiApiKey?: string | null;
   clearGeminiApiKey?: boolean;
-  braveSearchApiKey?: string | null;
-  clearBraveSearchApiKey?: boolean;
 }
 
 export interface ProviderModel {
