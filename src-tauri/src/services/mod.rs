@@ -28,6 +28,7 @@ pub mod provider_registry;
 pub mod provider_secret_service;
 pub mod publication_feedback_service;
 pub mod redaction_service;
+pub mod seeded_discovery_provider;
 pub mod role_service;
 pub mod seed_development_service;
 pub mod source_service;
