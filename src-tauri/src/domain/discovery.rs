@@ -17,15 +17,6 @@ impl DiscoveryFreshness {
         }
     }
 
-    pub fn parse(value: &str) -> Option<Self> {
-        match value {
-            "day" => Some(Self::Day),
-            "week" => Some(Self::Week),
-            "month" => Some(Self::Month),
-            _ => None,
-        }
-    }
-
     pub fn brave_value(self) -> &'static str {
         match self {
             Self::Day => "pd",
