@@ -116,7 +116,8 @@ pub fn is_http_url(url: &str) -> bool {
     url.starts_with("https://") || url.starts_with("http://")
 }
 
-pub fn source_labels() -> Vec<&'static str> {
+#[cfg(test)]
+fn source_labels() -> Vec<&'static str> {
     let mut labels = vec!["Hacker News"];
     labels.extend(RSS_SEEDS.iter().map(|(label, _)| *label));
     labels
