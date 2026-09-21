@@ -1,4 +1,5 @@
 pub mod candidates;
+pub mod discovery;
 pub mod edit_learning;
 pub mod feedback;
 pub mod interviews;
