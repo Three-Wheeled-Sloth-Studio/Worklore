@@ -20,8 +20,8 @@ use crate::{
     },
     error::{ServiceResult, WorkLoreError},
     services::{
-        app_preferences_service, brave_search_provider, canonical_store, discovery_query_plan,
-        inspiration_service, redaction_service, topic_service,
+        canonical_store, discovery_query_plan, inspiration_service, redaction_service,
+        seeded_discovery_provider, topic_service,
     },
 };
 
@@ -112,26 +112,12 @@ pub async fn scan(
         ));
     }
 
-    let api_key = app_preferences_service::get_brave_search_api_key()?.ok_or_else(|| {
-        discovery_error(
-            "not_configured",
-            "Save a Brave Search API key in Settings before scanning for timely topics.",
-        )
-    })?;
     let requested_count = request
         .max_results
         .unwrap_or(DEFAULT_SEARCH_RESULTS)
         .clamp(5, 20);
-    let query_count = external_queries.len();
-    let base_count = requested_count / query_count;
-    let remainder = requested_count % query_count;
-    let mut results = Vec::new();
-    for (index, query) in external_queries.iter().enumerate() {
-        let count = base_count + usize::from(index < remainder);
-        results.extend(
-            brave_search_provider::search(&api_key, query, request.freshness, count.max(1)).await?,
-        );
-    }
+    let results =
+        seeded_discovery_provider::fetch(&request.focus, request.freshness, requested_count).await?;
 
     let connection = open_connection(vault_path)?;
     let themes = load_theme_signals(&connection)?;
@@ -169,7 +155,7 @@ pub async fn scan(
         "INSERT INTO discovery_runs(
            run_id,provider_id,focus_text,external_query,freshness,requested_count,
            feedback_examples_used,created_at)
-         VALUES (?1,'brave_search',?2,?3,?4,?5,?6,?7)",
+         VALUES (?1,'seeded_public_sources',?2,?3,?4,?5,?6,?7)",
         params![
             &run_id,
             request.focus.trim(),
@@ -409,7 +395,7 @@ pub fn validate_source_url(
     canonical_store::initialize(vault_path)?;
     let connection = open_connection(vault_path)?;
     let opportunity = load_opportunity(&connection, opportunity_id)?;
-    if !brave_search_provider::is_http_url(requested_url) {
+    if !seeded_discovery_provider::is_http_url(requested_url) {
         return Err(discovery_error(
             "invalid_external_url",
             "WorkLore only opens HTTP or HTTPS discovery sources.",
