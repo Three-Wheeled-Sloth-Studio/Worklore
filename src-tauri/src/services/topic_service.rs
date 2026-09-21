@@ -880,7 +880,7 @@ mod tests {
         let path = vault();
         let topic_id = capture_topic(&path);
         canonical_store::initialize_and_migrate(&path).unwrap();
-        assert_eq!(canonical_store::schema_version(&path).unwrap(), 8);
+        assert_eq!(canonical_store::schema_version(&path).unwrap(), 9);
 
         let captured = load_topic(&path, &topic_id).unwrap();
         let listed = list_topics(&path).unwrap();
