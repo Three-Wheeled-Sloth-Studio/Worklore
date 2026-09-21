@@ -195,10 +195,10 @@ phases:
     status: in_progress
     objective: Surface timely opportunities where the user has credible standing and a differentiated angle.
     completed:
-      - Manual timely-topic scanning through Brave Search BYOK with freshness controls, privacy preflight, source provenance, clustering, standing/context qualification, explicit Inspiration/Topic promotion, and locally retained feedback learning.
-      - Bounded open-ended discovery where blank Focus explores several privacy-safe professional search areas without requiring Themes, while explicit Focus remains a single narrowed search and the total retrieval budget stays bounded.
-      - Optional active Themes, active Target Context titles, and prior Good candidate external topics can diversify blank-focus exploration; Story and Proof Point bodies never become search-plan inputs, and every outgoing query still passes privacy preflight.
-      - Cross-query URL deduplication and headline clustering occur before the existing qualification pass, preserving Good candidate, Not for me, and Not now as distinct feedback signals without modifying canonical Voice.
+      - Manual timely-topic scanning with freshness controls, source provenance, clustering, standing/context qualification, explicit Inspiration/Topic promotion, and locally retained feedback learning.
+      - Bounded open-ended discovery where blank Focus explores several professional topic areas without requiring Themes, while explicit Focus narrows local qualification and the total retrieval budget stays bounded.
+      - Keyless seeded retrieval reads Hacker News, TechCrunch, BBC Business, BLS, and Federal Reserve public sources; Focus is applied locally after retrieval so user Focus, Story/Proof text, and private entity text are not transmitted to those sources.
+      - Seeded-source URL deduplication and headline clustering occur before the existing qualification pass, preserving Good candidate, Not for me, and Not now as distinct feedback signals without modifying canonical Voice.
     scope:
       - Add current-news scanning tied to the user's themes, evidence, audience, and recent content history.
       - Rank candidate opportunities using relevance, credibility, audience fit, freshness, angle novelty, saturation, and risk.
