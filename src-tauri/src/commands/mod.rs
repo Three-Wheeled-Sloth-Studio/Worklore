@@ -1,6 +1,7 @@
 pub mod candidates;
 pub mod capture;
 pub mod development;
+pub mod discovery;
 pub mod feedback;
 pub mod inspirations;
 pub mod interviews;
@@ -51,16 +52,20 @@ pub mod external {
         Command::new("xdg-open").arg(url).status()
     }
 
-    #[tauri::command]
-    pub fn open_external_url(url: String) -> Result<(), String> {
-        validate_external_url(&url)?;
-        let status = open_with_system_browser(&url)
+    pub(crate) fn open_system_browser(url: &str) -> Result<(), String> {
+        let status = open_with_system_browser(url)
             .map_err(|error| format!("WorkLore could not start the system browser: {error}"))?;
         if status.success() {
             Ok(())
         } else {
             Err("WorkLore could not open that link in the system browser.".to_string())
         }
+    }
+
+    #[tauri::command]
+    pub fn open_external_url(url: String) -> Result<(), String> {
+        validate_external_url(&url)?;
+        open_system_browser(&url)
     }
 
     #[cfg(test)]
