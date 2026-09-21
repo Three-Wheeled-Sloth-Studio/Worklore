@@ -36,6 +36,7 @@ pub fn update_settings(
         openai_api_key_configured: false,
         gemini_model_id: normalize_optional_text(request.gemini_model_id.as_deref()),
         gemini_api_key_configured: false,
+        brave_search_api_key_configured: false,
     };
     app_preferences_service::save_provider_settings(
         settings,
@@ -44,6 +45,10 @@ pub fn update_settings(
             clear_openai_api_key: request.clear_openai_api_key,
             gemini_api_key: normalize_optional_secret(request.gemini_api_key.as_deref()),
             clear_gemini_api_key: request.clear_gemini_api_key,
+            brave_search_api_key: normalize_optional_secret(
+                request.brave_search_api_key.as_deref(),
+            ),
+            clear_brave_search_api_key: request.clear_brave_search_api_key,
         },
     )?;
     get_settings()
@@ -219,6 +224,7 @@ mod tests {
             openai_api_key_configured: provider_id == OPENAI_PROVIDER_ID,
             gemini_model_id: (provider_id == GEMINI_PROVIDER_ID).then(|| model_id.to_string()),
             gemini_api_key_configured: provider_id == GEMINI_PROVIDER_ID,
+            brave_search_api_key_configured: false,
         }
     }
 
