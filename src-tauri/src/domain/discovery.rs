@@ -17,13 +17,6 @@ impl DiscoveryFreshness {
         }
     }
 
-    pub fn brave_value(self) -> &'static str {
-        match self {
-            Self::Day => "pd",
-            Self::Week => "pw",
-            Self::Month => "pm",
-        }
-    }
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
