@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { TopicRecord } from "../domain/types";
 import { errorMessage } from "../domain/types";
 import { createTopic, listTopics } from "../lib/workloreApi";
+import { DiscoveryPanel } from "./DiscoveryPanel";
 import { InfoButton } from "./InfoButton";
 import { TopicPanel } from "./TopicPanel";
 
@@ -16,6 +17,7 @@ export function TopicsWorkspace({
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const [newTitle, setNewTitle] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showDiscovery, setShowDiscovery] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -69,11 +71,30 @@ export function TopicsWorkspace({
     <section className="workspace-panel compact-workspace-panel" aria-labelledby="topics-workspace-heading">
       <div className="compact-section-heading">
         <h2 id="topics-workspace-heading">Topics</h2>
-        <InfoButton label="About Topics">
-          Capture an idea, optionally connect Story or Proof Point standing and other context, then
-          generate the first Post draft from the Topic.
-        </InfoButton>
+        <div className="topic-icon-actions">
+          <button
+            className="secondary-button compact"
+            type="button"
+            onClick={() => setShowDiscovery((value) => !value)}
+          >
+            {showDiscovery ? "Close discovery" : "Find timely topics"}
+          </button>
+          <InfoButton label="About Topics">
+            Capture an idea, optionally connect Story or Proof Point standing and other context, then
+            generate the first Post draft from the Topic.
+          </InfoButton>
+        </div>
       </div>
+      {showDiscovery ? (
+        <DiscoveryPanel
+          vaultPath={vaultPath}
+          onTopicDeveloped={(topicId) => {
+            setShowDiscovery(false);
+            setSelectedTopicId(topicId);
+            void refresh();
+          }}
+        />
+      ) : null}
       <div className="inline-create-row">
         <input
           value={newTitle}
