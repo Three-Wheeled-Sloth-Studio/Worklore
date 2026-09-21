@@ -117,7 +117,8 @@ pub async fn scan(
         .unwrap_or(DEFAULT_SEARCH_RESULTS)
         .clamp(5, 20);
     let results =
-        seeded_discovery_provider::fetch(&request.focus, request.freshness, requested_count).await?;
+        seeded_discovery_provider::fetch(&request.focus, request.freshness, requested_count)
+            .await?;
 
     let connection = open_connection(vault_path)?;
     let themes = load_theme_signals(&connection)?;

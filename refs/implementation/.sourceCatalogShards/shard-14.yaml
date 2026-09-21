@@ -173,7 +173,7 @@ source_catalog:
   - path: src/components/DiscoveryPanel.tsx
     analysis_version: 1
     language: typescript
-    content_hash: 608dad3952972dbe7878105cc81da75788516298
+    content_hash: fa74bf19803e9a268cac9c45127de6efd4173212
     dependencies:
     - ../domain/discovery
     - ../domain/types
@@ -272,8 +272,8 @@ source_catalog:
       - *id007
     - name: toggleReason
       kind: function
-      line_start: 226
-      line_end: 233
+      line_start: 227
+      line_end: 234
       signature: 'toggleReason(reason: string)'
       inputs:
       - 'reason: string'
@@ -286,8 +286,8 @@ source_catalog:
       dependency_targets: []
     - name: saveFeedback
       kind: function
-      line_start: 234
-      line_end: 256
+      line_start: 235
+      line_end: 257
       signature: saveFeedback()
       inputs: []
       output: unspecified
@@ -308,8 +308,8 @@ source_catalog:
         symbol: recordDiscoveryFeedback
     - name: createTopic
       kind: function
-      line_start: 257
-      line_end: 278
+      line_start: 258
+      line_end: 279
       signature: createTopic()
       inputs: []
       output: unspecified
@@ -329,8 +329,8 @@ source_catalog:
       - *id007
     - name: openSource
       kind: function
-      line_start: 279
-      line_end: 287
+      line_start: 280
+      line_end: 288
       signature: 'openSource(url: string)'
       inputs:
       - 'url: string'
@@ -346,8 +346,8 @@ source_catalog:
         symbol: openDiscoverySource
     - name: Explanation
       kind: function
-      line_start: 483
-      line_end: 484
+      line_start: 484
+      line_end: 485
       signature: 'Explanation({ title, body }: { title: string; body: string })'
       inputs:
       - '{ title, body }: { title: string; body: string }'
@@ -357,8 +357,8 @@ source_catalog:
       dependency_targets: []
     - name: MatchRow
       kind: function
-      line_start: 492
-      line_end: 493
+      line_start: 493
+      line_end: 494
       signature: 'MatchRow({ label, values }: { label: string; values: string[] })'
       inputs:
       - '{ label, values }: { label: string; values: string[] }'
@@ -368,8 +368,8 @@ source_catalog:
       dependency_targets: []
     - name: humanize
       kind: function
-      line_start: 501
-      line_end: 504
+      line_start: 502
+      line_end: 505
       signature: 'humanize(value: string) -> string'
       inputs:
       - 'value: string'

@@ -10,13 +10,20 @@ use crate::{
 };
 
 const USER_AGENT: &str = "WorkLore/0.1 (+https://github.com/Three-Wheeled-Sloth-Studio/Worklore)";
-const HN_FRONT_PAGE_ENDPOINT: &str = "https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=30";
+const HN_FRONT_PAGE_ENDPOINT: &str =
+    "https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=30";
 
 const RSS_SEEDS: [(&str, &str); 4] = [
     ("TechCrunch", "https://techcrunch.com/feed/"),
-    ("BBC Business", "https://feeds.bbci.co.uk/news/business/rss.xml"),
+    (
+        "BBC Business",
+        "https://feeds.bbci.co.uk/news/business/rss.xml",
+    ),
     ("BLS", "https://www.bls.gov/feed/bls_latest.rss"),
-    ("Federal Reserve", "https://www.federalreserve.gov/feeds/press_all.xml"),
+    (
+        "Federal Reserve",
+        "https://www.federalreserve.gov/feeds/press_all.xml",
+    ),
 ];
 
 #[derive(Debug)]
@@ -72,7 +79,12 @@ pub async fn fetch(
     let client = reqwest::Client::builder()
         .user_agent(USER_AGENT)
         .build()
-        .map_err(|_| provider_error("provider_unavailable", "WorkLore could not initialize public discovery."))?;
+        .map_err(|_| {
+            provider_error(
+                "provider_unavailable",
+                "WorkLore could not initialize public discovery.",
+            )
+        })?;
 
     let focus_tokens = tokens(focus);
     let mut buckets = Vec::new();
@@ -119,19 +131,29 @@ async fn fetch_hacker_news(
         .get(HN_FRONT_PAGE_ENDPOINT)
         .send()
         .await
-        .map_err(|_| provider_error("source_unavailable", "Hacker News discovery is unavailable."))?;
+        .map_err(|_| {
+            provider_error(
+                "source_unavailable",
+                "Hacker News discovery is unavailable.",
+            )
+        })?;
 
     if !response.status().is_success() {
         return Err(provider_error(
             "source_unavailable",
-            format!("Hacker News discovery returned HTTP {}.", response.status().as_u16()),
+            format!(
+                "Hacker News discovery returned HTTP {}.",
+                response.status().as_u16()
+            ),
         ));
     }
 
-    let payload: HackerNewsResponse = response
-        .json()
-        .await
-        .map_err(|_| provider_error("invalid_provider_response", "Hacker News returned an unreadable response."))?;
+    let payload: HackerNewsResponse = response.json().await.map_err(|_| {
+        provider_error(
+            "invalid_provider_response",
+            "Hacker News returned an unreadable response.",
+        )
+    })?;
 
     let mut candidates = payload
         .hits
@@ -141,17 +163,16 @@ async fn fetch_hacker_news(
             if title.is_empty() {
                 return None;
             }
-            let published_at = hit
-                .created_at
-                .as_deref()
-                .and_then(parse_published_at);
+            let published_at = hit.created_at.as_deref().and_then(parse_published_at);
             if !within_freshness(published_at.as_ref(), freshness) {
                 return None;
             }
             let url = hit
                 .url
                 .filter(|value| is_http_url(value))
-                .unwrap_or_else(|| format!("https://news.ycombinator.com/item?id={}", hit.object_id));
+                .unwrap_or_else(|| {
+                    format!("https://news.ycombinator.com/item?id={}", hit.object_id)
+                });
             let description = match (hit.points, hit.num_comments) {
                 (Some(points), Some(comments)) => {
                     format!("Hacker News discussion: {points} points, {comments} comments.")
@@ -186,23 +207,29 @@ async fn fetch_rss(
     freshness: DiscoveryFreshness,
     focus_tokens: &BTreeSet<String>,
 ) -> ServiceResult<Vec<Candidate>> {
-    let response = client
-        .get(endpoint)
-        .send()
-        .await
-        .map_err(|_| provider_error("source_unavailable", format!("{label} discovery is unavailable.")))?;
+    let response = client.get(endpoint).send().await.map_err(|_| {
+        provider_error(
+            "source_unavailable",
+            format!("{label} discovery is unavailable."),
+        )
+    })?;
 
     if !response.status().is_success() {
         return Err(provider_error(
             "source_unavailable",
-            format!("{label} discovery returned HTTP {}.", response.status().as_u16()),
+            format!(
+                "{label} discovery returned HTTP {}.",
+                response.status().as_u16()
+            ),
         ));
     }
 
-    let body = response
-        .text()
-        .await
-        .map_err(|_| provider_error("invalid_provider_response", format!("{label} returned unreadable feed data.")))?;
+    let body = response.text().await.map_err(|_| {
+        provider_error(
+            "invalid_provider_response",
+            format!("{label} returned unreadable feed data."),
+        )
+    })?;
     let mut candidates = parse_rss_items(&body)
         .into_iter()
         .filter_map(|item| {
@@ -457,11 +484,13 @@ mod tests {
     #[test]
     fn focus_matching_happens_locally() {
         let focus = tokens("agentic product management");
-        assert!(relevance_score(
-            "Agentic workflows reshape product teams",
-            "New management patterns are emerging.",
-            &focus
-        ) > 0);
+        assert!(
+            relevance_score(
+                "Agentic workflows reshape product teams",
+                "New management patterns are emerging.",
+                &focus
+            ) > 0
+        );
         assert_eq!(
             relevance_score("Retail sales update", "Quarterly demand changed.", &focus),
             0
@@ -485,13 +514,22 @@ mod tests {
         }
         let output = round_robin(
             vec![
-                vec![candidate("https://example.com/a1"), candidate("https://example.com/a2")],
-                vec![candidate("https://example.org/b1"), candidate("https://example.org/b2")],
+                vec![
+                    candidate("https://example.com/a1"),
+                    candidate("https://example.com/a2"),
+                ],
+                vec![
+                    candidate("https://example.org/b1"),
+                    candidate("https://example.org/b2"),
+                ],
             ],
             3,
         );
         assert_eq!(
-            output.iter().map(|item| item.url.as_str()).collect::<Vec<_>>(),
+            output
+                .iter()
+                .map(|item| item.url.as_str())
+                .collect::<Vec<_>>(),
             vec![
                 "https://example.com/a1",
                 "https://example.org/b1",

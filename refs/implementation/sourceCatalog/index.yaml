@@ -4,15 +4,15 @@ source_catalog:
   format_version: 1
   generated_by: refs/tools/generate_source_catalog.py
   derived: true
-  tracked_source_files: 130
-  symbols: 1305
+  tracked_source_files: 131
+  symbols: 1327
   languages:
     python: 1
-    rust: 80
+    rust: 81
     typescript: 49
   parsers:
     python-ast: 3
-    rust-pattern: 994
+    rust-pattern: 1016
     typescript-pattern: 308
   shards:
   - path: refs/implementation/.sourceCatalogShards/shard-00.yaml
@@ -109,8 +109,8 @@ source_catalog:
     files: 1
     symbols: 9
   - path: refs/implementation/.sourceCatalogShards/shard-1f.yaml
-    files: 3
-    symbols: 49
+    files: 4
+    symbols: 71
   query_command: python refs/tools/generate_source_catalog.py --query "<task or symbol>"
   notes:
   - Generated from source; never hand-edit this catalog or its shards.
