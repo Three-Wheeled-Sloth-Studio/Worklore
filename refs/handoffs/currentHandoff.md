@@ -1,17 +1,17 @@
 ---
 type: Handoff
 title: Current WorkLore Handoff
-description: Agent Academy bounded-discovery alignment layered over the accepted v0.1.4 runtime QA checkpoint.
+description: Open-ended timely-topic discovery candidate for v0.1.9, pending exact-head validation.
 status: draft
-tags: [handoff, worklore]
+tags: [handoff, worklore, discovery]
 ---
 # Current Handoff
 
-Updated: 2026-09-16
+Updated: 2026-09-21
 
 ## Product Baseline
 
-WorkLore remains a local-first professional narrative and content intelligence application. The authoritative loop is:
+WorkLore remains a local-first professional narrative and content intelligence application. The governing loop is:
 
 `Capture -> Understand -> Develop -> Connect -> Draft -> Challenge -> Publish manually -> Measure -> Learn`
 
@@ -19,97 +19,98 @@ Locked boundaries remain:
 
 - standalone Windows-first deployment and local canonical storage;
 - no WorkLore-hosted backend, account, proprietary sync, or inference proxy;
-- no automatic publishing, scheduling, or autonomous engagement;
-- explicit human review before publication and before learned changes affect governed voice;
-- raw AI drafts never train canonical voice;
-- confidentiality transformation remains derived and non-destructive;
+- no automatic publication, scheduling, autonomous engagement, or background discovery monitoring;
+- explicit human review before publication and before learned changes affect governed Voice;
+- raw AI drafts never train canonical Voice;
 - Evidence, Inspiration, Target Context, and Voice Evidence remain semantically distinct;
-- resume import remains optional bootstrap rather than the product center;
 - provider selection remains explicit, with local Ollama first-class and no silent provider fallback;
-- local structured-output operations may retry other installed Ollama text-generation models when the configured model cannot satisfy the JSON contract; the actual successful model must remain in provenance;
-- the Private Entity Registry remains the privacy source of truth;
+- discovery retrieval remains separate from LLM inference;
+- Private Entity Registry remains the privacy source of truth;
+- Story and Proof Point bodies are not external-search query inputs;
 - no fake AI/human probability or opaque quality score.
 
-## Accepted Baseline
+## Current Candidate
 
-The last fully green product checkpoint is:
+Version: `0.1.9`
 
-`f38e75618b5967177b37ba1040aab68a27c177d1`
+The open-ended discovery slice is implemented on `dev` and is pending the normal exact-head validation gate before acceptance.
 
-Validation:
+What changed:
 
-- Actions `35016169532`, run 330;
-- Job `104540027121`;
-- frontend: 11 passed / 0 failed across 5 files;
-- production frontend build: green, 72 modules transformed;
-- Rust: 133 passed / 0 failed;
-- warnings-denied Clippy: green;
-- rustfmt: green;
-- build-layout, refs/OKF/path-safety, bounded agent context, case-collision, and repository/source-only checks: green.
+- blank Focus is now a first-class "Explore for me" path and no longer requires active Themes;
+- explicit Focus remains a single narrowed search intent;
+- blank Focus builds a bounded plan of at most four search intents;
+- optional active Theme names, active Target Context titles, and prior `Good candidate` external topic titles may diversify blank-focus exploration;
+- Story and Proof Point text is intentionally absent from the query-plan input surface;
+- every outgoing query passes the existing privacy preflight independently;
+- the existing total result budget is divided across exploration queries rather than multiplied by query count;
+- merged results deduplicate exact source URLs and then use the existing headline clustering before qualification;
+- qualification still explains Theme, standing, audience, timing, and feedback relationships;
+- `Good candidate` can positively influence similar candidates;
+- `Not for me` remains a negative fit signal;
+- `Not now` remains timing-only and does not down-rank a topic as personal rejection;
+- discovery learning remains separate from canonical Voice;
+- `Develop Topic` still requires explicit user-authored title and summary;
+- source and Inspiration provenance remains intact;
+- Phase 5 roadmap status is now `in_progress`.
 
-QA build version remains `0.1.4`.
+Generated source catalog after this slice:
 
-## What Landed Since The Accepted Baseline
+- 130 tracked source files;
+- 1,306 symbols;
+- 80 Rust source files;
+- 49 TypeScript source files;
+- 1 Python source file.
 
-The current `dev` work is an Agent Academy framework-alignment pass, not a product-behavior change.
+## Required Runtime Smoke After Validation
 
-It incorporates the bounded implementation-discovery guidance from Agent Academy commit `e4118f96cc0138490b950402ba711399580ee854`:
+The automated gate cannot exercise a real user Brave key or desktop interaction. After the exact `dev` head is green:
 
-- deterministic sharded source catalog under `refs/implementation/sourceCatalog/` plus hidden detail shards;
-- `generate_agent_context.py` now uses handoff Required Reads and source-catalog matches before file-map hints;
-- source discovery is catalog-first, then symbol/range reads, with broad reads only when concretely justified;
-- handoffs explicitly state the minimum Required Reads for the next slice;
-- when the environment supports sub-agents, bounded independent work should be delegated when useful, using the least expensive capable agent/model while keeping integration and validation responsibility with the parent;
-- repeated diagnostics/searches should become reusable tooling rather than repeated manual work;
-- coding standards now require cohesive modules and discourage adding unrelated responsibilities to already-large or mixed-purpose files;
-- source-catalog freshness is part of normal validation and CI.
+1. Launch v0.1.9 and confirm the displayed version.
+2. With Brave Search configured, open Topics -> Find timely topics.
+3. Leave Focus blank and run a 7-day scan in a vault with no active Themes.
+4. Confirm the scan succeeds and reports multiple bounded search areas.
+5. Confirm surfaced opportunities remain a small qualified set rather than a feed.
+6. Add an explicit Focus and confirm the next scan narrows to that subject.
+7. Confirm no private entity, Story body, or Proof Point body appears in externally submitted search text.
+8. Confirm Save as Inspiration retains the external source.
+9. Confirm Develop Topic still refuses creation until the user writes/confirms a summary.
+10. Record each feedback verdict once and confirm later qualification treats `Not now` differently from `Not for me`.
 
-WorkLore-specific privacy, provenance, branch, public-repository, and product-boundary guidance remains authoritative where it is stricter than the reusable Agent Academy harness.
+Stop on the first concrete correctness, privacy, provenance, recoverability, or blocking UX defect.
 
-## Current Evidence Or Gap
+## Next Recommended Slice
 
-The v0.1.4 product code remains the accepted green implementation baseline. The Agent Academy alignment is documentation/tooling only and is not accepted until the final exact `dev` head passes the complete WorkLore validation path with generated source-catalog and OKF indexes current.
+After runtime smoke, improve discovery quality only from observed evidence. The next likely slice is bounded query-plan quality and diversity tuning:
 
-## Next Slice
+- inspect whether the four exploration areas produce sufficiently distinct useful candidates;
+- determine whether public-safe signals need better weighting or rotation;
+- measure over-representation by one query/domain;
+- add diversity controls only where real scans show concentration or low-value repetition.
 
-After the alignment head is fully green, return to runtime QA. The first live check remains the defect that prompted v0.1.4:
-
-1. Confirm the sidebar reports `v0.1.4`.
-2. Run `Analyze approved writing` with the currently configured local Ollama model.
-3. If that model cannot satisfy structured JSON, confirm WorkLore transparently succeeds through another installed local text-generation model rather than surfacing the first JSON failure.
-4. Confirm returned suggestions remain separated into Core Voice traits and Writing Rules.
-5. Confirm the actual successful model is preserved in returned provenance/audit state rather than the originally configured model.
-6. Confirm non-model failures such as an unreachable Ollama server still fail immediately.
-7. Continue the accepted QA path for Stories readability, Voice action ordering, explicit trait/rule acceptance, discard behavior, and restart/reopen persistence.
-
-Stop on the first concrete correctness, provenance, privacy, recoverability, or blocking UX defect. Do not widen scope based on hypothetical behavior.
+Do not add background monitoring, notifications, subscriptions, scheduled scans, autonomous posting, or LLM-dependent retrieval as part of that tuning.
 
 ## Required Reads For Next Slice
 
-- `refs/handoffs/currentHandoff.md` - establishes the accepted v0.1.4 baseline, QA focus, and constraints for the next session.
-- `refs/agents.yaml` - required only to apply the new bounded source-discovery and delegation rules during continuation.
-- `refs/testing/validationCommands.yaml` - required before finalizing any code change exposed by QA.
-- Do not pre-read implementation source for routine QA. If QA exposes a defect, query `python refs/tools/generate_source_catalog.py --query "<observed behavior or symbol>"` and read only the returned source symbols/ranges plus concrete dependencies.
+- `refs/handoffs/currentHandoff.md`
+- `refs/handoffs/next-dev-prompt.md`
+- relevant source-catalog matches for the observed runtime issue
+- `src-tauri/src/services/discovery_query_plan.rs`
+- `src-tauri/src/services/discovery_service.rs` only for the specific qualification/retrieval behavior under investigation
+- `src/components/DiscoveryPanel.tsx` only when the issue is UI-facing
+- `refs/testing/validationCommands.yaml`
 
-## Relevant Files
-
-- `refs/tools/generate_source_catalog.py`
-- `refs/tools/generate_agent_context.py`
-- `refs/implementation/sourceCatalog/index.yaml`
-- `refs/implementation/.sourceCatalogShards/`
-- `refs/implementation/codingStandards.md`
-- `refs/handoffs/handoffTemplate.md`
-- `refs/templatePolicy.yaml`
-- `.github/workflows/ci.yml`
+Use packet-first/progressive loading. Do not reread repository history.
 
 ## Current Task State
 
 - `task-032`: complete. Explicit durable edit-learning accept/reject governance is accepted.
-- `task-033`: in progress. Broader cross-draft and portfolio rules still wait for meaningful real corpus evidence.
+- `task-033`: in progress. Broader cross-draft and portfolio rules wait for meaningful real corpus evidence.
 - `task-034`: complete. Provider-free confidentiality transformation preserves private canonical truth.
-- `task-035`: in progress. Topic-to-Post generation exists; current work is bounded runtime UX/correctness dogfood.
+- `task-035`: in progress. Topic-to-Post generation exists; runtime UX/correctness dogfood continues.
 - `task-036`: complete for exact lineage/publication/performance association.
 - `task-037`: in progress. Manual performance snapshots and conservative Insights exist.
+- Phase 5 discovery: in progress. Manual Brave retrieval and bounded open-ended exploration are implemented; runtime quality tuning remains evidence-driven.
 
 ## Do Not Reopen
 
@@ -117,21 +118,20 @@ Unless runtime, test, legal, or user evidence materially changes the plan:
 
 - do not recenter WorkLore on resume parsing;
 - do not merge Evidence, Inspiration, Target Context, and Voice Evidence;
-- do not let raw model output train canonical voice;
+- do not let raw model output train canonical Voice;
 - do not weaken immutable Revision authorship/provenance;
 - do not infer user standing from Target Context;
-- do not represent Tone Modes as separate identities;
 - do not silently accept or activate inferred traits or rules;
-- do not invent revision, publication, analytics, or cross-draft history;
-- do not add fake AI/human probability scores or opaque quality scores;
 - do not create a second confidentiality/private-entity model;
 - do not add WorkLore-hosted SaaS, account, sync, automatic publishing, scheduling, or autonomous engagement;
+- do not add background discovery monitoring or notifications;
+- do not make timely-topic retrieval LLM-dependent;
 - do not hand-edit generated OKF indexes or source-catalog files;
 - do not promote `qa` or `main` without explicit approval.
 
 ## Validation
 
-For the Agent Academy alignment, require the normal full validation path, including:
+Require the normal full validation path on the exact final `dev` head:
 
 ```powershell
 python scripts/check-case-collisions.py
@@ -147,4 +147,4 @@ cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -
 ./scripts/assert-repo-clean.ps1
 ```
 
-Do not call the alignment accepted or hand QA back until those checks pass on the exact current `dev` head.
+Do not call v0.1.9 accepted until those checks pass on the exact current `dev` head.
