@@ -83,9 +83,11 @@
   border-radius: 999px;
   color: #8a5a1f;
   background: rgba(255, 244, 224, 0.9);
+  font-family: inherit;
   font-size: 0.72rem;
   font-weight: 700;
   text-decoration: none;
+  cursor: pointer;
 }
 .shell-support-pill:hover { background: #f7ead2; border-color: rgba(138, 90, 31, 0.62); }
 .shell-support-pill svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
