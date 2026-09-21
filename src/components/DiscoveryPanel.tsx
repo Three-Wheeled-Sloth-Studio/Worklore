@@ -66,10 +66,15 @@ export function DiscoveryPanel({
       });
       await refresh();
       const count = result.feedbackExamplesUsed;
+      const queryCount = result.externalQueries.length;
+      const scanSummary =
+        queryCount === 1
+          ? "Scan complete around your focus."
+          : "Scan complete across " + queryCount + " bounded search areas.";
       setNotice(
         count > 0
-          ? "Scan complete. " + count + " prior feedback example" + (count === 1 ? "" : "s") + " informed qualification."
-          : "Scan complete. No prior feedback examples matched this run yet.",
+          ? scanSummary + " " + count + " prior feedback example" + (count === 1 ? "" : "s") + " informed qualification."
+          : scanSummary + " No prior feedback examples matched this run yet.",
       );
     } catch (caught) {
       setError(errorMessage(caught));
@@ -116,19 +121,19 @@ export function DiscoveryPanel({
       </div>
 
       <p className="discovery-intro">
-        Scan current public material, then qualify it against your Themes, standing, Target Context,
-        recent Topics, and prior discovery feedback. Search results remain external context until you
-        explicitly develop them.
+        Leave Focus blank to explore a bounded set of current professional discussions, or add a
+        Focus to explore around a subject you already have in mind. WorkLore then qualifies results
+        against your Themes, standing, Target Context, recent Topics, and prior discovery feedback.
       </p>
 
       <div className="discovery-scan-row">
         <label>
-          Focus
+          Focus (optional)
           <input
             value={focus}
             disabled={busy !== null}
             onChange={(event) => setFocus(event.target.value)}
-            placeholder="Optional. Leave blank to use active Themes."
+            placeholder="Leave blank to explore for me."
           />
         </label>
         <label>
@@ -154,8 +159,8 @@ export function DiscoveryPanel({
       </div>
 
       <p className="discovery-privacy-note">
-        Discovery uses the separately configured Brave Search key. WorkLore privacy-preflights the
-        query before sending it and does not send your Story or Proof Point text to the search API.
+        Discovery uses the separately configured Brave Search key. WorkLore privacy-preflights every
+        external search query and does not send your Story or Proof Point text to the search API.
       </p>
       {busy ? <p className="discovery-status">{busy}</p> : null}
       {notice ? <p className="discovery-notice" role="status">{notice}</p> : null}
@@ -163,8 +168,8 @@ export function DiscoveryPanel({
 
       {opportunities.length === 0 ? (
         <div className="compact-empty-state">
-          No discovery opportunities yet. Run a scan when you want a current hook for your existing
-          professional material.
+          No discovery opportunities yet. Scan with Focus blank for ideas, or add a Focus to explore
+          around a subject you already have in mind.
         </div>
       ) : (
         <div className="discovery-list">
