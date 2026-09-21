@@ -401,7 +401,7 @@ source_catalog:
   - path: src-tauri/src/services/discovery_service.rs
     analysis_version: 1
     language: rust
-    content_hash: 3e9d4f94a499152b301415dadf9c6f919f2da76b
+    content_hash: 4c52c9fc218ab445d21b754bad44acadfa347f61
     dependencies:
     - chrono::Utc
     - "crate::{\n    domain::discovery::{\n        DevelopDiscoveryTopicRequest, DevelopDiscoveryTopicResult, DiscoveryFeedbackView,\n\
@@ -452,8 +452,8 @@ source_catalog:
     symbols:
     - name: scan
       kind: function
-      line_start: 57
-      line_end: 155
+      line_start: 67
+      line_end: 163
       signature: 'scan(vault_path: &Path, request: ScanDiscoveryRequest) -> ServiceResult<DiscoveryScanResult>'
       inputs:
       - 'vault_path: &Path'
@@ -514,8 +514,8 @@ source_catalog:
         symbol: load_theme_signals
     - name: list_opportunities
       kind: function
-      line_start: 156
-      line_end: 174
+      line_start: 164
+      line_end: 182
       signature: 'list_opportunities(vault_path: &Path, limit: usize) -> ServiceResult<Vec<DiscoveryOpportunityView>>'
       inputs:
       - 'vault_path: &Path'
@@ -541,8 +541,8 @@ source_catalog:
         symbol: load_opportunity
     - name: record_feedback
       kind: function
-      line_start: 175
-      line_end: 231
+      line_start: 183
+      line_end: 239
       signature: 'record_feedback(vault_path: &Path, request: RecordDiscoveryFeedbackRequest) -> ServiceResult<DiscoveryFeedbackView>'
       inputs:
       - 'vault_path: &Path'
@@ -594,8 +594,8 @@ source_catalog:
         symbol: tokens
     - name: save_as_inspiration
       kind: function
-      line_start: 232
-      line_end: 239
+      line_start: 240
+      line_end: 247
       signature: 'save_as_inspiration(vault_path: &Path, opportunity_id: &str) -> ServiceResult<SaveDiscoveryInspirationResult>'
       inputs:
       - 'vault_path: &Path'
@@ -611,8 +611,8 @@ source_catalog:
         symbol: ensure_inspiration
     - name: develop_topic
       kind: function
-      line_start: 240
-      line_end: 338
+      line_start: 248
+      line_end: 346
       signature: 'develop_topic(vault_path: &Path, request: DevelopDiscoveryTopicRequest) -> ServiceResult<DevelopDiscoveryTopicResult>'
       inputs:
       - 'vault_path: &Path'
@@ -661,8 +661,8 @@ source_catalog:
       - *id006
     - name: dismiss_opportunity
       kind: function
-      line_start: 339
-      line_end: 360
+      line_start: 347
+      line_end: 368
       signature: 'dismiss_opportunity(vault_path: &Path, opportunity_id: &str) -> ServiceResult<DiscoveryOpportunityView>'
       inputs:
       - 'vault_path: &Path'
@@ -686,8 +686,8 @@ source_catalog:
       - *id006
     - name: validate_source_url
       kind: function
-      line_start: 361
-      line_end: 387
+      line_start: 369
+      line_end: 395
       signature: 'validate_source_url(vault_path: &Path, opportunity_id: &str, requested_url: &str) -> ServiceResult<String>'
       inputs:
       - 'vault_path: &Path'
@@ -715,8 +715,8 @@ source_catalog:
       - *id006
     - name: ensure_inspiration
       kind: function
-      line_start: 388
-      line_end: 502
+      line_start: 396
+      line_end: 510
       signature: 'ensure_inspiration(vault_path: &Path, opportunity_id: &str) -> ServiceResult<String>'
       inputs:
       - 'vault_path: &Path'
@@ -762,28 +762,23 @@ source_catalog:
       - *id006
     - name: qualify_cluster
       kind: function
-      line_start: 503
-      line_end: 659
-      signature: 'qualify_cluster(run_id: &str, provider_position: usize, sources: Vec<DiscoverySourceView>, themes: &[SignalRecord],
-        standing: &[SignalRecord], audience: &[SignalRecord], recent_topics: &[SignalRecord], prior_feedback: &[PriorFeedback],
-        used_feedback_ids: &mut HashSet<String>, now: &str) -> RankedOpportunity'
+      line_start: 511
+      line_end: 661
+      signature: 'qualify_cluster(context: &QualificationContext<''_>, provider_position: usize, sources: Vec<DiscoverySourceView>,
+        used_feedback_ids: &mut HashSet<String>) -> RankedOpportunity'
       inputs:
-      - 'run_id: &str'
+      - 'context: &QualificationContext<''_>'
       - 'provider_position: usize'
       - 'sources: Vec<DiscoverySourceView>'
-      - 'themes: &[SignalRecord]'
-      - 'standing: &[SignalRecord]'
-      - 'audience: &[SignalRecord]'
-      - 'recent_topics: &[SignalRecord]'
-      - 'prior_feedback: &[PriorFeedback]'
       - 'used_feedback_ids: &mut HashSet<String>'
-      - 'now: &str'
       output: RankedOpportunity
       dependencies:
       - Some
       - and_then
       - audience_matches.is_empty
       - concerns.push
+      - context.now.to_string
+      - context.run_id.to_string
       - description.is_empty
       - discussion
       - feedback.feedback_id.clone
@@ -795,12 +790,10 @@ source_catalog:
       - map
       - matching_signals
       - new
-      - now.to_string
       - now_v7
       - positive.cmp
       - push
       - recent_matches.is_empty
-      - run_id.to_string
       - source.age.as_deref
       - source.description.trim
       - source.title.clone
@@ -810,8 +803,8 @@ source_catalog:
         symbol: matching_signals
     - name: compare_ranked
       kind: function
-      line_start: 660
-      line_end: 689
+      line_start: 662
+      line_end: 691
       signature: 'compare_ranked(left: &RankedOpportunity, right: &RankedOpportunity) -> Ordering'
       inputs:
       - 'left: &RankedOpportunity'
@@ -832,8 +825,8 @@ source_catalog:
       dependency_targets: []
     - name: persist_opportunity
       kind: function
-      line_start: 690
-      line_end: 724
+      line_start: 692
+      line_end: 726
       signature: 'persist_opportunity(connection: &Connection, item: &RankedOpportunity, rank_position: usize) -> ServiceResult<()>'
       inputs:
       - 'connection: &Connection'
@@ -855,8 +848,8 @@ source_catalog:
       dependency_targets: []
     - name: load_opportunity
       kind: function
-      line_start: 725
-      line_end: 784
+      line_start: 727
+      line_end: 786
       signature: 'load_opportunity(connection: &Connection, opportunity_id: &str) -> ServiceResult<DiscoveryOpportunityView>'
       inputs:
       - 'connection: &Connection'
@@ -874,8 +867,8 @@ source_catalog:
       dependency_targets: []
     - name: discovery_query
       kind: function
-      line_start: 785
-      line_end: 805
+      line_start: 787
+      line_end: 807
       signature: 'discovery_query(connection: &Connection, focus: &str) -> ServiceResult<String>'
       inputs:
       - 'connection: &Connection'
@@ -897,8 +890,8 @@ source_catalog:
       - *id013
     - name: load_theme_signals
       kind: function
-      line_start: 806
-      line_end: 813
+      line_start: 808
+      line_end: 815
       signature: 'load_theme_signals(connection: &Connection) -> ServiceResult<Vec<SignalRecord>>'
       inputs:
       - 'connection: &Connection'
@@ -912,8 +905,8 @@ source_catalog:
         symbol: load_signals
     - name: load_standing_signals
       kind: function
-      line_start: 814
-      line_end: 827
+      line_start: 816
+      line_end: 829
       signature: 'load_standing_signals(connection: &Connection) -> ServiceResult<Vec<SignalRecord>>'
       inputs:
       - 'connection: &Connection'
@@ -927,8 +920,8 @@ source_catalog:
       - *id014
     - name: load_audience_signals
       kind: function
-      line_start: 828
-      line_end: 835
+      line_start: 830
+      line_end: 837
       signature: 'load_audience_signals(connection: &Connection) -> ServiceResult<Vec<SignalRecord>>'
       inputs:
       - 'connection: &Connection'
@@ -940,8 +933,8 @@ source_catalog:
       - *id014
     - name: load_recent_topic_signals
       kind: function
-      line_start: 836
-      line_end: 844
+      line_start: 838
+      line_end: 846
       signature: 'load_recent_topic_signals(connection: &Connection) -> ServiceResult<Vec<SignalRecord>>'
       inputs:
       - 'connection: &Connection'
@@ -953,8 +946,8 @@ source_catalog:
       - *id014
     - name: load_signals
       kind: function
-      line_start: 845
-      line_end: 866
+      line_start: 847
+      line_end: 868
       signature: 'load_signals(connection: &Connection, sql: &str, kind: &''static str) -> ServiceResult<Vec<SignalRecord>>'
       inputs:
       - 'connection: &Connection'
@@ -971,8 +964,8 @@ source_catalog:
       - *id015
     - name: matching_signals
       kind: function
-      line_start: 867
-      line_end: 883
+      line_start: 869
+      line_end: 885
       signature: 'matching_signals(signals: &[SignalRecord], opportunity_tokens: &BTreeSet<String>) -> Vec<DiscoveryMatchView>'
       inputs:
       - 'signals: &[SignalRecord]'
@@ -995,8 +988,8 @@ source_catalog:
         symbol: signal_matches
     - name: signal_matches
       kind: function
-      line_start: 884
-      line_end: 894
+      line_start: 886
+      line_end: 896
       signature: 'signal_matches(left: &BTreeSet<String>, right: &BTreeSet<String>) -> bool'
       inputs:
       - 'left: &BTreeSet<String>'
@@ -1014,8 +1007,8 @@ source_catalog:
       dependency_targets: []
     - name: load_prior_feedback
       kind: function
-      line_start: 895
-      line_end: 932
+      line_start: 897
+      line_end: 934
       signature: 'load_prior_feedback(connection: &Connection) -> ServiceResult<Vec<PriorFeedback>>'
       inputs:
       - 'connection: &Connection'
@@ -1039,8 +1032,8 @@ source_catalog:
       dependency_targets: []
     - name: token_similarity
       kind: function
-      line_start: 933
-      line_end: 941
+      line_start: 935
+      line_end: 943
       signature: 'token_similarity(left: &BTreeSet<String>, right: &BTreeSet<String>) -> bool'
       inputs:
       - 'left: &BTreeSet<String>'
@@ -1054,8 +1047,8 @@ source_catalog:
       dependency_targets: []
     - name: cluster_sources
       kind: function
-      line_start: 942
-      line_end: 958
+      line_start: 944
+      line_end: 960
       signature: 'cluster_sources(results: Vec<DiscoverySourceView>) -> Vec<Vec<DiscoverySourceView>>'
       inputs:
       - 'results: Vec<DiscoverySourceView>'
@@ -1081,8 +1074,8 @@ source_catalog:
       - *id015
     - name: title_similarity
       kind: function
-      line_start: 959
-      line_end: 964
+      line_start: 961
+      line_end: 966
       signature: 'title_similarity(left: &BTreeSet<String>, right: &BTreeSet<String>) -> bool'
       inputs:
       - 'left: &BTreeSet<String>'
@@ -1096,8 +1089,8 @@ source_catalog:
       dependency_targets: []
     - name: tokens
       kind: function
-      line_start: 965
-      line_end: 973
+      line_start: 967
+      line_end: 975
       signature: 'tokens(value: &str) -> BTreeSet<String>'
       inputs:
       - 'value: &str'
@@ -1116,8 +1109,8 @@ source_catalog:
       dependency_targets: []
     - name: normalize_reasons
       kind: function
-      line_start: 981
-      line_end: 1002
+      line_start: 983
+      line_end: 1004
       signature: 'normalize_reasons(values: Vec<String>) -> Vec<String>'
       inputs:
       - 'values: Vec<String>'
@@ -1136,8 +1129,8 @@ source_catalog:
       dependency_targets: []
     - name: required_text
       kind: function
-      line_start: 1003
-      line_end: 1013
+      line_start: 1005
+      line_end: 1015
       signature: 'required_text(value: &str, label: &str) -> ServiceResult<String>'
       inputs:
       - 'value: &str'
@@ -1154,8 +1147,8 @@ source_catalog:
       dependency_targets: []
     - name: open_connection
       kind: function
-      line_start: 1014
-      line_end: 1020
+      line_start: 1016
+      line_end: 1022
       signature: 'open_connection(vault_path: &Path) -> ServiceResult<Connection>'
       inputs:
       - 'vault_path: &Path'
@@ -1173,8 +1166,8 @@ source_catalog:
         symbol: database_path
     - name: audit
       kind: function
-      line_start: 1021
-      line_end: 1042
+      line_start: 1023
+      line_end: 1044
       signature: 'audit(connection: &Connection, event_type: &str, record_type: &str, record_id: &str, details: Value) ->
         ServiceResult<()>'
       inputs:
@@ -1197,8 +1190,8 @@ source_catalog:
       dependency_targets: []
     - name: discovery_error
       kind: function
-      line_start: 1043
-      line_end: 1049
+      line_start: 1045
+      line_end: 1051
       signature: 'discovery_error(code: &''static str, message: impl Into<String>) -> WorkLoreError'
       inputs:
       - 'code: &''static str'
@@ -1210,8 +1203,8 @@ source_catalog:
       dependency_targets: []
     - name: clustering_collapses_substantially_similar_headlines
       kind: function
-      line_start: 1056
-      line_end: 1083
+      line_start: 1058
+      line_end: 1085
       signature: clustering_collapses_substantially_similar_headlines()
       inputs: []
       output: unspecified
@@ -1226,8 +1219,8 @@ source_catalog:
       - *id016
     - name: feedback_similarity_requires_more_than_one_generic_token
       kind: function
-      line_start: 1086
-      line_end: 1095
+      line_start: 1088
+      line_end: 1097
       signature: feedback_similarity_requires_more_than_one_generic_token()
       inputs: []
       output: unspecified
@@ -1241,8 +1234,8 @@ source_catalog:
       - *id015
     - name: normalized_feedback_reasons_are_bounded_and_deduplicated
       kind: function
-      line_start: 1098
-      line_end: 1107
+      line_start: 1100
+      line_end: 1109
       signature: normalized_feedback_reasons_are_bounded_and_deduplicated()
       inputs: []
       output: unspecified

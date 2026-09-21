@@ -7,12 +7,11 @@ source_catalog:
   - path: src-tauri/src/domain/discovery.rs
     analysis_version: 1
     language: rust
-    content_hash: b3adb437585162722f2f0202ddabe4f2555b82a7
+    content_hash: 8408d1085891f7dc79fee18d0e3bcd60f3e65e1b
     dependencies:
     - serde::{Deserialize, Serialize}
     provides:
     - as_str
-    - parse
     - brave_value
     - as_str
     - parse
@@ -29,22 +28,10 @@ source_catalog:
       dependencies: []
       parser: rust-pattern
       dependency_targets: []
-    - name: parse
-      kind: function
-      line_start: 19
-      line_end: 27
-      signature: 'parse(value: &str) -> Option<Self>'
-      inputs:
-      - 'value: &str'
-      output: Option<Self>
-      dependencies:
-      - Some
-      parser: rust-pattern
-      dependency_targets: []
     - name: brave_value
       kind: function
-      line_start: 28
-      line_end: 35
+      line_start: 19
+      line_end: 26
       signature: brave_value(self) -> &'static str
       inputs:
       - self
@@ -54,8 +41,8 @@ source_catalog:
       dependency_targets: []
     - name: as_str
       kind: function
-      line_start: 48
-      line_end: 55
+      line_start: 39
+      line_end: 46
       signature: as_str(self) -> &'static str
       inputs:
       - self
@@ -65,8 +52,8 @@ source_catalog:
       dependency_targets: []
     - name: parse
       kind: function
-      line_start: 56
-      line_end: 65
+      line_start: 47
+      line_end: 56
       signature: 'parse(value: &str) -> Option<Self>'
       inputs:
       - 'value: &str'
@@ -77,8 +64,8 @@ source_catalog:
       dependency_targets: []
     - name: as_str
       kind: function
-      line_start: 77
-      line_end: 83
+      line_start: 68
+      line_end: 74
       signature: as_str(self) -> &'static str
       inputs:
       - self
