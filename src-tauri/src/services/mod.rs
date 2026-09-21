@@ -7,6 +7,7 @@ pub mod capture_metadata_service;
 pub mod capture_service;
 pub mod confidentiality_service;
 pub mod contextual_entity_scan;
+pub mod discovery_query_plan;
 pub mod discovery_service;
 pub mod document_extraction;
 pub mod edit_learning_service;
