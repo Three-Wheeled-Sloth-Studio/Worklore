@@ -41,3 +41,18 @@
   border-left: 3px solid rgba(138, 90, 31, 0.42);
   background: rgba(255, 244, 224, 0.48);
 }
+
+
+.provider-discovery-settings {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 0.35rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid #d2d0c8;
+}
+
+.provider-discovery-settings h3 {
+  margin: 0;
+  color: #303a33;
+  font-size: 1rem;
+}
