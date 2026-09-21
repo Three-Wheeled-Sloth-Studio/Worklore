@@ -1,4 +1,5 @@
 name: Temporary WorkLore Maintenance
+# one-shot validation marker
 
 on:
   push:
