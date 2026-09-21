@@ -13,8 +13,8 @@ use uuid::Uuid;
 
 use crate::{
     domain::discovery::{
-        DevelopDiscoveryTopicRequest, DevelopDiscoveryTopicResult, DiscoveryFeedbackVerdict,
-        DiscoveryFeedbackView, DiscoveryFreshness, DiscoveryMatchView, DiscoveryOpportunityStatus,
+        DevelopDiscoveryTopicRequest, DevelopDiscoveryTopicResult, DiscoveryFeedbackView,
+        DiscoveryMatchView, DiscoveryOpportunityStatus,
         DiscoveryOpportunityView, DiscoveryScanResult, DiscoverySourceView,
         RecordDiscoveryFeedbackRequest, SaveDiscoveryInspirationResult, ScanDiscoveryRequest,
     },
