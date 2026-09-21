@@ -57,7 +57,7 @@ What changed:
 Generated source catalog after this slice:
 
 - 130 tracked source files;
-- 1,306 symbols;
+- 1,305 symbols;
 - 80 Rust source files;
 - 49 TypeScript source files;
 - 1 Python source file.
