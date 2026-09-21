@@ -36,8 +36,6 @@ struct AppPreferences {
     gemini_model_id: Option<String>,
     #[serde(default)]
     gemini_api_key_ciphertext: Option<String>,
-    #[serde(default)]
-    brave_search_api_key_ciphertext: Option<String>,
     updated_at: String,
 }
 
@@ -54,7 +52,6 @@ impl Default for AppPreferences {
             openai_api_key_ciphertext: None,
             gemini_model_id: None,
             gemini_api_key_ciphertext: None,
-            brave_search_api_key_ciphertext: None,
             updated_at: Utc::now().to_rfc3339(),
         }
     }
@@ -65,8 +62,6 @@ pub struct ProviderSecretUpdate {
     pub clear_openai_api_key: bool,
     pub gemini_api_key: Option<String>,
     pub clear_gemini_api_key: bool,
-    pub brave_search_api_key: Option<String>,
-    pub clear_brave_search_api_key: bool,
 }
 
 pub fn get_last_vault_path() -> ServiceResult<Option<String>> {
@@ -130,9 +125,6 @@ pub fn get_provider_settings() -> ServiceResult<ProviderSettingsView> {
         openai_api_key_configured: has_ciphertext(&preferences.openai_api_key_ciphertext),
         gemini_model_id: preferences.gemini_model_id,
         gemini_api_key_configured: has_ciphertext(&preferences.gemini_api_key_ciphertext),
-        brave_search_api_key_configured: has_ciphertext(
-            &preferences.brave_search_api_key_ciphertext,
-        ),
     })
 }
 
@@ -142,9 +134,8 @@ pub fn save_provider_settings(
 ) -> ServiceResult<()> {
     let protected_openai = protect_optional_secret(secrets.openai_api_key.as_deref())?;
     let protected_gemini = protect_optional_secret(secrets.gemini_api_key.as_deref())?;
-    let protected_brave = protect_optional_secret(secrets.brave_search_api_key.as_deref())?;
     update_preferences(|preferences| {
-        preferences.schema_version = 4;
+        preferences.schema_version = 5;
         preferences.selected_provider_id = settings.selected_provider_id.clone();
         preferences.ollama_base_url = settings.ollama_base_url.clone();
         preferences.ollama_model_id = settings.ollama_model_id.clone();
@@ -160,20 +151,7 @@ pub fn save_provider_settings(
         } else if let Some(ciphertext) = &protected_gemini {
             preferences.gemini_api_key_ciphertext = Some(ciphertext.clone());
         }
-        if secrets.clear_brave_search_api_key {
-            preferences.brave_search_api_key_ciphertext = None;
-        } else if let Some(ciphertext) = &protected_brave {
-            preferences.brave_search_api_key_ciphertext = Some(ciphertext.clone());
-        }
     })
-}
-
-pub fn get_brave_search_api_key() -> ServiceResult<Option<String>> {
-    let preferences = read_preferences_or_default(&preferences_path()?)?;
-    preferences
-        .brave_search_api_key_ciphertext
-        .map(|value| provider_secret_service::unprotect_secret(&value))
-        .transpose()
 }
 
 pub fn get_provider_api_key(provider_id: &str) -> ServiceResult<Option<String>> {
@@ -270,7 +248,7 @@ fn local_config_root() -> Option<PathBuf> {
 }
 
 const fn default_schema_version() -> u32 {
-    4
+    5
 }
 
 fn default_ollama_base_url() -> String {
@@ -284,7 +262,7 @@ mod tests {
     #[test]
     fn default_preferences_keep_vault_import_and_provider_secrets_separate() {
         let preferences = AppPreferences::default();
-        assert_eq!(preferences.schema_version, 4);
+        assert_eq!(preferences.schema_version, 5);
         assert!(preferences.last_vault_path.is_none());
         assert!(preferences.last_import_directory.is_none());
         assert!(preferences.selected_provider_id.is_none());
@@ -294,7 +272,6 @@ mod tests {
         assert!(preferences.openai_api_key_ciphertext.is_none());
         assert!(preferences.gemini_model_id.is_none());
         assert!(preferences.gemini_api_key_ciphertext.is_none());
-        assert!(preferences.brave_search_api_key_ciphertext.is_none());
     }
 
     #[test]
