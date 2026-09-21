@@ -55,7 +55,7 @@ export function DiscoveryPanel({
   }
 
   async function scan() {
-    setBusy("Scanning current web results");
+    setBusy("Scanning current public sources");
     setError(null);
     setNotice(null);
     try {
@@ -70,7 +70,7 @@ export function DiscoveryPanel({
       const scanSummary =
         queryCount === 1
           ? "Scan complete around your focus."
-          : "Scan complete across " + queryCount + " bounded search areas.";
+          : "Scan complete across " + queryCount + " bounded topic areas.";
       setNotice(
         count > 0
           ? scanSummary + " " + count + " prior feedback example" + (count === 1 ? "" : "s") + " informed qualification."
@@ -159,8 +159,9 @@ export function DiscoveryPanel({
       </div>
 
       <p className="discovery-privacy-note">
-        Discovery uses the separately configured Brave Search key. WorkLore privacy-preflights every
-        external search query and does not send your Story or Proof Point text to the search API.
+        Discovery reads a small set of free public sources, including Hacker News, TechCrunch,
+        BBC Business, BLS, and Federal Reserve feeds. Focus is applied locally after retrieval, so
+        WorkLore does not send your Focus, Story, Proof Point, or private entity text to those sources.
       </p>
       {busy ? <p className="discovery-status">{busy}</p> : null}
       {notice ? <p className="discovery-notice" role="status">{notice}</p> : null}
