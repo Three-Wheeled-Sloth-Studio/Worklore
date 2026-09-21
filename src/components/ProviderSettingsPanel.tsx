@@ -12,6 +12,7 @@ import "../provider-settings.css";
 const DEFAULT_OLLAMA_URL = "http://127.0.0.1:11434";
 const OPENAI_ENDPOINT = "https://api.openai.com/v1";
 const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/openai";
+const BRAVE_SEARCH_ENDPOINT = "https://api.search.brave.com/res/v1/web/search";
 
 const EMPTY_SETTINGS: ProviderSettings = {
   selectedProviderId: null,
@@ -21,6 +22,7 @@ const EMPTY_SETTINGS: ProviderSettings = {
   openaiApiKeyConfigured: false,
   geminiModelId: null,
   geminiApiKeyConfigured: false,
+  braveSearchApiKeyConfigured: false,
 };
 
 export function ProviderSettingsPanel() {
@@ -28,8 +30,10 @@ export function ProviderSettingsPanel() {
   const [models, setModels] = useState<ProviderModel[]>([]);
   const [openaiApiKey, setOpenaiApiKey] = useState("");
   const [geminiApiKey, setGeminiApiKey] = useState("");
+  const [braveSearchApiKey, setBraveSearchApiKey] = useState("");
   const [clearOpenaiApiKey, setClearOpenaiApiKey] = useState(false);
   const [clearGeminiApiKey, setClearGeminiApiKey] = useState(false);
+  const [clearBraveSearchApiKey, setClearBraveSearchApiKey] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -59,13 +63,17 @@ export function ProviderSettingsPanel() {
         geminiModelId: settings.geminiModelId,
         geminiApiKey: geminiApiKey.trim() || null,
         clearGeminiApiKey,
+        braveSearchApiKey: braveSearchApiKey.trim() || null,
+        clearBraveSearchApiKey,
       };
       const saved = await updateProviderSettings(request);
       setSettings(saved);
       setOpenaiApiKey("");
       setGeminiApiKey("");
+      setBraveSearchApiKey("");
       setClearOpenaiApiKey(false);
       setClearGeminiApiKey(false);
+      setClearBraveSearchApiKey(false);
       setNotice(saveMessage(saved));
       return saved;
     } catch (caught) {
@@ -236,6 +244,66 @@ export function ProviderSettingsPanel() {
           API usage is billed by the provider and is separate from consumer ChatGPT or Gemini subscriptions.
         </p>
       ) : null}
+      <div className="provider-discovery-settings" aria-labelledby="discovery-provider-heading">
+        <p className="eyebrow">Web discovery</p>
+        <h3 id="discovery-provider-heading">Timely-topic search</h3>
+        <p className="provider-note">
+          Discovery is separate from the selected LLM provider. WorkLore uses Brave Search only when
+          you press Scan now, and privacy-preflights the search query before it leaves the machine.
+        </p>
+        <div className="provider-endpoint-row">
+          <span className="field-label">Search endpoint</span>
+          <code>{BRAVE_SEARCH_ENDPOINT}</code>
+        </div>
+        <label className="field-label" htmlFor="brave-search-api-key">Brave Search API key</label>
+        <input
+          id="brave-search-api-key"
+          type="password"
+          value={braveSearchApiKey}
+          disabled={busy !== null || clearBraveSearchApiKey}
+          autoComplete="off"
+          spellCheck={false}
+          placeholder={
+            settings.braveSearchApiKeyConfigured
+              ? "Saved for this Windows user - enter a replacement only"
+              : "Paste Brave Search API key"
+          }
+          onChange={(event) => setBraveSearchApiKey(event.target.value)}
+        />
+        <div className="provider-key-status">
+          <span>
+            {settings.braveSearchApiKeyConfigured && !clearBraveSearchApiKey
+              ? "A protected discovery key is saved locally."
+              : clearBraveSearchApiKey
+                ? "Saved discovery key will be removed when you save."
+                : "No saved discovery key."}
+          </span>
+          {settings.braveSearchApiKeyConfigured && !clearBraveSearchApiKey ? (
+            <button
+              className="quiet-button compact"
+              type="button"
+              disabled={busy !== null}
+              onClick={() => setClearBraveSearchApiKey(true)}
+            >
+              Forget key on save
+            </button>
+          ) : clearBraveSearchApiKey ? (
+            <button
+              className="quiet-button compact"
+              type="button"
+              disabled={busy !== null}
+              onClick={() => setClearBraveSearchApiKey(false)}
+            >
+              Keep saved key
+            </button>
+          ) : null}
+        </div>
+        <p className="provider-note">
+          The key uses the same Windows user-scoped protection as LLM BYOK credentials and is never
+          returned to the UI after saving.
+        </p>
+      </div>
+
       {busy ? <p className="provider-note">{busy}</p> : null}
       {notice ? <div className="feedback notice" role="status">{notice}</div> : null}
       {error ? <div className="feedback error" role="alert">{error}</div> : null}
