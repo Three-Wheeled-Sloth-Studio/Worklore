@@ -1,5 +1,4 @@
 pub mod app_preferences_service;
-pub mod brave_search_provider;
 pub mod candidate_service;
 pub mod canonical_store;
 pub mod capture_catalog_service;
