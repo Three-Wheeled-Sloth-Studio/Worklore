@@ -10,6 +10,7 @@ const BROAD_EXPLORATION_QUERIES: [&str; 4] = [
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DiscoveryQueryPlan {
     queries: Vec<String>,
+    explicit_focus: bool,
 }
 
 impl DiscoveryQueryPlan {
@@ -22,7 +23,7 @@ impl DiscoveryQueryPlan {
     }
 
     pub fn is_explicit_focus(&self) -> bool {
-        self.queries.len() == 1
+        self.explicit_focus
     }
 }
 
@@ -36,6 +37,7 @@ pub fn build_query_plan(
     if !focus.is_empty() {
         return DiscoveryQueryPlan {
             queries: vec![focus],
+            explicit_focus: true,
         };
     }
 
@@ -51,7 +53,10 @@ pub fn build_query_plan(
         }
     }
 
-    DiscoveryQueryPlan { queries }
+    DiscoveryQueryPlan {
+        queries,
+        explicit_focus: false,
+    }
 }
 
 fn push_first_unique(queries: &mut Vec<String>, candidates: &[String]) {
@@ -127,7 +132,10 @@ mod tests {
         );
 
         assert!(plan.is_explicit_focus());
-        assert_eq!(plan.queries(), &["agentic workflow management"]);
+        assert_eq!(
+            plan.queries(),
+            &[String::from("agentic workflow management")]
+        );
     }
 
     #[test]
