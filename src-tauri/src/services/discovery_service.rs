@@ -55,6 +55,16 @@ struct RankedOpportunity {
     recent_overlap: bool,
 }
 
+struct QualificationContext<'a> {
+    run_id: &'a str,
+    themes: &'a [SignalRecord],
+    standing: &'a [SignalRecord],
+    audience: &'a [SignalRecord],
+    recent_topics: &'a [SignalRecord],
+    prior_feedback: &'a [PriorFeedback],
+    now: &'a str,
+}
+
 pub async fn scan(
     vault_path: &Path,
     request: ScanDiscoveryRequest,
@@ -101,23 +111,21 @@ pub async fn scan(
     let clusters = cluster_sources(results);
     let run_id = format!("discovery_run_{}", Uuid::now_v7());
     let now = Utc::now().to_rfc3339();
+    let context = QualificationContext {
+        run_id: &run_id,
+        themes: &themes,
+        standing: &standing,
+        audience: &audience,
+        recent_topics: &recent_topics,
+        prior_feedback: &prior_feedback,
+        now: &now,
+    };
     let mut used_feedback_ids = HashSet::new();
     let mut ranked = clusters
         .into_iter()
         .enumerate()
         .map(|(position, sources)| {
-            qualify_cluster(
-                &run_id,
-                position,
-                sources,
-                &themes,
-                &standing,
-                &audience,
-                &recent_topics,
-                &prior_feedback,
-                &mut used_feedback_ids,
-                &now,
-            )
+            qualify_cluster(&context, position, sources, &mut used_feedback_ids)
         })
         .collect::<Vec<_>>();
 
@@ -502,16 +510,10 @@ fn ensure_inspiration(vault_path: &Path, opportunity_id: &str) -> ServiceResult<
 }
 
 fn qualify_cluster(
-    run_id: &str,
+    context: &QualificationContext<'_>,
     provider_position: usize,
     sources: Vec<DiscoverySourceView>,
-    themes: &[SignalRecord],
-    standing: &[SignalRecord],
-    audience: &[SignalRecord],
-    recent_topics: &[SignalRecord],
-    prior_feedback: &[PriorFeedback],
     used_feedback_ids: &mut HashSet<String>,
-    now: &str,
 ) -> RankedOpportunity {
     let title = sources
         .first()
@@ -530,16 +532,16 @@ fn qualify_cluster(
             .collect::<Vec<_>>()
             .join(" "),
     );
-    let theme_matches = matching_signals(themes, &feature_tokens);
-    let standing_matches = matching_signals(standing, &feature_tokens);
-    let audience_matches = matching_signals(audience, &feature_tokens);
-    let recent_matches = matching_signals(recent_topics, &feature_tokens);
+    let theme_matches = matching_signals(context.themes, &feature_tokens);
+    let standing_matches = matching_signals(context.standing, &feature_tokens);
+    let audience_matches = matching_signals(context.audience, &feature_tokens);
+    let recent_matches = matching_signals(context.recent_topics, &feature_tokens);
     let recent_overlap = !recent_matches.is_empty();
 
     let mut positive = 0usize;
     let mut negative = 0usize;
     let mut not_now = 0usize;
-    for feedback in prior_feedback {
+    for feedback in context.prior_feedback {
         if token_similarity(&feature_tokens, &feedback.tokens) {
             used_feedback_ids.insert(feedback.feedback_id.clone());
             match feedback.verdict.as_str() {
@@ -633,7 +635,7 @@ fn qualify_cluster(
 
     let view = DiscoveryOpportunityView {
         opportunity_id: format!("discovery_opportunity_{}", Uuid::now_v7()),
-        run_id: run_id.to_string(),
+        run_id: context.run_id.to_string(),
         title,
         summary,
         sources,
@@ -647,7 +649,7 @@ fn qualify_cluster(
         status: DiscoveryOpportunityStatus::Candidate,
         topic_id: None,
         inspiration_id: None,
-        created_at: now.to_string(),
+        created_at: context.now.to_string(),
     };
     RankedOpportunity {
         view,
