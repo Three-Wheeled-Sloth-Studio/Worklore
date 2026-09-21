@@ -244,7 +244,7 @@ pub fn develop_topic(
 ) -> ServiceResult<DevelopDiscoveryTopicResult> {
     canonical_store::initialize(vault_path)?;
     let title = required_text(&request.title, "Topic title")?;
-    let summary = request.summary.trim().to_string();
+    let summary = required_text(&request.summary, "Topic summary")?;
     let connection = open_connection(vault_path)?;
     let opportunity = load_opportunity(&connection, &request.opportunity_id)?;
     if let Some(topic_id) = opportunity.topic_id {
