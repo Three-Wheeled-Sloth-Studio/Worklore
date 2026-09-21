@@ -1,7 +1,7 @@
 ---
 type: Handoff
 title: Current WorkLore Handoff
-description: Accepted v0.1.9 open-ended timely-topic discovery checkpoint and runtime-smoke handoff.
+description: v0.1.10 keyless seeded timely-topic discovery checkpoint and runtime-smoke handoff.
 status: draft
 tags: [handoff, worklore, discovery]
 ---
@@ -31,19 +31,19 @@ Locked boundaries remain:
 
 ## Accepted Checkpoint
 
-Version: `0.1.9`
+Version: `0.1.10`
 
-The open-ended discovery slice is implemented and accepted after the normal exact-head validation gate. Use the current `dev` head as the implementation source of truth; promoted branches remain unchanged until explicitly requested.
+The keyless seeded discovery slice replaces Brave as the default retrieval path. Final acceptance still requires the normal exact-head validation gate. Promoted branches remain unchanged until explicitly requested.
 
 What changed:
 
 - blank Focus is now a first-class "Explore for me" path and no longer requires active Themes;
-- explicit Focus remains a single narrowed search intent;
+- explicit Focus remains a narrowed intent, but it is now applied locally after seeded-source retrieval;
 - blank Focus builds a bounded plan of at most four search intents;
 - optional active Theme names, active Target Context titles, and prior `Good candidate` external topic titles may diversify blank-focus exploration;
 - Story and Proof Point text is intentionally absent from the query-plan input surface;
-- every outgoing query passes the existing privacy preflight independently;
-- the existing total result budget is divided across exploration queries rather than multiplied by query count;
+- fixed seeded-source requests contain no user Focus, Story, Proof Point, or private entity text;
+- the existing total result budget remains bounded and results are round-robin balanced across seeded sources;
 - merged results deduplicate exact source URLs and then use the existing headline clustering before qualification;
 - qualification still explains Theme, standing, audience, timing, and feedback relationships;
 - `Good candidate` can positively influence similar candidates;
@@ -64,15 +64,15 @@ Generated source catalog after this slice:
 
 ## Required Runtime Smoke After Validation
 
-The automated gate cannot exercise a real user Brave key or desktop interaction. After the exact `dev` head is green:
+The automated gate cannot fully exercise live external feeds or desktop interaction. After the exact `dev` head is green:
 
-1. Launch v0.1.9 and confirm the displayed version.
-2. With Brave Search configured, open Topics -> Find timely topics.
+1. Launch v0.1.10 and confirm the displayed version.
+2. With no Brave Search key configured, open Topics -> Find timely topics.
 3. Leave Focus blank and run a 7-day scan in a vault with no active Themes.
-4. Confirm the scan succeeds and reports multiple bounded search areas.
+4. Confirm the scan succeeds and reports multiple bounded topic areas.
 5. Confirm surfaced opportunities remain a small qualified set rather than a feed.
 6. Add an explicit Focus and confirm the next scan narrows to that subject.
-7. Confirm no private entity, Story body, or Proof Point body appears in externally submitted search text.
+7. Confirm seeded requests are fixed URLs and no Focus, private entity, Story body, or Proof Point body is transmitted externally.
 8. Confirm Save as Inspiration retains the external source.
 9. Confirm Develop Topic still refuses creation until the user writes/confirms a summary.
 10. Record each feedback verdict once and confirm later qualification treats `Not now` differently from `Not for me`.
@@ -110,7 +110,7 @@ Use packet-first/progressive loading. Do not reread repository history.
 - `task-035`: in progress. Topic-to-Post generation exists; runtime UX/correctness dogfood continues.
 - `task-036`: complete for exact lineage/publication/performance association.
 - `task-037`: in progress. Manual performance snapshots and conservative Insights exist.
-- Phase 5 discovery: in progress. Manual Brave retrieval and bounded open-ended exploration are implemented; runtime quality tuning remains evidence-driven.
+- Phase 5 discovery: in progress. Keyless seeded retrieval and bounded open-ended exploration are implemented; runtime quality tuning remains evidence-driven.
 
 ## Do Not Reopen
 
