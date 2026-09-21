@@ -49,6 +49,7 @@ export interface ScanDiscoveryRequest {
 export interface DiscoveryScanResult {
   runId: string;
   externalQuery: string;
+  externalQueries: string[];
   freshness: DiscoveryFreshness;
   feedbackExamplesUsed: number;
   opportunities: DiscoveryOpportunity[];
