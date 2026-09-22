@@ -1,0 +1,1734 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: 1f
+  files:
+  - path: src-tauri/src/domain/stories.rs
+    analysis_version: 1
+    language: rust
+    content_hash: cfc1c784bbb6dc3ef473d229d750b111694c694d
+    dependencies:
+    - crate::domain::models::PrivacyScanStatus
+    - serde::{Deserialize, Serialize}
+    provides: []
+    symbols: []
+  - path: src-tauri/src/services/redaction_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 21fa6d6cc0ef34c2b0878dedd811d14acb3a454b
+    dependencies:
+    - crate::domain::models::{EntityAlias, EntityType}
+    - "crate::{\n    domain::{\n        models::{\n            CloudIdentifierMode, EntityReviewItem, EntitySensitivity, EntityStatus,\
+      \ PrivateEntity,\n            VaultDocument,\n        },\n        providers::{PrivacyPreflightSummary, RedactionReplacement},\n\
+      \    },\n    error::{ServiceResult, WorkLoreError},\n    io_utils::read_json,\n    services::entity_scan::load_registry,\n\
+      }"
+    - std::{collections::HashMap, fs, path::Path}
+    - super::*
+    provides:
+    - redact_for_external_use
+    - replacement_rules
+    - replace_alias
+    - replace_ascii_case_insensitive
+    - replace_case_sensitive
+    - is_token_boundary
+    - pending_reviews
+    - entity
+    - replacement_rules_respect_include_mode_except_never_send
+    - replacement_does_not_change_substrings_inside_words
+    - replacement_is_ascii_case_insensitive
+    symbols:
+    - name: redact_for_external_use
+      kind: function
+      line_start: 21
+      line_end: 109
+      signature: 'redact_for_external_use(vault_path: &Path, input: &str) -> ServiceResult<RedactedText>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'input: &str'
+      output: ServiceResult<RedactedText>
+      dependencies:
+      - Err
+      - Ok
+      - ProviderPreflightBlocked
+      - Reverse
+      - any
+      - blocked_review_item_ids.is_empty
+      - blocked_review_item_ids.len
+      - counts.contains_key
+      - counts.entry
+      - entity.entity_id.clone
+      - entity.public_token.clone
+      - filter
+      - filter_map
+      - get
+      - input.to_string
+      - item.review_item_id.clone
+      - item.risk.as_str
+      - iter
+      - left.replacement.cmp
+      - let
+      - load_registry
+      - map
+      - new
+      - or_insert
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/entity_scan.rs
+        symbol: load_registry
+    - name: replacement_rules
+      kind: function
+      line_start: 117
+      line_end: 156
+      signature: 'replacement_rules(entities: &[PrivateEntity], mode: CloudIdentifierMode) -> Vec<ReplacementRule>'
+      inputs:
+      - 'entities: &[PrivateEntity]'
+      - 'mode: CloudIdentifierMode'
+      output: Vec<ReplacementRule>
+      dependencies:
+      - alias.value.clone
+      - entity.canonical_name.clone
+      - entity.entity_id.clone
+      - entity.public_token.clone
+      - filter
+      - iter
+      - new
+      - rules.push
+      parser: rust-pattern
+      dependency_targets: []
+    - name: replace_alias
+      kind: function
+      line_start: 157
+      line_end: 167
+      signature: 'replace_alias(input: &str, alias: &str, token: &str) -> (String, usize)'
+      inputs:
+      - 'input: &str'
+      - 'alias: &str'
+      - 'token: &str'
+      output: (String, usize)
+      dependencies:
+      - alias.is_ascii
+      - alias.is_empty
+      - input.is_ascii
+      - input.to_string
+      - replace_ascii_case_insensitive
+      - replace_case_sensitive
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/redaction_service.rs
+        symbol: replace_ascii_case_insensitive
+      - path: src-tauri/src/services/redaction_service.rs
+        symbol: replace_case_sensitive
+    - name: replace_ascii_case_insensitive
+      kind: function
+      line_start: 168
+      line_end: 192
+      signature: 'replace_ascii_case_insensitive(input: &str, alias: &str, token: &str) -> (String, usize)'
+      inputs:
+      - 'input: &str'
+      - 'alias: &str'
+      - 'token: &str'
+      output: (String, usize)
+      dependencies:
+      - Some
+      - alias.to_ascii_lowercase
+      - end.max
+      - find
+      - input.as_bytes
+      - input.len
+      - input.to_ascii_lowercase
+      - is_token_boundary
+      - needle.len
+      - output.push_str
+      - with_capacity
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/services/entity_scan.rs
+        symbol: is_token_boundary
+      - &id002
+        path: src-tauri/src/services/redaction_service.rs
+        symbol: is_token_boundary
+    - name: replace_case_sensitive
+      kind: function
+      line_start: 193
+      line_end: 215
+      signature: 'replace_case_sensitive(input: &str, alias: &str, token: &str) -> (String, usize)'
+      inputs:
+      - 'input: &str'
+      - 'alias: &str'
+      - 'token: &str'
+      output: (String, usize)
+      dependencies:
+      - Some
+      - alias.len
+      - end.max
+      - find
+      - input.as_bytes
+      - input.len
+      - is_token_boundary
+      - output.push_str
+      - with_capacity
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+    - name: is_token_boundary
+      kind: function
+      line_start: 216
+      line_end: 224
+      signature: 'is_token_boundary(bytes: &[u8], start: usize, end: usize) -> bool'
+      inputs:
+      - 'bytes: &[u8]'
+      - 'start: usize'
+      - 'end: usize'
+      output: bool
+      dependencies:
+      - and_then
+      - bytes.get
+      - checked_sub
+      - is_some_and
+      parser: rust-pattern
+      dependency_targets: []
+    - name: pending_reviews
+      kind: function
+      line_start: 225
+      line_end: 245
+      signature: 'pending_reviews(vault_path: &Path) -> ServiceResult<Vec<EntityReviewItem>>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Vec<EntityReviewItem>>
+      dependencies:
+      - Ok
+      - Some
+      - and_then
+      - directory.exists
+      - entry.file_type
+      - entry.path
+      - extension
+      - is_file
+      - items.push
+      - new
+      - read_dir
+      - read_json
+      - value.to_str
+      - vault_path.join
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/io_utils.rs
+        symbol: read_json
+    - name: entity
+      kind: function
+      line_start: 251
+      line_end: 277
+      signature: 'entity(name: &str, alias: &str, sensitivity: EntitySensitivity) -> PrivateEntity'
+      inputs:
+      - 'name: &str'
+      - 'alias: &str'
+      - 'sensitivity: EntitySensitivity'
+      output: PrivateEntity
+      dependencies:
+      - alias.to_ascii_lowercase
+      - alias.to_string
+      - name.to_string
+      - new
+      - to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: replacement_rules_respect_include_mode_except_never_send
+      kind: function
+      line_start: 280
+      line_end: 292
+      signature: replacement_rules_respect_include_mode_except_never_send()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - entity
+      - is_empty
+      - len
+      - replacement_rules
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/confidentiality_service.rs
+        symbol: entity
+      - path: src-tauri/src/services/redaction_service.rs
+        symbol: entity
+      - path: src-tauri/src/services/redaction_service.rs
+        symbol: replacement_rules
+    - name: replacement_does_not_change_substrings_inside_words
+      kind: function
+      line_start: 295
+      line_end: 299
+      signature: replacement_does_not_change_substrings_inside_words()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - let
+      - replace_alias
+      parser: rust-pattern
+      dependency_targets:
+      - &id003
+        path: src-tauri/src/services/redaction_service.rs
+        symbol: replace_alias
+    - name: replacement_is_ascii_case_insensitive
+      kind: function
+      line_start: 302
+      line_end: 306
+      signature: replacement_is_ascii_case_insensitive()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - let
+      - replace_alias
+      parser: rust-pattern
+      dependency_targets:
+      - *id003
+  - path: src-tauri/src/services/seeded_discovery_provider.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 8c53ba05cf6542bbd09acdb8e365366cb40a1038
+    dependencies:
+    - chrono::{DateTime, Duration as ChronoDuration, Utc}
+    - "crate::{\n    domain::discovery::{DiscoveryFreshness, DiscoverySourceView},\n    error::{ServiceResult, WorkLoreError},\n\
+      }"
+    - quick_xml::{events::Event, Reader}
+    - serde::Deserialize
+    - std::collections::{BTreeSet, HashSet}
+    - super::*
+    provides:
+    - fetch
+    - is_http_url
+    - source_labels
+    - fetch_hacker_news
+    - fetch_rss
+    - parse_rss_items
+    - append_field
+    - sort_candidates
+    - round_robin
+    - within_freshness
+    - parse_published_at
+    - relevance_score
+    - tokens
+    - plain_text
+    - domain_from_url
+    - provider_error
+    - seeded_endpoints_never_interpolate_user_focus
+    - source_mix_is_bounded_and_diverse
+    - parses_rss_items_without_network_access
+    - focus_matching_happens_locally
+    - round_robin_prevents_one_source_from_consuming_the_scan
+    - candidate
+    symbols:
+    - name: fetch
+      kind: function
+      line_start: 73
+      line_end: 113
+      signature: 'fetch(focus: &str, freshness: DiscoveryFreshness, count: usize) -> ServiceResult<Vec<DiscoverySourceView>>'
+      inputs:
+      - 'focus: &str'
+      - 'freshness: DiscoveryFreshness'
+      - 'count: usize'
+      output: ServiceResult<Vec<DiscoverySourceView>>
+      dependencies:
+      - Err
+      - Ok
+      - buckets.push
+      - build
+      - builder
+      - count.clamp
+      - fetch_hacker_news
+      - fetch_rss
+      - map_err
+      - new
+      - provider_error
+      - round_robin
+      - tokens
+      - user_agent
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/seeded_discovery_provider.rs
+        symbol: fetch_hacker_news
+      - path: src-tauri/src/services/seeded_discovery_provider.rs
+        symbol: fetch_rss
+      - &id010
+        path: src-tauri/src/services/seeded_discovery_provider.rs
+        symbol: round_robin
+      - &id007
+        path: src-tauri/src/services/discovery_service.rs
+        symbol: tokens
+      - &id008
+        path: src-tauri/src/services/seeded_discovery_provider.rs
+        symbol: tokens
+    - name: is_http_url
+      kind: function
+      line_start: 114
+      line_end: 117
+      signature: 'is_http_url(url: &str) -> bool'
+      inputs:
+      - 'url: &str'
+      output: bool
+      dependencies:
+      - url.starts_with
+      parser: rust-pattern
+      dependency_targets: []
+    - name: source_labels
+      kind: function
+      line_start: 120
+      line_end: 124
+      signature: source_labels() -> Vec<&'static str>
+      inputs: []
+      output: Vec<&'static str>
+      dependencies:
+      - RSS_SEEDS.iter
+      - labels.extend
+      - map
+      parser: rust-pattern
+      dependency_targets: []
+    - name: fetch_hacker_news
+      kind: function
+      line_start: 125
+      line_end: 202
+      signature: 'fetch_hacker_news(client: &reqwest::Client, freshness: DiscoveryFreshness, focus_tokens: &BTreeSet<String>)
+        -> ServiceResult<Vec<Candidate>>'
+      inputs:
+      - 'client: &reqwest::Client'
+      - 'freshness: DiscoveryFreshness'
+      - 'focus_tokens: &BTreeSet<String>'
+      output: ServiceResult<Vec<Candidate>>
+      dependencies:
+      - Err
+      - Ok
+      - Some
+      - and_then
+      - as_u16
+      - await.map_err
+      - domain_from_url
+      - filter
+      - filter_map
+      - focus_tokens.is_empty
+      - get
+      - hit.created_at.as_deref
+      - into_iter
+      - is_http_url
+      - is_success
+      - map
+      - map_err
+      - match
+      - provider_error
+      - published_at.as_ref
+      - relevance_score
+      - response.json
+      - response.status
+      - send
+      parser: rust-pattern
+      dependency_targets:
+      - &id004
+        path: src-tauri/src/services/seeded_discovery_provider.rs
+        symbol: domain_from_url
+      - &id005
+        path: src-tauri/src/services/seeded_discovery_provider.rs
+        symbol: is_http_url
+      - &id006
+        path: src-tauri/src/services/seeded_discovery_provider.rs
+        symbol: relevance_score
+    - name: fetch_rss
+      kind: function
+      line_start: 203
+      line_end: 266
+      signature: 'fetch_rss(client: &reqwest::Client, label: &str, endpoint: &str, freshness: DiscoveryFreshness, focus_tokens:
+        &BTreeSet<String>) -> ServiceResult<Vec<Candidate>>'
+      inputs:
+      - 'client: &reqwest::Client'
+      - 'label: &str'
+      - 'endpoint: &str'
+      - 'freshness: DiscoveryFreshness'
+      - 'focus_tokens: &BTreeSet<String>'
+      output: ServiceResult<Vec<Candidate>>
+      dependencies:
+      - Err
+      - Ok
+      - Some
+      - as_u16
+      - await.map_err
+      - client.get
+      - domain_from_url
+      - filter_map
+      - focus_tokens.is_empty
+      - into_iter
+      - is_http_url
+      - is_success
+      - item.link.trim
+      - map
+      - parse_published_at
+      - parse_rss_items
+      - plain_text
+      - provider_error
+      - published_at.as_ref
+      - relevance_score
+      - response.status
+      - response.text
+      - send
+      - sort_candidates
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+      - *id005
+      - path: src-tauri/src/services/seeded_discovery_provider.rs
+        symbol: parse_published_at
+      - &id009
+        path: src-tauri/src/services/seeded_discovery_provider.rs
+        symbol: parse_rss_items
+      - path: src-tauri/src/services/seeded_discovery_provider.rs
+        symbol: plain_text
+      - *id006
+      - path: src-tauri/src/services/seeded_discovery_provider.rs
+        symbol: sort_candidates
+    - name: parse_rss_items
+      kind: function
+      line_start: 267
+      line_end: 320
+      signature: 'parse_rss_items(xml: &str) -> Vec<RssItem>'
+      inputs:
+      - 'xml: &str'
+      output: Vec<RssItem>
+      dependencies:
+      - CData
+      - End
+      - Err
+      - Ok
+      - Some
+      - Start
+      - Text
+      - append_field
+      - as_ref
+      - buffer.clear
+      - current.as_mut
+      - current.is_some
+      - current.take
+      - default
+      - event.name
+      - from_str
+      - from_utf8_lossy
+      - items.push
+      - let
+      - new
+      - reader.config_mut
+      - reader.read_event_into
+      - text.as_ref
+      - text.decode
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/seeded_discovery_provider.rs
+        symbol: append_field
+      - path: src-tauri/src/services/app_preferences_service.rs
+        symbol: default
+    - name: append_field
+      kind: function
+      line_start: 321
+      line_end: 333
+      signature: 'append_field(item: &mut RssItem, field: RssField, value: &str)'
+      inputs:
+      - 'item: &mut RssItem'
+      - 'field: RssField'
+      - 'value: &str'
+      output: unspecified
+      dependencies:
+      - target.is_empty
+      - target.push
+      - target.push_str
+      - value.trim
+      parser: rust-pattern
+      dependency_targets: []
+    - name: sort_candidates
+      kind: function
+      line_start: 334
+      line_end: 342
+      signature: 'sort_candidates(candidates: &mut [Candidate])'
+      inputs:
+      - 'candidates: &mut [Candidate]'
+      output: unspecified
+      dependencies:
+      - candidates.sort_by
+      - cmp
+      - right.published_at.cmp
+      - then_with
+      parser: rust-pattern
+      dependency_targets: []
+    - name: round_robin
+      kind: function
+      line_start: 343
+      line_end: 369
+      signature: 'round_robin(mut buckets: Vec<Vec<Candidate>>, count: usize) -> Vec<DiscoverySourceView>'
+      inputs:
+      - 'mut buckets: Vec<Vec<Candidate>>'
+      - 'count: usize'
+      output: Vec<DiscoverySourceView>
+      dependencies:
+      - Some
+      - all
+      - bucket.get
+      - bucket.len
+      - buckets.iter
+      - candidate.source.clone
+      - candidate.source.url.clone
+      - new
+      - output.len
+      - output.push
+      - seen_urls.insert
+      parser: rust-pattern
+      dependency_targets: []
+    - name: within_freshness
+      kind: function
+      line_start: 370
+      line_end: 381
+      signature: 'within_freshness(published_at: Option<&DateTime<Utc>>, freshness: DiscoveryFreshness) -> bool'
+      inputs:
+      - 'published_at: Option<&DateTime<Utc>>'
+      - 'freshness: DiscoveryFreshness'
+      output: bool
+      dependencies:
+      - Some
+      - days
+      - hours
+      - now
+      parser: rust-pattern
+      dependency_targets: []
+    - name: parse_published_at
+      kind: function
+      line_start: 382
+      line_end: 392
+      signature: 'parse_published_at(value: &str) -> Option<DateTime<Utc>>'
+      inputs:
+      - 'value: &str'
+      output: Option<DateTime<Utc>>
+      dependencies:
+      - map
+      - ok
+      - or_else
+      - parse_from_rfc2822
+      - parse_from_rfc3339
+      - value.is_empty
+      - value.trim
+      - value.with_timezone
+      parser: rust-pattern
+      dependency_targets: []
+    - name: relevance_score
+      kind: function
+      line_start: 393
+      line_end: 400
+      signature: 'relevance_score(title: &str, description: &str, focus_tokens: &BTreeSet<String>) -> usize'
+      inputs:
+      - 'title: &str'
+      - 'description: &str'
+      - 'focus_tokens: &BTreeSet<String>'
+      output: usize
+      dependencies:
+      - count
+      - focus_tokens.intersection
+      - focus_tokens.is_empty
+      - tokens
+      parser: rust-pattern
+      dependency_targets:
+      - *id007
+      - *id008
+    - name: tokens
+      kind: function
+      line_start: 401
+      line_end: 409
+      signature: 'tokens(value: &str) -> BTreeSet<String>'
+      inputs:
+      - 'value: &str'
+      output: BTreeSet<String>
+      dependencies:
+      - character.is_alphanumeric
+      - collect
+      - filter
+      - map
+      - split
+      - token.len
+      parser: rust-pattern
+      dependency_targets: []
+    - name: plain_text
+      kind: function
+      line_start: 410
+      line_end: 423
+      signature: 'plain_text(value: &str) -> String'
+      inputs:
+      - 'value: &str'
+      output: String
+      dependencies:
+      - join
+      - output.push
+      - output.split_whitespace
+      - value.chars
+      - value.len
+      - with_capacity
+      parser: rust-pattern
+      dependency_targets: []
+    - name: domain_from_url
+      kind: function
+      line_start: 424
+      line_end: 434
+      signature: 'domain_from_url(url: &str) -> String'
+      inputs:
+      - 'url: &str'
+      output: String
+      dependencies:
+      - map
+      - next
+      - split
+      - to_string
+      - trim_start_matches
+      - unwrap_or
+      - url.split_once
+      parser: rust-pattern
+      dependency_targets: []
+    - name: provider_error
+      kind: function
+      line_start: 435
+      line_end: 441
+      signature: 'provider_error(code: &''static str, message: impl Into<String>) -> WorkLoreError'
+      inputs:
+      - 'code: &''static str'
+      - 'message: impl Into<String>'
+      output: WorkLoreError
+      dependencies:
+      - message.into
+      parser: rust-pattern
+      dependency_targets: []
+    - name: seeded_endpoints_never_interpolate_user_focus
+      kind: function
+      line_start: 448
+      line_end: 454
+      signature: seeded_endpoints_never_interpolate_user_focus()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - HN_FRONT_PAGE_ENDPOINT.contains
+      - all
+      - endpoint.contains
+      - iter
+      parser: rust-pattern
+      dependency_targets: []
+    - name: source_mix_is_bounded_and_diverse
+      kind: function
+      line_start: 457
+      line_end: 468
+      signature: source_mix_is_bounded_and_diverse()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - source_labels
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/seeded_discovery_provider.rs
+        symbol: source_labels
+    - name: parses_rss_items_without_network_access
+      kind: function
+      line_start: 471
+      line_end: 483
+      signature: parses_rss_items_without_network_access()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - description.contains
+      - items.len
+      - parse_rss_items
+      parser: rust-pattern
+      dependency_targets:
+      - *id009
+    - name: focus_matching_happens_locally
+      kind: function
+      line_start: 486
+      line_end: 499
+      signature: focus_matching_happens_locally()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - relevance_score
+      - tokens
+      parser: rust-pattern
+      dependency_targets:
+      - *id006
+      - *id007
+      - *id008
+    - name: round_robin_prevents_one_source_from_consuming_the_scan
+      kind: function
+      line_start: 502
+      line_end: 540
+      signature: round_robin_prevents_one_source_from_consuming_the_scan()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - candidate
+      - item.url.as_str
+      - iter
+      - map
+      - new
+      - round_robin
+      - to_string
+      - url.to_string
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/seeded_discovery_provider.rs
+        symbol: candidate
+      - path: src/voiceWorkspaceQueue.test.ts
+        symbol: candidate
+      - *id010
+    - name: candidate
+      kind: function
+      line_start: 503
+      line_end: 515
+      signature: 'candidate(url: &str) -> Candidate'
+      inputs:
+      - 'url: &str'
+      output: Candidate
+      dependencies:
+      - new
+      - to_string
+      - url.to_string
+      parser: rust-pattern
+      dependency_targets: []
+  - path: src-tauri/src/services/topic_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: ce3fa18a929294c1998941772cc179e4d85ee44d
+    dependencies:
+    - chrono::Utc
+    - "crate::{\n        domain::models::SourceType,\n        services::{capture_service, vault_service},\n    }"
+    - "crate::{\n    error::{ServiceResult, WorkLoreError},\n    services::canonical_store,\n}"
+    - rusqlite::{params, Connection, OptionalExtension}
+    - serde::{Deserialize, Serialize}
+    - serde_json::json
+    - std::{fs, path::PathBuf}
+    - std::{path::Path, time::Duration}
+    - super::*
+    - uuid::Uuid
+    provides:
+    - as_str
+    - parse
+    - as_str
+    - parse
+    - as_str
+    - parse
+    - relationship_type
+    - target_type
+    - category
+    - from_relationship_type
+    - create_topic
+    - load_topic
+    - list_topics
+    - update_topic
+    - create_theme
+    - load_theme
+    - list_themes
+    - update_theme
+    - add_topic_relationship
+    - remove_topic_relationship
+    - list_topic_link_targets
+    - load_topic_from_connection
+    - load_theme_from_connection
+    - load_relationships
+    - lookup_target
+    - ensure_topic_exists
+    - open_connection
+    - audit
+    - timing_fields
+    - clean_optional
+    - required_text
+    - topic_not_found
+    - theme_not_found
+    - vault
+    - capture_topic
+    - capture_proof
+    - captured_topic_survives_reopen_and_timing_updates_preserve_identity
+    - topic_relationships_are_typed_idempotent_and_context_never_becomes_evidence
+    symbols:
+    - name: as_str
+      kind: function
+      line_start: 26
+      line_end: 35
+      signature: as_str(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: parse
+      kind: function
+      line_start: 36
+      line_end: 49
+      signature: 'parse(value: &str) -> ServiceResult<Self>'
+      inputs:
+      - 'value: &str'
+      output: ServiceResult<Self>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      parser: rust-pattern
+      dependency_targets: []
+    - name: as_str
+      kind: function
+      line_start: 60
+      line_end: 65
+      signature: as_str(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: parse
+      kind: function
+      line_start: 66
+      line_end: 75
+      signature: 'parse(value: &str) -> ServiceResult<Self>'
+      inputs:
+      - 'value: &str'
+      output: ServiceResult<Self>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      parser: rust-pattern
+      dependency_targets: []
+    - name: as_str
+      kind: function
+      line_start: 87
+      line_end: 93
+      signature: as_str(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: parse
+      kind: function
+      line_start: 94
+      line_end: 104
+      signature: 'parse(value: &str) -> ServiceResult<Self>'
+      inputs:
+      - 'value: &str'
+      output: ServiceResult<Self>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      parser: rust-pattern
+      dependency_targets: []
+    - name: relationship_type
+      kind: function
+      line_start: 118
+      line_end: 126
+      signature: relationship_type(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: target_type
+      kind: function
+      line_start: 127
+      line_end: 136
+      signature: target_type(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: category
+      kind: function
+      line_start: 137
+      line_end: 145
+      signature: category(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: from_relationship_type
+      kind: function
+      line_start: 146
+      line_end: 156
+      signature: 'from_relationship_type(value: &str) -> Option<Self>'
+      inputs:
+      - 'value: &str'
+      output: Option<Self>
+      dependencies:
+      - Some
+      parser: rust-pattern
+      dependency_targets: []
+    - name: create_topic
+      kind: function
+      line_start: 255
+      line_end: 294
+      signature: 'create_topic(vault_path: &Path, request: CreateTopicRequest) -> ServiceResult<TopicRecordView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: CreateTopicRequest'
+      output: ServiceResult<TopicRecordView>
+      dependencies:
+      - VALUES
+      - audit
+      - connection.execute
+      - initialize
+      - let
+      - load_topic
+      - now
+      - now_v7
+      - open_connection
+      - request.summary.trim
+      - request.timing_class.as_str
+      - required_text
+      - timing_fields
+      - to_rfc3339
+      - to_string
+      - topic_candidates
+      parser: rust-pattern
+      dependency_targets:
+      - &id013
+        path: src-tauri/src/services/discovery_service.rs
+        symbol: audit
+      - &id014
+        path: src-tauri/src/services/inspiration_service.rs
+        symbol: audit
+      - &id015
+        path: src-tauri/src/services/target_context_service.rs
+        symbol: audit
+      - &id016
+        path: src-tauri/src/services/topic_service.rs
+        symbol: audit
+      - &id011
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: initialize
+      - &id017
+        path: src-tauri/src/services/topic_service.rs
+        symbol: load_topic
+      - &id018
+        path: src-tauri/src/services/topic_service.rs
+        symbol: timing_fields
+    - name: load_topic
+      kind: function
+      line_start: 295
+      line_end: 300
+      signature: 'load_topic(vault_path: &Path, topic_id: &str) -> ServiceResult<TopicRecordView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'topic_id: &str'
+      output: ServiceResult<TopicRecordView>
+      dependencies:
+      - initialize
+      - load_topic_from_connection
+      - open_connection
+      parser: rust-pattern
+      dependency_targets:
+      - *id011
+      - &id012
+        path: src-tauri/src/services/topic_service.rs
+        symbol: load_topic_from_connection
+    - name: list_topics
+      kind: function
+      line_start: 301
+      line_end: 317
+      signature: 'list_topics(vault_path: &Path) -> ServiceResult<Vec<TopicRecordView>>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Vec<TopicRecordView>>
+      dependencies:
+      - collect
+      - connection.prepare
+      - ids.into_iter
+      - initialize
+      - load_topic_from_connection
+      - map
+      - open_connection
+      - query_map
+      parser: rust-pattern
+      dependency_targets:
+      - *id011
+      - *id012
+    - name: update_topic
+      kind: function
+      line_start: 318
+      line_end: 374
+      signature: 'update_topic(vault_path: &Path, request: UpdateTopicRequest) -> ServiceResult<TopicRecordView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: UpdateTopicRequest'
+      output: ServiceResult<TopicRecordView>
+      dependencies:
+      - Err
+      - audit
+      - before.lifecycle.as_str
+      - before.timing_class.as_str
+      - connection.transaction
+      - initialize
+      - let
+      - load_topic
+      - load_topic_from_connection
+      - now
+      - open_connection
+      - request.lifecycle.as_str
+      - request.summary.trim
+      - request.timing_class.as_str
+      - required_text
+      - timing_fields
+      - to_rfc3339
+      - to_string
+      - topic_not_found
+      - tx.commit
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets:
+      - *id013
+      - *id014
+      - *id015
+      - *id016
+      - *id011
+      - *id017
+      - *id012
+      - *id018
+      - &id026
+        path: src-tauri/src/services/topic_service.rs
+        symbol: topic_not_found
+    - name: create_theme
+      kind: function
+      line_start: 375
+      line_end: 399
+      signature: 'create_theme(vault_path: &Path, request: CreateThemeRequest) -> ServiceResult<ThemeRecordView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: CreateThemeRequest'
+      output: ServiceResult<ThemeRecordView>
+      dependencies:
+      - VALUES
+      - audit
+      - connection.execute
+      - initialize
+      - load_theme
+      - now
+      - now_v7
+      - open_connection
+      - request.description.trim
+      - required_text
+      - themes
+      - to_rfc3339
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - *id013
+      - *id014
+      - *id015
+      - *id016
+      - *id011
+      - &id019
+        path: src-tauri/src/services/topic_service.rs
+        symbol: load_theme
+    - name: load_theme
+      kind: function
+      line_start: 400
+      line_end: 405
+      signature: 'load_theme(vault_path: &Path, theme_id: &str) -> ServiceResult<ThemeRecordView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'theme_id: &str'
+      output: ServiceResult<ThemeRecordView>
+      dependencies:
+      - initialize
+      - load_theme_from_connection
+      - open_connection
+      parser: rust-pattern
+      dependency_targets:
+      - *id011
+      - &id020
+        path: src-tauri/src/services/topic_service.rs
+        symbol: load_theme_from_connection
+    - name: list_themes
+      kind: function
+      line_start: 406
+      line_end: 431
+      signature: 'list_themes(vault_path: &Path) -> ServiceResult<Vec<ThemeRecordView>>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Vec<ThemeRecordView>>
+      dependencies:
+      - Ok
+      - collect
+      - connection.prepare
+      - initialize
+      - map
+      - open_connection
+      - query_map
+      - raw.into_iter
+      parser: rust-pattern
+      dependency_targets:
+      - *id011
+    - name: update_theme
+      kind: function
+      line_start: 432
+      line_end: 470
+      signature: 'update_theme(vault_path: &Path, request: UpdateThemeRequest) -> ServiceResult<ThemeRecordView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: UpdateThemeRequest'
+      output: ServiceResult<ThemeRecordView>
+      dependencies:
+      - Err
+      - audit
+      - before.lifecycle.as_str
+      - connection.transaction
+      - initialize
+      - load_theme
+      - load_theme_from_connection
+      - now
+      - open_connection
+      - request.description.trim
+      - request.lifecycle.as_str
+      - required_text
+      - theme_not_found
+      - to_rfc3339
+      - to_string
+      - tx.commit
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets:
+      - *id013
+      - *id014
+      - *id015
+      - *id016
+      - *id011
+      - *id019
+      - *id020
+      - &id027
+        path: src-tauri/src/services/topic_service.rs
+        symbol: theme_not_found
+    - name: add_topic_relationship
+      kind: function
+      line_start: 471
+      line_end: 523
+      signature: 'add_topic_relationship(vault_path: &Path, topic_id: &str, relation_kind: TopicRelationKind, target_id: &str)
+        -> ServiceResult<TopicRelationshipMutationResult>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'topic_id: &str'
+      - 'relation_kind: TopicRelationKind'
+      - 'target_id: &str'
+      output: ServiceResult<TopicRelationshipMutationResult>
+      dependencies:
+      - InvalidVault
+      - Ok
+      - VALUES
+      - audit
+      - connection.transaction
+      - ensure_topic_exists
+      - initialize
+      - lookup_target
+      - now
+      - now_v7
+      - ok_or_else
+      - open_connection
+      - record_relationships
+      - relation_kind.category
+      - relation_kind.relationship_type
+      - relation_kind.target_type
+      - target_id.to_string
+      - to_rfc3339
+      - to_string
+      - topic_id.to_string
+      - tx.commit
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets:
+      - *id013
+      - *id014
+      - *id015
+      - *id016
+      - &id021
+        path: src-tauri/src/services/topic_service.rs
+        symbol: ensure_topic_exists
+      - *id011
+      - &id028
+        path: src-tauri/src/services/topic_service.rs
+        symbol: lookup_target
+      - &id029
+        path: src-tauri/src/services/topic_service.rs
+        symbol: category
+      - &id022
+        path: src-tauri/src/domain/posts.rs
+        symbol: relationship_type
+      - &id023
+        path: src-tauri/src/services/capture_service.rs
+        symbol: relationship_type
+      - &id024
+        path: src-tauri/src/services/inspiration_service.rs
+        symbol: relationship_type
+      - &id025
+        path: src-tauri/src/services/topic_service.rs
+        symbol: relationship_type
+    - name: remove_topic_relationship
+      kind: function
+      line_start: 524
+      line_end: 567
+      signature: 'remove_topic_relationship(vault_path: &Path, topic_id: &str, relation_kind: TopicRelationKind, target_id:
+        &str) -> ServiceResult<TopicRelationshipMutationResult>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'topic_id: &str'
+      - 'relation_kind: TopicRelationKind'
+      - 'target_id: &str'
+      output: ServiceResult<TopicRelationshipMutationResult>
+      dependencies:
+      - Ok
+      - audit
+      - connection.transaction
+      - ensure_topic_exists
+      - initialize
+      - now
+      - open_connection
+      - relation_kind.relationship_type
+      - relation_kind.target_type
+      - target_id.to_string
+      - to_rfc3339
+      - topic_id.to_string
+      - tx.commit
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets:
+      - *id013
+      - *id014
+      - *id015
+      - *id016
+      - *id021
+      - *id011
+      - *id022
+      - *id023
+      - *id024
+      - *id025
+    - name: list_topic_link_targets
+      kind: function
+      line_start: 568
+      line_end: 603
+      signature: 'list_topic_link_targets(vault_path: &Path, relation_kind: TopicRelationKind) -> ServiceResult<Vec<TopicLinkTargetView>>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'relation_kind: TopicRelationKind'
+      output: ServiceResult<Vec<TopicLinkTargetView>>
+      dependencies:
+      - Ok
+      - connection.prepare
+      - initialize
+      - open_connection
+      - row.get
+      - statement.query_map
+      parser: rust-pattern
+      dependency_targets:
+      - *id011
+    - name: load_topic_from_connection
+      kind: function
+      line_start: 604
+      line_end: 644
+      signature: 'load_topic_from_connection(connection: &Connection, topic_id: &str) -> ServiceResult<TopicRecordView>'
+      inputs:
+      - 'connection: &Connection'
+      - 'topic_id: &str'
+      output: ServiceResult<TopicRecordView>
+      dependencies:
+      - Ok
+      - load_relationships
+      - ok_or_else
+      - optional
+      - parse
+      - query_row
+      - topic_not_found
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/inspiration_service.rs
+        symbol: load_relationships
+      - path: src-tauri/src/services/target_context_service.rs
+        symbol: load_relationships
+      - path: src-tauri/src/services/topic_service.rs
+        symbol: load_relationships
+      - *id026
+    - name: load_theme_from_connection
+      kind: function
+      line_start: 645
+      line_end: 669
+      signature: 'load_theme_from_connection(connection: &Connection, theme_id: &str) -> ServiceResult<ThemeRecordView>'
+      inputs:
+      - 'connection: &Connection'
+      - 'theme_id: &str'
+      output: ServiceResult<ThemeRecordView>
+      dependencies:
+      - Ok
+      - ok_or_else
+      - optional
+      - query_row
+      - theme_from_row
+      - theme_not_found
+      parser: rust-pattern
+      dependency_targets:
+      - *id027
+    - name: load_relationships
+      kind: function
+      line_start: 684
+      line_end: 729
+      signature: 'load_relationships(connection: &Connection, topic_id: &str) -> ServiceResult<Vec<TopicRelationshipView>>'
+      inputs:
+      - 'connection: &Connection'
+      - 'topic_id: &str'
+      output: ServiceResult<Vec<TopicRelationshipView>>
+      dependencies:
+      - InvalidVault
+      - Ok
+      - Some
+      - connection.prepare
+      - from_relationship_type
+      - lookup_target
+      - new
+      - ok_or_else
+      - query_map
+      - relation_kind.category
+      - relation_kind.target_type
+      - relationships.push
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/topic_service.rs
+        symbol: from_relationship_type
+      - *id028
+      - *id029
+    - name: lookup_target
+      kind: function
+      line_start: 730
+      line_end: 756
+      signature: 'lookup_target(connection: &Connection, relation_kind: TopicRelationKind, target_id: &str) -> ServiceResult<Option<(String,
+        String, String)>>'
+      inputs:
+      - 'connection: &Connection'
+      - 'relation_kind: TopicRelationKind'
+      - 'target_id: &str'
+      output: ServiceResult<Option<(String, String, String)>>
+      dependencies:
+      - Ok
+      - optional
+      - query_row
+      - row.get
+      parser: rust-pattern
+      dependency_targets: []
+    - name: ensure_topic_exists
+      kind: function
+      line_start: 757
+      line_end: 767
+      signature: 'ensure_topic_exists(connection: &Connection, topic_id: &str) -> ServiceResult<()>'
+      inputs:
+      - 'connection: &Connection'
+      - 'topic_id: &str'
+      output: ServiceResult<()>
+      dependencies:
+      - Ok
+      - found.ok_or_else
+      - optional
+      - query_row
+      - topic_not_found
+      parser: rust-pattern
+      dependency_targets:
+      - *id026
+    - name: open_connection
+      kind: function
+      line_start: 768
+      line_end: 774
+      signature: 'open_connection(vault_path: &Path) -> ServiceResult<Connection>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Connection>
+      dependencies:
+      - Ok
+      - connection.busy_timeout
+      - connection.pragma_update
+      - database_path
+      - from_secs
+      - open
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: database_path
+    - name: audit
+      kind: function
+      line_start: 775
+      line_end: 796
+      signature: 'audit(connection: &Connection, event_type: &str, record_type: &str, record_id: &str, details: serde_json::Value)
+        -> ServiceResult<()>'
+      inputs:
+      - 'connection: &Connection'
+      - 'event_type: &str'
+      - 'record_type: &str'
+      - 'record_id: &str'
+      - 'details: serde_json::Value'
+      output: ServiceResult<()>
+      dependencies:
+      - Ok
+      - VALUES
+      - audit_events
+      - connection.execute
+      - details.to_string
+      - now
+      - now_v7
+      - to_rfc3339
+      parser: rust-pattern
+      dependency_targets: []
+    - name: timing_fields
+      kind: function
+      line_start: 797
+      line_end: 807
+      signature: 'timing_fields(timing_class: TopicTimingClass, relevant_until: Option<String>, timely_note: Option<String>)
+        -> (Option<String>, Option<String>)'
+      inputs:
+      - 'timing_class: TopicTimingClass'
+      - 'relevant_until: Option<String>'
+      - 'timely_note: Option<String>'
+      output: (Option<String>, Option<String>)
+      dependencies:
+      - clean_optional
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/topic_service.rs
+        symbol: clean_optional
+    - name: clean_optional
+      kind: function
+      line_start: 808
+      line_end: 814
+      signature: 'clean_optional(value: Option<String>) -> Option<String>'
+      inputs:
+      - 'value: Option<String>'
+      output: Option<String>
+      dependencies:
+      - then
+      - trimmed.is_empty
+      - trimmed.to_string
+      - value.and_then
+      - value.trim
+      parser: rust-pattern
+      dependency_targets: []
+    - name: required_text
+      kind: function
+      line_start: 815
+      line_end: 825
+      signature: 'required_text(value: &str, label: &str) -> ServiceResult<String>'
+      inputs:
+      - 'value: &str'
+      - 'label: &str'
+      output: ServiceResult<String>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      - trimmed.is_empty
+      - trimmed.to_string
+      - value.trim
+      parser: rust-pattern
+      dependency_targets: []
+    - name: topic_not_found
+      kind: function
+      line_start: 826
+      line_end: 829
+      signature: 'topic_not_found(topic_id: &str) -> WorkLoreError'
+      inputs:
+      - 'topic_id: &str'
+      output: WorkLoreError
+      dependencies:
+      - InvalidVault
+      parser: rust-pattern
+      dependency_targets: []
+    - name: theme_not_found
+      kind: function
+      line_start: 830
+      line_end: 833
+      signature: 'theme_not_found(theme_id: &str) -> WorkLoreError'
+      inputs:
+      - 'theme_id: &str'
+      output: WorkLoreError
+      dependencies:
+      - InvalidVault
+      parser: rust-pattern
+      dependency_targets: []
+    - name: vault
+      kind: function
+      line_start: 844
+      line_end: 849
+      signature: vault() -> PathBuf
+      inputs: []
+      output: PathBuf
+      dependencies:
+      - create_vault
+      - expect
+      - join
+      - now_v7
+      - temp_dir
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/commands/vault.rs
+        symbol: create_vault
+      - path: src-tauri/src/services/vault_service.rs
+        symbol: create_vault
+    - name: capture_topic
+      kind: function
+      line_start: 850
+      line_end: 865
+      signature: 'capture_topic(path: &Path) -> String'
+      inputs:
+      - 'path: &Path'
+      output: String
+      dependencies:
+      - classify_capture_source
+      - create_capture_source
+      - unwrap
+      parser: rust-pattern
+      dependency_targets:
+      - &id030
+        path: src-tauri/src/commands/capture.rs
+        symbol: classify_capture_source
+      - &id031
+        path: src-tauri/src/services/capture_service.rs
+        symbol: classify_capture_source
+      - &id032
+        path: src-tauri/src/commands/capture.rs
+        symbol: create_capture_source
+      - &id033
+        path: src-tauri/src/services/capture_service.rs
+        symbol: create_capture_source
+    - name: capture_proof
+      kind: function
+      line_start: 866
+      line_end: 876
+      signature: 'capture_proof(path: &Path, text: &str) -> String'
+      inputs:
+      - 'path: &Path'
+      - 'text: &str'
+      output: String
+      dependencies:
+      - classify_capture_source
+      - create_capture_source
+      - unwrap
+      parser: rust-pattern
+      dependency_targets:
+      - *id030
+      - *id031
+      - *id032
+      - *id033
+    - name: captured_topic_survives_reopen_and_timing_updates_preserve_identity
+      kind: function
+      line_start: 879
+      line_end: 939
+      signature: captured_topic_survives_reopen_and_timing_updates_preserve_identity()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - COUNT
+      - Some
+      - any
+      - capture_topic
+      - captured.summary.clone
+      - initialize_and_migrate
+      - into
+      - list_topics
+      - listed.iter
+      - load_topic
+      - open_connection
+      - query_row
+      - remove_dir_all
+      - row.get
+      - schema_version
+      - timely.relevant_until.as_deref
+      - topic_id.clone
+      - unwrap
+      - update_topic
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - &id034
+        path: src-tauri/src/services/topic_service.rs
+        symbol: capture_topic
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: initialize_and_migrate
+      - path: src-tauri/src/commands/topics.rs
+        symbol: list_topics
+      - path: src-tauri/src/services/topic_service.rs
+        symbol: list_topics
+      - *id017
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: schema_version
+      - path: src-tauri/src/commands/topics.rs
+        symbol: update_topic
+      - path: src-tauri/src/services/topic_service.rs
+        symbol: update_topic
+    - name: topic_relationships_are_typed_idempotent_and_context_never_becomes_evidence
+      kind: function
+      line_start: 942
+      line_end: 1115
+      signature: topic_relationships_are_typed_idempotent_and_context_never_becomes_evidence()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - COUNT
+      - add_topic_relationship
+      - capture_proof
+      - capture_topic
+      - count
+      - create_inspiration
+      - create_story
+      - create_target_context
+      - create_theme
+      - drop
+      - filter
+      - inspiration_id.clone
+      - into
+      - is_ok
+      - iter
+      - list_themes
+      - list_topic_link_targets
+      - listed_themes.len
+      - load_story
+      - load_theme
+      - load_topic
+      - open_connection
+      - proof_a.clone
+      - proof_b.clone
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/commands/topics.rs
+        symbol: add_topic_relationship
+      - path: src-tauri/src/services/topic_service.rs
+        symbol: add_topic_relationship
+      - path: src-tauri/src/services/topic_service.rs
+        symbol: capture_proof
+      - *id034
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: create_inspiration
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: create_story
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: create_target_context
+      - path: src-tauri/src/commands/topics.rs
+        symbol: create_theme
+      - path: src-tauri/src/services/topic_service.rs
+        symbol: create_theme
+      - path: src-tauri/src/services/confidentiality_service.rs
+        symbol: drop
+      - path: src-tauri/src/commands/topics.rs
+        symbol: list_themes
+      - path: src-tauri/src/services/topic_service.rs
+        symbol: list_themes
+      - path: src-tauri/src/commands/topics.rs
+        symbol: list_topic_link_targets
+      - path: src-tauri/src/services/topic_service.rs
+        symbol: list_topic_link_targets
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: load_story
+      - *id019
+      - *id017

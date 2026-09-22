@@ -1,37 +1,62 @@
-version: 1
+version: 2
 schema: refs/schemas/schemaRegistry.yaml
-updated: 2026-07-25
+updated: 2026-09-12
 features:
-  - id: feature-vault
+  - id: feature-professional-memory
+    status: next
+    summary: Capture and durably connect stories, story seeds, proof points, topics, themes, inspiration, and target context without requiring resume import.
+  - id: feature-capture-inbox
     status: planned
-    summary: Create and open local user-owned vaults with copied source files and portable canonical records.
-  - id: feature-resume-ingestion
+    summary: Save memories, ideas, notes, URLs, excerpts, job descriptions, and writing samples first, then classify or develop them later.
+  - id: feature-story-development
     status: planned
-    summary: Extract roles and bullet-level story candidates from resumes.
-  - id: feature-story-interview
-    status: planned
-    summary: Ask focused questions, track completeness, and synthesize discrete evidence-backed stories.
+    summary: Expand incomplete memories through guided questions while preserving evidence, uncertainty, and provenance.
   - id: feature-private-entity-registry
-    status: planned
+    status: implemented_foundation
     summary: Persist named entities, aliases, relationships, sensitivity, stable tokens, confidence scores, and review history.
-  - id: feature-job-lens
+  - id: feature-resume-seeding
+    status: implemented_foundation
+    summary: Optionally seed story candidates from resume work history without making resume parsing the primary workflow.
+  - id: feature-voice-intelligence
     status: planned
-    summary: Extract job requirements and match them to existing or potential stories.
-  - id: feature-local-git
+    summary: Learn core voice from user-authored and human-approved evidence, support intentional tone modes and direction, and prohibit raw AI drafts from training voice.
+  - id: feature-writing-quality
     status: planned
-    summary: Scan local repositories and parent folders, cluster commits, and create interview candidates.
-  - id: feature-voice-profile
+    summary: Detect generic AI patterns, repetitive structures, weak standing, unsupported claims, and proof-point overuse without claiming a fake AI probability score.
+  - id: feature-confidentiality-transform
     status: planned
-    summary: Combine explicit voice instructions with patterns inferred from writing samples.
+    summary: Preserve private factual accuracy while applying hard pre-publication confidentiality rules to public-facing drafts.
+  - id: feature-audience-lens
+    status: planned
+    summary: Explain the signals a draft sends to different reader archetypes without automatically cloning audience-specific rewrites.
+  - id: feature-content-studio
+    status: planned
+    summary: Generate diverse angles, draft in selected voice and tone, preserve revision lineage, and archive exact human-approved final content.
+  - id: feature-feedback-intelligence
+    status: planned
+    summary: Import LinkedIn analytics and learn cautiously from exact published posts with sample-size and confidence awareness.
+  - id: feature-discovery
+    status: future
+    summary: Scan current news and pinned sources for qualified topics where the user's themes, evidence, audience, and standing support a differentiated angle.
+  - id: feature-target-context
+    status: planned
+    summary: Mine job descriptions and selected professional profiles for concepts, topics, responsibilities, and skills worth addressing without keyword overfitting.
+  - id: feature-inspiration
+    status: planned
+    summary: Pin posts, articles, papers, and URLs with provenance and extract concepts, questions, and counterpoints without treating them as user evidence or voice.
   - id: feature-ollama
     status: planned
-    summary: Run supported agent operations through a local Ollama model.
-  - id: feature-gemini
+    summary: Run supported model operations through a local Ollama provider.
+  - id: feature-external-provider
     status: planned
-    summary: Run supported agent operations through Gemini using a user-supplied API key.
+    summary: Run supported operations through explicit user-authorized external providers such as Gemini.
   - id: feature-manual-bridge
-    status: planned
-    summary: Export and re-import structured workspace packages for existing ChatGPT, Claude, or Gemini subscriptions.
-  - id: feature-linkedin-bridge
-    status: later
-    summary: Export selected stories, public anonymization rules, and voice guidance for manual LinkedIn content generation.
+    status: implemented_foundation
+    summary: Export and re-import structured privacy-safe workspace packages for external AI tools.
+explicit_non_goals:
+  - automatic social publishing
+  - social scheduling integration
+  - autonomous comments or engagement
+  - WorkLore-hosted SaaS backend
+  - WorkLore user accounts
+  - proprietary cloud vault synchronization

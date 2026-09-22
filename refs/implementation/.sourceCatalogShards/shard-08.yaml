@@ -1,0 +1,454 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: 08
+  files:
+  - path: src-tauri/src/services/contextual_entity_scan.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 310377ab6496df9242cd76d7be9ada2c23146612
+    dependencies:
+    - chrono::Utc
+    - "crate::{\n    domain::models::{\n        EntityAlias, EntityOccurrence, EntityReviewItem, EntitySensitivity, EntityStatus,\n\
+      \        EntityType, PrivacyScanStatus, PrivateEntity, ReviewCandidateMatch, ReviewScores,\n    },\n    error::ServiceResult,\n\
+      \    io_utils::{read_json, write_json_atomic},\n    services::entity_scan::{\n        is_generic_entity_term, is_public_domain_acronym,\
+      \ load_registry, save_registry, ScanOutcome,\n    },\n}"
+    - regex::Regex
+    - std::{collections::HashSet, fs, path::Path}
+    - super::*
+    - uuid::Uuid
+    provides:
+    - scan_named_projects
+    - detect_named_projects
+    - is_plausible_project_name
+    - ranked_candidates
+    - meaningful_tokens
+    - create_provisional_project
+    - add_occurrence
+    - exact_entity_index
+    - occurrence_already_exists
+    - existing_review_locators
+    - normalize
+    - finds_named_project_after_strong_development_cue
+    - does_not_treat_role_and_skill_words_as_project_names
+    - loose_built_and_product_cues_do_not_create_entities
+    - explicit_named_tool_is_detected
+    - lexical_candidate_score_requires_real_overlap
+    symbols:
+    - name: scan_named_projects
+      kind: function
+      line_start: 31
+      line_end: 137
+      signature: 'scan_named_projects(vault_path: &Path, record_type: &str, record_id: &str, text: &str) -> ServiceResult<ScanOutcome>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'record_type: &str'
+      - 'record_id: &str'
+      - 'text: &str'
+      output: ServiceResult<ScanOutcome>
+      dependencies:
+      - Ok
+      - SCAN_VERSION.to_string
+      - Some
+      - add_occurrence
+      - context.to_string
+      - create_provisional_project
+      - detect_named_projects
+      - detection.normalized.clone
+      - detection.text.clone
+      - exact_entity_index
+      - existing_review_locators
+      - existing_review_locators.contains
+      - find
+      - fold
+      - get
+      - iter
+      - iter_mut
+      - join
+      - load_registry
+      - map
+      - new
+      - now
+      - now.clone
+      - now_v7
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/contextual_entity_scan.rs
+        symbol: add_occurrence
+      - path: src-tauri/src/services/entity_scan.rs
+        symbol: add_occurrence
+      - path: src-tauri/src/services/contextual_entity_scan.rs
+        symbol: create_provisional_project
+      - &id005
+        path: src-tauri/src/services/contextual_entity_scan.rs
+        symbol: detect_named_projects
+      - path: src-tauri/src/services/contextual_entity_scan.rs
+        symbol: exact_entity_index
+      - path: src-tauri/src/services/contextual_entity_scan.rs
+        symbol: existing_review_locators
+      - path: src-tauri/src/services/entity_scan.rs
+        symbol: load_registry
+    - name: detect_named_projects
+      kind: function
+      line_start: 138
+      line_end: 181
+      signature: 'detect_named_projects(text: &str) -> Vec<NamedDetection>'
+      inputs:
+      - 'text: &str'
+      output: Vec<NamedDetection>
+      dependencies:
+      - Some
+      - captures.name
+      - expect
+      - is_plausible_project_name
+      - matched.as_str
+      - matched.end
+      - matched.start
+      - min
+      - new
+      - normalize
+      - pattern.captures_iter
+      - results.push
+      - results.sort_by_key
+      - saturating_sub
+      - seen.insert
+      - text.len
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/contextual_entity_scan.rs
+        symbol: is_plausible_project_name
+      - path: src-tauri/src/services/performance_service.rs
+        symbol: start
+      - &id001
+        path: src-tauri/src/services/contextual_entity_scan.rs
+        symbol: normalize
+      - &id002
+        path: src-tauri/src/services/entity_scan.rs
+        symbol: normalize
+      - &id003
+        path: src-tauri/src/services/role_service.rs
+        symbol: normalize
+      - &id004
+        path: src-tauri/src/services/story_service.rs
+        symbol: normalize
+    - name: is_plausible_project_name
+      kind: function
+      line_start: 182
+      line_end: 196
+      signature: 'is_plausible_project_name(value: &str) -> bool'
+      inputs:
+      - 'value: &str'
+      output: bool
+      dependencies:
+      - all
+      - character.is_ascii_uppercase
+      - chars
+      - is_generic_entity_term
+      - is_public_domain_acronym
+      - trimmed.len
+      - value.trim
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/entity_scan.rs
+        symbol: is_generic_entity_term
+      - path: src-tauri/src/services/entity_scan.rs
+        symbol: is_public_domain_acronym
+    - name: ranked_candidates
+      kind: function
+      line_start: 197
+      line_end: 255
+      signature: 'ranked_candidates(entities: &[PrivateEntity], context: &str) -> Vec<ReviewCandidateMatch>'
+      inputs:
+      - 'entities: &[PrivateEntity]'
+      - 'context: &str'
+      output: Vec<ReviewCandidateMatch>
+      dependencies:
+      - Some
+      - candidates.sort_by
+      - candidates.truncate
+      - count
+      - entity.canonical_name.clone
+      - entity.entity_id.clone
+      - entity_text.push
+      - entity_text.push_str
+      - entity_tokens.intersection
+      - entity_tokens.is_empty
+      - entity_tokens.len
+      - filter
+      - filter_map
+      - iter
+      - meaningful_tokens
+      - min
+      - overlap.min
+      - partial_cmp
+      - unwrap_or
+      parser: rust-pattern
+      dependency_targets:
+      - &id006
+        path: src-tauri/src/services/contextual_entity_scan.rs
+        symbol: meaningful_tokens
+    - name: meaningful_tokens
+      kind: function
+      line_start: 256
+      line_end: 298
+      signature: 'meaningful_tokens(value: &str) -> HashSet<String>'
+      inputs:
+      - 'value: &str'
+      output: HashSet<String>
+      dependencies:
+      - STOP_WORDS.contains
+      - character.is_ascii_alphanumeric
+      - collect
+      - filter
+      - map
+      - split
+      - token.as_str
+      - token.len
+      parser: rust-pattern
+      dependency_targets: []
+    - name: create_provisional_project
+      kind: function
+      line_start: 299
+      line_end: 349
+      signature: 'create_provisional_project(registry: &mut crate::domain::models::PrivateEntityRegistry, record_type: &str,
+        record_id: &str, locator: &str, detection: &NamedDetection, now: &str) -> String'
+      inputs:
+      - 'registry: &mut crate::domain::models::PrivateEntityRegistry'
+      - 'record_type: &str'
+      - 'record_id: &str'
+      - 'locator: &str'
+      - 'detection: &NamedDetection'
+      - 'now: &str'
+      output: String
+      dependencies:
+      - Project.token_family
+      - detection.normalized.clone
+      - detection.text.clone
+      - entity_id.clone
+      - family.clone
+      - locator.to_string
+      - new
+      - now.to_string
+      - now_v7
+      - or_insert
+      - record_id.to_string
+      - record_type.to_string
+      - registry.entities.push
+      - registry.token_counters.entry
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/domain/models.rs
+        symbol: token_family
+    - name: add_occurrence
+      kind: function
+      line_start: 350
+      line_end: 383
+      signature: 'add_occurrence(entity: &mut PrivateEntity, record_type: &str, record_id: &str, locator: &str, matched_text:
+        &str, now: &str, identity_match_confidence: f32)'
+      inputs:
+      - 'entity: &mut PrivateEntity'
+      - 'record_type: &str'
+      - 'record_id: &str'
+      - 'locator: &str'
+      - 'matched_text: &str'
+      - 'now: &str'
+      - 'identity_match_confidence: f32'
+      output: unspecified
+      dependencies:
+      - Some
+      - entity.occurrences.push
+      - find
+      - iter_mut
+      - locator.to_string
+      - matched_text.to_string
+      - now.to_string
+      - now_v7
+      - record_id.to_string
+      - record_type.to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: exact_entity_index
+      kind: function
+      line_start: 384
+      line_end: 393
+      signature: 'exact_entity_index(entities: &[PrivateEntity], normalized: &str) -> Option<usize>'
+      inputs:
+      - 'entities: &[PrivateEntity]'
+      - 'normalized: &str'
+      output: Option<usize>
+      dependencies:
+      - any
+      - entities.iter
+      - entity.aliases.iter
+      - normalize
+      - position
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - *id004
+    - name: occurrence_already_exists
+      kind: function
+      line_start: 394
+      line_end: 402
+      signature: 'occurrence_already_exists(entities: &[PrivateEntity], record_id: &str, locator: &str) -> bool'
+      inputs:
+      - 'entities: &[PrivateEntity]'
+      - 'record_id: &str'
+      - 'locator: &str'
+      output: bool
+      dependencies:
+      - any
+      - entities.iter
+      - iter
+      parser: rust-pattern
+      dependency_targets: []
+    - name: existing_review_locators
+      kind: function
+      line_start: 403
+      line_end: 422
+      signature: 'existing_review_locators(vault_path: &Path, record_id: &str) -> ServiceResult<HashSet<String>>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'record_id: &str'
+      output: ServiceResult<HashSet<String>>
+      dependencies:
+      - Ok
+      - Some
+      - and_then
+      - directory.exists
+      - entry.path
+      - extension
+      - locators.insert
+      - new
+      - read_dir
+      - read_json
+      - value.to_str
+      - vault_path.join
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/io_utils.rs
+        symbol: read_json
+    - name: normalize
+      kind: function
+      line_start: 423
+      line_end: 430
+      signature: 'normalize(value: &str) -> String'
+      inputs:
+      - 'value: &str'
+      output: String
+      dependencies:
+      - character.is_ascii_alphanumeric
+      - character.to_lowercase
+      - chars
+      - collect
+      - filter
+      - flat_map
+      parser: rust-pattern
+      dependency_targets: []
+    - name: finds_named_project_after_strong_development_cue
+      kind: function
+      line_start: 437
+      line_end: 442
+      signature: finds_named_project_after_strong_development_cue()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - detect_named_projects
+      - detections.len
+      parser: rust-pattern
+      dependency_targets:
+      - *id005
+    - name: does_not_treat_role_and_skill_words_as_project_names
+      kind: function
+      line_start: 445
+      line_end: 448
+      signature: does_not_treat_role_and_skill_words_as_project_names()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - detect_named_projects
+      - is_empty
+      parser: rust-pattern
+      dependency_targets:
+      - *id005
+    - name: loose_built_and_product_cues_do_not_create_entities
+      kind: function
+      line_start: 451
+      line_end: 454
+      signature: loose_built_and_product_cues_do_not_create_entities()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - detect_named_projects
+      - is_empty
+      parser: rust-pattern
+      dependency_targets:
+      - *id005
+    - name: explicit_named_tool_is_detected
+      kind: function
+      line_start: 457
+      line_end: 462
+      signature: explicit_named_tool_is_detected()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - detect_named_projects
+      - detections.len
+      parser: rust-pattern
+      dependency_targets:
+      - *id005
+    - name: lexical_candidate_score_requires_real_overlap
+      kind: function
+      line_start: 465
+      line_end: 470
+      signature: lexical_candidate_score_requires_real_overlap()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - meaningful_tokens
+      - tokens.contains
+      parser: rust-pattern
+      dependency_targets:
+      - *id006
+  - path: src/voiceWorkspaceQueue.test.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: 137a9472cbb06808261df3987b48d94411e17cc7
+    dependencies:
+    - ./domain/types
+    - ./voiceWorkspaceQueue
+    - vitest
+    provides:
+    - candidate
+    - evidence
+    symbols:
+    - name: candidate
+      kind: function
+      line_start: 4
+      line_end: 18
+      signature: 'candidate(sourceId: string, voiceEvidenceId: string | null, blockedReason: string | null) -> VoiceSourceCandidate'
+      inputs:
+      - 'sourceId: string'
+      - 'voiceEvidenceId: string | null'
+      - 'blockedReason: string | null'
+      output: VoiceSourceCandidate
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: evidence
+      kind: function
+      line_start: 19
+      line_end: 36
+      signature: 'evidence(voiceEvidenceId: string, status: VoiceEvidenceRecord["status"]) -> VoiceEvidenceRecord'
+      inputs:
+      - 'voiceEvidenceId: string'
+      - 'status: VoiceEvidenceRecord["status"]'
+      output: VoiceEvidenceRecord
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []

@@ -1,0 +1,1908 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: 0b
+  files:
+  - path: src-tauri/src/commands/posts.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 21b9e1c106b14bfee1e4ba4aa8b906df859304b8
+    dependencies:
+    - "crate::{\n    domain::posts::{\n        AppendPostRevisionRequest, ApprovePostRevisionRequest, CreatePostRequest,\n\
+      \        GeneratePostFromTopicRequest, GeneratePostFromTopicResult,\n        LinkPostSupportingMaterialRequest, PostLineageView,\
+      \ PostRecordView,\n    },\n    error::{CommandError, CommandResult, WorkLoreError},\n    services::{\n        confidentiality_service::{\n\
+      \            self, ConfidentialityState, ConfidentialityTransformRequest,\n            ConfidentialityTransformResult,\n\
+      \        },\n        post_catalog_service, post_generation_service, post_lineage_service,\n    },\n}"
+    - std::path::PathBuf
+    - super::*
+    provides:
+    - create_post
+    - list_posts
+    - generate_post_from_topic
+    - append_post_revision
+    - approve_post_revision
+    - ensure_public_safe_revision
+    - get_post_lineage
+    - link_post_supporting_material
+    - preflight
+    - final_approval_requires_ready_exact_public_safe_text
+    symbols:
+    - name: create_post
+      kind: function
+      line_start: 20
+      line_end: 26
+      signature: 'create_post(vault_path: String, request: CreatePostRequest) -> CommandResult<PostLineageView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: CreatePostRequest'
+      output: CommandResult<PostLineageView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/domain/candidates.rs
+        symbol: from
+      - &id002
+        path: src-tauri/src/domain/models.rs
+        symbol: from
+      - &id003
+        path: src-tauri/src/error.rs
+        symbol: from
+    - name: list_posts
+      kind: function
+      line_start: 29
+      line_end: 31
+      signature: 'list_posts(vault_path: String) -> CommandResult<Vec<PostRecordView>>'
+      inputs:
+      - 'vault_path: String'
+      output: CommandResult<Vec<PostRecordView>>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: generate_post_from_topic
+      kind: function
+      line_start: 34
+      line_end: 41
+      signature: 'generate_post_from_topic(vault_path: String, request: GeneratePostFromTopicRequest) -> CommandResult<GeneratePostFromTopicResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: GeneratePostFromTopicRequest'
+      output: CommandResult<GeneratePostFromTopicResult>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: append_post_revision
+      kind: function
+      line_start: 44
+      line_end: 50
+      signature: 'append_post_revision(vault_path: String, request: AppendPostRevisionRequest) -> CommandResult<PostLineageView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: AppendPostRevisionRequest'
+      output: CommandResult<PostLineageView>
+      dependencies:
+      - append_revision
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: append_revision
+      - *id001
+      - *id002
+      - *id003
+    - name: approve_post_revision
+      kind: function
+      line_start: 53
+      line_end: 80
+      signature: 'approve_post_revision(vault_path: String, request: ApprovePostRevisionRequest) -> CommandResult<PostLineageView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: ApprovePostRevisionRequest'
+      output: CommandResult<PostLineageView>
+      dependencies:
+      - InvalidVault
+      - approve_revision
+      - ensure_public_safe_revision
+      - find
+      - from
+      - get_post_lineage
+      - iter
+      - map_err
+      - ok_or_else
+      - revision.text.clone
+      - transform_for_public_use
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: approve_revision
+      - &id004
+        path: src-tauri/src/commands/posts.rs
+        symbol: ensure_public_safe_revision
+      - *id001
+      - *id002
+      - *id003
+      - path: src-tauri/src/commands/posts.rs
+        symbol: get_post_lineage
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: get_post_lineage
+      - path: src-tauri/src/services/confidentiality_service.rs
+        symbol: transform_for_public_use
+    - name: ensure_public_safe_revision
+      kind: function
+      line_start: 81
+      line_end: 98
+      signature: 'ensure_public_safe_revision(revision_text: &str, preflight: &ConfidentialityTransformResult) -> Result<(),
+        WorkLoreError>'
+      inputs:
+      - 'revision_text: &str'
+      - 'preflight: &ConfidentialityTransformResult'
+      output: Result<(), WorkLoreError>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      - to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: get_post_lineage
+      kind: function
+      line_start: 101
+      line_end: 104
+      signature: 'get_post_lineage(vault_path: String, post_id: String) -> CommandResult<PostLineageView>'
+      inputs:
+      - 'vault_path: String'
+      - 'post_id: String'
+      output: CommandResult<PostLineageView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: link_post_supporting_material
+      kind: function
+      line_start: 107
+      line_end: 118
+      signature: 'link_post_supporting_material(vault_path: String, request: LinkPostSupportingMaterialRequest) -> CommandResult<PostLineageView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: LinkPostSupportingMaterialRequest'
+      output: CommandResult<PostLineageView>
+      dependencies:
+      - from
+      - link_supporting_material
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: link_supporting_material
+    - name: preflight
+      kind: function
+      line_start: 123
+      line_end: 138
+      signature: 'preflight(state: ConfidentialityState, public_safe_text: &str) -> ConfidentialityTransformResult'
+      inputs:
+      - 'state: ConfidentialityState'
+      - 'public_safe_text: &str'
+      output: ConfidentialityTransformResult
+      dependencies:
+      - new
+      - public_safe_text.to_string
+      - to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: final_approval_requires_ready_exact_public_safe_text
+      kind: function
+      line_start: 141
+      line_end: 157
+      signature: final_approval_requires_ready_exact_public_safe_text()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - ensure_public_safe_revision
+      - is_err
+      - is_ok
+      - preflight
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+      - path: src-tauri/src/commands/posts.rs
+        symbol: preflight
+  - path: src-tauri/src/commands/target_contexts.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 8749dd4d25b0bd55030840e2674c2c4cc0f89d29
+    dependencies:
+    - "crate::{\n    error::{CommandError, CommandResult},\n    services::target_context_service::{\n        self, CreateTargetContextResult,\
+      \ TargetContextExtractionResult,\n        TargetContextLinkTargetView, TargetContextRecordView, TargetContextRelationKind,\n\
+      \        TargetContextRelationshipMutationResult, UpdateTargetContextRequest,\n    },\n}"
+    - std::path::PathBuf
+    provides:
+    - create_target_context_from_source
+    - get_target_context
+    - list_target_contexts
+    - update_target_context
+    - extract_target_context_signals
+    - add_target_context_relationship
+    - remove_target_context_relationship
+    - list_target_context_link_targets
+    symbols:
+    - name: create_target_context_from_source
+      kind: function
+      line_start: 13
+      line_end: 22
+      signature: 'create_target_context_from_source(vault_path: String, source_id: String) -> CommandResult<CreateTargetContextResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'source_id: String'
+      output: CommandResult<CreateTargetContextResult>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: get_target_context
+      kind: function
+      line_start: 25
+      line_end: 31
+      signature: 'get_target_context(vault_path: String, target_id: String) -> CommandResult<TargetContextRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'target_id: String'
+      output: CommandResult<TargetContextRecordView>
+      dependencies:
+      - from
+      - load_target_context
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - path: src-tauri/src/services/target_context_service.rs
+        symbol: load_target_context
+    - name: list_target_contexts
+      kind: function
+      line_start: 34
+      line_end: 37
+      signature: 'list_target_contexts(vault_path: String) -> CommandResult<Vec<TargetContextRecordView>>'
+      inputs:
+      - 'vault_path: String'
+      output: CommandResult<Vec<TargetContextRecordView>>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: update_target_context
+      kind: function
+      line_start: 40
+      line_end: 46
+      signature: 'update_target_context(vault_path: String, request: UpdateTargetContextRequest) -> CommandResult<TargetContextRecordView>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: UpdateTargetContextRequest'
+      output: CommandResult<TargetContextRecordView>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: extract_target_context_signals
+      kind: function
+      line_start: 49
+      line_end: 55
+      signature: 'extract_target_context_signals(vault_path: String, target_id: String) -> CommandResult<TargetContextExtractionResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'target_id: String'
+      output: CommandResult<TargetContextExtractionResult>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: add_target_context_relationship
+      kind: function
+      line_start: 58
+      line_end: 71
+      signature: 'add_target_context_relationship(vault_path: String, target_context_id: String, relation_kind: TargetContextRelationKind,
+        target_id: String) -> CommandResult<TargetContextRelationshipMutationResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'target_context_id: String'
+      - 'relation_kind: TargetContextRelationKind'
+      - 'target_id: String'
+      output: CommandResult<TargetContextRelationshipMutationResult>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: remove_target_context_relationship
+      kind: function
+      line_start: 74
+      line_end: 87
+      signature: 'remove_target_context_relationship(vault_path: String, target_context_id: String, relation_kind: TargetContextRelationKind,
+        target_id: String) -> CommandResult<TargetContextRelationshipMutationResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'target_context_id: String'
+      - 'relation_kind: TargetContextRelationKind'
+      - 'target_id: String'
+      output: CommandResult<TargetContextRelationshipMutationResult>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+    - name: list_target_context_link_targets
+      kind: function
+      line_start: 90
+      line_end: 99
+      signature: 'list_target_context_link_targets(vault_path: String, relation_kind: TargetContextRelationKind) -> CommandResult<Vec<TargetContextLinkTargetView>>'
+      inputs:
+      - 'vault_path: String'
+      - 'relation_kind: TargetContextRelationKind'
+      output: CommandResult<Vec<TargetContextLinkTargetView>>
+      dependencies:
+      - from
+      - map_err
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+  - path: src-tauri/src/domain/performance.rs
+    analysis_version: 1
+    language: rust
+    content_hash: a9edc1860dcba0e46f03225ce97e4c4e96eb400b
+    dependencies:
+    - serde::{Deserialize, Serialize}
+    provides: []
+    symbols: []
+  - path: src-tauri/src/services/discovery_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 9b6a1ffd0c689dd45cf2c4e399a7d886ec8a37cd
+    dependencies:
+    - chrono::Utc
+    - crate::services::vault_service
+    - crate::services::{topic_service, vault_service}
+    - "crate::{\n    domain::discovery::{\n        DevelopDiscoveryTopicRequest, DevelopDiscoveryTopicResult, DiscoveryFeedbackView,\n\
+      \        DiscoveryMatchView, DiscoveryOpportunityStatus, DiscoveryOpportunityView,\n        DiscoveryScanResult, DiscoverySourceView,\
+      \ RecordDiscoveryFeedbackRequest,\n        SaveDiscoveryInspirationResult, ScanDiscoveryRequest,\n    },\n    error::{ServiceResult,\
+      \ WorkLoreError},\n    services::{\n        canonical_store, discovery_query_plan, inspiration_service, redaction_service,\n\
+      \        seeded_discovery_provider, topic_service,\n    },\n}"
+    - rusqlite::{params, Connection, OptionalExtension}
+    - serde_json::{json, Value}
+    - sha2::{Digest, Sha256}
+    - std::fs
+    - "std::{\n    cmp::Ordering,\n    collections::{BTreeSet, HashSet},\n    path::Path,\n    time::Duration,\n}"
+    - super::*
+    - uuid::Uuid
+    provides:
+    - bias
+    - scan
+    - list_opportunities
+    - record_feedback
+    - save_as_inspiration
+    - develop_topic
+    - dismiss_opportunity
+    - validate_source_url
+    - ensure_inspiration
+    - qualify_cluster
+    - compare_ranked
+    - persist_opportunity
+    - load_opportunity
+    - privacy_safe_queries
+    - load_query_plan_signals
+    - load_string_column
+    - load_theme_signals
+    - load_standing_signals
+    - load_audience_signals
+    - load_recent_topic_signals
+    - load_signals
+    - matching_signals
+    - signal_matches
+    - load_prior_feedback
+    - summarize_feedback
+    - token_similarity
+    - cluster_sources
+    - title_similarity
+    - tokens
+    - normalize_reasons
+    - required_text
+    - open_connection
+    - audit
+    - discovery_error
+    - clustering_collapses_substantially_similar_headlines
+    - feedback_similarity_requires_more_than_one_generic_token
+    - normalized_feedback_reasons_are_bounded_and_deduplicated
+    - duplicate_urls_from_exploration_queries_collapse_before_qualification
+    - feedback_keeps_timing_separate_from_personal_fit
+    - query_plan_inputs_exclude_story_and_proof_point_bodies
+    - develop_topic_requires_explicit_user_summary
+    - saving_discovery_inspiration_preserves_external_source_provenance
+    symbols:
+    - name: bias
+      kind: function
+      line_start: 76
+      line_end: 82
+      signature: bias(&self) -> i8
+      inputs:
+      - '&self'
+      output: i8
+      dependencies:
+      - self.positive.cmp
+      parser: rust-pattern
+      dependency_targets: []
+    - name: scan
+      kind: function
+      line_start: 91
+      line_end: 184
+      signature: 'scan(vault_path: &Path, request: ScanDiscoveryRequest) -> ServiceResult<DiscoveryScanResult>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: ScanDiscoveryRequest'
+      output: ServiceResult<DiscoveryScanResult>
+      dependencies:
+      - Err
+      - Ok
+      - VALUES
+      - build_query_plan
+      - clamp
+      - cluster_sources
+      - collect
+      - connection.execute
+      - discovery_error
+      - discovery_runs
+      - drop
+      - enumerate
+      - external_queries.is_empty
+      - external_queries.join
+      - fetch
+      - initialize
+      - into_iter
+      - load_audience_signals
+      - load_prior_feedback
+      - load_query_plan_signals
+      - load_recent_topic_signals
+      - load_standing_signals
+      - load_theme_signals
+      - map
+      parser: rust-pattern
+      dependency_targets:
+      - &id021
+        path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: build_query_plan
+      - &id017
+        path: src-tauri/src/services/discovery_service.rs
+        symbol: cluster_sources
+      - &id013
+        path: src-tauri/src/services/discovery_service.rs
+        symbol: discovery_error
+      - &id011
+        path: src-tauri/src/services/confidentiality_service.rs
+        symbol: drop
+      - path: src-tauri/src/services/seeded_discovery_provider.rs
+        symbol: fetch
+      - &id005
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: initialize
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: load_audience_signals
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: load_prior_feedback
+      - &id022
+        path: src-tauri/src/services/discovery_service.rs
+        symbol: load_query_plan_signals
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: load_recent_topic_signals
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: load_standing_signals
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: load_theme_signals
+    - name: list_opportunities
+      kind: function
+      line_start: 185
+      line_end: 203
+      signature: 'list_opportunities(vault_path: &Path, limit: usize) -> ServiceResult<Vec<DiscoveryOpportunityView>>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'limit: usize'
+      output: ServiceResult<Vec<DiscoveryOpportunityView>>
+      dependencies:
+      - collect
+      - connection.prepare
+      - ids.into_iter
+      - initialize
+      - limit.clamp
+      - load_opportunity
+      - map
+      - open_connection
+      - query_map
+      - try_from
+      - unwrap_or
+      parser: rust-pattern
+      dependency_targets:
+      - *id005
+      - &id006
+        path: src-tauri/src/services/discovery_service.rs
+        symbol: load_opportunity
+    - name: record_feedback
+      kind: function
+      line_start: 204
+      line_end: 260
+      signature: 'record_feedback(vault_path: &Path, request: RecordDiscoveryFeedbackRequest) -> ServiceResult<DiscoveryFeedbackView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: RecordDiscoveryFeedbackRequest'
+      output: ServiceResult<DiscoveryFeedbackView>
+      dependencies:
+      - Ok
+      - VALUES
+      - audit
+      - cloned
+      - connection.execute
+      - discovery_feedback
+      - initialize
+      - load_opportunity
+      - normalize_reasons
+      - normalized_signals.to_string
+      - note_tokens.iter
+      - now
+      - now_v7
+      - open_connection
+      - opportunity_tokens.iter
+      - reasons.clone
+      - request.note.trim
+      - request.verdict.as_str
+      - to_rfc3339
+      - to_string
+      - tokens
+      parser: rust-pattern
+      dependency_targets:
+      - &id007
+        path: src-tauri/src/services/discovery_service.rs
+        symbol: audit
+      - &id008
+        path: src-tauri/src/services/inspiration_service.rs
+        symbol: audit
+      - &id009
+        path: src-tauri/src/services/target_context_service.rs
+        symbol: audit
+      - &id010
+        path: src-tauri/src/services/topic_service.rs
+        symbol: audit
+      - *id005
+      - *id006
+      - &id019
+        path: src-tauri/src/services/discovery_service.rs
+        symbol: normalize_reasons
+      - &id015
+        path: src-tauri/src/services/discovery_service.rs
+        symbol: tokens
+      - &id016
+        path: src-tauri/src/services/seeded_discovery_provider.rs
+        symbol: tokens
+    - name: save_as_inspiration
+      kind: function
+      line_start: 261
+      line_end: 268
+      signature: 'save_as_inspiration(vault_path: &Path, opportunity_id: &str) -> ServiceResult<SaveDiscoveryInspirationResult>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'opportunity_id: &str'
+      output: ServiceResult<SaveDiscoveryInspirationResult>
+      dependencies:
+      - Ok
+      - ensure_inspiration
+      parser: rust-pattern
+      dependency_targets:
+      - &id012
+        path: src-tauri/src/services/discovery_service.rs
+        symbol: ensure_inspiration
+    - name: develop_topic
+      kind: function
+      line_start: 269
+      line_end: 367
+      signature: 'develop_topic(vault_path: &Path, request: DevelopDiscoveryTopicRequest) -> ServiceResult<DevelopDiscoveryTopicResult>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: DevelopDiscoveryTopicRequest'
+      output: ServiceResult<DevelopDiscoveryTopicResult>
+      dependencies:
+      - InvalidVault
+      - Ok
+      - Some
+      - add_topic_relationship
+      - audit
+      - chain
+      - connection.execute
+      - create_topic
+      - drop
+      - ensure_inspiration
+      - initialize
+      - item.kind.as_str
+      - iter
+      - load_opportunity
+      - now
+      - open_connection
+      - opportunity.audience_matches.iter
+      - opportunity.inspiration_id.ok_or_else
+      - opportunity.theme_matches.iter
+      - required_text
+      - to_rfc3339
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/commands/topics.rs
+        symbol: add_topic_relationship
+      - path: src-tauri/src/services/topic_service.rs
+        symbol: add_topic_relationship
+      - *id007
+      - *id008
+      - *id009
+      - *id010
+      - path: src-tauri/src/commands/topics.rs
+        symbol: create_topic
+      - path: src-tauri/src/services/topic_service.rs
+        symbol: create_topic
+      - *id011
+      - *id012
+      - *id005
+      - *id006
+    - name: dismiss_opportunity
+      kind: function
+      line_start: 368
+      line_end: 389
+      signature: 'dismiss_opportunity(vault_path: &Path, opportunity_id: &str) -> ServiceResult<DiscoveryOpportunityView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'opportunity_id: &str'
+      output: ServiceResult<DiscoveryOpportunityView>
+      dependencies:
+      - audit
+      - connection.execute
+      - initialize
+      - load_opportunity
+      - now
+      - open_connection
+      - to_rfc3339
+      parser: rust-pattern
+      dependency_targets:
+      - *id007
+      - *id008
+      - *id009
+      - *id010
+      - *id005
+      - *id006
+    - name: validate_source_url
+      kind: function
+      line_start: 390
+      line_end: 416
+      signature: 'validate_source_url(vault_path: &Path, opportunity_id: &str, requested_url: &str) -> ServiceResult<String>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'opportunity_id: &str'
+      - 'requested_url: &str'
+      output: ServiceResult<String>
+      dependencies:
+      - Err
+      - discovery_error
+      - find
+      - initialize
+      - is_http_url
+      - iter
+      - load_opportunity
+      - map
+      - ok_or_else
+      - open_connection
+      - source.url.clone
+      parser: rust-pattern
+      dependency_targets:
+      - *id013
+      - *id005
+      - path: src-tauri/src/services/seeded_discovery_provider.rs
+        symbol: is_http_url
+      - *id006
+    - name: ensure_inspiration
+      kind: function
+      line_start: 417
+      line_end: 531
+      signature: 'ensure_inspiration(vault_path: &Path, opportunity_id: &str) -> ServiceResult<String>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'opportunity_id: &str'
+      output: ServiceResult<String>
+      dependencies:
+      - InvalidVault
+      - Ok
+      - Some
+      - VALUES
+      - audit
+      - captured_text.as_bytes
+      - captured_text.chars
+      - captured_text.len
+      - connection.execute
+      - count
+      - create_inspiration_from_source
+      - created.inspiration.inspiration_id.clone
+      - digest
+      - drop
+      - encode
+      - extraction.to_string
+      - initialize
+      - item.label.clone
+      - iter
+      - load_opportunity
+      - map
+      - map_err
+      - new
+      - now
+      parser: rust-pattern
+      dependency_targets:
+      - *id007
+      - *id008
+      - *id009
+      - *id010
+      - path: src-tauri/src/commands/inspirations.rs
+        symbol: create_inspiration_from_source
+      - path: src-tauri/src/services/inspiration_service.rs
+        symbol: create_inspiration_from_source
+      - *id011
+      - *id005
+      - *id006
+    - name: qualify_cluster
+      kind: function
+      line_start: 532
+      line_end: 665
+      signature: 'qualify_cluster(context: &QualificationContext<''_>, provider_position: usize, sources: Vec<DiscoverySourceView>,
+        used_feedback_ids: &mut HashSet<String>) -> RankedOpportunity'
+      inputs:
+      - 'context: &QualificationContext<''_>'
+      - 'provider_position: usize'
+      - 'sources: Vec<DiscoverySourceView>'
+      - 'used_feedback_ids: &mut HashSet<String>'
+      output: RankedOpportunity
+      dependencies:
+      - Some
+      - and_then
+      - audience_matches.is_empty
+      - concerns.push
+      - context.now.to_string
+      - context.run_id.to_string
+      - description.is_empty
+      - discussion
+      - feedback.bias
+      - find
+      - first
+      - iter
+      - join
+      - map
+      - matching_signals
+      - new
+      - now_v7
+      - push
+      - recent_matches.is_empty
+      - source.age.as_deref
+      - source.description.trim
+      - source.title.clone
+      - sources.first
+      - sources.len
+      parser: rust-pattern
+      dependency_targets:
+      - &id020
+        path: src-tauri/src/services/discovery_service.rs
+        symbol: bias
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: matching_signals
+    - name: compare_ranked
+      kind: function
+      line_start: 666
+      line_end: 695
+      signature: 'compare_ranked(left: &RankedOpportunity, right: &RankedOpportunity) -> Ordering'
+      inputs:
+      - 'left: &RankedOpportunity'
+      - 'right: &RankedOpportunity'
+      output: Ordering
+      dependencies:
+      - cmp
+      - left.provider_position.cmp
+      - left.recent_overlap.cmp
+      - left.view.audience_matches.len
+      - left.view.sources.len
+      - left.view.standing_matches.len
+      - left.view.theme_matches.len
+      - len
+      - right.view.sources.len
+      - then_with
+      parser: rust-pattern
+      dependency_targets: []
+    - name: persist_opportunity
+      kind: function
+      line_start: 696
+      line_end: 730
+      signature: 'persist_opportunity(connection: &Connection, item: &RankedOpportunity, rank_position: usize) -> ServiceResult<()>'
+      inputs:
+      - 'connection: &Connection'
+      - 'item: &RankedOpportunity'
+      - 'rank_position: usize'
+      output: ServiceResult<()>
+      dependencies:
+      - Ok
+      - VALUES
+      - cloned
+      - connection.execute
+      - discovery_opportunities
+      - item.feature_tokens.iter
+      - item.view.status.as_str
+      - to_string
+      - try_from
+      - unwrap_or
+      parser: rust-pattern
+      dependency_targets: []
+    - name: load_opportunity
+      kind: function
+      line_start: 731
+      line_end: 790
+      signature: 'load_opportunity(connection: &Connection, opportunity_id: &str) -> ServiceResult<DiscoveryOpportunityView>'
+      inputs:
+      - 'connection: &Connection'
+      - 'opportunity_id: &str'
+      output: ServiceResult<DiscoveryOpportunityView>
+      dependencies:
+      - InvalidVault
+      - Ok
+      - from_str
+      - ok_or_else
+      - optional
+      - parse
+      - query_row
+      parser: rust-pattern
+      dependency_targets: []
+    - name: privacy_safe_queries
+      kind: function
+      line_start: 791
+      line_end: 815
+      signature: 'privacy_safe_queries(vault_path: &Path, plan: &discovery_query_plan::DiscoveryQueryPlan) -> ServiceResult<Vec<String>>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'plan: &discovery_query_plan::DiscoveryQueryPlan'
+      output: ServiceResult<Vec<String>>
+      dependencies:
+      - Err
+      - Ok
+      - discovery_error
+      - external_queries.push
+      - external_query.is_empty
+      - external_query.to_ascii_lowercase
+      - new
+      - plan.is_explicit_focus
+      - plan.queries
+      - redact_for_external_use
+      - redacted.text.trim
+      - seen.insert
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - *id013
+      - path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: is_explicit_focus
+      - &id023
+        path: src-tauri/src/services/discovery_query_plan.rs
+        symbol: queries
+      - path: src-tauri/src/services/redaction_service.rs
+        symbol: redact_for_external_use
+    - name: load_query_plan_signals
+      kind: function
+      line_start: 816
+      line_end: 838
+      signature: 'load_query_plan_signals(connection: &Connection) -> ServiceResult<QueryPlanSignals>'
+      inputs:
+      - 'connection: &Connection'
+      output: ServiceResult<QueryPlanSignals>
+      dependencies:
+      - Ok
+      - load_string_column
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: load_string_column
+    - name: load_string_column
+      kind: function
+      line_start: 839
+      line_end: 846
+      signature: 'load_string_column(connection: &Connection, sql: &str) -> ServiceResult<Vec<String>>'
+      inputs:
+      - 'connection: &Connection'
+      - 'sql: &str'
+      output: ServiceResult<Vec<String>>
+      dependencies:
+      - Ok
+      - connection.prepare
+      - query_map
+      parser: rust-pattern
+      dependency_targets: []
+    - name: load_theme_signals
+      kind: function
+      line_start: 847
+      line_end: 854
+      signature: 'load_theme_signals(connection: &Connection) -> ServiceResult<Vec<SignalRecord>>'
+      inputs:
+      - 'connection: &Connection'
+      output: ServiceResult<Vec<SignalRecord>>
+      dependencies:
+      - load_signals
+      parser: rust-pattern
+      dependency_targets:
+      - &id014
+        path: src-tauri/src/services/discovery_service.rs
+        symbol: load_signals
+    - name: load_standing_signals
+      kind: function
+      line_start: 855
+      line_end: 868
+      signature: 'load_standing_signals(connection: &Connection) -> ServiceResult<Vec<SignalRecord>>'
+      inputs:
+      - 'connection: &Connection'
+      output: ServiceResult<Vec<SignalRecord>>
+      dependencies:
+      - Ok
+      - load_signals
+      - out.extend
+      parser: rust-pattern
+      dependency_targets:
+      - *id014
+    - name: load_audience_signals
+      kind: function
+      line_start: 869
+      line_end: 876
+      signature: 'load_audience_signals(connection: &Connection) -> ServiceResult<Vec<SignalRecord>>'
+      inputs:
+      - 'connection: &Connection'
+      output: ServiceResult<Vec<SignalRecord>>
+      dependencies:
+      - load_signals
+      parser: rust-pattern
+      dependency_targets:
+      - *id014
+    - name: load_recent_topic_signals
+      kind: function
+      line_start: 877
+      line_end: 885
+      signature: 'load_recent_topic_signals(connection: &Connection) -> ServiceResult<Vec<SignalRecord>>'
+      inputs:
+      - 'connection: &Connection'
+      output: ServiceResult<Vec<SignalRecord>>
+      dependencies:
+      - load_signals
+      parser: rust-pattern
+      dependency_targets:
+      - *id014
+    - name: load_signals
+      kind: function
+      line_start: 886
+      line_end: 907
+      signature: 'load_signals(connection: &Connection, sql: &str, kind: &''static str) -> ServiceResult<Vec<SignalRecord>>'
+      inputs:
+      - 'connection: &Connection'
+      - 'sql: &str'
+      - 'kind: &''static str'
+      output: ServiceResult<Vec<SignalRecord>>
+      dependencies:
+      - Ok
+      - connection.prepare
+      - statement.query_map
+      - tokens
+      parser: rust-pattern
+      dependency_targets:
+      - *id015
+      - *id016
+    - name: matching_signals
+      kind: function
+      line_start: 908
+      line_end: 924
+      signature: 'matching_signals(signals: &[SignalRecord], opportunity_tokens: &BTreeSet<String>) -> Vec<DiscoveryMatchView>'
+      inputs:
+      - 'signals: &[SignalRecord]'
+      - 'opportunity_tokens: &BTreeSet<String>'
+      output: Vec<DiscoveryMatchView>
+      dependencies:
+      - collect
+      - filter
+      - iter
+      - map
+      - signal.detail.clone
+      - signal.kind.to_string
+      - signal.label.clone
+      - signal.record_id.clone
+      - signal_matches
+      - take
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: signal_matches
+    - name: signal_matches
+      kind: function
+      line_start: 925
+      line_end: 935
+      signature: 'signal_matches(left: &BTreeSet<String>, right: &BTreeSet<String>) -> bool'
+      inputs:
+      - 'left: &BTreeSet<String>'
+      - 'right: &BTreeSet<String>'
+      output: bool
+      dependencies:
+      - count
+      - intersection
+      - is_some_and
+      - left.intersection
+      - left.len
+      - next
+      - value.len
+      parser: rust-pattern
+      dependency_targets: []
+    - name: load_prior_feedback
+      kind: function
+      line_start: 936
+      line_end: 973
+      signature: 'load_prior_feedback(connection: &Connection) -> ServiceResult<Vec<PriorFeedback>>'
+      inputs:
+      - 'connection: &Connection'
+      output: ServiceResult<Vec<PriorFeedback>>
+      dependencies:
+      - Ok
+      - and_then
+      - connection.prepare
+      - filter_map
+      - flatten
+      - get
+      - into_iter
+      - map
+      - parsed.extend
+      - row.get
+      - statement.query_map
+      - try_from
+      - unwrap_or
+      - unwrap_or_else
+      parser: rust-pattern
+      dependency_targets: []
+    - name: summarize_feedback
+      kind: function
+      line_start: 974
+      line_end: 993
+      signature: 'summarize_feedback(prior_feedback: &[PriorFeedback], feature_tokens: &BTreeSet<String>, used_feedback_ids:
+        &mut HashSet<String>) -> FeedbackSummary'
+      inputs:
+      - 'prior_feedback: &[PriorFeedback]'
+      - 'feature_tokens: &BTreeSet<String>'
+      - 'used_feedback_ids: &mut HashSet<String>'
+      output: FeedbackSummary
+      dependencies:
+      - default
+      - feedback.feedback_id.clone
+      - feedback.verdict.as_str
+      - token_similarity
+      - used_feedback_ids.insert
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/app_preferences_service.rs
+        symbol: default
+      - &id018
+        path: src-tauri/src/services/discovery_service.rs
+        symbol: token_similarity
+    - name: token_similarity
+      kind: function
+      line_start: 994
+      line_end: 1002
+      signature: 'token_similarity(left: &BTreeSet<String>, right: &BTreeSet<String>) -> bool'
+      inputs:
+      - 'left: &BTreeSet<String>'
+      - 'right: &BTreeSet<String>'
+      output: bool
+      dependencies:
+      - count
+      - left.intersection
+      - left.union
+      parser: rust-pattern
+      dependency_targets: []
+    - name: cluster_sources
+      kind: function
+      line_start: 1003
+      line_end: 1023
+      signature: 'cluster_sources(results: Vec<DiscoverySourceView>) -> Vec<Vec<DiscoverySourceView>>'
+      inputs:
+      - 'results: Vec<DiscoverySourceView>'
+      output: Vec<Vec<DiscoverySourceView>>
+      dependencies:
+      - Some
+      - cluster.extend
+      - cluster_tokens.extend
+      - clusters.into_iter
+      - clusters.push
+      - collect
+      - find
+      - iter_mut
+      - map
+      - new
+      - once
+      - seen_urls.insert
+      - source.url.clone
+      - title_similarity
+      - tokens
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: title_similarity
+      - *id015
+      - *id016
+    - name: title_similarity
+      kind: function
+      line_start: 1024
+      line_end: 1029
+      signature: 'title_similarity(left: &BTreeSet<String>, right: &BTreeSet<String>) -> bool'
+      inputs:
+      - 'left: &BTreeSet<String>'
+      - 'right: &BTreeSet<String>'
+      output: bool
+      dependencies:
+      - count
+      - left.intersection
+      - left.union
+      parser: rust-pattern
+      dependency_targets: []
+    - name: tokens
+      kind: function
+      line_start: 1030
+      line_end: 1038
+      signature: 'tokens(value: &str) -> BTreeSet<String>'
+      inputs:
+      - 'value: &str'
+      output: BTreeSet<String>
+      dependencies:
+      - STOPWORDS.contains
+      - character.is_ascii_alphanumeric
+      - collect
+      - filter
+      - map
+      - split
+      - take
+      - token.as_str
+      - token.len
+      parser: rust-pattern
+      dependency_targets: []
+    - name: normalize_reasons
+      kind: function
+      line_start: 1046
+      line_end: 1067
+      signature: 'normalize_reasons(values: Vec<String>) -> Vec<String>'
+      inputs:
+      - 'values: Vec<String>'
+      output: Vec<String>
+      dependencies:
+      - ALLOWED.contains
+      - filter
+      - into_iter
+      - map
+      - normalized.dedup
+      - normalized.sort
+      - to_ascii_lowercase
+      - value.as_str
+      - value.trim
+      parser: rust-pattern
+      dependency_targets: []
+    - name: required_text
+      kind: function
+      line_start: 1068
+      line_end: 1078
+      signature: 'required_text(value: &str, label: &str) -> ServiceResult<String>'
+      inputs:
+      - 'value: &str'
+      - 'label: &str'
+      output: ServiceResult<String>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      - trimmed.is_empty
+      - trimmed.to_string
+      - value.trim
+      parser: rust-pattern
+      dependency_targets: []
+    - name: open_connection
+      kind: function
+      line_start: 1079
+      line_end: 1085
+      signature: 'open_connection(vault_path: &Path) -> ServiceResult<Connection>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Connection>
+      dependencies:
+      - Ok
+      - connection.busy_timeout
+      - connection.pragma_update
+      - database_path
+      - from_secs
+      - open
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: database_path
+    - name: audit
+      kind: function
+      line_start: 1086
+      line_end: 1107
+      signature: 'audit(connection: &Connection, event_type: &str, record_type: &str, record_id: &str, details: Value) ->
+        ServiceResult<()>'
+      inputs:
+      - 'connection: &Connection'
+      - 'event_type: &str'
+      - 'record_type: &str'
+      - 'record_id: &str'
+      - 'details: Value'
+      output: ServiceResult<()>
+      dependencies:
+      - Ok
+      - VALUES
+      - audit_events
+      - connection.execute
+      - details.to_string
+      - now
+      - now_v7
+      - to_rfc3339
+      parser: rust-pattern
+      dependency_targets: []
+    - name: discovery_error
+      kind: function
+      line_start: 1108
+      line_end: 1114
+      signature: 'discovery_error(code: &''static str, message: impl Into<String>) -> WorkLoreError'
+      inputs:
+      - 'code: &''static str'
+      - 'message: impl Into<String>'
+      output: WorkLoreError
+      dependencies:
+      - message.into
+      parser: rust-pattern
+      dependency_targets: []
+    - name: clustering_collapses_substantially_similar_headlines
+      kind: function
+      line_start: 1121
+      line_end: 1148
+      signature: clustering_collapses_substantially_similar_headlines()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - cluster_sources
+      - clustered.len
+      - into
+      - len
+      - new
+      parser: rust-pattern
+      dependency_targets:
+      - *id017
+    - name: feedback_similarity_requires_more_than_one_generic_token
+      kind: function
+      line_start: 1151
+      line_end: 1160
+      signature: feedback_similarity_requires_more_than_one_generic_token()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - token_similarity
+      - tokens
+      parser: rust-pattern
+      dependency_targets:
+      - *id018
+      - *id015
+      - *id016
+    - name: normalized_feedback_reasons_are_bounded_and_deduplicated
+      kind: function
+      line_start: 1163
+      line_end: 1172
+      signature: normalized_feedback_reasons_are_bounded_and_deduplicated()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - into
+      - normalize_reasons
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - *id019
+    - name: duplicate_urls_from_exploration_queries_collapse_before_qualification
+      kind: function
+      line_start: 1175
+      line_end: 1196
+      signature: duplicate_urls_from_exploration_queries_collapse_before_qualification()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - cluster_sources
+      - clustered.len
+      - into
+      - len
+      parser: rust-pattern
+      dependency_targets:
+      - *id017
+    - name: feedback_keeps_timing_separate_from_personal_fit
+      kind: function
+      line_start: 1199
+      line_end: 1231
+      signature: feedback_keeps_timing_separate_from_personal_fit()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - feature_tokens.clone
+      - id.into
+      - make_feedback
+      - negative.bias
+      - new
+      - positive.bias
+      - summarize_feedback
+      - timing_only.bias
+      - tokens
+      - verdict.into
+      parser: rust-pattern
+      dependency_targets:
+      - *id020
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: summarize_feedback
+      - *id015
+      - *id016
+    - name: query_plan_inputs_exclude_story_and_proof_point_bodies
+      kind: function
+      line_start: 1234
+      line_end: 1281
+      signature: query_plan_inputs_exclude_story_and_proof_point_bodies()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - VALUES
+      - build_query_plan
+      - create_story
+      - create_theme
+      - create_vault
+      - drop
+      - execute
+      - expect
+      - into
+      - join
+      - load_query_plan_signals
+      - now_v7
+      - open_connection
+      - plan.queries
+      - proof_points
+      - remove_dir_all
+      - rendered.contains
+      - temp_dir
+      parser: rust-pattern
+      dependency_targets:
+      - *id021
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: create_story
+      - path: src-tauri/src/commands/topics.rs
+        symbol: create_theme
+      - path: src-tauri/src/services/topic_service.rs
+        symbol: create_theme
+      - &id024
+        path: src-tauri/src/commands/vault.rs
+        symbol: create_vault
+      - &id025
+        path: src-tauri/src/services/vault_service.rs
+        symbol: create_vault
+      - *id011
+      - *id022
+      - *id023
+    - name: develop_topic_requires_explicit_user_summary
+      kind: function
+      line_start: 1284
+      line_end: 1304
+      signature: develop_topic_requires_explicit_user_summary()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - contains
+      - create_vault
+      - develop_topic
+      - error.to_string
+      - expect
+      - expect_err
+      - into
+      - join
+      - now_v7
+      - remove_dir_all
+      - temp_dir
+      parser: rust-pattern
+      dependency_targets:
+      - *id024
+      - *id025
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: develop_topic
+    - name: saving_discovery_inspiration_preserves_external_source_provenance
+      kind: function
+      line_start: 1307
+      line_end: 1394
+      signature: saving_discovery_inspiration_preserves_external_source_provenance()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Ok
+      - Some
+      - VALUES
+      - and_then
+      - create_vault
+      - discovery_runs
+      - drop
+      - execute
+      - expect
+      - from_str
+      - get
+      - into
+      - join
+      - let
+      - new
+      - now_v7
+      - open_connection
+      - persist_opportunity
+      - provenance.get
+      - query_row
+      - remove_dir_all
+      - row.get
+      - run_id.into
+      - save_as_inspiration
+      parser: rust-pattern
+      dependency_targets:
+      - *id024
+      - *id025
+      - *id011
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: persist_opportunity
+      - path: src-tauri/src/services/discovery_service.rs
+        symbol: save_as_inspiration
+  - path: src/components/PerformancePanel.tsx
+    analysis_version: 1
+    language: typescript
+    content_hash: 184f64c24065637184ad2e74e18e5747698f8a3e
+    dependencies:
+    - ../domain/types
+    provides:
+    - PerformancePanel
+    - MetricTable
+    - progressLabel
+    - formatDuration
+    - humanize
+    symbols:
+    - name: PerformancePanel
+      kind: function
+      line_start: 7
+      line_end: 8
+      signature: 'PerformancePanel({ snapshot, onRefresh }: PerformancePanelProps)'
+      inputs:
+      - '{ snapshot, onRefresh }: PerformancePanelProps'
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: MetricTable
+      kind: function
+      line_start: 75
+      line_end: 79
+      signature: MetricTable({ metrics, showOperation)
+      inputs:
+      - '{ metrics, showOperation'
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: progressLabel
+      kind: function
+      line_start: 100
+      line_end: 106
+      signature: 'progressLabel(current: number | null, total: number | null) -> string'
+      inputs:
+      - 'current: number | null'
+      - 'total: number | null'
+      output: string
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: formatDuration
+      kind: function
+      line_start: 107
+      line_end: 119
+      signature: 'formatDuration(durationMs: number) -> string'
+      inputs:
+      - 'durationMs: number'
+      output: string
+      dependencies:
+      - Math.floor
+      - Math.round
+      - seconds.toFixed
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: humanize
+      kind: function
+      line_start: 120
+      line_end: 123
+      signature: 'humanize(value: string) -> string'
+      inputs:
+      - 'value: string'
+      output: string
+      dependencies:
+      - value.replaceAll
+      parser: typescript-pattern
+      dependency_targets: []
+  - path: src/components/ProviderSettingsPanel.tsx
+    analysis_version: 1
+    language: typescript
+    content_hash: 4a31d6882213c0674a3fbbe6f700021d602b21da
+    dependencies:
+    - ../domain/types
+    - ../lib/workloreApi
+    - react
+    provides:
+    - ProviderSettingsPanel
+    - save
+    - refreshModels
+    - testConnection
+    - selectProvider
+    - providerLabel
+    - saveMessage
+    symbols:
+    - name: ProviderSettingsPanel
+      kind: function
+      line_start: 25
+      line_end: 253
+      signature: ProviderSettingsPanel()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - async
+      - errorMessage
+      - geminiApiKey.trim
+      - getProviderSettings
+      - listProviderModels
+      - models.map
+      - models.some
+      - openaiApiKey.trim
+      - providerLabel
+      - refreshModels
+      - save
+      - saveMessage
+      - selectProvider
+      - setBusy
+      - setClearGeminiApiKey
+      - setClearOpenaiApiKey
+      - setError
+      - setGeminiApiKey
+      - setModels
+      - setNotice
+      - setOpenaiApiKey
+      - setSettings
+      - testConnection
+      - testProviderConnection
+      parser: typescript-pattern
+      dependency_targets:
+      - &id026
+        path: src/domain/types.ts
+        symbol: errorMessage
+      - path: src/lib/workloreApi.ts
+        symbol: getProviderSettings
+      - &id028
+        path: src/lib/workloreApi.ts
+        symbol: listProviderModels
+      - &id029
+        path: src/components/ProviderSettingsPanel.tsx
+        symbol: providerLabel
+      - path: src/components/ProviderSettingsPanel.tsx
+        symbol: refreshModels
+      - &id030
+        path: src/components/ProviderSettingsPanel.tsx
+        symbol: save
+      - &id027
+        path: src/components/ProviderSettingsPanel.tsx
+        symbol: saveMessage
+      - path: src/components/ProviderSettingsPanel.tsx
+        symbol: selectProvider
+      - path: src/components/ProviderSettingsPanel.tsx
+        symbol: testConnection
+      - &id031
+        path: src/lib/workloreApi.ts
+        symbol: testProviderConnection
+    - name: save
+      kind: function
+      line_start: 46
+      line_end: 77
+      signature: save() -> Promise<ProviderSettings | null>
+      inputs: []
+      output: Promise<ProviderSettings | null>
+      dependencies:
+      - errorMessage
+      - geminiApiKey.trim
+      - openaiApiKey.trim
+      - saveMessage
+      - setBusy
+      - setClearGeminiApiKey
+      - setClearOpenaiApiKey
+      - setError
+      - setGeminiApiKey
+      - setNotice
+      - setOpenaiApiKey
+      - setSettings
+      - updateProviderSettings
+      parser: typescript-pattern
+      dependency_targets:
+      - *id026
+      - *id027
+      - path: src/lib/workloreApi.ts
+        symbol: updateProviderSettings
+    - name: refreshModels
+      kind: function
+      line_start: 78
+      line_end: 99
+      signature: refreshModels()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - listProviderModels
+      - providerLabel
+      - save
+      - setBusy
+      - setError
+      - setModels
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - *id026
+      - *id028
+      - *id029
+      - *id030
+    - name: testConnection
+      kind: function
+      line_start: 100
+      line_end: 115
+      signature: testConnection()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - providerLabel
+      - save
+      - setBusy
+      - setError
+      - setNotice
+      - testProviderConnection
+      parser: typescript-pattern
+      dependency_targets:
+      - *id026
+      - *id029
+      - *id030
+      - *id031
+    - name: selectProvider
+      kind: function
+      line_start: 116
+      line_end: 123
+      signature: 'selectProvider(providerId: string)'
+      inputs:
+      - 'providerId: string'
+      output: unspecified
+      dependencies:
+      - setModels
+      - setSettings
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: providerLabel
+      kind: function
+      line_start: 329
+      line_end: 337
+      signature: 'providerLabel(providerId: string) -> string'
+      inputs:
+      - 'providerId: string'
+      output: string
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: saveMessage
+      kind: function
+      line_start: 338
+      line_end: 354
+      signature: 'saveMessage(settings: ProviderSettings) -> string'
+      inputs:
+      - 'settings: ProviderSettings'
+      output: string
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+  - path: src/components/StoryBankPanel.tsx
+    analysis_version: 1
+    language: typescript
+    content_hash: 432c3ffaf0a1809929e44e862597d79bfe75a55e
+    dependencies:
+    - ../domain/types
+    - ../lib/captureApi
+    - ../lib/workloreApi
+    - ./InfoButton
+    - ./SeedDevelopmentPanel
+    - react
+    provides:
+    - StoryBankPanel
+    - resolveVaultPath
+    - refresh
+    - develop
+    - handleStatusChange
+    - DevelopIcon
+    - humanize
+    symbols:
+    - name: StoryBankPanel
+      kind: function
+      line_start: 14
+      line_end: 15
+      signature: 'StoryBankPanel({ vaultPath: vaultPathProp, stories, onStatusChange }: StoryBankPanelProps)'
+      inputs:
+      - '{ vaultPath: vaultPathProp, stories, onStatusChange }: StoryBankPanelProps'
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: resolveVaultPath
+      kind: function
+      line_start: 41
+      line_end: 45
+      signature: resolveVaultPath() -> Promise<string | null>
+      inputs: []
+      output: Promise<string | null>
+      dependencies:
+      - getLastVaultPath
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/lib/workloreApi.ts
+        symbol: getLastVaultPath
+    - name: refresh
+      kind: function
+      line_start: 46
+      line_end: 61
+      signature: refresh()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Promise.all
+      - errorMessage
+      - listCaptureSources
+      - listStories
+      - resolveVaultPath
+      - setActiveVaultPath
+      - setCaptures
+      - setError
+      - setLocalStories
+      parser: typescript-pattern
+      dependency_targets:
+      - *id026
+      - path: src/lib/captureApi.ts
+        symbol: listCaptureSources
+      - path: src/lib/workloreApi.ts
+        symbol: listStories
+      - &id032
+        path: src/components/StoryBankPanel.tsx
+        symbol: resolveVaultPath
+    - name: develop
+      kind: function
+      line_start: 62
+      line_end: 81
+      signature: 'develop(capture: CaptureSource)'
+      inputs:
+      - 'capture: CaptureSource'
+      output: unspecified
+      dependencies:
+      - capture.classifications.find
+      - classifyCaptureSource
+      - errorMessage
+      - refresh
+      - resolveVaultPath
+      - setActiveVaultPath
+      - setBusySourceId
+      - setDevelopmentSeedId
+      - setError
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/lib/workloreApi.ts
+        symbol: classifyCaptureSource
+      - *id026
+      - *id032
+    - name: handleStatusChange
+      kind: function
+      line_start: 82
+      line_end: 86
+      signature: 'handleStatusChange(storyId: string, status: StoryStatus)'
+      inputs:
+      - 'storyId: string'
+      - 'status: StoryStatus'
+      output: unspecified
+      dependencies:
+      - onStatusChange
+      - refresh
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: DevelopIcon
+      kind: function
+      line_start: 219
+      line_end: 226
+      signature: DevelopIcon()
+      inputs: []
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: humanize
+      kind: function
+      line_start: 227
+      line_end: 230
+      signature: 'humanize(value: string) -> string'
+      inputs:
+      - 'value: string'
+      output: string
+      dependencies:
+      - value.replaceAll
+      parser: typescript-pattern
+      dependency_targets: []
+  - path: src/lib/confidentialityApi.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: 6f3a22f5c8ef31c24bbc9806d69034a518eb1542
+    dependencies:
+    - ../domain/confidentiality
+    - '@tauri-apps/api/core'
+    provides:
+    - transformConfidentialityForPublicUse
+    symbols:
+    - name: transformConfidentialityForPublicUse
+      kind: function
+      line_start: 6
+      line_end: 15
+      signature: 'transformConfidentialityForPublicUse(vaultPath: string, request: ConfidentialityTransformRequest) -> Promise<ConfidentialityTransformResult>'
+      inputs:
+      - 'vaultPath: string'
+      - 'request: ConfidentialityTransformRequest'
+      output: Promise<ConfidentialityTransformResult>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []

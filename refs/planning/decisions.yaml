@@ -1,15 +1,14 @@
-version: 1
+version: 2
 schema: refs/schemas/schemaRegistry.yaml
-updated: 2026-07-25
+updated: 2026-09-12
 decisions:
   - id: decision-001
     date: 2026-07-25
-    status: accepted
+    status: superseded
     summary: WorkLore is local-first and stores canonical user data in a user-owned vault.
-    rationale: Career evidence can contain confidential and personally identifying information. Users must retain control of storage and portability.
+    rationale: Superseded by decision-009 because the local-first rule remains accepted but SQLite or similar durable local storage may now be canonical rather than rebuildable-only.
     consequences:
-      - Live synchronization is out of scope for the initial product.
-      - Local files remain authoritative and SQLite indexes must be rebuildable.
+      - Historical context only.
   - id: decision-002
     date: 2026-07-25
     status: accepted
@@ -21,18 +20,17 @@ decisions:
   - id: decision-003
     date: 2026-07-25
     status: accepted
-    summary: Career stories represent discrete accomplishments or episodes and link to roles.
-    rationale: Discrete stories are easier to reuse for interviews, resumes, job matching, and public content.
+    summary: Career stories represent discrete accomplishments or episodes and link to roles where relevant.
+    rationale: Discrete stories are reusable across interviews, career materials, and professional content.
     consequences:
-      - Role summaries should be generated from linked stories.
+      - Stories may also originate from direct capture rather than resume bullets.
   - id: decision-004
     date: 2026-07-25
-    status: accepted
+    status: superseded
     summary: Gemini is the first supported cloud provider, alongside Ollama and a manual workspace bridge.
-    rationale: Gemini is inexpensive for early testing while Ollama preserves a fully local path.
+    rationale: Provider-neutral user-authorized external models remain valid, but a WorkLore-hosted paid provider is outside the accepted roadmap.
     consequences:
-      - Cloud access uses user-supplied credentials initially.
-      - A hosted paid provider remains a later product option.
+      - Historical provider sequencing only.
   - id: decision-005
     date: 2026-07-25
     status: accepted
@@ -45,23 +43,64 @@ decisions:
     date: 2026-07-25
     status: accepted
     summary: Each vault contains a durable Private Entity Registry with stable tokens and repeated scan-and-map behavior.
-    rationale: Entity mappings must remain consistent across sources, stories, interviews, and exports.
+    rationale: Entity mappings must remain consistent across sources, stories, drafts, and exports.
     consequences:
-      - Content additions and material edits trigger entity scans.
+      - Content additions and material edits trigger entity scans where relevant.
       - Low-confidence matches require user resolution.
-      - Entity merge, split, alias, and token redirect actions must be reversible.
+      - Entity merge, split, alias, and token redirect actions must remain auditable.
   - id: decision-007
     date: 2026-07-25
-    status: accepted
+    status: deferred
     summary: Local Git repository scanning precedes GitHub account integration.
-    rationale: Local scans provide most early learning value without OAuth, permission, and rate-limit complexity.
+    rationale: Useful concept, but it is no longer on the accepted near-term roadmap after the product refocus.
     consequences:
-      - The first repository workflow supports one checkout and parent-folder discovery.
+      - Revisit only when it supports professional-memory capture better than higher-priority sources.
   - id: decision-008
     date: 2026-07-25
-    status: accepted
+    status: superseded
     summary: WorkLore is a public repository, while any future hosted backend may remain private.
-    rationale: Inspectable local-first privacy behavior supports user trust and tester participation.
+    rationale: WorkLore remains public and AGPL-3.0-only, but hosted backend work is outside the accepted roadmap rather than an assumed future component.
     consequences:
-      - Only synthetic data may be committed.
-      - Licensing remains a separate open decision.
+      - Historical context only.
+  - id: decision-009
+    date: 2026-09-12
+    status: accepted
+    summary: WorkLore is a standalone Windows-first desktop application with local canonical storage; SQLite or similar durable local persistence is allowed.
+    rationale: The product handles private professional memory and is expected to run primarily on one user-owned machine without requiring a WorkLore account or backend.
+    consequences:
+      - WorkLore-hosted SaaS, accounts, proprietary sync, and multi-user collaboration are outside the accepted roadmap.
+      - Human-readable export remains desirable for portability and recovery.
+      - User-managed portable or synced storage may work without an early WorkLore sync guarantee.
+  - id: decision-010
+    date: 2026-09-12
+    status: accepted
+    summary: Automatic social publishing, scheduling integration, and autonomous engagement are outside the accepted roadmap.
+    rationale: The human publication boundary reinforces user control, editorial judgment, and WorkLore's anti-slop positioning.
+    consequences:
+      - WorkLore may prepare copyable or exportable content.
+      - The user explicitly reviews, approves, and publishes outside the application.
+  - id: decision-011
+    date: 2026-09-12
+    status: accepted
+    summary: Raw AI drafts never train canonical voice.
+    rationale: Canonical voice must reflect the user rather than recursively learning model-generated patterns.
+    consequences:
+      - Voice evidence comes from user-authored material or explicit human-approved final material.
+      - Edit deltas may inform proposed voice traits but require auditable provenance and user control.
+  - id: decision-012
+    date: 2026-09-12
+    status: accepted
+    summary: WorkLore should resist generic, unsupported, repetitive, derivative, or volume-driven content rather than act as a neutral content factory.
+    rationale: Productive resistance is a core quality differentiator and supports credible professional identity.
+    consequences:
+      - WorkLore may advise against publishing weak material while preserving user override.
+      - Evidence, standing, repetition, tone, and anti-pattern checks are first-class product behavior.
+  - id: decision-013
+    date: 2026-09-12
+    status: accepted
+    summary: Evidence, Inspiration, and Target Context are distinct source classes; resume ingestion is optional bootstrap support.
+    rationale: External material and target job descriptions should stimulate ideas without becoming false evidence about the user, and resumes should not define the product architecture.
+    consequences:
+      - Job descriptions inform topics, concepts, skills, hooks, and angles without keyword overfitting.
+      - User-pinned posts, articles, papers, and URLs are Inspiration unless separately established as evidence.
+      - Resume parsing receives maintenance-level investment as `Seed from resume`.

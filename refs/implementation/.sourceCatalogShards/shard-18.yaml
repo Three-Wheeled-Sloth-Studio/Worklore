@@ -1,0 +1,1457 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: '18'
+  files:
+  - path: src-tauri/src/commands/privacy.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 0cc3ca776c5d1c212f1a9fd9fe662b6dc9473d8c
+    dependencies:
+    - "crate::{\n    error::{CommandError, CommandResult},\n    services::{\n        confidentiality_service::{\n        \
+      \    self, ConfidentialityTransformRequest, ConfidentialityTransformResult,\n        },\n        entity_review::{\n\
+      \            self, EntityReviewView, ResolveEntityReviewRequest, ResolveEntityReviewResult,\n        },\n    },\n}"
+    - std::path::PathBuf
+    provides:
+    - list_entity_reviews
+    - resolve_entity_review
+    - transform_confidentiality_for_public_use
+    symbols:
+    - name: list_entity_reviews
+      kind: function
+      line_start: 16
+      line_end: 22
+      signature: 'list_entity_reviews(vault_path: String, pending_only: Option<bool>) -> CommandResult<Vec<EntityReviewView>>'
+      inputs:
+      - 'vault_path: String'
+      - 'pending_only: Option<bool>'
+      output: CommandResult<Vec<EntityReviewView>>
+      dependencies:
+      - from
+      - list_reviews
+      - map_err
+      - pending_only.unwrap_or
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/domain/candidates.rs
+        symbol: from
+      - &id002
+        path: src-tauri/src/domain/models.rs
+        symbol: from
+      - &id003
+        path: src-tauri/src/error.rs
+        symbol: from
+      - path: src-tauri/src/services/entity_review.rs
+        symbol: list_reviews
+    - name: resolve_entity_review
+      kind: function
+      line_start: 25
+      line_end: 30
+      signature: 'resolve_entity_review(vault_path: String, request: ResolveEntityReviewRequest) -> CommandResult<ResolveEntityReviewResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: ResolveEntityReviewRequest'
+      output: CommandResult<ResolveEntityReviewResult>
+      dependencies:
+      - from
+      - map_err
+      - resolve_review
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - path: src-tauri/src/services/entity_review.rs
+        symbol: resolve_review
+    - name: transform_confidentiality_for_public_use
+      kind: function
+      line_start: 33
+      line_end: 39
+      signature: 'transform_confidentiality_for_public_use(vault_path: String, request: ConfidentialityTransformRequest) ->
+        CommandResult<ConfidentialityTransformResult>'
+      inputs:
+      - 'vault_path: String'
+      - 'request: ConfidentialityTransformRequest'
+      output: CommandResult<ConfidentialityTransformResult>
+      dependencies:
+      - from
+      - map_err
+      - transform_for_public_use
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - &id037
+        path: src-tauri/src/services/confidentiality_service.rs
+        symbol: transform_for_public_use
+  - path: src-tauri/src/services/capture_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: f8dee93772678fd9548214f980cb55ad3843853e
+    dependencies:
+    - chrono::Utc
+    - crate::services::vault_service
+    - "crate::{\n    domain::models::SourceType,\n    error::{ServiceResult, WorkLoreError},\n    services::canonical_store,\n\
+      }"
+    - rusqlite::{params, Connection, OptionalExtension}
+    - serde::{Deserialize, Serialize}
+    - serde_json::json
+    - sha2::{Digest, Sha256}
+    - std::fs
+    - std::{path::Path, time::Duration}
+    - super::*
+    - uuid::Uuid
+    provides:
+    - relationship_type
+    - target_type
+    - label
+    - create_capture_source
+    - get_capture_source
+    - list_unclassified_captures
+    - classify_capture_source
+    - open_connection
+    - load_classifications
+    - source_type_text
+    - source_type_from_text
+    - role_from_relationship
+    - capture_title
+    - compact
+    - text_hash
+    - vault
+    - capture_persists_before_classification_and_reopen
+    - story_seed_classification_is_idempotent_and_role_free
+    - target_inspiration_and_writing_sample_boundaries_hold
+    symbols:
+    - name: relationship_type
+      kind: function
+      line_start: 27
+      line_end: 35
+      signature: relationship_type(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: target_type
+      kind: function
+      line_start: 36
+      line_end: 45
+      signature: target_type(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: label
+      kind: function
+      line_start: 46
+      line_end: 55
+      signature: label(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: create_capture_source
+      kind: function
+      line_start: 85
+      line_end: 153
+      signature: 'create_capture_source(vault_path: &Path, text: &str, source_type: SourceType) -> ServiceResult<CaptureSourceView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'text: &str'
+      - 'source_type: SourceType'
+      output: ServiceResult<CaptureSourceView>
+      dependencies:
+      - Err
+      - InvalidVault
+      - VALUES
+      - audit_events
+      - capture_title
+      - connection.execute
+      - count
+      - extraction.to_string
+      - get_capture_source
+      - initialize
+      - is_empty
+      - map_err
+      - now
+      - now_v7
+      - open_connection
+      - privacy.to_string
+      - provenance.to_string
+      - source_type_text
+      - sources
+      - text.chars
+      - text.len
+      - text.trim
+      - text_hash
+      - to_rfc3339
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/capture_service.rs
+        symbol: capture_title
+      - &id005
+        path: src-tauri/src/commands/capture.rs
+        symbol: get_capture_source
+      - &id006
+        path: src-tauri/src/services/capture_service.rs
+        symbol: get_capture_source
+      - &id004
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: initialize
+      - path: src-tauri/src/services/capture_metadata_service.rs
+        symbol: source_type_text
+      - path: src-tauri/src/services/capture_service.rs
+        symbol: source_type_text
+      - path: src-tauri/src/services/capture_service.rs
+        symbol: text_hash
+    - name: get_capture_source
+      kind: function
+      line_start: 154
+      line_end: 178
+      signature: 'get_capture_source(vault_path: &Path, source_id: &str) -> ServiceResult<CaptureSourceView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'source_id: &str'
+      output: ServiceResult<CaptureSourceView>
+      dependencies:
+      - COALESCE
+      - Ok
+      - capture_view
+      - initialize
+      - load_classifications
+      - ok_or
+      - open_connection
+      - optional
+      - query_row
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+      - path: src-tauri/src/services/capture_catalog_service.rs
+        symbol: load_classifications
+      - path: src-tauri/src/services/capture_service.rs
+        symbol: load_classifications
+    - name: list_unclassified_captures
+      kind: function
+      line_start: 179
+      line_end: 213
+      signature: 'list_unclassified_captures(vault_path: &Path, limit: usize) -> ServiceResult<Vec<CaptureSourceView>>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'limit: usize'
+      output: ServiceResult<Vec<CaptureSourceView>>
+      dependencies:
+      - COALESCE
+      - EXISTS
+      - Ok
+      - capture_view
+      - collect
+      - connection.prepare
+      - initialize
+      - limit.clamp
+      - map
+      - new
+      - open_connection
+      - raw.into_iter
+      - statement.query_map
+      - try_from
+      - unwrap_or
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+    - name: classify_capture_source
+      kind: function
+      line_start: 214
+      line_end: 343
+      signature: 'classify_capture_source(vault_path: &Path, source_id: &str, role: CaptureRole) -> ServiceResult<CaptureClassificationResult>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'source_id: &str'
+      - 'role: CaptureRole'
+      output: ServiceResult<CaptureClassificationResult>
+      dependencies:
+      - COALESCE
+      - Ok
+      - Some
+      - VALUES
+      - audit_events
+      - connection.transaction
+      - initialize
+      - inspirations
+      - let
+      - now
+      - now_v7
+      - ok_or
+      - open_connection
+      - optional
+      - proof_points
+      - query_row
+      - record_relationships
+      - role.label
+      - role.relationship_type
+      - role.target_type
+      - row.get
+      - source_id.to_string
+      - source_type_from_text
+      - story_seeds
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+      - path: src-tauri/src/services/capture_service.rs
+        symbol: label
+      - path: src-tauri/src/services/writing_lint_service.rs
+        symbol: label
+      - &id021
+        path: src-tauri/src/domain/posts.rs
+        symbol: relationship_type
+      - &id022
+        path: src-tauri/src/services/capture_service.rs
+        symbol: relationship_type
+      - &id023
+        path: src-tauri/src/services/inspiration_service.rs
+        symbol: relationship_type
+      - &id024
+        path: src-tauri/src/services/topic_service.rs
+        symbol: relationship_type
+      - path: src-tauri/src/services/capture_catalog_service.rs
+        symbol: source_type_from_text
+      - path: src-tauri/src/services/capture_service.rs
+        symbol: source_type_from_text
+    - name: open_connection
+      kind: function
+      line_start: 344
+      line_end: 350
+      signature: 'open_connection(vault_path: &Path) -> ServiceResult<Connection>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Connection>
+      dependencies:
+      - Ok
+      - connection.busy_timeout
+      - connection.pragma_update
+      - database_path
+      - from_secs
+      - open
+      parser: rust-pattern
+      dependency_targets:
+      - &id028
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: database_path
+    - name: load_classifications
+      kind: function
+      line_start: 351
+      line_end: 372
+      signature: 'load_classifications(connection: &Connection, source_id: &str) -> ServiceResult<Vec<CaptureClassificationView>>'
+      inputs:
+      - 'connection: &Connection'
+      - 'source_id: &str'
+      output: ServiceResult<Vec<CaptureClassificationView>>
+      dependencies:
+      - Ok
+      - Some
+      - classifications.push
+      - connection.prepare
+      - let
+      - new
+      - role_from_relationship
+      - statement.query_map
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/capture_catalog_service.rs
+        symbol: role_from_relationship
+      - path: src-tauri/src/services/capture_service.rs
+        symbol: role_from_relationship
+    - name: source_type_text
+      kind: function
+      line_start: 388
+      line_end: 398
+      signature: 'source_type_text(source_type: SourceType) -> &''static str'
+      inputs:
+      - 'source_type: SourceType'
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: source_type_from_text
+      kind: function
+      line_start: 399
+      line_end: 412
+      signature: 'source_type_from_text(value: &str) -> ServiceResult<SourceType>'
+      inputs:
+      - 'value: &str'
+      output: ServiceResult<SourceType>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      parser: rust-pattern
+      dependency_targets: []
+    - name: role_from_relationship
+      kind: function
+      line_start: 413
+      line_end: 423
+      signature: 'role_from_relationship(value: &str) -> Option<CaptureRole>'
+      inputs:
+      - 'value: &str'
+      output: Option<CaptureRole>
+      dependencies:
+      - Some
+      parser: rust-pattern
+      dependency_targets: []
+    - name: capture_title
+      kind: function
+      line_start: 424
+      line_end: 431
+      signature: 'capture_title(text: &str) -> String'
+      inputs:
+      - 'text: &str'
+      output: String
+      dependencies:
+      - compact
+      - find
+      - is_empty
+      - line.trim
+      - lines
+      - unwrap_or
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: compact
+      - path: src-tauri/src/services/capture_service.rs
+        symbol: compact
+    - name: compact
+      kind: function
+      line_start: 432
+      line_end: 445
+      signature: 'compact(value: &str, max: usize) -> String'
+      inputs:
+      - 'value: &str'
+      - 'max: usize'
+      output: String
+      dependencies:
+      - chars
+      - count
+      - join
+      - max.saturating_sub
+      - normalized.chars
+      - shortened.push_str
+      - take
+      - value.split_whitespace
+      parser: rust-pattern
+      dependency_targets: []
+    - name: text_hash
+      kind: function
+      line_start: 446
+      line_end: 451
+      signature: 'text_hash(text: &str) -> String'
+      inputs:
+      - 'text: &str'
+      output: String
+      dependencies:
+      - encode
+      - hasher.finalize
+      - hasher.update
+      - new
+      - text.as_bytes
+      parser: rust-pattern
+      dependency_targets: []
+    - name: vault
+      kind: function
+      line_start: 458
+      line_end: 463
+      signature: vault() -> std::path::PathBuf
+      inputs: []
+      output: std::path::PathBuf
+      dependencies:
+      - create_vault
+      - expect
+      - join
+      - now_v7
+      - temp_dir
+      parser: rust-pattern
+      dependency_targets:
+      - &id029
+        path: src-tauri/src/commands/vault.rs
+        symbol: create_vault
+      - &id030
+        path: src-tauri/src/services/vault_service.rs
+        symbol: create_vault
+    - name: capture_persists_before_classification_and_reopen
+      kind: function
+      line_start: 466
+      line_end: 492
+      signature: capture_persists_before_classification_and_reopen()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - COALESCE
+      - Ok
+      - captured.classifications.is_empty
+      - create_capture_source
+      - drop
+      - get_capture_source
+      - initialize_and_migrate
+      - open_connection
+      - query_row
+      - remove_dir_all
+      - reopened.classifications.is_empty
+      - row.get
+      - unwrap
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - &id007
+        path: src-tauri/src/commands/capture.rs
+        symbol: create_capture_source
+      - &id008
+        path: src-tauri/src/services/capture_service.rs
+        symbol: create_capture_source
+      - &id009
+        path: src-tauri/src/services/confidentiality_service.rs
+        symbol: drop
+      - *id005
+      - *id006
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: initialize_and_migrate
+    - name: story_seed_classification_is_idempotent_and_role_free
+      kind: function
+      line_start: 495
+      line_end: 538
+      signature: story_seed_classification_is_idempotent_and_role_free()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - COUNT
+      - classify_capture_source
+      - create_capture_source
+      - drop
+      - open_connection
+      - query_row
+      - remove_dir_all
+      - row.get
+      - unwrap
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - &id010
+        path: src-tauri/src/commands/capture.rs
+        symbol: classify_capture_source
+      - &id011
+        path: src-tauri/src/services/capture_service.rs
+        symbol: classify_capture_source
+      - *id007
+      - *id008
+      - *id009
+    - name: target_inspiration_and_writing_sample_boundaries_hold
+      kind: function
+      line_start: 541
+      line_end: 589
+      signature: target_inspiration_and_writing_sample_boundaries_hold()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - COUNT
+      - classify_capture_source
+      - create_capture_source
+      - drop
+      - get_capture_source
+      - is_empty
+      - len
+      - list_unclassified_captures
+      - open_connection
+      - query_row
+      - remove_dir_all
+      - row.get
+      - unwrap
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - *id010
+      - *id011
+      - *id007
+      - *id008
+      - *id009
+      - *id005
+      - *id006
+      - path: src-tauri/src/commands/capture.rs
+        symbol: list_unclassified_captures
+      - path: src-tauri/src/services/capture_service.rs
+        symbol: list_unclassified_captures
+  - path: src-tauri/src/services/post_lineage_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 06d93bc72bd95effa36107411e690cd1eae31004
+    dependencies:
+    - chrono::Utc
+    - "crate::{\n        domain::models::SourceType,\n        services::{capture_service, confidentiality_service, vault_service},\n\
+      \    }"
+    - "crate::{\n    domain::posts::{\n        AppendPostRevisionRequest, ApprovePostRevisionRequest, CreatePostRequest, PostLineageView,\n\
+      \        PostRecordView, PostRevisionAuthorship, PostRevisionOrigin, PostRevisionView, PostStatus,\n        PostSupportRole,\
+      \ PostSupportingMaterialView,\n    },\n    error::{ServiceResult, WorkLoreError},\n    services::canonical_store,\n}"
+    - rusqlite::{params, Connection, OptionalExtension, Transaction}
+    - serde_json::{json, Value}
+    - std::fs
+    - std::{path::Path, time::Duration}
+    - super::*
+    - uuid::Uuid
+    provides:
+    - create_post
+    - append_revision
+    - approve_revision
+    - link_supporting_material
+    - get_post_lineage
+    - insert_revision
+    - validate_text
+    - validate_revision_metadata
+    - nonblank
+    - normalized_title
+    - load_post
+    - load_post_tx
+    - post_from_raw
+    - load_revision_tx
+    - load_revisions
+    - revision_row
+    - revision_from_raw
+    - load_supporting_material
+    - ensure_support_target_exists
+    - audit_tx
+    - open_connection
+    - post_not_found
+    - revision_not_found
+    - vault
+    - user_post
+    - user_draft_edit_and_exact_final_approval_survive_reopen
+    - model_ancestor_stays_model_and_human_edit_is_user_edited_model
+    - support_links_keep_semantic_roles_distinct
+    - schema_upgrade_does_not_invent_post_history
+    - confidentiality_transform_is_derived_and_does_not_overwrite_revision_truth
+    - final_approval_freezes_foundation_until_explicit_reopen_exists
+    symbols:
+    - name: create_post
+      kind: function
+      line_start: 17
+      line_end: 94
+      signature: 'create_post(vault_path: &Path, request: CreatePostRequest) -> ServiceResult<PostLineageView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: CreatePostRequest'
+      output: ServiceResult<PostLineageView>
+      dependencies:
+      - VALUES
+      - audit_tx
+      - connection.transaction
+      - get_post_lineage
+      - initialize
+      - insert_revision
+      - normalized_title
+      - now
+      - now_v7
+      - open_connection
+      - posts
+      - request.authorship_state.as_str
+      - request.model_id.as_deref
+      - request.origin.as_str
+      - request.provider_id.as_deref
+      - request.provider_run_id.as_deref
+      - to_rfc3339
+      - to_string
+      - tx.commit
+      - tx.execute
+      - validate_revision_metadata
+      - validate_text
+      parser: rust-pattern
+      dependency_targets:
+      - &id012
+        path: src-tauri/src/services/edit_learning_service.rs
+        symbol: audit_tx
+      - &id013
+        path: src-tauri/src/services/post_lineage_service.rs
+        symbol: audit_tx
+      - &id014
+        path: src-tauri/src/services/voice_evidence_service.rs
+        symbol: audit_tx
+      - &id015
+        path: src-tauri/src/services/voice_profile_service.rs
+        symbol: audit_tx
+      - &id016
+        path: src-tauri/src/commands/posts.rs
+        symbol: get_post_lineage
+      - &id017
+        path: src-tauri/src/services/post_lineage_service.rs
+        symbol: get_post_lineage
+      - *id004
+      - &id018
+        path: src-tauri/src/services/post_lineage_service.rs
+        symbol: insert_revision
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: normalized_title
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: normalized_title
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: validate_revision_metadata
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: validate_text
+    - name: append_revision
+      kind: function
+      line_start: 95
+      line_end: 169
+      signature: 'append_revision(vault_path: &Path, request: AppendPostRevisionRequest) -> ServiceResult<PostLineageView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: AppendPostRevisionRequest'
+      output: ServiceResult<PostLineageView>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Some
+      - audit_tx
+      - connection.transaction
+      - get_post_lineage
+      - initialize
+      - insert_revision
+      - load_post_tx
+      - load_revision_tx
+      - now
+      - now_v7
+      - ok_or_else
+      - open_connection
+      - parent.sequence.checked_add
+      - request.authorship_state.as_str
+      - request.model_id.as_deref
+      - request.origin.as_str
+      - request.provider_id.as_deref
+      - request.provider_run_id.as_deref
+      - to_rfc3339
+      - to_string
+      - tx.commit
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets:
+      - *id012
+      - *id013
+      - *id014
+      - *id015
+      - *id016
+      - *id017
+      - *id004
+      - *id018
+      - &id019
+        path: src-tauri/src/services/post_lineage_service.rs
+        symbol: load_post_tx
+      - &id020
+        path: src-tauri/src/services/post_lineage_service.rs
+        symbol: load_revision_tx
+    - name: approve_revision
+      kind: function
+      line_start: 170
+      line_end: 211
+      signature: 'approve_revision(vault_path: &Path, request: ApprovePostRevisionRequest) -> ServiceResult<PostLineageView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: ApprovePostRevisionRequest'
+      output: ServiceResult<PostLineageView>
+      dependencies:
+      - Err
+      - InvalidVault
+      - audit_tx
+      - connection.transaction
+      - get_post_lineage
+      - initialize
+      - load_post_tx
+      - load_revision_tx
+      - now
+      - open_connection
+      - revision.authorship_state.as_str
+      - revision.origin.as_str
+      - to_rfc3339
+      - to_string
+      - tx.commit
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets:
+      - *id012
+      - *id013
+      - *id014
+      - *id015
+      - *id016
+      - *id017
+      - *id004
+      - *id019
+      - *id020
+    - name: link_supporting_material
+      kind: function
+      line_start: 212
+      line_end: 263
+      signature: 'link_supporting_material(vault_path: &Path, post_id: &str, role: PostSupportRole, target_id: &str) -> ServiceResult<PostLineageView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'post_id: &str'
+      - 'role: PostSupportRole'
+      - 'target_id: &str'
+      output: ServiceResult<PostLineageView>
+      dependencies:
+      - Err
+      - InvalidVault
+      - VALUES
+      - audit_tx
+      - connection.transaction
+      - ensure_support_target_exists
+      - get_post_lineage
+      - initialize
+      - load_post_tx
+      - now
+      - now_v7
+      - open_connection
+      - post_id.is_empty
+      - post_id.trim
+      - record_relationships
+      - role.relationship_type
+      - role.target_type
+      - target_id.is_empty
+      - target_id.trim
+      - to_rfc3339
+      - to_string
+      - tx.commit
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets:
+      - *id012
+      - *id013
+      - *id014
+      - *id015
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: ensure_support_target_exists
+      - *id016
+      - *id017
+      - *id004
+      - *id019
+      - *id021
+      - *id022
+      - *id023
+      - *id024
+    - name: get_post_lineage
+      kind: function
+      line_start: 264
+      line_end: 276
+      signature: 'get_post_lineage(vault_path: &Path, post_id: &str) -> ServiceResult<PostLineageView>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'post_id: &str'
+      output: ServiceResult<PostLineageView>
+      dependencies:
+      - Ok
+      - initialize
+      - load_post
+      - load_revisions
+      - load_supporting_material
+      - open_connection
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: load_post
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: load_revisions
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: load_supporting_material
+    - name: insert_revision
+      kind: function
+      line_start: 291
+      line_end: 319
+      signature: 'insert_revision(tx: &Transaction<''_>, revision: RevisionInsert<''_>) -> ServiceResult<()>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'revision: RevisionInsert<''_>'
+      output: ServiceResult<()>
+      dependencies:
+      - Ok
+      - VALUES
+      - post_revisions
+      - revision.authorship_state.as_str
+      - revision.origin.as_str
+      - to_string
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets: []
+    - name: validate_text
+      kind: function
+      line_start: 320
+      line_end: 329
+      signature: 'validate_text(text: &str) -> ServiceResult<()>'
+      inputs:
+      - 'text: &str'
+      output: ServiceResult<()>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      - is_empty
+      - text.trim
+      - to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: validate_revision_metadata
+      kind: function
+      line_start: 330
+      line_end: 382
+      signature: 'validate_revision_metadata(origin: PostRevisionOrigin, authorship: PostRevisionAuthorship, parent_authorship:
+        Option<PostRevisionAuthorship>, provider_run_id: Option<&str>, provider_id: Option<&str>, model_id: Option<&str>)
+        -> ServiceResult<()>'
+      inputs:
+      - 'origin: PostRevisionOrigin'
+      - 'authorship: PostRevisionAuthorship'
+      - 'parent_authorship: Option<PostRevisionAuthorship>'
+      - 'provider_run_id: Option<&str>'
+      - 'provider_id: Option<&str>'
+      - 'model_id: Option<&str>'
+      output: ServiceResult<()>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      - Some
+      - expected.as_str
+      - model_id.is_some
+      - nonblank
+      - provider_id.is_none
+      - provider_id.is_some
+      - provider_run_id.is_some
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: nonblank
+    - name: nonblank
+      kind: function
+      line_start: 383
+      line_end: 386
+      signature: 'nonblank(value: Option<&str>) -> Option<&str>'
+      inputs:
+      - 'value: Option<&str>'
+      output: Option<&str>
+      dependencies:
+      - is_empty
+      - item.trim
+      - value.filter
+      parser: rust-pattern
+      dependency_targets: []
+    - name: normalized_title
+      kind: function
+      line_start: 387
+      line_end: 395
+      signature: 'normalized_title(value: &str) -> String'
+      inputs:
+      - 'value: &str'
+      output: String
+      dependencies:
+      - to_string
+      - value.is_empty
+      - value.to_string
+      - value.trim
+      parser: rust-pattern
+      dependency_targets: []
+    - name: load_post
+      kind: function
+      line_start: 408
+      line_end: 432
+      signature: 'load_post(connection: &Connection, post_id: &str) -> ServiceResult<PostRecordView>'
+      inputs:
+      - 'connection: &Connection'
+      - 'post_id: &str'
+      output: ServiceResult<PostRecordView>
+      dependencies:
+      - Ok
+      - and_then
+      - ok_or_else
+      - optional
+      - post_from_raw
+      - post_not_found
+      - query_row
+      parser: rust-pattern
+      dependency_targets:
+      - &id025
+        path: src-tauri/src/services/post_catalog_service.rs
+        symbol: post_from_raw
+      - &id026
+        path: src-tauri/src/services/post_lineage_service.rs
+        symbol: post_from_raw
+      - &id027
+        path: src-tauri/src/services/post_lineage_service.rs
+        symbol: post_not_found
+    - name: load_post_tx
+      kind: function
+      line_start: 433
+      line_end: 456
+      signature: 'load_post_tx(tx: &Transaction<''_>, post_id: &str) -> ServiceResult<PostRecordView>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'post_id: &str'
+      output: ServiceResult<PostRecordView>
+      dependencies:
+      - Ok
+      - and_then
+      - ok_or_else
+      - optional
+      - post_from_raw
+      - post_not_found
+      - tx.query_row
+      parser: rust-pattern
+      dependency_targets:
+      - *id025
+      - *id026
+      - *id027
+    - name: post_from_raw
+      kind: function
+      line_start: 457
+      line_end: 473
+      signature: 'post_from_raw(raw: PostRaw, post_id: &str) -> ServiceResult<PostRecordView>'
+      inputs:
+      - 'raw: PostRaw'
+      - 'post_id: &str'
+      output: ServiceResult<PostRecordView>
+      dependencies:
+      - InvalidVault
+      - Ok
+      - map_err
+      - parse
+      - raw.3.ok_or_else
+      parser: rust-pattern
+      dependency_targets: []
+    - name: load_revision_tx
+      kind: function
+      line_start: 474
+      line_end: 485
+      signature: 'load_revision_tx(tx: &Transaction<''_>, revision_id: &str) -> ServiceResult<PostRevisionView>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'revision_id: &str'
+      output: ServiceResult<PostRevisionView>
+      dependencies:
+      - and_then
+      - ok_or_else
+      - optional
+      - revision_not_found
+      - tx.query_row
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: revision_not_found
+    - name: load_revisions
+      kind: function
+      line_start: 486
+      line_end: 496
+      signature: 'load_revisions(connection: &Connection, post_id: &str) -> ServiceResult<Vec<PostRevisionView>>'
+      inputs:
+      - 'connection: &Connection'
+      - 'post_id: &str'
+      output: ServiceResult<Vec<PostRevisionView>>
+      dependencies:
+      - and_then
+      - collect
+      - connection.prepare
+      - row.map_err
+      - rows.map
+      - statement.query_map
+      parser: rust-pattern
+      dependency_targets: []
+    - name: revision_row
+      kind: function
+      line_start: 511
+      line_end: 526
+      signature: 'revision_row(row: &rusqlite::Row<''_>) -> rusqlite::Result<RevisionRaw>'
+      inputs:
+      - 'row: &rusqlite::Row<''_>'
+      output: rusqlite::Result<RevisionRaw>
+      dependencies:
+      - Ok
+      - row.get
+      parser: rust-pattern
+      dependency_targets: []
+    - name: revision_from_raw
+      kind: function
+      line_start: 527
+      line_end: 552
+      signature: 'revision_from_raw(raw: RevisionRaw) -> ServiceResult<PostRevisionView>'
+      inputs:
+      - 'raw: RevisionRaw'
+      output: ServiceResult<PostRevisionView>
+      dependencies:
+      - Err
+      - InvalidVault
+      - Ok
+      - map_err
+      - parse
+      - raw.5.as_str
+      parser: rust-pattern
+      dependency_targets: []
+    - name: load_supporting_material
+      kind: function
+      line_start: 553
+      line_end: 584
+      signature: 'load_supporting_material(connection: &Connection, post_id: &str) -> ServiceResult<Vec<PostSupportingMaterialView>>'
+      inputs:
+      - 'connection: &Connection'
+      - 'post_id: &str'
+      output: ServiceResult<Vec<PostSupportingMaterialView>>
+      dependencies:
+      - Ok
+      - Some
+      - connection.prepare
+      - let
+      - new
+      - out.push
+      - parse_relationship
+      - statement.query_map
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/domain/posts.rs
+        symbol: parse_relationship
+    - name: ensure_support_target_exists
+      kind: function
+      line_start: 585
+      line_end: 612
+      signature: 'ensure_support_target_exists(tx: &Transaction<''_>, role: PostSupportRole, target_id: &str) -> ServiceResult<()>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'role: PostSupportRole'
+      - 'target_id: &str'
+      output: ServiceResult<()>
+      dependencies:
+      - EXISTS
+      - Err
+      - InvalidVault
+      - Ok
+      - let
+      - role.relationship_type
+      - row.get
+      - tx.query_row
+      parser: rust-pattern
+      dependency_targets:
+      - *id021
+      - *id022
+      - *id023
+      - *id024
+    - name: audit_tx
+      kind: function
+      line_start: 613
+      line_end: 633
+      signature: 'audit_tx(tx: &Transaction<''_>, event_type: &str, post_id: &str, details: Value, occurred_at: &str) -> ServiceResult<()>'
+      inputs:
+      - 'tx: &Transaction<''_>'
+      - 'event_type: &str'
+      - 'post_id: &str'
+      - 'details: Value'
+      - 'occurred_at: &str'
+      output: ServiceResult<()>
+      dependencies:
+      - Ok
+      - VALUES
+      - audit_events
+      - details.to_string
+      - now_v7
+      - tx.execute
+      parser: rust-pattern
+      dependency_targets: []
+    - name: open_connection
+      kind: function
+      line_start: 634
+      line_end: 640
+      signature: 'open_connection(vault_path: &Path) -> ServiceResult<Connection>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Connection>
+      dependencies:
+      - Ok
+      - connection.busy_timeout
+      - connection.pragma_update
+      - database_path
+      - from_secs
+      - open
+      parser: rust-pattern
+      dependency_targets:
+      - *id028
+    - name: post_not_found
+      kind: function
+      line_start: 641
+      line_end: 644
+      signature: 'post_not_found(id: &str) -> WorkLoreError'
+      inputs:
+      - 'id: &str'
+      output: WorkLoreError
+      dependencies:
+      - InvalidVault
+      parser: rust-pattern
+      dependency_targets: []
+    - name: revision_not_found
+      kind: function
+      line_start: 645
+      line_end: 648
+      signature: 'revision_not_found(id: &str) -> WorkLoreError'
+      inputs:
+      - 'id: &str'
+      output: WorkLoreError
+      dependencies:
+      - InvalidVault
+      parser: rust-pattern
+      dependency_targets: []
+    - name: vault
+      kind: function
+      line_start: 658
+      line_end: 663
+      signature: vault() -> std::path::PathBuf
+      inputs: []
+      output: std::path::PathBuf
+      dependencies:
+      - create_vault
+      - expect
+      - join
+      - now_v7
+      - temp_dir
+      parser: rust-pattern
+      dependency_targets:
+      - *id029
+      - *id030
+    - name: user_post
+      kind: function
+      line_start: 664
+      line_end: 675
+      signature: 'user_post(title: &str, text: &str) -> CreatePostRequest'
+      inputs:
+      - 'title: &str'
+      - 'text: &str'
+      output: CreatePostRequest
+      dependencies:
+      - text.to_string
+      - title.to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: user_draft_edit_and_exact_final_approval_survive_reopen
+      kind: function
+      line_start: 678
+      line_end: 728
+      signature: user_draft_edit_and_exact_final_approval_survive_reopen()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - append_revision
+      - approve_revision
+      - approved.post.final_approved_revision_id.as_deref
+      - clone
+      - create_post
+      - created.post.post_id.clone
+      - created.revisions.len
+      - first.parent_revision_id.is_none
+      - first.revision_id.as_str
+      - get_post_lineage
+      - initialize
+      - remove_dir_all
+      - second.parent_revision_id.as_deref
+      - second.revision_id.as_str
+      - second.revision_id.clone
+      - to_string
+      - unwrap
+      - user_post
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - &id031
+        path: src-tauri/src/services/post_lineage_service.rs
+        symbol: append_revision
+      - &id038
+        path: src-tauri/src/services/post_lineage_service.rs
+        symbol: approve_revision
+      - &id032
+        path: src-tauri/src/commands/posts.rs
+        symbol: create_post
+      - &id033
+        path: src-tauri/src/services/post_lineage_service.rs
+        symbol: create_post
+      - *id016
+      - *id017
+      - *id004
+      - &id034
+        path: src-tauri/src/services/post_catalog_service.rs
+        symbol: user_post
+      - &id035
+        path: src-tauri/src/services/post_lineage_service.rs
+        symbol: user_post
+      - &id036
+        path: src-tauri/src/services/publication_feedback_service.rs
+        symbol: user_post
+    - name: model_ancestor_stays_model_and_human_edit_is_user_edited_model
+      kind: function
+      line_start: 731
+      line_end: 792
+      signature: model_ancestor_stays_model_and_human_edit_is_user_edited_model()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - COUNT
+      - Some
+      - append_revision
+      - clone
+      - create_post
+      - created.post.post_id.clone
+      - drop
+      - mislabeled.is_err
+      - model_revision.revision_id.as_str
+      - open_connection
+      - parent_revision_id.as_deref
+      - query_row
+      - remove_dir_all
+      - row.get
+      - to_string
+      - unwrap
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - *id031
+      - *id032
+      - *id033
+      - *id009
+    - name: support_links_keep_semantic_roles_distinct
+      kind: function
+      line_start: 795
+      line_end: 849
+      signature: support_links_keep_semantic_roles_distinct()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - create_capture_source
+      - create_evidence
+      - create_inspiration
+      - create_post
+      - create_target_context
+      - iter
+      - link_supporting_material
+      - map
+      - remove_dir_all
+      - roles.contains
+      - unwrap
+      - user_post
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - *id007
+      - *id008
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: create_evidence
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: create_inspiration
+      - *id032
+      - *id033
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: create_target_context
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: link_supporting_material
+      - *id034
+      - *id035
+      - *id036
+    - name: schema_upgrade_does_not_invent_post_history
+      kind: function
+      line_start: 852
+      line_end: 866
+      signature: schema_upgrade_does_not_invent_post_history()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - COUNT
+      - create_story
+      - drop
+      - initialize
+      - open_connection
+      - query_row
+      - remove_dir_all
+      - row.get
+      - unwrap
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: create_story
+      - *id009
+      - *id004
+    - name: confidentiality_transform_is_derived_and_does_not_overwrite_revision_truth
+      kind: function
+      line_start: 869
+      line_end: 887
+      signature: confidentiality_transform_is_derived_and_does_not_overwrite_revision_truth()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - create_post
+      - get_post_lineage
+      - private_text.to_string
+      - remove_dir_all
+      - transform_for_public_use
+      - unwrap
+      - user_post
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - *id032
+      - *id033
+      - *id016
+      - *id017
+      - *id037
+      - *id034
+      - *id035
+      - *id036
+    - name: final_approval_freezes_foundation_until_explicit_reopen_exists
+      kind: function
+      line_start: 890
+      line_end: 916
+      signature: final_approval_freezes_foundation_until_explicit_reopen_exists()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - append_revision
+      - approve_revision
+      - create_post
+      - created.post.post_id.clone
+      - remove_dir_all
+      - result.is_err
+      - revision_id.clone
+      - to_string
+      - unwrap
+      - user_post
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - *id031
+      - *id038
+      - *id032
+      - *id033
+      - *id034
+      - *id035
+      - *id036
+  - path: src/lib/vaultApi.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: 78af5c2373466ac5129abb857fd5da3e28e6c465
+    dependencies:
+    - ../domain/types
+    - '@tauri-apps/api/core'
+    provides:
+    - createVaultInParent
+    symbols:
+    - name: createVaultInParent
+      kind: function
+      line_start: 3
+      line_end: 9
+      signature: 'createVaultInParent(parentPath: string, name: string) -> Promise<VaultSummary>'
+      inputs:
+      - 'parentPath: string'
+      - 'name: string'
+      output: Promise<VaultSummary>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []

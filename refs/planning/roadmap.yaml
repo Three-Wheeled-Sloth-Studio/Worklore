@@ -1,28 +1,225 @@
-version: 1
+version: 2
 schema: refs/schemas/schemaRegistry.yaml
-updated: 2026-07-25
-roadmap:
-  - id: roadmap-001
+updated: 2026-09-14
+product_reference: refs/product/prd.md
+
+roadmap_principles:
+  - WorkLore is a standalone Windows-first desktop application with local canonical storage.
+  - A useful WorkLore vault must not require resume import.
+  - Raw AI drafts never train canonical voice.
+  - Public content always crosses an explicit human review and manual publication boundary.
+  - Automatic social publishing, social scheduling integration, WorkLore-hosted SaaS, proprietary cloud sync, and multi-user collaboration are outside the accepted roadmap.
+  - Existing resume ingestion and story-interview work is prototype foundation, not the organizing center of the product.
+  - Ollama remains a first-class local provider; remote model access uses explicit bring-your-own-key adapters with credentials outside the vault and no WorkLore-hosted proxy.
+
+prototype_foundation:
+  status: preserve_and_reuse_selectively
+  implemented_capabilities:
+    - Tauri 2 plus React, TypeScript, and Rust application shell.
+    - Local vault creation and reopen behavior.
+    - Local TXT, Markdown, PDF, and DOCX source extraction.
+    - Resume work-history candidate extraction.
+    - Guided interview and evidence labeling.
+    - Durable Private Entity Registry and stable redaction tokens.
+    - Manual privacy-safe AI workspace export and structured response import.
+    - Canonical story storage and role linking.
+    - Local operation timing and external build boundaries.
+  de_emphasized:
+    - Robust arbitrary resume parsing beyond practical maintenance.
+    - Resume-first navigation and workflow assumptions.
+
+phases:
+  - id: phase-0
+    name: Product Refocus and Contracts
     horizon: now
-    status: active
-    summary: Establish the repository, durable project references, schemas, and initial Tauri application shell.
-  - id: roadmap-002
+    status: complete
+    objective: Lock the professional narrative and content intelligence product direction before further feature development.
+    deliverables:
+      - Authoritative PRD covering product thesis, domain concepts, source classes, voice contract, anti-slop stance, privacy, deployment, success measures, and explicit non-goals.
+      - Roadmap aligned to the refocused product.
+      - Standalone deployment boundary with no hosted backend requirement and no automatic social publishing.
+      - Existing resume-centric work explicitly classified as reusable prototype foundation.
+    exit_criteria:
+      - Product direction is documented in refs/product/prd.md.
+      - Accepted roadmap contains no automatic publishing or scheduling phase.
+      - Future engineering begins from domain-model and navigation refocus rather than adding features to the resume-centric shell.
+
+  - id: phase-1
+    name: Professional Memory
+    horizon: now
+    status: complete
+    objective: Recenter WorkLore around durable capture, stories, topics, themes, proof points, inspiration, and target context.
+    scope:
+      - Replace the resume-centric primary navigation with Capture, Stories, Topics, Voice, Posts, and Insights-oriented navigation.
+      - Add low-friction save-first capture for memories, ideas, proof points, URLs, excerpts, job descriptions, writing samples, and notes.
+      - Define and persist Story, Story Seed, Proof Point, Topic Candidate, Theme, Inspiration, Target Context, and Source relationships.
+      - Support story maturity without requiring every story to be complete.
+      - Support guided story-gap questions independent of resume bullets.
+      - Add target job-description ingestion for ideation of topics, concepts, responsibilities, and skills without keyword overfitting.
+      - Add inspiration ingestion with provenance, user notes, extracted concepts, questions, and counterpoints.
+      - Preserve Private Entity Registry and privacy preflight as infrastructure.
+      - Demote resume ingestion to an optional Seed from resume path.
+    completed:
+      - Canonical SQLite persistence and non-destructive prototype migration foundation.
+      - Save-first typed/pasted Capture with neutral Source persistence before classification.
+      - Post-save manual classification into Story Seed, Proof Point, Topic Candidate, Inspiration, or Target Context with typed relationships and idempotency.
+      - Thin Capture UI and recent-unclassified recovery path without provider/model dependency.
+      - Direct canonical Story Seed guided development without a resume candidate or mandatory Role.
+      - Shared deterministic interview rules across direct-seed and legacy candidate paths, including answer classifications, skip, and do-not-remember semantics.
+      - Canonical Story creation from developed Story Seeds with explicit seed/interview lineage and attributed answers.
+      - Durable Topic Candidates with captured/exploring/ready/drafted/parked/retired lifecycle and explicit evergreen/timely metadata.
+      - Durable Themes with emerging/active/retired lifecycle independent from Topic lifecycle.
+      - Idempotent typed Topic relationships to Stories, Proof Points, Themes, Inspiration, and Target Context with standing/context semantics preserved.
+      - Thin Topic editor/API path that preserves Capture-created Topic identity and remains provider-free.
+      - Source-backed Inspiration records with stable identity across captured text, URL-only captures, and imported local-file Sources.
+      - Structured Inspiration metadata for provenance, summary, takeaways, attributed excerpts, why-it-matters notes, user reaction, concepts, questions, counterpoints, and saved/processed/archived lifecycle.
+      - Idempotent Inspiration connections to Topics and Themes through the shared relationship graph without creating Evidence, Proof Points, Stories, or Voice Evidence.
+      - Thin Inspiration editor/API path that explicitly separates external wording from user-authored reaction and remains provider/network-free.
+      - Source-backed Target Context records with stable identity, opportunity metadata, active/stale/archived lifecycle, and structured responsibilities, skills, concepts, notable language, tensions, summary, and notes.
+      - Deterministic provider-free Target Context signal extraction from captured text or safe vault-relative local extraction cache, with idempotent merge behavior and no fit score, ATS score, or automatic standing claim.
+      - Explicit idempotent Target Context connections to Topics, Themes, and Stories while preserving the rule that opportunity context is not Evidence or Proof about the user.
+      - Thin Target Context editor/API path that makes the semantic boundary visible and keeps Capture, Story, Topic, and Inspiration flows green.
+      - Task-oriented application shell with first-class Home, Capture, Stories, and Topics; supporting Library/Privacy/Import-Export/Settings access; reopenable Inspiration and Target Context; and honest future Voice, Posts, and Insights destinations.
+    architecture_notes:
+      - Durable local persistence uses SQLite for canonical structured state while source bytes remain in the vault filesystem.
+      - Human-readable export remains desirable.
+      - The vault remains usable without a WorkLore account or hosted service.
+      - Direct Story Seed development remains local-only until provider export/preflight is explicitly generalized for canonical seed/story targets.
+      - Topic timing, lifecycle, and relationships are deterministic local state and do not require provider or network availability.
+      - Inspiration is external context, not factual evidence about the user; excerpts retain Source attribution and user reaction remains separately attributable even though neither becomes Voice Evidence automatically.
+      - Target Context records what an opportunity or audience asks for. Extracted responsibilities, skills, concepts, language, and tensions are contextual signals only; they do not establish that the user possesses a skill, create standing, or authorize keyword stuffing.
+      - Phase 1 is complete. The task-oriented shell now exposes the professional-memory model directly while retaining resume bootstrap and infrastructure as supporting paths. Phase 2 begins explicitly with Voice Evidence provenance rather than provider execution or trait inference.
+    exit_criteria:
+      - A new user can build useful stories and topic candidates without importing a resume.
+      - Capture survives restart and supports incomplete material.
+      - Evidence, Inspiration, and Target Context remain distinct in storage and behavior.
+      - Existing resume-derived stories can coexist with directly captured stories.
+      - The primary application shell presents professional-memory workflows rather than the prototype resume/storage sequence, while optional resume bootstrap and supporting infrastructure remain reachable.
+
+  - id: phase-2
+    name: Voice Intelligence
     horizon: next
-    status: planned
-    summary: Build the local vault, source import, resume extraction, candidate triage, guided interview, and story editing loop.
-  - id: roadmap-003
+    status: in_progress
+    objective: Make authentic, auditable, intentionally variable user voice a first-class system capability.
+    completed:
+      - Governed canonical Voice Evidence with schema-v6 persistence, stable Source lineage, explicit authorship and approval, pending/eligible/rejected/retired lifecycle, revisioned audit events, and hard exclusion of raw model/external-author material from eligibility.
+      - Thin provider-free Voice Evidence review UI for candidate creation, provenance review, approve/reject/retire decisions, reopen, and visible ineligibility reasons.
+      - Schema-v7 provider-free Core Voice foundation with versioned proposed/active/superseded identity, queryable attributable traits, eligible Voice Evidence/user-guidance provenance, transactional activation/supersession, and invalidated-provenance surfacing without historical rewrite.
+      - Durable Tone Modes, Voice Directions, and Writing Rules with independent lifecycles plus thin Voice workspace management that keeps observed identity, intentional tone, desired evolution, and behavioral rules semantically separate.
+      - Provider-neutral executable registry seam with Ollama as the first local adapter, machine-local non-secret provider preferences, explicit provider/model selection, normalized failures, loopback-only local configuration, and no silent fallback.
+      - Versioned `analyze_voice_evidence` v1 workflow that uses only eligible Voice Evidence plus explicit guidance, validates attributable structured proposals locally, keeps results transient until human acceptance, and reuses schema-v7 provenance enforcement when a proposal is saved into a proposed Core Voice.
+      - Provider-free deterministic single-draft Writing Pattern Linter with stable explainable findings, browser-compatible UTF-16 locations, bounded question-opening/engagement-bait/hashtag/list-dominance checks, and explicit machine-enforceable active Writing Rules without an AI probability, opaque quality score, provider call, or draft persistence.
+      - Provider-free confidentiality transformation that reuses the Private Entity Registry, stable token redaction, explicitly stored public descriptions, current review/risk policy, and transient sensitive-text scanning to return derived public-safe text plus explicit ready/needs-review/blocked state without mutating canonical private truth or inventing replacement facts.
+      - Schema-v8 provider-free durable Post/Revision lineage with immutable exact revision snapshots, deterministic parentage, explicit user/model authorship provenance, exact final approval, typed supporting-material links, and a non-destructive confidentiality boundary.
+      - Provider-free deterministic edit-learning foundation over real persisted parent/child Revisions, with explainable additions/removals/replacements, exact Post/Revision provenance, model-ancestor preservation, and recurring-preference proposals only after the same normalized correction appears across at least two distinct Posts; proposals remain transient and do not mutate governed voice state.
+      - Explicit provider-free edit-learning decisions using the existing audit ledger: accept/reject validates the currently reproducible proposal and exact supporting Revision-pair set, persists hashed proposal/support identity plus exact Post/Revision IDs, suppresses unchanged decided evidence, allows materially expanded evidence to resurface, and routes acceptance only into a proposed Writing Rule without automatic activation or canonical voice mutation.
+    scope:
+      - Introduce canonical Voice Evidence, Core Voice, Tone Modes, Voice Direction, and Writing Rules.
+      - Ingest representative user-authored writing and approved final posts as voice evidence.
+      - Implement provenance rules that prevent raw AI drafts, rejected drafts, and unedited provider output from training canonical voice.
+      - Capture user edit deltas and propose recurring voice preferences for explicit acceptance.
+      - Support intentional voice evolution without confusing it with accidental drift.
+      - Support tone diversity including serious, analytical, reflective, conversational, whimsical, and context-appropriate dark humor while preserving author identity.
+      - Add deterministic and model-assisted writing-pattern linting.
+      - Add cross-draft repetition detection and proof-point rotation.
+      - Add confidentiality transformation as a hard pre-publication requirement.
+      - Add evidence and Do I Have Standing review.
+      - Introduce the provider registry around Ollama, manual workspace packages, and explicit BYOK remote adapters beginning with Gemini.
+      - Keep remote-provider credentials in the operating-system credential store, outside vaults, logs, exports, provider-run records, and frontend state.
+      - Require privacy preflight and user-visible remote-data disclosure before BYOK calls; never silently fall back from local to cloud.
+    exit_criteria:
+      - Every canonical voice trait has auditable source provenance.
+      - Raw AI drafts cannot contaminate the voice model.
+      - A user can deliberately select or approve tone variation without losing core identity.
+      - WorkLore can identify meaningful AI-default and repetitive writing patterns without claiming a fake human/AI probability score.
+      - Confidential entities can be transformed for public drafts while preserving factual meaning.
+      - Ollama and configured BYOK adapters can serve the same provider-neutral workflow contracts without exposing credentials to canonical state or frontend code.
+
+  - id: phase-3
+    name: Content Studio
     horizon: next
-    status: planned
-    summary: Add the durable Private Entity Registry, automatic content scans, stable redaction tokens, confidence scoring, and user-assisted entity resolution.
-  - id: roadmap-004
+    status: in_progress
+    objective: Turn stories, topics, inspiration, and target context into evidence-backed professional content through an explicit human editorial workflow.
+    completed:
+      - Thin Posts workspace with durable catalog/reopen behavior, manual Post creation, immutable Revision editing, and explicit human authorship state.
+      - Typed supporting-material links preserve Story, Proof Point, Inspiration, and Target Context roles without collapsing context into evidence.
+      - Deterministic challenge flow combines writing-pattern linting with confidentiality preflight before approval.
+      - Final approval freezes an exact current Revision only when the exact saved text already equals the derived public-safe text; private canonical Revision truth is never overwritten by confidentiality transformation.
+      - Exact final-approved Revisions can be user-marked as manually published after external publication while WorkLore itself performs no publishing or scheduling.
+    scope:
+      - Generate multiple genuinely different angles before drafting prose.
+      - Connect angles to stories, proof points, themes, inspiration, target context, and audience intent.
+      - Implement Audience Lens as reader-signal analysis rather than automatic audience-specific rewrites.
+      - Draft LinkedIn-appropriate posts using core voice plus selected tone mode and writing rules.
+      - Support comment and reply drafting using user voice, original-poster presence, and subject seriousness.
+      - Run voice, anti-slop, evidence, standing, confidentiality, repetition, and audience checks before approval.
+      - Maintain robust revision history from model draft through user edits and final approved text.
+      - Archive exact final human-approved and user-marked published versions.
+      - Track proof-point, theme, angle, tone, and structure reuse across the content portfolio.
+      - Support explicit content experiments.
+    excluded:
+      - Automatic publishing.
+      - LinkedIn scheduling integration.
+      - Autonomous commenting or engagement.
+    exit_criteria:
+      - A user can move from topic or story to several angles, select one, draft, challenge, edit, and archive a final post.
+      - The audit trail connects a final post to its factual evidence and creative inspiration.
+      - Audience Lens provides useful interpretation for multiple reader archetypes without simply cloning the post.
+      - WorkLore can recommend not publishing weak, generic, or unsupported material while still allowing user override.
+
+  - id: phase-4
+    name: Feedback Intelligence
     horizon: later
-    status: planned
-    summary: Add job description matching, local Git repository scanning, parent-folder discovery, and commit clustering.
-  - id: roadmap-005
-    horizon: later
-    status: planned
-    summary: Add writing sample analysis, explicit voice controls, and manual LinkedIn content workspace exports.
-  - id: roadmap-006
+    status: in_progress
+    objective: Close the loop between published content and measured audience response without overfitting small samples.
+    completed:
+      - Exact final-approved Revisions can be associated with user-recorded manual external publications without adding a WorkLore publishing or scheduling path.
+      - LinkedIn performance can be entered as append-only cumulative snapshots associated with the exact publication record; the latest snapshot drives the current view without rewriting historical measurements.
+      - Thin Insights feedback displays conservative baseline and small-sample warnings, and only after enough measured Posts exposes descriptive observed rates with an explicit non-causality boundary.
+    scope:
+      - Import LinkedIn-native analytics exports manually.
+      - Associate analytics with exact published-post records.
+      - Analyze performance by topic, theme, story, angle, tone, length, post type, proof point, audience intent, publication time, and experiment.
+      - Track user-selected outcomes such as profile views, saves, relevant comments, and other meaningful measures rather than optimizing only for likes.
+      - Surface confidence, sample size, and uncertainty with recommendations.
+      - Recommend increase, hold, reduce, or test-next decisions for topics, cadence, tones, structures, and timing.
+      - Add voice-drift audits that distinguish intentional direction from generic-AI drift.
+    exit_criteria:
+      - Imported analytics can be joined reliably to published content history.
+      - Recommendations disclose sample weakness rather than turning small samples into rules.
+      - WorkLore can identify underused stories and proof points when building future content plans.
+
+  - id: phase-5
+    name: Discovery and External Awareness
     horizon: future
-    status: planned
-    summary: Add private GitHub account access and an optional hosted WorkLore LLM provider with paid credits.
+    status: in_progress
+    objective: Surface timely opportunities where the user has credible standing and a differentiated angle.
+    completed:
+      - Manual timely-topic scanning with freshness controls, source provenance, clustering, standing/context qualification, explicit Inspiration/Topic promotion, and locally retained feedback learning.
+      - Bounded open-ended discovery where blank Focus explores several professional topic areas without requiring Themes, while explicit Focus narrows local qualification and the total retrieval budget stays bounded.
+      - Keyless seeded retrieval reads Hacker News, TechCrunch, BBC Business, BLS, and Federal Reserve public sources; Focus is applied locally after retrieval so user Focus, Story/Proof text, and private entity text are not transmitted to those sources.
+      - Seeded-source URL deduplication and headline clustering occur before the existing qualification pass, preserving Good candidate, Not for me, and Not now as distinct feedback signals without modifying canonical Voice.
+    scope:
+      - Add current-news scanning tied to the user's themes, evidence, audience, and recent content history.
+      - Rank candidate opportunities using relevance, credibility, audience fit, freshness, angle novelty, saturation, and risk.
+      - Allow WorkLore to reject relevant news as poor posting material when the user lacks standing or differentiated perspective.
+      - Ingest the user's own LinkedIn profile as target context for public positioning and consistency analysis.
+      - Support selected public professional profiles or audience examples as supplemental audience context.
+      - Expand inspiration retrieval from user-pinned articles, papers, posts, and URLs.
+      - Connect discovery results to existing stories, proof points, and themes before proposing draft angles.
+    exit_criteria:
+      - Discovery produces qualified posting opportunities rather than a generic news feed.
+      - Every suggested timely topic explains why it fits the user, why the audience may care, and which evidence gives the user standing.
+      - External material cannot silently become evidence about the user or canonical voice material.
+
+explicit_non_goals:
+  - WorkLore-hosted SaaS backend.
+  - WorkLore user accounts.
+  - Proprietary WorkLore cloud vault synchronization.
+  - WorkLore-hosted inference proxy or credential gateway under the accepted roadmap.
+  - Multi-user collaboration.
+  - Automatic LinkedIn or social publishing.
+  - LinkedIn scheduling integration.
+  - Autonomous comments or engagement.
+  - Content-volume optimization as a product goal.
+  - Major engineering investment in arbitrary resume-layout parsing.

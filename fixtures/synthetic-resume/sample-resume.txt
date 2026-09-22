@@ -1,0 +1,16 @@
+Morgan Reed
+morgan.reed@example.test
+
+PRODUCT MANAGER
+
+Acme Regulatory Cooperative | Lead Product Manager | 2022 to 2026
+
+- Reduced complaint investigation time from several months to hours by redesigning intake, triage, and evidence workflows.
+- Led development of Kinections, an LLM-assisted tool used to pre-screen investor complaints before analyst review.
+- Replaced fragmented reporting with a single operational view used by 14 investigation teams.
+- Guided coding agents with product requirements, acceptance criteria, and business context to reduce implementation rework.
+
+Northwind Community Health | Product Manager | 2018 to 2022
+
+- Reduced delivery cycle time by approximately 80 percent through workflow automation and clearer release criteria.
+- Coordinated state reporting, billing, scheduling, and care-management integrations across more than 20 programs.

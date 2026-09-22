@@ -1,0 +1,121 @@
+.target-context-panel {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--border-subtle, #d8d8d8);
+  border-radius: 0.9rem;
+  background: var(--surface-raised, #fff);
+}
+
+.target-context-heading-row,
+.target-context-actions-row,
+.target-context-connect-row,
+.target-context-link-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.target-context-heading-row {
+  align-items: flex-start;
+}
+
+.target-context-heading-row p,
+.target-context-connections p {
+  max-width: 70ch;
+}
+
+.target-context-provenance,
+.target-context-boundary {
+  display: grid;
+  gap: 0.25rem;
+  margin: 1rem 0;
+  padding: 0.8rem;
+  border-radius: 0.7rem;
+  background: var(--surface-muted, #f5f5f5);
+}
+
+.target-context-editor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.target-context-editor-grid label {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 600;
+}
+
+.target-context-editor-grid input,
+.target-context-editor-grid textarea,
+.target-context-editor-grid select,
+.target-context-connect-row select {
+  width: 100%;
+}
+
+.target-context-wide {
+  grid-column: 1 / -1;
+}
+
+.target-context-actions-row {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.target-context-actions-row span {
+  font-size: 0.82rem;
+  opacity: 0.72;
+}
+
+.target-context-connections {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.target-context-link-row {
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--border-subtle, #e3e3e3);
+}
+
+.target-context-link-row div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.target-context-link-row span {
+  font-size: 0.82rem;
+  opacity: 0.72;
+}
+
+.target-context-connect-row {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.target-context-connect-row select {
+  max-width: 18rem;
+}
+
+.target-context-feedback {
+  min-height: 1.4rem;
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 760px) {
+  .target-context-editor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .target-context-wide {
+    grid-column: auto;
+  }
+
+  .target-context-heading-row,
+  .target-context-link-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
