@@ -1,0 +1,7 @@
+# Signing and release controls
+/CODE_SIGNING_POLICY.md @SlothMD
+/PRIVACY.md @SlothMD
+/.signpath/ @SlothMD
+/.github/workflows/sign-release.yml @SlothMD
+/scripts/build.ps1 @SlothMD
+/src-tauri/tauri.conf.json @SlothMD

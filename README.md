@@ -10,6 +10,14 @@ See [`docs/quick-start.md`](docs/quick-start.md) for the current user guide, inc
 
 The same guide is available inside the desktop app from the shaded `?` help control in the upper-right corner.
 
+## Windows Preview
+
+The current Windows alpha is available from the [WorkLore portfolio card](https://work.threewheeledsloth.com/#projects). It is a portable application: download the executable and run it from a user-writable folder. To uninstall it, close WorkLore and delete the executable. WorkLore vaults are separate user-owned folders and are not deleted automatically.
+
+The currently published preview is unsigned while the project's SignPath Foundation application is pending. Windows may display a SmartScreen warning. Future tagged releases will be built from this public repository on GitHub-hosted runners and published only after successful Authenticode signing and verification.
+
+See the [Code signing policy](CODE_SIGNING_POLICY.md) and [Privacy policy](PRIVACY.md).
+
 ## Current Development Slice
 
 The current desktop foundation can:

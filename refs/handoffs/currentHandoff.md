@@ -7,7 +7,7 @@ tags: [handoff, worklore, discovery]
 ---
 # Current Handoff
 
-Updated: 2026-09-21
+Updated: 2026-09-22
 
 ## Product Baseline
 
@@ -111,6 +111,21 @@ Use packet-first/progressive loading. Do not reread repository history.
 - `task-036`: complete for exact lineage/publication/performance association.
 - `task-037`: in progress. Manual performance snapshots and conservative Insights exist.
 - Phase 5 discovery: in progress. Keyless seeded retrieval and bounded open-ended exploration are implemented; runtime quality tuning remains evidence-driven.
+
+## SignPath Foundation Preparation
+
+The `dev` branch now contains the repository-side prerequisites for a SignPath Foundation application and a fail-closed signed Windows release path:
+
+- public code-signing and privacy policies;
+- a reviewed SignPath PE artifact configuration;
+- signing-sensitive CODEOWNERS entries;
+- a GitHub-hosted tag workflow that builds, submits, manually awaits approval, verifies Authenticode and timestamp identity, and publishes only signed bytes plus their post-signing checksum;
+- explicit Tauri publisher and copyright metadata; and
+- maintainer setup and release documentation.
+
+A clean local production build verified the intended `WorkLore`, `0.1.10`, `Three-Wheeled Sloth Studio`, and copyright metadata. The generated executable is intentionally unsigned before SignPath processing.
+
+Remaining external steps are: promote the preparation through the accepted `dev -> qa -> main` path, submit the SignPath Foundation application, install the SignPath GitHub App after approval, import the reviewed artifact configuration, create the manual-approval production policy, and set the documented GitHub secret and variables. No SignPath approval or public signature is claimed yet.
 
 ## Do Not Reopen
 

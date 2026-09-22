@@ -30,6 +30,10 @@
     "targets": "all",
     "icon": [],
     "category": "Productivity",
+    "publisher": "Three-Wheeled Sloth Studio",
+    "copyright": "Copyright (c) 2026 Three-Wheeled Sloth Studio",
+    "homepage": "https://github.com/Three-Wheeled-Sloth-Studio/Worklore",
+    "license": "AGPL-3.0-only",
     "shortDescription": "Turn career evidence into reusable stories.",
     "longDescription": "WorkLore is a local-first career story bank for turning resumes, documents, and project history into evidence-backed professional stories."
   }
