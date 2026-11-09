@@ -88,6 +88,8 @@ pub struct InspirationSourceView {
     pub original_file_name: String,
     pub stored_path: String,
     pub source_url: Option<String>,
+    pub source_author: Option<String>,
+    pub user_note: Option<String>,
     pub captured_text: String,
 }
 
@@ -219,9 +221,9 @@ pub fn create_inspiration_from_source(
     connection.execute(
         "INSERT INTO inspirations(
            inspiration_id,source_id,title,notes,status,provenance_json,created_at,updated_at,revision,
-           source_url,source_title,summary,takeaways_json,excerpts_json,why_interesting,user_reaction,
+           source_url,source_title,source_author,summary,takeaways_json,excerpts_json,why_interesting,user_reaction,
            concepts_json,questions_json,counterpoints_json)
-         VALUES (?1,?2,?3,'','saved',?4,?5,?5,1,?6,?7,'','[]','[]','','','[]','[]','[]')",
+         VALUES (?1,?2,?3,'','saved',?4,?5,?5,1,?6,?7,?8,'','[]','[]','',?9,'[]','[]','[]')",
         params![
             &inspiration_id,
             source_id,
@@ -235,6 +237,8 @@ pub fn create_inspiration_from_source(
             &now,
             &source_url,
             &source.display_name,
+            source.source_author,
+            source.user_note,
         ],
     )?;
     connection.execute(
@@ -593,6 +597,8 @@ fn load_source_from_connection(
             original_file_name: row.4,
             stored_path: row.5,
             source_url: source_url_from_provenance(&row.6),
+            source_author: provenance_field(&row.6, "sourceAuthor"),
+            user_note: provenance_field(&row.6, "userNote"),
             captured_text: row.7,
         })
     })
@@ -685,13 +691,13 @@ fn ensure_target_exists(
 }
 
 fn source_url_from_provenance(value: &str) -> Option<String> {
+    provenance_field(value, "sourceUrl")
+}
+
+fn provenance_field(value: &str, field: &str) -> Option<String> {
     serde_json::from_str::<Value>(value)
         .ok()
-        .and_then(|json| {
-            json.get("sourceUrl")
-                .and_then(Value::as_str)
-                .map(str::to_string)
-        })
+        .and_then(|json| json.get(field).and_then(Value::as_str).map(str::to_string))
         .filter(|value| !value.trim().is_empty())
 }
 

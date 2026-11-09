@@ -18,15 +18,21 @@ pub fn create_capture_source(
     source_author: Option<String>,
     user_note: Option<String>,
 ) -> CommandResult<CaptureSourceView> {
-    capture_service::create_capture_source_with_metadata(
-        &PathBuf::from(vault_path),
-        &text,
-        source_type.unwrap_or(SourceType::Other),
-        source_url,
-        source_author,
-        user_note,
-    )
-    .map_err(CommandError::from)
+    let path = PathBuf::from(vault_path);
+    let source_type = source_type.unwrap_or(SourceType::Other);
+    let result = if source_url.is_none() && source_author.is_none() && user_note.is_none() {
+        capture_service::create_capture_source(&path, &text, source_type)
+    } else {
+        capture_service::create_capture_source_with_metadata(
+            &path,
+            &text,
+            source_type,
+            source_url,
+            source_author,
+            user_note,
+        )
+    };
+    result.map_err(CommandError::from)
 }
 
 #[tauri::command]

@@ -251,12 +251,12 @@ pub fn classify_capture_source(
     canonical_store::initialize(vault_path)?;
     let mut connection = open_connection(vault_path)?;
     let tx = connection.transaction()?;
-    let (source_type_text_value, title, text): (String, String, String) = tx
+    let (source_type_text_value, title, text, source_provenance): (String, String, String, String) = tx
         .query_row(
-            "SELECT source_type,display_name,COALESCE(captured_text,'') FROM sources
+            "SELECT source_type,display_name,COALESCE(captured_text,''),provenance_json FROM sources
              WHERE source_id=?1 AND source_origin='captured_text'",
             [source_id],
-            |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+            |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
         )
         .optional()?
         .ok_or(WorkLoreError::SourceNotFound)?;
@@ -279,6 +279,10 @@ pub fn classify_capture_source(
     }
 
     let source_type = source_type_from_text(&source_type_text_value)?;
+    let source_meta: serde_json::Value = serde_json::from_str(&source_provenance)?;
+    let source_url = source_meta.get("sourceUrl").and_then(|v| v.as_str());
+    let source_author = source_meta.get("sourceAuthor").and_then(|v| v.as_str());
+    let user_note = source_meta.get("userNote").and_then(|v| v.as_str());
     let now = Utc::now().to_rfc3339();
     let provenance = json!({
         "creationActor": "user",
@@ -317,9 +321,11 @@ pub fn classify_capture_source(
         CaptureRole::Inspiration => {
             let id = format!("inspiration_{}", Uuid::now_v7());
             tx.execute(
-                "INSERT INTO inspirations(inspiration_id,source_id,title,notes,status,provenance_json,created_at,updated_at,revision)
-                 VALUES (?1,?2,?3,'','saved',?4,?5,?5,1)",
-                params![&id, source_id, &title, &provenance, &now],
+                "INSERT INTO inspirations(
+                   inspiration_id,source_id,title,notes,status,provenance_json,created_at,updated_at,revision,
+                   source_url,source_title,source_author,user_reaction)
+                 VALUES (?1,?2,?3,'','saved',?4,?5,?5,1,?6,?7,?8,?9)",
+                params![&id, source_id, &title, &provenance, &now, source_url, &title, source_author, user_note],
             )?;
             id
         }
@@ -331,9 +337,9 @@ pub fn classify_capture_source(
                 "captured_context"
             };
             tx.execute(
-                "INSERT INTO target_contexts(target_id,source_id,context_type,title,notes,status,provenance_json,created_at,updated_at,revision)
-                 VALUES (?1,?2,?3,?4,'','active',?5,?6,?6,1)",
-                params![&id, source_id, context_type, &title, &provenance, &now],
+                "INSERT INTO target_contexts(target_id,source_id,context_type,title,notes,status,provenance_json,created_at,updated_at,revision,source_url)
+                 VALUES (?1,?2,?3,?4,?5,'active',?6,?7,?7,1,?8)",
+                params![&id, source_id, context_type, &title, user_note.unwrap_or(""), &provenance, &now, source_url],
             )?;
             id
         }
@@ -640,5 +646,34 @@ mod tests {
         assert_eq!(reopened.user_note.as_deref(), Some("My counterpoint"));
         fs::remove_dir_all(path).unwrap();
     }
+
+    #[test]
+    fn classified_inspiration_preserves_source_url_author_and_user_reaction() {
+        let path = vault();
+        let source = create_capture_source_with_metadata(
+            &path,
+            "An externally authored insight.",
+            SourceType::Other,
+            Some("https://example.com/insight".to_owned()),
+            Some("Example Publisher".to_owned()),
+            Some("I disagree with the conclusion.".to_owned()),
+        )
+        .unwrap();
+        let result = classify_capture_source(&path, &source.source_id, CaptureRole::Inspiration)
+            .unwrap();
+        let connection = open_connection(&path).unwrap();
+        let attribution: (Option<String>, Option<String>, String) = connection
+            .query_row(
+                "SELECT source_url,source_author,user_reaction FROM inspirations WHERE inspiration_id=?1",
+                [&result.target_id],
+                |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+            )
+            .unwrap();
+        assert_eq!(attribution.0.as_deref(), Some("https://example.com/insight"));
+        assert_eq!(attribution.1.as_deref(), Some("Example Publisher"));
+        assert_eq!(attribution.2, "I disagree with the conclusion.");
+        std::fs::remove_dir_all(path).unwrap();
+    }
+
 
 }
