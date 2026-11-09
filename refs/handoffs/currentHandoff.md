@@ -164,21 +164,40 @@ cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -
 
 Any subsequent change to `dev` requires this full gate again before that new head is called accepted.
 
-## November 9, 2026 - Editorial foundations (unvalidated implementation)
+## November 9, 2026 - Editorial implementation progress (pending validation)
 
-Dev includes the first code increment for editorial-01 and editorial-02. This is not a new accepted runtime checkpoint; v0.1.10 remains the last documented acceptance baseline.
+Code on `dev` now covers the following bounded increments:
 
-- Capture now supports explicit source URL, source author/publisher, and a separate user note, stored in original source provenance and returned in Capture records. URL-only captures do **not** fetch remote content. Existing 3-argument Rust capture callers remain intact through a wrapper.
-- Posts now includes a vault-local Audience Goals editor for primary/secondary readers, roles, industries, positioning, and whether the user permits mentioning an active job search. Goals are stored in `data/audience-goals.json` using atomic JSON writes; they are not yet automatically applied to drafts or Audience Lens.
-- Added Rust unit test cases for source metadata and audience-goal persistence/limits. The tests have **not** been executed in this session.
-- Implementation remains **in progress**, not feature-complete. Remaining intake work includes duplicate/source freshness UX, author and note propagation into Inspiration, unreadable URL recovery, and richer file intake. Remaining audience work includes post-level goal overrides and Audience Lens consumption.
+- Save source URLs, authors/publishers and independent user notes in Capture. Reopen and catalog view preserve those fields. Link-only captures do not make network requests.
+- Propagate source attribution into Inspiration, including legacy URL-only captures, and URL/note into Target Context. Inspiration-from-Source now carries source author and user reaction.
+- Edit durable vault-level Audience Goals, including audiences, roles, industries, positioning and job-search disclosure.
+- Save a per-Post audience override and desired reader signal, or clear it to return to vault defaults. Post overrides do not change revisions, Voice, publication or canonical evidence.
+- Rust tests have been authored for basic capture attribution and audience persistence, but were not executed here.
 
-### Validation required before acceptance
+Remaining task-042/043 work: duplicate/retry/freshness UX, broader source intake, applying post intent to generation and Audience Lens, and acceptance QA. No changes to the publishing boundary, cloud policies, or calendar implementation.
 
-1. Run `cargo fmt --manifest-path src-tauri/Cargo.toml --all`, regenerate the source catalog using `python refs/tools/generate_source_catalog.py`, then rerun the standard checks from `refs/testing/validationCommands.yaml`.
-2. Run `npm run test`, `npm run build:frontend`, `cargo test --manifest-path src-tauri/Cargo.toml`, and `cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison`.
-3. In QA, exercise free-text capture, URL-only capture, author/note reopen, classification to Inspiration, existing resume and Voice paths, and audience-goal persistence across app/vault restart.
-4. Confirm the new audience-goal JSON never enters public repository files, cloud requests, or Voice Evidence automatically. Check keyboard input for multiple roles/industries, and contrast in both Posts and Capture.
-5. Update generated indexes and mark tasks 042/043 complete only once the actual runtime behaviors and remaining acceptance criteria pass.
+**This is NOT an accepted checkpoint.** The current environment could not run Rust or a full Tauri build. No CI was triggered for the new dev head. Do not promote or mark the work complete.
 
-The November 9 branch promotion moved the pre-feature dev tree to main; feature implementation remains on dev.
+### Next required validation on the Windows development checkout
+
+```powershell
+git switch dev
+git pull --ff-only origin dev
+cargo fmt --manifest-path src-tauri/Cargo.toml --all
+python refs/tools/generate_source_catalog.py
+python scripts/check-case-collisions.py
+git diff --check
+python refs/tools/generate_source_catalog.py --check
+python refs/tools/validate_refs.py --mode initialized
+python refs/tools/generate_agent_context.py --check
+npm run test
+npm run build:frontend
+cargo test --manifest-path src-tauri/Cargo.toml
+cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
+cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
+./scripts/assert-repo-clean.ps1
+```
+
+Review formatting/catalog diffs, commit generated changes only via their generators, fix any build/test failures, and run QA smoke on text capture, URL-only capture, Inspiration attribution, Target Context notes, goals persistence, post override/revert, and vault switching. Confirm no cloud calls happen during these local operations.
+
+The November 9 promotion moved the *pre-feature* dev baseline to main. All new work stays on dev.

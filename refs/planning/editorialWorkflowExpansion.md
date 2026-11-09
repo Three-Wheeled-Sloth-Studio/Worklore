@@ -69,7 +69,7 @@ Strengthen WorkLore's existing `Capture -> Understand -> Develop -> Connect -> D
 
 ## Implementation checkpoint (2026-11-09)
 
-- Editorial-01: in progress. Basic explicit source URL/author/user-note capture and URL-only persistence implemented; deeper metadata propagation, duplicate/retry UX, and source freshness remain pending.
-- Editorial-02: in progress. Local audience-goals editor and persistent settings implemented; per-post selection and Audience Lens consumption remain pending.
+- Editorial-01: in progress. Capture now persists source URL, author/publisher, and user note; URL-only capture remains local; source attribution carries into Inspiration/Target Context and direct Inspiration-from-Source. Duplicate/retry and freshness UX remain pending.
+- Editorial-02: in progress. Local audience-goals editor and settings plus reversible per-post audience intent implemented. Automated use by generation and Audience Lens remains pending.
 - Editor, calendar, recommendation governance, and Google Drive feasibility work have not begun.
 - Tests, formatting, generated-source-index checks, full build, and hands-on QA still required before an accepted release checkpoint.
