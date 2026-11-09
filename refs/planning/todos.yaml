@@ -169,11 +169,11 @@ todos:
     summary: Replace the prototype resume-centric top-level workflow with the accepted task-oriented application shell, make Home/Capture/Stories/Topics first-class, demote resume/storage/privacy utilities to supporting access, reopen durable Inspiration and Target Context through the Library, and represent future Voice/Posts/Insights honestly without beginning later phases.
 
   - id: task-042
-    status: planned
+    status: in_progress
     area: intake
     summary: Editorial-01: improve save-first source capture and source metadata, duplicate/unreadable handling, and refresh awareness without conflating evidence, inspiration, target context, or voice evidence.
   - id: task-043
-    status: planned
+    status: in_progress
     area: audience
     summary: Editorial-02: persist audience/positioning objectives, job-search disclosure choice, and post-level intent for Audience Lens without inferring author standing from target context.
   - id: task-044

@@ -163,3 +163,22 @@ cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -
 ```
 
 Any subsequent change to `dev` requires this full gate again before that new head is called accepted.
+
+## November 9, 2026 - Editorial foundations (unvalidated implementation)
+
+Dev includes the first code increment for editorial-01 and editorial-02. This is not a new accepted runtime checkpoint; v0.1.10 remains the last documented acceptance baseline.
+
+- Capture now supports explicit source URL, source author/publisher, and a separate user note, stored in original source provenance and returned in Capture records. URL-only captures do **not** fetch remote content. Existing 3-argument Rust capture callers remain intact through a wrapper.
+- Posts now includes a vault-local Audience Goals editor for primary/secondary readers, roles, industries, positioning, and whether the user permits mentioning an active job search. Goals are stored in `data/audience-goals.json` using atomic JSON writes; they are not yet automatically applied to drafts or Audience Lens.
+- Added Rust unit test cases for source metadata and audience-goal persistence/limits. The tests have **not** been executed in this session.
+- Implementation remains **in progress**, not feature-complete. Remaining intake work includes duplicate/source freshness UX, author and note propagation into Inspiration, unreadable URL recovery, and richer file intake. Remaining audience work includes post-level goal overrides and Audience Lens consumption.
+
+### Validation required before acceptance
+
+1. Run `cargo fmt --manifest-path src-tauri/Cargo.toml --all`, regenerate the source catalog using `python refs/tools/generate_source_catalog.py`, then rerun the standard checks from `refs/testing/validationCommands.yaml`.
+2. Run `npm run test`, `npm run build:frontend`, `cargo test --manifest-path src-tauri/Cargo.toml`, and `cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison`.
+3. In QA, exercise free-text capture, URL-only capture, author/note reopen, classification to Inspiration, existing resume and Voice paths, and audience-goal persistence across app/vault restart.
+4. Confirm the new audience-goal JSON never enters public repository files, cloud requests, or Voice Evidence automatically. Check keyboard input for multiple roles/industries, and contrast in both Posts and Capture.
+5. Update generated indexes and mark tasks 042/043 complete only once the actual runtime behaviors and remaining acceptance criteria pass.
+
+The November 9 branch promotion moved the pre-feature dev tree to main; feature implementation remains on dev.
