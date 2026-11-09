@@ -2,12 +2,100 @@
 
 Turn the work you did into stories you can actually use.
 
-WorkLore is a local-first career story bank. It helps you uncover useful, evidence-backed stories from resumes, job descriptions, writing samples, and Git history, then guides you through focused interviews to fill in the missing context.
+WorkLore is a local-first career story bank. It helps uncover useful, evidence-backed stories from resumes and other career sources, then preserves those stories as user-owned records instead of trapping them in an opaque application database.
 
-## Available Features
+## Quick Start
 
-WorkLore is in early development. No test build is available yet.
+See [`docs/quick-start.md`](docs/quick-start.md) for the current user guide, including the fastest bootstrap path from resume bullets to professional-memory Story Seeds and Proof Points.
 
-## Installation
+The same guide is available inside the desktop app from the shaded `?` help control in the upper-right corner.
 
-There is nothing to install yet. Test builds will be published through GitHub Releases when they are ready.
+## Windows Preview
+
+The current Windows alpha is available from the [WorkLore portfolio card](https://work.threewheeledsloth.com/#projects). It is a portable application: download the executable and run it from a user-writable folder. To uninstall it, close WorkLore and delete the executable. WorkLore vaults are separate user-owned folders and are not deleted automatically.
+
+The currently published preview is unsigned while the project's SignPath Foundation application is pending. Windows may display a SmartScreen warning. Future tagged releases will be built from this public repository on GitHub-hosted runners and published only after successful Authenticode signing and verification.
+
+See the [Code signing policy](CODE_SIGNING_POLICY.md) and [Privacy policy](PRIVACY.md).
+
+## Current Development Slice
+
+The current desktop foundation can:
+
+- Create and reopen a local WorkLore vault
+- Copy TXT, Markdown, PDF, and DOCX sources into that vault
+- Detect duplicate files with SHA-256
+- Extract local text from supported documents
+- Scan extracted text for private entities and assign stable redaction tokens
+- Review and resolve ambiguous entity mappings
+- Extract resume bullets into story candidates
+- Restrict resume candidate extraction to recognized Work History or Employment History sections
+- Ignore headline job titles, career summaries, skills, education, and other non-employment sections
+- Record local operation timings for import, extraction, and privacy-scan phases
+
+The application remains an early alpha build. Local Ollama and explicit user-keyed OpenAI/Gemini execution are available for bounded provider-assisted workflows; broader product polish and discovery workflows are still under development.
+
+## Development
+
+Requirements:
+
+- Windows 11
+- Node.js 22 or a compatible current release
+- Rust stable toolchain
+- Microsoft WebView2 runtime
+
+Run the desktop development environment:
+
+```powershell
+./dev.bat
+```
+
+Development compilation is written outside the repository under the configured WorkLore external root. By default this is:
+
+```text
+%LOCALAPPDATA%\WorkLore\build\dev
+```
+
+## Validation
+
+Run the source validation build without producing an installer:
+
+```powershell
+npm run validate
+```
+
+Build output, Rust targets, frontend bundles, and validation logs are written outside the repository. The build scripts fail when known build or install folders appear inside the repository.
+
+## QA Install
+
+Build, stage, and launch the QA runtime:
+
+```powershell
+./qa.bat
+```
+
+The default QA install location is:
+
+```text
+%LOCALAPPDATA%\WorkLore\installed\qa
+```
+
+The QA executable is copied into that external install folder before it runs. It is not launched from the repository or from the compiler target directory.
+
+Set `WORKLORE_EXTERNAL_ROOT` to move all external development, build, and QA folders to another location.
+
+## Local Instrumentation
+
+WorkLore records operation timing metadata inside each vault at:
+
+```text
+.worklore/operation-metrics/
+```
+
+Metrics include operation names, phases, durations, outcomes, file sizes, and character counts. They do not include resume text, interview responses, or provider request bodies.
+
+The desktop workspace shows active phases and the slowest recent operations so long-running local tasks can be inspected without rummaging through logs like a raccoon in a server closet.
+
+## License
+
+WorkLore is licensed under the GNU Affero General Public License v3.0 only, identified as `AGPL-3.0-only`. See `LICENSE` for the full terms and `LICENSE_POLICY.md` for the studio's default public-repository policy and exceptions.

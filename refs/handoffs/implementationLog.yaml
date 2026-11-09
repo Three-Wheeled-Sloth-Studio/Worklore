@@ -1,6 +1,6 @@
-version: 1
+version: 2
 schema: refs/schemas/schemaRegistry.yaml
-updated: 2026-07-25
+updated: 2026-09-16
 entries:
   - date: 2026-07-25
     summary: Initialized the public WorkLore repository and durable project reference structure.
@@ -14,3 +14,22 @@ entries:
       - Confirmed README contains only user purpose, current implemented status, and installation guidance.
       - Confirmed repository guidance prohibits real user data and credentials.
       - Recorded current product, privacy, provider, vault, story, and Git-scanning decisions.
+  - date: 2026-09-16
+    summary: Aligned WorkLore with Agent Academy bounded implementation discovery at e4118f96cc0138490b950402ba711399580ee854.
+    files:
+      - AGENTS.md
+      - refs/agents.yaml
+      - refs/tools/generate_agent_context.py
+      - refs/tools/generate_source_catalog.py
+      - refs/implementation/sourceCatalog
+      - refs/implementation/codingStandards.md
+      - refs/handoffs/currentHandoff.md
+      - refs/handoffs/handoffTemplate.md
+      - refs/testing/validationCommands.yaml
+      - .github/workflows/ci.yml
+    validation:
+      - Source catalog is deterministic generated discovery, not runtime truth.
+      - Routine re-entry is catalog-first and handoff Required Reads are explicit and bounded.
+      - Sub-agent guidance prefers bounded delegation and the least expensive capable agent while retaining parent integration responsibility.
+      - Source modularity guidance favors cohesive modules that support targeted symbol/range reads.
+      - Exact-head full CI validation remains required before the alignment is accepted.

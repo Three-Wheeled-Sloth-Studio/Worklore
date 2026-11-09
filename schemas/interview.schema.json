@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://worklore.local/schemas/interview.schema.json",
+  "title": "WorkLore Interview Session",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "interviewId",
+    "candidateIds",
+    "storyId",
+    "status",
+    "completeness",
+    "turns",
+    "createdAt",
+    "updatedAt",
+    "revision"
+  ],
+  "$defs": {
+    "completenessItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "status",
+        "confidence",
+        "notes"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "enum": [
+            "context",
+            "problem_or_opportunity",
+            "responsibility",
+            "constraints",
+            "actions_and_decisions",
+            "alternatives_considered",
+            "stakeholders",
+            "tools_and_systems",
+            "outcomes",
+            "metrics_and_evidence",
+            "lessons_learned",
+            "operating_philosophy",
+            "reusable_themes",
+            "disclosure_restrictions"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "missing",
+            "partial",
+            "sufficient",
+            "not_applicable"
+          ]
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "turn": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "turnId",
+        "actor",
+        "turnType",
+        "text",
+        "createdAt"
+      ],
+      "properties": {
+        "turnId": {
+          "type": "string",
+          "pattern": "^turn_[A-Za-z0-9_-]+$"
+        },
+        "actor": {
+          "type": "string",
+          "enum": [
+            "agent",
+            "user",
+            "system"
+          ]
+        },
+        "turnType": {
+          "type": "string",
+          "enum": [
+            "question",
+            "answer",
+            "skip",
+            "do_not_remember",
+            "memory_prompt",
+            "why_it_matters",
+            "state_update",
+            "note"
+          ]
+        },
+        "text": {
+          "type": "string"
+        },
+        "targetFields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true,
+          "default": []
+        },
+        "answerClassification": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "confirmed_fact",
+            "user_estimate",
+            "uncertain",
+            "not_applicable",
+            null
+          ]
+        },
+        "providerRunId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "interviewId": {
+      "type": "string",
+      "pattern": "^interview_[A-Za-z0-9_-]+$"
+    },
+    "candidateIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^candidate_[A-Za-z0-9_-]+$"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "storyId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^story_[A-Za-z0-9_-]+$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "not_started",
+        "active",
+        "paused",
+        "ready_for_synthesis",
+        "completed",
+        "abandoned"
+      ]
+    },
+    "questionRound": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0
+    },
+    "questionsInCurrentRound": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3,
+      "default": 0
+    },
+    "completeness": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/completenessItem"
+      }
+    },
+    "turns": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/turn"
+      }
+    },
+    "activeQuestionTurnId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}

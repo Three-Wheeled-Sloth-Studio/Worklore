@@ -1,0 +1,529 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: '12'
+  files:
+  - path: src-tauri/src/domain/roles.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 6fdc5bcfd94b78f99681b2a9d7b0f62d61aa3d03
+    dependencies:
+    - serde::{Deserialize, Serialize}
+    provides: []
+    symbols: []
+  - path: src-tauri/src/services/confidentiality_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: f5fef85e391d04fbbb7757905978ea730d380797
+    dependencies:
+    - "crate::{\n        domain::models::{\n            EntityAlias, EntityStatus, PrivateEntity, TokenRedirect, VaultFeatures,\
+      \ VaultPrivacy,\n        },\n        io_utils::write_json_atomic,\n        services::redaction_service,\n    }"
+    - "crate::{\n    domain::models::{\n        CloudIdentifierMode, EntityReviewItem, EntitySensitivity, EntityType,\n  \
+      \      PrivateEntityRegistry, VaultDocument,\n    },\n    error::ServiceResult,\n    io_utils::{read_json, write_json_atomic},\n\
+      \    services::{\n        entity_review, entity_scan,\n        redaction_service::{self, RedactedText},\n    },\n}"
+    - serde::{Deserialize, Serialize}
+    - "std::{\n    collections::HashSet,\n    fs,\n    path::{Path, PathBuf},\n}"
+    - super::*
+    - uuid::Uuid
+    provides:
+    - transform_for_public_use
+    - build_public_safe_text
+    - scan_transient_risks
+    - parse_char_locator
+    - is_known_entity_scanner_wrapper
+    - transient_risk
+    - is_high_risk
+    - parse_entity_type
+    - create
+    - drop
+    - create
+    - add_review
+    - drop
+    - entity
+    - public_transform_uses_only_stored_descriptions_and_preserves_private_truth
+    - high_risk_pending_review_blocks_when_vault_policy_requires_it
+    - lower_risk_pending_review_remains_visible_without_claiming_ready
+    - unregistered_high_risk_text_is_blocked_without_mutating_the_registry
+    - never_send_to_cloud_stays_redacted_on_existing_external_path
+    symbols:
+    - name: transform_for_public_use
+      kind: function
+      line_start: 96
+      line_end: 160
+      signature: 'transform_for_public_use(vault_path: &Path, request: ConfidentialityTransformRequest) -> ServiceResult<ConfidentialityTransformResult>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: ConfidentialityTransformRequest'
+      output: ServiceResult<ConfidentialityTransformResult>
+      dependencies:
+      - Ok
+      - Some
+      - any
+      - build_public_safe_text
+      - create
+      - into_iter
+      - is_high_risk
+      - let
+      - list_reviews
+      - load_registry
+      - map
+      - read_json
+      - redact_for_external_use
+      - scan_transient_risks
+      - to_string
+      - unresolved_risks.extend
+      - unresolved_risks.is_empty
+      - unresolved_risks.iter
+      - vault_path.join
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/confidentiality_service.rs
+        symbol: build_public_safe_text
+      - &id005
+        path: src-tauri/src/services/confidentiality_service.rs
+        symbol: create
+      - path: src-tauri/src/services/confidentiality_service.rs
+        symbol: is_high_risk
+      - path: src-tauri/src/services/entity_review.rs
+        symbol: list_reviews
+      - &id001
+        path: src-tauri/src/services/entity_scan.rs
+        symbol: load_registry
+      - &id002
+        path: src-tauri/src/io_utils.rs
+        symbol: read_json
+      - &id010
+        path: src-tauri/src/services/redaction_service.rs
+        symbol: redact_for_external_use
+      - path: src-tauri/src/services/confidentiality_service.rs
+        symbol: scan_transient_risks
+    - name: build_public_safe_text
+      kind: function
+      line_start: 161
+      line_end: 214
+      signature: 'build_public_safe_text(token_redacted_text: &str, redaction_replacements: &[crate::domain::providers::RedactionReplacement],
+        registry: &PrivateEntityRegistry) -> (String, Vec<ConfidentialityReplacement>)'
+      inputs:
+      - 'token_redacted_text: &str'
+      - 'redaction_replacements: &[crate::domain::providers::RedactionReplacement]'
+      - 'registry: &PrivateEntityRegistry'
+      output: (String, Vec<ConfidentialityReplacement>)
+      dependencies:
+      - Some
+      - as_deref
+      - description.to_string
+      - entity.entity_id.clone
+      - entity.public_token.clone
+      - enumerate
+      - filter
+      - find
+      - iter
+      - let
+      - map
+      - new
+      - now_v7
+      - public_representation.clone
+      - redaction_replacements.iter
+      - replacements.push
+      - staged_replacements.push
+      - staged_text.replace
+      - token_redacted_text.to_string
+      - value.is_empty
+      parser: rust-pattern
+      dependency_targets: []
+    - name: scan_transient_risks
+      kind: function
+      line_start: 215
+      line_end: 294
+      signature: 'scan_transient_risks(transient_vault_path: &Path, original_registry: &PrivateEntityRegistry, text: &str)
+        -> ServiceResult<Vec<ConfidentialityRisk>>'
+      inputs:
+      - 'transient_vault_path: &Path'
+      - 'original_registry: &PrivateEntityRegistry'
+      - 'text: &str'
+      output: ServiceResult<Vec<ConfidentialityRisk>>
+      dependencies:
+      - Ok
+      - Some
+      - any
+      - entity.entity_id.clone
+      - entity.occurrences.iter
+      - filter
+      - filter_map
+      - flat_map
+      - is_known_entity_scanner_wrapper
+      - is_none_or
+      - iter
+      - join
+      - known_ids.contains
+      - load_registry
+      - map
+      - new
+      - occurrence.locator.clone
+      - occurrences.first
+      - occurrences.is_empty
+      - occurrences.len
+      - parse_char_locator
+      - parse_entity_type
+      - read_json
+      - risks.push
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/confidentiality_service.rs
+        symbol: is_known_entity_scanner_wrapper
+      - *id001
+      - path: src-tauri/src/services/confidentiality_service.rs
+        symbol: parse_char_locator
+      - path: src-tauri/src/services/confidentiality_service.rs
+        symbol: parse_entity_type
+      - *id002
+    - name: parse_char_locator
+      kind: function
+      line_start: 295
+      line_end: 302
+      signature: 'parse_char_locator(locator: &str) -> Option<TextRange>'
+      inputs:
+      - 'locator: &str'
+      output: Option<TextRange>
+      dependencies:
+      - let
+      - locator.strip_prefix
+      - ok
+      - range.split_once
+      - then_some
+      parser: rust-pattern
+      dependency_targets: []
+    - name: is_known_entity_scanner_wrapper
+      kind: function
+      line_start: 303
+      line_end: 316
+      signature: 'is_known_entity_scanner_wrapper(candidate: TextRange, known: TextRange) -> bool'
+      inputs:
+      - 'candidate: TextRange'
+      - 'known: TextRange'
+      output: bool
+      dependencies:
+      - candidate.end.saturating_sub
+      - known.start.saturating_sub
+      parser: rust-pattern
+      dependency_targets: []
+    - name: transient_risk
+      kind: function
+      line_start: 317
+      line_end: 327
+      signature: 'transient_risk(entity_type: EntityType) -> &''static str'
+      inputs:
+      - 'entity_type: EntityType'
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: is_high_risk
+      kind: function
+      line_start: 328
+      line_end: 331
+      signature: 'is_high_risk(risk: &str) -> bool'
+      inputs:
+      - 'risk: &str'
+      output: bool
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: parse_entity_type
+      kind: function
+      line_start: 332
+      line_end: 352
+      signature: 'parse_entity_type(value: &str) -> Option<EntityType>'
+      inputs:
+      - 'value: &str'
+      output: Option<EntityType>
+      dependencies:
+      - Some
+      parser: rust-pattern
+      dependency_targets: []
+    - name: create
+      kind: function
+      line_start: 359
+      line_end: 373
+      signature: 'create(vault: &VaultDocument, registry: &PrivateEntityRegistry) -> ServiceResult<Self>'
+      inputs:
+      - 'vault: &VaultDocument'
+      - 'registry: &PrivateEntityRegistry'
+      output: ServiceResult<Self>
+      dependencies:
+      - Ok
+      - create_dir_all
+      - join
+      - now_v7
+      - save_registry
+      - temp_dir
+      - transient.path.join
+      - vault.clone
+      - write_json_atomic
+      parser: rust-pattern
+      dependency_targets:
+      - &id003
+        path: src-tauri/src/services/entity_scan.rs
+        symbol: save_registry
+      - &id004
+        path: src-tauri/src/io_utils.rs
+        symbol: write_json_atomic
+    - name: drop
+      kind: function
+      line_start: 377
+      line_end: 379
+      signature: drop(&mut self)
+      inputs:
+      - '&mut self'
+      output: unspecified
+      dependencies:
+      - remove_dir_all
+      parser: rust-pattern
+      dependency_targets: []
+    - name: create
+      kind: function
+      line_start: 398
+      line_end: 440
+      signature: 'create(entities: Vec<PrivateEntity>, block_high_risk_review: bool, identifier_mode: CloudIdentifierMode)
+        -> Self'
+      inputs:
+      - 'entities: Vec<PrivateEntity>'
+      - 'block_high_risk_review: bool'
+      - 'identifier_mode: CloudIdentifierMode'
+      output: Self
+      dependencies:
+      - create_dir_all
+      - default
+      - expect
+      - join
+      - new
+      - now_v7
+      - path.join
+      - save_registry
+      - temp_dir
+      - to_string
+      - write_json_atomic
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/app_preferences_service.rs
+        symbol: default
+      - *id003
+      - *id004
+    - name: add_review
+      kind: function
+      line_start: 441
+      line_end: 473
+      signature: 'add_review(&self, id: &str, risk: &str)'
+      inputs:
+      - '&self'
+      - 'id: &str'
+      - 'risk: &str'
+      output: unspecified
+      dependencies:
+      - expect
+      - id.to_string
+      - join
+      - new
+      - risk.to_string
+      - to_string
+      - write_json_atomic
+      parser: rust-pattern
+      dependency_targets:
+      - *id004
+    - name: drop
+      kind: function
+      line_start: 477
+      line_end: 479
+      signature: drop(&mut self)
+      inputs:
+      - '&mut self'
+      output: unspecified
+      dependencies:
+      - remove_dir_all
+      parser: rust-pattern
+      dependency_targets: []
+    - name: entity
+      kind: function
+      line_start: 481
+      line_end: 519
+      signature: 'entity(id: &str, entity_type: EntityType, canonical_name: &str, alias: &str, token: &str, description: Option<&str>,
+        sensitivity: EntitySensitivity) -> PrivateEntity'
+      inputs:
+      - 'id: &str'
+      - 'entity_type: EntityType'
+      - 'canonical_name: &str'
+      - 'alias: &str'
+      - 'token: &str'
+      - 'description: Option<&str>'
+      - 'sensitivity: EntitySensitivity'
+      output: PrivateEntity
+      dependencies:
+      - alias.to_string
+      - canonical_name.to_string
+      - character.is_ascii_alphanumeric
+      - character.to_lowercase
+      - chars
+      - collect
+      - description.map
+      - filter
+      - flat_map
+      - id.to_string
+      - new
+      - to_string
+      - token.to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: public_transform_uses_only_stored_descriptions_and_preserves_private_truth
+      kind: function
+      line_start: 522
+      line_end: 600
+      signature: public_transform_uses_only_stored_descriptions_and_preserves_private_truth()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - create
+      - entity
+      - expect
+      - input.to_string
+      - read_to_string
+      - result.public_safe_text.contains
+      - result.replacements.len
+      - transform_for_public_use
+      - vault.path.join
+      parser: rust-pattern
+      dependency_targets:
+      - *id005
+      - &id008
+        path: src-tauri/src/services/confidentiality_service.rs
+        symbol: entity
+      - &id009
+        path: src-tauri/src/services/redaction_service.rs
+        symbol: entity
+      - &id006
+        path: src-tauri/src/services/confidentiality_service.rs
+        symbol: transform_for_public_use
+    - name: high_risk_pending_review_blocks_when_vault_policy_requires_it
+      kind: function
+      line_start: 603
+      line_end: 626
+      signature: high_risk_pending_review_blocks_when_vault_policy_requires_it()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - any
+      - create
+      - expect
+      - iter
+      - new
+      - result.unresolved_risks.len
+      - risk.review_item_id.as_deref
+      - to_string
+      - transform_for_public_use
+      - vault.add_review
+      parser: rust-pattern
+      dependency_targets:
+      - *id005
+      - *id006
+      - &id007
+        path: src-tauri/src/services/confidentiality_service.rs
+        symbol: add_review
+    - name: lower_risk_pending_review_remains_visible_without_claiming_ready
+      kind: function
+      line_start: 629
+      line_end: 647
+      signature: lower_risk_pending_review_remains_visible_without_claiming_ready()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - create
+      - expect
+      - new
+      - result.unresolved_risks.len
+      - to_string
+      - transform_for_public_use
+      - vault.add_review
+      parser: rust-pattern
+      dependency_targets:
+      - *id005
+      - *id006
+      - *id007
+    - name: unregistered_high_risk_text_is_blocked_without_mutating_the_registry
+      kind: function
+      line_start: 650
+      line_end: 674
+      signature: unregistered_high_risk_text_is_blocked_without_mutating_the_registry()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - any
+      - create
+      - expect
+      - new
+      - read_to_string
+      - result.unresolved_risks.iter
+      - to_string
+      - transform_for_public_use
+      - vault.path.join
+      parser: rust-pattern
+      dependency_targets:
+      - *id005
+      - *id006
+    - name: never_send_to_cloud_stays_redacted_on_existing_external_path
+      kind: function
+      line_start: 677
+      line_end: 701
+      signature: never_send_to_cloud_stays_redacted_on_existing_external_path()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - create
+      - entity
+      - expect
+      - redact_for_external_use
+      parser: rust-pattern
+      dependency_targets:
+      - *id005
+      - *id008
+      - *id009
+      - *id010
+  - path: src/lib/captureApi.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: 61a012fd049d326db98ff1de1a2ef80aa39c6ffa
+    dependencies:
+    - ../domain/types
+    - '@tauri-apps/api/core'
+    provides:
+    - listCaptureSources
+    - updateCaptureSourceType
+    symbols:
+    - name: listCaptureSources
+      kind: function
+      line_start: 3
+      line_end: 12
+      signature: 'listCaptureSources(vaultPath: string, limit) -> Promise<CaptureSource[]>'
+      inputs:
+      - 'vaultPath: string'
+      - limit
+      output: Promise<CaptureSource[]>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: updateCaptureSourceType
+      kind: function
+      line_start: 13
+      line_end: 24
+      signature: 'updateCaptureSourceType(vaultPath: string, sourceId: string, sourceType: SourceType) -> Promise<CaptureSource>'
+      inputs:
+      - 'vaultPath: string'
+      - 'sourceId: string'
+      - 'sourceType: SourceType'
+      output: Promise<CaptureSource>
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []

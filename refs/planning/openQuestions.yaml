@@ -3,14 +3,18 @@ schema: refs/schemas/schemaRegistry.yaml
 updated: 2026-07-25
 open_questions:
   - id: openq-001
-    status: open
+    status: resolved
+    resolution: License WorkLore under AGPL-3.0-only. Use AGPL-3.0-only as the default for new public software repositories, with an explicit compatibility and copyright review before relicensing existing repositories.
     summary: Which license best balances public inspection, contributions, and protection against unwanted commercial reuse?
   - id: openq-002
-    status: open
+    status: resolved
+    resolution: Use a configurable Gemini adapter with JSON Schema structured output. Start testing with gemini-3.6-flash, but do not make the model identifier part of the workflow contract.
     summary: Which Gemini model and structured-output strategy should be the default for the first test build?
   - id: openq-003
-    status: open
+    status: resolved
+    resolution: Defer vault-level encryption until after the first technical workflow test. Require clear early-tester guidance to use operating-system disk encryption, then treat vault encryption as the first major security-hardening increment before broad distribution.
     summary: Should vault encryption at rest be part of the first public test build or a later hardening increment?
   - id: openq-004
-    status: open
-    summary: Which document parsing libraries provide the best local support for PDF, DOCX, Markdown, and text without bloating the desktop package?
+    status: resolved_pending_validation
+    resolution: Use native UTF-8 reads for text and Markdown, pdf-extract for text-bearing PDFs, and ZIP plus streaming OOXML parsing for DOCX. Report scanned or unsupported documents honestly and defer OCR.
+    summary: Which document parsing libraries provide local PDF, DOCX, Markdown, and text support without unnecessary desktop bloat?

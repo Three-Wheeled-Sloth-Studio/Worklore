@@ -1,0 +1,75 @@
+.candidate-panel {
+  grid-column: 1 / -1;
+  padding: 1rem;
+}
+
+.candidate-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.story-candidate {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem;
+  border: 1px solid #42493e;
+  border-radius: 10px;
+  background: #1c201b;
+}
+
+.story-candidate.ready_to_interview {
+  border-color: #7c6b43;
+  background: #25251c;
+}
+
+.story-candidate.saved_for_later {
+  opacity: 0.76;
+}
+
+.candidate-copy {
+  min-width: 0;
+}
+
+.candidate-copy h3 {
+  margin-bottom: 0.42rem;
+  color: #edf0eb;
+  font-size: 0.98rem;
+  line-height: 1.42;
+}
+
+.candidate-context {
+  margin-bottom: 0.2rem;
+  color: #c4a969;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.candidate-signals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.candidate-gaps {
+  margin: 0.4rem 0 0;
+  color: #949d91;
+  font-size: 0.74rem;
+}
+
+.candidate-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+@media (max-width: 850px) {
+  .story-candidate {
+    grid-template-columns: 1fr;
+  }
+
+  .candidate-actions {
+    flex-wrap: wrap;
+  }
+}

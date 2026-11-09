@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://worklore.local/schemas/private-entity-registry.schema.json",
+  "title": "WorkLore Private Entity Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "registryId",
+    "vaultId",
+    "tokenCounters",
+    "entities",
+    "tokenRedirects",
+    "createdAt",
+    "updatedAt",
+    "revision"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "registryId": {
+      "type": "string",
+      "pattern": "^registry_[A-Za-z0-9_-]+$"
+    },
+    "vaultId": {
+      "type": "string",
+      "pattern": "^vault_[A-Za-z0-9_-]+$"
+    },
+    "tokenCounters": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "description": "Highest token number ever allocated for each token family. Values never decrease."
+    },
+    "entities": {
+      "type": "array",
+      "items": {
+        "$ref": "private-entity.schema.json"
+      }
+    },
+    "tokenRedirects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "retiredToken",
+          "survivingEntityId",
+          "createdAt",
+          "reason"
+        ],
+        "properties": {
+          "retiredToken": {
+            "type": "string",
+            "pattern": "^\\[[A-Z_]+_[0-9]+\\]$"
+          },
+          "survivingEntityId": {
+            "type": "string",
+            "pattern": "^entity_[A-Za-z0-9_-]+$"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "merge",
+              "split_reconciliation",
+              "manual_correction",
+              "migration"
+            ]
+          }
+        }
+      },
+      "default": []
+    },
+    "ignoredTerms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "normalizedValue",
+          "scope",
+          "createdAt"
+        ],
+        "properties": {
+          "normalizedValue": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "vault",
+              "record"
+            ]
+          },
+          "recordId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "default": []
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}

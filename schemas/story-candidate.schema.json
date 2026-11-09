@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://worklore.local/schemas/story-candidate.schema.json",
+  "title": "WorkLore Story Candidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "candidateId",
+    "sourceRefs",
+    "candidateType",
+    "status",
+    "claim",
+    "context",
+    "missingFields",
+    "createdAt",
+    "updatedAt",
+    "revision"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "candidateId": {
+      "type": "string",
+      "pattern": "^candidate_[A-Za-z0-9_-]+$"
+    },
+    "sourceRefs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sourceId",
+          "fragmentId"
+        ],
+        "properties": {
+          "sourceId": {
+            "type": "string",
+            "pattern": "^source_[A-Za-z0-9_-]+$"
+          },
+          "fragmentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "capturedText": {
+            "type": "string",
+            "default": ""
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "candidateType": {
+      "type": "string",
+      "enum": [
+        "resume_claim",
+        "job_gap",
+        "git_cluster",
+        "manual_note",
+        "interview_followup",
+        "other"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "saved_for_later",
+        "ready_to_interview",
+        "interviewing",
+        "merged",
+        "split",
+        "ignored",
+        "unsupported",
+        "converted_to_story"
+      ]
+    },
+    "claim": {
+      "type": "string",
+      "minLength": 1
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roleIds",
+        "entityIds",
+        "skills",
+        "tools",
+        "metrics"
+      ],
+      "properties": {
+        "roleIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^role_[A-Za-z0-9_-]+$"
+          },
+          "uniqueItems": true
+        },
+        "entityIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^entity_[A-Za-z0-9_-]+$"
+          },
+          "uniqueItems": true
+        },
+        "skills": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "missingFields": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "possibleExistingStoryIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^story_[A-Za-z0-9_-]+$"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "mergedIntoId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "splitIntoIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^candidate_[A-Za-z0-9_-]+$"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}

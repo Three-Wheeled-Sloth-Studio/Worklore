@@ -1,0 +1,31 @@
+name: Check AGPL License
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Verify AGPL marker
+        shell: python
+        run: |
+          from pathlib import Path
+
+          license_text = Path("LICENSE").read_text(encoding="utf-8")
+          required = [
+              "GNU AFFERO GENERAL PUBLIC LICENSE",
+              "Version 3, 19 November 2007",
+          ]
+          missing = [marker for marker in required if marker not in license_text]
+          if missing:
+              raise SystemExit(f"LICENSE is missing expected AGPL markers: {missing}")
+          print("LICENSE contains the expected AGPL-3.0 text markers.")

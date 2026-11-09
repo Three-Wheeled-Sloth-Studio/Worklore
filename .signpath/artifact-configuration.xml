@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <parameters>
+    <parameter name="version" required="true" />
+  </parameters>
+  <pe-file
+    path="WorkLore.exe"
+    product-name="WorkLore"
+    product-version="${version}"
+    file-version="${version}"
+    company-name="Three-Wheeled Sloth Studio"
+    copyright="Copyright (c) 2026 Three-Wheeled Sloth Studio">
+    <authenticode-sign
+      hash-algorithm="sha256"
+      description="WorkLore"
+      description-url="https://github.com/Three-Wheeled-Sloth-Studio/Worklore" />
+  </pe-file>
+</artifact-configuration>

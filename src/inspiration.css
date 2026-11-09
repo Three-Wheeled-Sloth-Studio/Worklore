@@ -1,0 +1,148 @@
+.inspiration-panel {
+  border-top: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.14));
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.inspiration-heading-row,
+.inspiration-actions-row,
+.inspiration-connect-row,
+.inspiration-link-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.inspiration-heading-row {
+  align-items: flex-start;
+}
+
+.inspiration-heading-row h3,
+.inspiration-connections h4 {
+  margin: 0;
+}
+
+.inspiration-heading-row p,
+.inspiration-connections p {
+  margin: 0.35rem 0 0;
+  color: var(--text-muted, #a8b3bd);
+}
+
+.inspiration-provenance {
+  display: grid;
+  gap: 0.25rem;
+  margin: 1rem 0;
+  padding: 0.8rem;
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.14));
+  border-radius: 0.75rem;
+  background: rgba(8, 18, 28, 0.35);
+}
+
+.inspiration-provenance span {
+  color: var(--text-muted, #a8b3bd);
+  overflow-wrap: anywhere;
+}
+
+.inspiration-editor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.inspiration-editor-grid label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.inspiration-editor-grid input,
+.inspiration-editor-grid select,
+.inspiration-editor-grid textarea,
+.inspiration-connect-row select {
+  width: 100%;
+}
+
+.inspiration-editor-grid small {
+  color: var(--text-muted, #a8b3bd);
+  font-weight: 400;
+}
+
+.inspiration-wide {
+  grid-column: 1 / -1;
+}
+
+.inspiration-reaction {
+  padding: 0.7rem;
+  border-left: 3px solid rgba(255, 255, 255, 0.28);
+  background: rgba(8, 18, 28, 0.35);
+}
+
+.inspiration-actions-row {
+  margin-top: 1rem;
+  justify-content: flex-start;
+}
+
+.inspiration-actions-row span {
+  color: var(--text-muted, #a8b3bd);
+  font-size: 0.82rem;
+}
+
+.inspiration-connections {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.14));
+}
+
+.inspiration-link-row {
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.14));
+}
+
+.inspiration-link-row div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.inspiration-link-row span,
+.inspiration-empty {
+  color: var(--text-muted, #a8b3bd);
+  font-size: 0.85rem;
+}
+
+.inspiration-connect-row {
+  justify-content: flex-start;
+}
+
+.inspiration-connect-row select {
+  max-width: 20rem;
+}
+
+.inspiration-feedback {
+  min-height: 1.4rem;
+  margin-top: 0.75rem;
+  color: var(--text-muted, #a8b3bd);
+}
+
+@media (max-width: 760px) {
+  .inspiration-editor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .inspiration-wide {
+    grid-column: auto;
+  }
+
+  .inspiration-connect-row,
+  .inspiration-heading-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .inspiration-connect-row select {
+    max-width: none;
+  }
+}

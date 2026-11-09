@@ -1,19 +1,36 @@
-version: 1
+version: 2
 schema: refs/schemas/schemaRegistry.yaml
-updated: 2026-07-25
+updated: 2026-09-12
 identity:
   name: WorkLore
   repository_url: https://github.com/Three-Wheeled-Sloth-Studio/Worklore
-  summary: Local-first application for turning career evidence into durable, reusable professional stories.
-  current_phase: planning and repository initialization
+  summary: Local-first professional narrative and content intelligence application for building durable career stories, topic candidates, authentic voice, and evidence-backed professional content.
+  current_phase: product refocus complete; professional memory domain refactor next
 thesis:
-  core_promise: Help users recover the useful stories buried in their work history and turn them into evidence-backed career assets without surrendering control of their data.
+  core_promise: Help users preserve what they have done and what they think, turn it into credible professional stories and content that sounds like them, resist generic AI slop, and learn from audience response over time without surrendering control of their data or public voice.
 audience:
   primary_users:
-    - Professionals building a reusable career story bank.
-    - Technical early testers comfortable with local applications, Git, Ollama, or bring-your-own API keys.
+    - Career-active professionals building a visible professional identity.
+    - Active job seekers using stories, target context, and professional content to strengthen discoverability and credibility.
+    - Technical early testers comfortable with a standalone local application, Ollama, or bring-your-own provider credentials.
+product_contract:
+  canonical_prd: refs/product/prd.md
+  deployment_contract: refs/architecture/standalone-deployment-contract.md
+  primary_loop: Capture -> Understand -> Develop -> Connect -> Draft -> Challenge -> Publish manually -> Measure -> Learn
+  hard_rules:
+    - Durable professional memory is local and user-controlled.
+    - Raw AI drafts do not train canonical voice.
+    - Private accuracy is preserved while public discretion is applied downstream.
+    - WorkLore should resist generic, unsupported, repetitive, or volume-driven content rather than acting as a neutral slop factory.
+    - Public posting always requires explicit human review and action outside WorkLore.
+    - Automatic social publishing and scheduling are outside the accepted roadmap.
+    - WorkLore-hosted SaaS, accounts, proprietary sync, and multi-user collaboration are outside the accepted roadmap.
 stack:
-  summary: Tauri 2 desktop application with React, TypeScript, Rust, local canonical files, rebuildable SQLite indexes, Ollama, and Gemini API support.
+  summary: Tauri 2 desktop application with React, TypeScript, Rust, durable local storage, optional SQLite or similar local memory/indexing, Ollama, user-authorized external model providers, and bounded web/news retrieval for discovery.
+  deployment: standalone_windows_first
+  canonical_storage: local
+  hosted_backend_required: false
+  social_auto_publish_supported: false
 repository_layout:
   source_roots:
     - src
@@ -30,7 +47,9 @@ source_of_truth:
   ui: refs/UI
   shared_design_principles: Three-Wheeled-Sloth-Studio/TWS-Design-Principles
   agent_reference_pattern: Three-Wheeled-Sloth-Studio/Agent-Academy
-known_open_questions:
-  - openq-001
-  - openq-002
-  - openq-003
+current_priorities:
+  - Redefine the durable domain around capture, stories, topics, themes, proof points, inspiration, target context, voice, posts, analytics, and audit history.
+  - Replace resume-centric primary navigation with task-oriented product navigation.
+  - Preserve useful resume, privacy, interview, provider, and instrumentation work as prototype foundation without allowing it to dictate the new domain model.
+  - Establish canonical voice provenance before building additional generation features.
+known_open_questions: []
