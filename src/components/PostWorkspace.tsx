@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { InfoButton } from "./InfoButton";
+import { AudienceGoalsPanel } from "./AudienceGoalsPanel";
 import type { ConfidentialityTransformResult } from "../domain/confidentiality";
 import type { PostLineageView, PostRecordView } from "../domain/posts";
 import type { LintDraftResult, TopicRecord } from "../domain/types";
@@ -257,6 +258,7 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
 
   return (
     <section className="posts-workspace" aria-labelledby="posts-heading">
+      <AudienceGoalsPanel vaultPath={vaultPath} />
       <section className="workspace-panel post-workbench">
         <div className="post-workbench-toolbar">
           <div className="post-toolbar-group post-topic-control">

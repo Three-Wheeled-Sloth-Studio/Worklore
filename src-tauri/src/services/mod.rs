@@ -1,4 +1,5 @@
 pub mod app_preferences_service;
+pub mod audience_goals_service;
 pub mod candidate_service;
 pub mod canonical_store;
 pub mod capture_catalog_service;

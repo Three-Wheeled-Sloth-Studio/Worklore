@@ -1,3 +1,4 @@
+pub mod audience_goals;
 pub mod candidates;
 pub mod capture;
 pub mod development;
