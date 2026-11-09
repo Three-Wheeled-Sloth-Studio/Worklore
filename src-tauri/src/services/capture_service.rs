@@ -280,7 +280,19 @@ pub fn classify_capture_source(
 
     let source_type = source_type_from_text(&source_type_text_value)?;
     let source_meta: serde_json::Value = serde_json::from_str(&source_provenance)?;
-    let source_url = source_meta.get("sourceUrl").and_then(|v| v.as_str());
+    let source_url = source_meta
+        .get("sourceUrl")
+        .and_then(|v| v.as_str())
+        .or_else(|| {
+            let candidate = text.trim();
+            if (candidate.starts_with("https://") || candidate.starts_with("http://"))
+                && !candidate.chars().any(char::is_whitespace)
+            {
+                Some(candidate)
+            } else {
+                None
+            }
+        });
     let source_author = source_meta.get("sourceAuthor").and_then(|v| v.as_str());
     let user_note = source_meta.get("userNote").and_then(|v| v.as_str());
     let now = Utc::now().to_rfc3339();
