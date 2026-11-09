@@ -230,8 +230,9 @@ export async function createCaptureSource(
   vaultPath: string,
   text: string,
   sourceType: SourceType = "other",
+  metadata?: { sourceUrl?: string; sourceAuthor?: string; userNote?: string },
 ): Promise<CaptureSource> {
-  return invoke<CaptureSource>("create_capture_source", { vaultPath, text, sourceType });
+  return invoke<CaptureSource>("create_capture_source", { vaultPath, text, sourceType, ...metadata });
 }
 
 export async function getCaptureSource(

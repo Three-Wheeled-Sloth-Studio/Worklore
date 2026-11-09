@@ -189,3 +189,9 @@
     justify-content: space-between;
   }
 }
+
+.capture-source-tools { margin-top: 0.45rem; }
+.capture-source-fields { display: grid; gap: 0.5rem; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); margin-top: 0.4rem; }
+.capture-source-fields label { display: grid; gap: 0.25rem; color: #dce2d9; font-size: 0.8rem; }
+.capture-source-fields input, .capture-source-fields textarea { width: 100%; min-width: 0; padding: 0.48rem; border: 1px solid #596052; border-radius: 6px; background: #151815; color: #eef1ec; font: inherit; }
+.capture-source-fields p, .capture-source-summary { color: #adb7a7; font-size: 0.76rem; }

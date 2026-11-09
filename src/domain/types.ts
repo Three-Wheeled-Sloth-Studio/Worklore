@@ -29,6 +29,9 @@ export interface CaptureSource {
   createdAt: string;
   updatedAt: string;
   classifications: CaptureClassification[];
+  sourceUrl: string | null;
+  sourceAuthor: string | null;
+  userNote: string | null;
 }
 
 export interface CaptureClassificationResult {

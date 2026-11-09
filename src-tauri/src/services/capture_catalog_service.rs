@@ -17,7 +17,7 @@ pub fn list_captures(vault_path: &Path, limit: usize) -> ServiceResult<Vec<Captu
     let query_limit = i64::try_from(limit.clamp(1, 500)).unwrap_or(500);
     let rows = {
         let mut statement = connection.prepare(
-            "SELECT source_id,source_type,display_name,COALESCE(captured_text,''),imported_at,updated_at
+            "SELECT source_id,source_type,display_name,COALESCE(captured_text,''),imported_at,updated_at,provenance_json
              FROM sources
              WHERE source_origin='captured_text'
              ORDER BY imported_at DESC,source_id
@@ -31,6 +31,7 @@ pub fn list_captures(vault_path: &Path, limit: usize) -> ServiceResult<Vec<Captu
                 row.get::<_, String>(3)?,
                 row.get::<_, String>(4)?,
                 row.get::<_, String>(5)?,
+                row.get::<_, String>(6)?,
             ))
         })?;
         mapped.collect::<Result<Vec<_>, _>>()?
@@ -39,7 +40,12 @@ pub fn list_captures(vault_path: &Path, limit: usize) -> ServiceResult<Vec<Captu
     rows.into_iter()
         .map(|row| {
             let classifications = load_classifications(&connection, &row.0)?;
+            let provenance: serde_json::Value = serde_json::from_str(&row.6).unwrap_or_default();
+            let field = |name: &str| provenance.get(name).and_then(|v| v.as_str()).map(str::to_owned);
             Ok(CaptureSourceView {
+                source_url: field("sourceUrl"),
+                source_author: field("sourceAuthor"),
+                user_note: field("userNote"),
                 source_id: row.0,
                 source_type: source_type_from_text(&row.1)?,
                 display_name: row.2,
@@ -121,6 +127,7 @@ mod tests {
             &path,
             "Reduced delivery cycle time by 80% while rebuilding the release process.",
             SourceType::Resume,
+            None, None, None,
         )
         .unwrap();
         capture_service::classify_capture_source(&path, &capture.source_id, CaptureRole::StorySeed)

@@ -14,11 +14,17 @@ pub fn create_capture_source(
     vault_path: String,
     text: String,
     source_type: Option<SourceType>,
+    source_url: Option<String>,
+    source_author: Option<String>,
+    user_note: Option<String>,
 ) -> CommandResult<CaptureSourceView> {
     capture_service::create_capture_source(
         &PathBuf::from(vault_path),
         &text,
         source_type.unwrap_or(SourceType::Other),
+        source_url,
+        source_author,
+        user_note,
     )
     .map_err(CommandError::from)
 }

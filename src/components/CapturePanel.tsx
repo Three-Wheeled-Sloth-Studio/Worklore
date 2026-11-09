@@ -41,6 +41,10 @@ export function CapturePanel({
 }) {
   const [text, setText] = useState("");
   const [sourceType, setSourceType] = useState<SourceType>("other");
+  const [sourceUrl, setSourceUrl] = useState("");
+  const [sourceAuthor, setSourceAuthor] = useState("");
+  const [userNote, setUserNote] = useState("");
+  const [showSourceDetails, setShowSourceDetails] = useState(false);
   const [saved, setSaved] = useState<CaptureSource | null>(null);
   const [recent, setRecent] = useState<CaptureSource[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
@@ -98,16 +102,19 @@ export function CapturePanel({
   }
 
   async function handleSave() {
-    if (!text.trim()) return;
+    if (!text.trim() && !sourceUrl.trim()) return;
     setBusy("Saving");
     setNotice(null);
     setError(null);
     try {
-      const created = await createCaptureSource(vaultPath, text, sourceType);
+      const created = await createCaptureSource(vaultPath, text, sourceType, { sourceUrl, sourceAuthor, userNote });
       clearDevelopmentPanels();
       setSaved(created);
       setText("");
-      setNotice("Saved.");
+      setSourceUrl("");
+      setSourceAuthor("");
+      setUserNote("");
+      setNotice("Saved. Links are not fetched automatically.");
       await refreshRecent();
     } catch (caught) {
       setError(errorMessage(caught));
@@ -230,11 +237,22 @@ export function CapturePanel({
         onChange={(event) => setText(event.target.value)}
         rows={5}
       />
+      <div className="capture-source-tools">
+        <button type="button" className="quiet-button compact" onClick={() => setShowSourceDetails((value) => !value)}>
+          {showSourceDetails ? "Hide attribution" : "Add link / attribution"}
+        </button>
+        {showSourceDetails ? <div className="capture-source-fields">
+          <label>Source URL <input type="url" maxLength={2048} value={sourceUrl} placeholder="https://..." onChange={(e) => setSourceUrl(e.target.value)} /></label>
+          <label>Author or publisher <input maxLength={200} value={sourceAuthor} onChange={(e) => setSourceAuthor(e.target.value)} /></label>
+          <label>Why you saved this <textarea rows={2} maxLength={2000} value={userNote} onChange={(e) => setUserNote(e.target.value)} /></label>
+          <p>Paste source text above if available. A link-only capture is saved without fetching its content.</p>
+        </div> : null}
+      </div>
       <div className="capture-save-row compact-action-row">
         <button
           className="shell-icon-button primary-icon"
           type="button"
-          disabled={!text.trim() || busy !== null}
+          disabled={(!text.trim() && !sourceUrl.trim()) || busy !== null}
           aria-label="Save capture"
           title="Save capture"
           onClick={() => void handleSave()}
@@ -271,6 +289,11 @@ export function CapturePanel({
             </button>
           </div>
           <p className="capture-preview">{saved.text}</p>
+          {saved.sourceUrl || saved.sourceAuthor || saved.userNote ? <div className="capture-source-summary">
+            {saved.sourceUrl ? <p>URL: {saved.sourceUrl}</p> : null}
+            {saved.sourceAuthor ? <p>Author: {saved.sourceAuthor}</p> : null}
+            {saved.userNote ? <p>Your note: {saved.userNote}</p> : null}
+          </div> : null}
           <div className="capture-classify">
             <div className="topic-section-heading">
               <h4>{saved.sourceType === "writing_sample" ? "Voice" : "Connect"}</h4>

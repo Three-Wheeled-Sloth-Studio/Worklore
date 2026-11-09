@@ -72,6 +72,9 @@ pub struct CaptureSourceView {
     pub created_at: String,
     pub updated_at: String,
     pub classifications: Vec<CaptureClassificationView>,
+    pub source_url: Option<String>,
+    pub source_author: Option<String>,
+    pub user_note: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -87,13 +90,26 @@ pub fn create_capture_source(
     vault_path: &Path,
     text: &str,
     source_type: SourceType,
+    source_url: Option<String>,
+    source_author: Option<String>,
+    user_note: Option<String>,
 ) -> ServiceResult<CaptureSourceView> {
     canonical_store::initialize(vault_path)?;
-    if text.trim().is_empty() {
-        return Err(WorkLoreError::InvalidVault(
-            "Capture text cannot be empty.".to_string(),
-        ));
+    let source_url = source_url.map(|value| value.trim().to_owned()).filter(|v| !v.is_empty());
+    if let Some(url) = &source_url {
+        if url.len() > 2048 || !(url.starts_with("https://") || url.starts_with("http://")) || url.chars().any(char::is_whitespace) {
+            return Err(WorkLoreError::InvalidVault("Provide a valid HTTP(S) URL (maximum 2048 characters).".into()));
+        }
     }
+    let source_author = source_author.map(|v| v.trim().to_owned()).filter(|v| !v.is_empty());
+    let user_note = user_note.map(|v| v.trim().to_owned()).filter(|v| !v.is_empty());
+    if source_author.as_ref().is_some_and(|v| v.chars().count() > 200) || user_note.as_ref().is_some_and(|v| v.chars().count() > 2000) {
+        return Err(WorkLoreError::InvalidVault("Source author or note exceeds length limit.".into()));
+    }
+    if text.trim().is_empty() && source_url.is_none() {
+        return Err(WorkLoreError::InvalidVault("Capture text or a source URL is required.".into()));
+    }
+    let text = if text.trim().is_empty() { source_url.as_deref().unwrap_or("") } else { text };
 
     let connection = open_connection(vault_path)?;
     let source_id = format!("source_{}", Uuid::now_v7());
@@ -117,7 +133,11 @@ pub fn create_capture_source(
     });
     let provenance = json!({
         "creationActor": "user",
-        "importMethod": "capture_text"
+        "importMethod": "capture_text",
+        "sourceUrl": source_url,
+        "sourceAuthor": source_author,
+        "userNote": user_note,
+        "readability": if source_url.is_some() && text == source_url.as_deref().unwrap_or("") { "url_only_not_fetched" } else { "user_supplied_text" }
     });
 
     connection.execute(
@@ -157,7 +177,7 @@ pub fn get_capture_source(vault_path: &Path, source_id: &str) -> ServiceResult<C
     let connection = open_connection(vault_path)?;
     let row = connection
         .query_row(
-            "SELECT source_id,source_type,display_name,COALESCE(captured_text,''),imported_at,updated_at
+            "SELECT source_id,source_type,display_name,COALESCE(captured_text,''),imported_at,updated_at,provenance_json
              FROM sources WHERE source_id=?1 AND source_origin='captured_text'",
             [source_id],
             |row| {
@@ -168,6 +188,7 @@ pub fn get_capture_source(vault_path: &Path, source_id: &str) -> ServiceResult<C
                     row.get::<_, String>(3)?,
                     row.get::<_, String>(4)?,
                     row.get::<_, String>(5)?,
+                    row.get::<_, String>(6)?,
                 ))
             },
         )
@@ -184,7 +205,7 @@ pub fn list_unclassified_captures(
     canonical_store::initialize(vault_path)?;
     let connection = open_connection(vault_path)?;
     let mut statement = connection.prepare(
-        "SELECT s.source_id,s.source_type,s.display_name,COALESCE(s.captured_text,''),s.imported_at,s.updated_at
+        "SELECT s.source_id,s.source_type,s.display_name,COALESCE(s.captured_text,''),s.imported_at,s.updated_at,s.provenance_json
          FROM sources s
          WHERE s.source_origin='captured_text'
            AND NOT EXISTS (
@@ -204,6 +225,7 @@ pub fn list_unclassified_captures(
             row.get::<_, String>(3)?,
             row.get::<_, String>(4)?,
             row.get::<_, String>(5)?,
+            row.get::<_, String>(6)?,
         ))
     })?;
     let raw = rows.collect::<Result<Vec<_>, _>>()?;
@@ -372,10 +394,15 @@ fn load_classifications(
 }
 
 fn capture_view(
-    row: (String, String, String, String, String, String),
+    row: (String, String, String, String, String, String, String),
     classifications: Vec<CaptureClassificationView>,
 ) -> ServiceResult<CaptureSourceView> {
+    let provenance: serde_json::Value = serde_json::from_str(&row.6).unwrap_or_default();
+    let field = |name: &str| provenance.get(name).and_then(|v| v.as_str()).map(str::to_owned);
     Ok(CaptureSourceView {
+        source_url: field("sourceUrl"),
+        source_author: field("sourceAuthor"),
+        user_note: field("userNote"),
         source_id: row.0,
         source_type: source_type_from_text(&row.1)?,
         display_name: row.2,
@@ -466,7 +493,7 @@ mod tests {
     fn capture_persists_before_classification_and_reopen() {
         let path = vault();
         let raw = "  A memory I do not want to lose.\nSecond line.  ";
-        let captured = create_capture_source(&path, raw, SourceType::Other).unwrap();
+        let captured = create_capture_source(&path, raw, SourceType::Other, None, None, None).unwrap();
         assert_eq!(captured.text, raw);
         assert!(captured.classifications.is_empty());
         canonical_store::initialize_and_migrate(&path).unwrap();
@@ -498,6 +525,7 @@ mod tests {
             &path,
             "I led a difficult launch and changed the release process.",
             SourceType::Other,
+        None, None, None,
         )
         .unwrap();
         let first =
@@ -544,6 +572,7 @@ mod tests {
             &path,
             "Senior Product Manager - improve clinical workflows",
             SourceType::JobDescription,
+        None, None, None,
         )
         .unwrap();
         assert_eq!(list_unclassified_captures(&path, 10).unwrap().len(), 1);
@@ -554,6 +583,7 @@ mod tests {
             &path,
             "An external article with an interesting counterpoint.",
             SourceType::Other,
+        None, None, None,
         )
         .unwrap();
         classify_capture_source(&path, &external.source_id, CaptureRole::Inspiration).unwrap();
@@ -562,6 +592,7 @@ mod tests {
             &path,
             "A user-authored paragraph saved for possible future voice review.",
             SourceType::WritingSample,
+        None, None, None,
         )
         .unwrap();
         assert!(get_capture_source(&path, &writing.source_id)
@@ -587,4 +618,18 @@ mod tests {
         drop(connection);
         fs::remove_dir_all(path).unwrap();
     }
+    #[test]
+    fn link_only_capture_retains_attribution_without_web_fetch() {
+        let path = vault();
+        let capture = create_capture_source(&path, "", SourceType::Other,
+            Some("https://example.com/example".into()), Some("Example Author".into()),
+            Some("My counterpoint".into())).unwrap();
+        assert_eq!(capture.text, "https://example.com/example");
+        let reopened = get_capture_source(&path, &capture.source_id).unwrap();
+        assert_eq!(reopened.source_url.as_deref(), Some("https://example.com/example"));
+        assert_eq!(reopened.source_author.as_deref(), Some("Example Author"));
+        assert_eq!(reopened.user_note.as_deref(), Some("My counterpoint"));
+        fs::remove_dir_all(path).unwrap();
+    }
+
 }
