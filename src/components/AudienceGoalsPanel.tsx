@@ -14,7 +14,7 @@ const BLANK: AudienceGoals = {
 };
 
 function parseLines(value: string): string[] {
-  return value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  return value.split(/\r?\n/);
 }
 
 export function AudienceGoalsPanel({ vaultPath }: { vaultPath: string }) {

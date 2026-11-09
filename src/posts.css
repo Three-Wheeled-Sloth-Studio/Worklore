@@ -353,11 +353,11 @@
 
 /* Vault-local audience planning context */
 .audience-goals-panel { margin-bottom: 0.7rem; }
-.audience-goals-panel h2 { margin: 0; font-size: 1rem; }
-.audience-goals-summary { margin: 0.4rem 0 0; font-size: 0.82rem; color: #b8c0b4; }
+.audience-goals-panel h2 { margin: 0; font-size: 1rem; color: #273129; }
+.audience-goals-summary { margin: 0.4rem 0 0; font-size: 0.82rem; color: #535e57; }
 .audience-goals-form { display: grid; gap: 0.65rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-top: 0.7rem; }
-.audience-goals-form label { display: grid; gap: 0.28rem; color: #dce2d9; font-size: 0.8rem; }
+.audience-goals-form label { display: grid; gap: 0.28rem; color: #394a40; font-size: 0.8rem; }
 .audience-goals-form input, .audience-goals-form textarea, .audience-goals-form select {
   width: 100%; min-width: 0; padding: 0.45rem; border: 1px solid #596052; border-radius: 6px;
-  background: #151815; color: #eef1ec; font: inherit;
+  background: #fffdf8; color: #273129; font: inherit;
 }
