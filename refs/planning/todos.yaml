@@ -167,3 +167,28 @@ todos:
     status: complete
     area: ux
     summary: Replace the prototype resume-centric top-level workflow with the accepted task-oriented application shell, make Home/Capture/Stories/Topics first-class, demote resume/storage/privacy utilities to supporting access, reopen durable Inspiration and Target Context through the Library, and represent future Voice/Posts/Insights honestly without beginning later phases.
+
+  - id: task-042
+    status: planned
+    area: intake
+    summary: Editorial-01: improve save-first source capture and source metadata, duplicate/unreadable handling, and refresh awareness without conflating evidence, inspiration, target context, or voice evidence.
+  - id: task-043
+    status: planned
+    area: audience
+    summary: Editorial-02: persist audience/positioning objectives, job-search disclosure choice, and post-level intent for Audience Lens without inferring author standing from target context.
+  - id: task-044
+    status: planned
+    area: calendar
+    summary: Editorial-03: add editable four-week content planning with dates, post types, hooks, linked material, lifecycle and repetition warnings; no automatic publishing or scheduling integration.
+  - id: task-045
+    status: planned
+    area: editing
+    summary: Editorial-04: support user-authored post review, intent-preserving full rewrites, explainable changes, immutable revisions, confidentiality checks and explicit acceptance.
+  - id: task-046
+    status: planned
+    area: learning
+    summary: Editorial-05: separate temporary plan proposals from durable standing-rule proposals using evidence and cautious analytics, with explicit reversible approvals and no silent governance changes.
+  - id: task-047
+    status: proposed_research
+    area: external_sources
+    summary: Editorial-06: evaluate opt-in Google Drive source import/refresh, privacy and permissions; require go/no-go before implementation and keep local canonical vault authoritative.

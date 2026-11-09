@@ -223,3 +223,63 @@ explicit_non_goals:
   - Autonomous comments or engagement.
   - Content-volume optimization as a product goal.
   - Major engineering investment in arbitrary resume-layout parsing.
+
+# Proposed editorial workflow expansion from LinkedIn Content Partner Setup.
+# These are planning increments only, not implementation claims.
+editorial_workflow_expansion:
+  status: planned
+  source_review:
+    - https://github.com/crystaljonespmp/LinkedIn-Content-Partner-Setup
+    - https://github.com/crystaljonespmp/LinkedIn-Content-Partner-Setup/blob/main/Markdown/LinkedIn-Content-Partner-Project-Instructions.md
+    - https://github.com/crystaljonespmp/LinkedIn-Content-Partner-Setup/blob/main/Markdown/Keep-Your-Source-Files-in-Google-Drive.md
+  limitation: LinkedIn-Content-Partner-Automation was not accessible during review; no implementation claims are based on it.
+  detailed_plan: refs/planning/editorialWorkflowExpansion.md
+  sequence:
+    - id: editorial-01
+      name: Improve source intake
+      horizon: next
+      status: planned
+      builds_on: Phase 1 Capture, Inspiration, Target Context and privacy/source provenance
+      deliverable: Low-friction capture of links, pasted text, local files and user notes, with source freshness and revisit cues.
+      dependencies: []
+      acceptance: Source origin, author, original URL or document identity, capture time, user reaction and semantic source class remain traceable; duplicate and unreadable sources have clear recovery paths.
+    - id: editorial-02
+      name: Make audience goals explicit
+      horizon: next
+      status: planned
+      builds_on: Target Context, Themes, and planned Audience Lens
+      deliverable: Durable opt-in audience and professional-positioning goals, with job-search-disclosure control and post-level intent.
+      dependencies: [editorial-01]
+      acceptance: Users can select audiences and desired reader signals without attributing abilities from target profiles or forcing resume-like keywords into posts.
+    - id: editorial-03
+      name: Four-week editorial calendar
+      horizon: next
+      status: planned
+      builds_on: Topics, Posts, Revision approval and manual publication records
+      deliverable: Local four-week plan with proposed dates, post formats, hooks, linked evidence, source diversity and editorial lifecycle.
+      dependencies: [editorial-02]
+      acceptance: Users can generate, manually adjust and approve a plan; reuse warnings are advisory; no direct social publishing or external scheduler integration occurs.
+    - id: editorial-04
+      name: Review and rewrite user-authored posts
+      horizon: next
+      status: planned
+      builds_on: Post/Revision lineage, Voice, Writing Rules, confidentiality preflight and challenge checks
+      deliverable: Preserve-author-intent edit/rewrite workflow with a complete proposed revision, change rationale and accept/discard actions.
+      dependencies: [editorial-02]
+      acceptance: Original text and human/model authorship survive revisions, source claims remain auditable, edits never silently activate voice rules and publication still requires exact public-safe approval.
+    - id: editorial-05
+      name: Plan changes vs standing rule changes
+      horizon: later
+      status: planned
+      builds_on: Insights, publication snapshots, edit-learning decisions and governed Writing Rules
+      deliverable: Evidence-linked recommendation queue classifying temporary calendar adjustments separately from enduring proposed writing or editorial rules.
+      dependencies: [editorial-03, editorial-04]
+      acceptance: Each recommendation has scope, evidence, sample limitations, user accept/reject, reversible history and no automatic Voice or Writing Rule activation.
+    - id: editorial-06
+      name: Evaluate Google Drive source integration
+      horizon: exploration
+      status: proposed_research
+      builds_on: Local canonical vault, source import and Private Entity Registry
+      deliverable: Privacy, permission, cost and sync-conflict feasibility study with manual import or one-way refresh prototype options.
+      dependencies: [editorial-01]
+      acceptance: A documented go/no-go decision explicitly preserves local vault authority, user consent, source version/provenance and no WorkLore-hosted backend; no OAuth integration is implied by this plan.
