@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { InfoButton } from "./InfoButton";
 import { AudienceGoalsPanel } from "./AudienceGoalsPanel";
+import { PostAudiencePanel } from "./PostAudiencePanel";
 import type { ConfidentialityTransformResult } from "../domain/confidentiality";
 import type { PostLineageView, PostRecordView } from "../domain/posts";
 import type { LintDraftResult, TopicRecord } from "../domain/types";
@@ -317,6 +318,7 @@ export function PostWorkspace({ vaultPath }: { vaultPath: string }) {
           </div>
         ) : (
           <div className="post-editor-surface">
+            <PostAudiencePanel key={lineage.post.postId} vaultPath={vaultPath} postId={lineage.post.postId} />
             <div className="post-editor-heading">
               <div>
                 <h2 id="posts-heading">{lineage.post.title}</h2>

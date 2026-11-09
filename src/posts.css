@@ -361,3 +361,10 @@
   width: 100%; min-width: 0; padding: 0.45rem; border: 1px solid #596052; border-radius: 6px;
   background: #fffdf8; color: #273129; font: inherit;
 }
+
+.post-audience-intent { padding: 0.55rem 0.7rem; margin-bottom: 0.65rem; background: #eceae3; border: 1px solid #c9c6bd; border-radius: 8px; color: #273129; }
+.post-audience-heading { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; }
+.post-audience-intent p { margin: 0.35rem 0; color: #535e57; font-size: 0.8rem; }
+.post-audience-edit { display: grid; gap: 0.5rem; margin-top: 0.5rem; }
+.post-audience-edit label { display: grid; gap: 0.25rem; font-size: 0.8rem; }
+.post-audience-edit input, .post-audience-edit textarea { width: 100%; padding: 0.45rem; border: 1px solid #a3aaa3; border-radius: 6px; background: #fffdf8; color: #273129; font: inherit; }

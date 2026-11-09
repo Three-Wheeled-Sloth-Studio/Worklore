@@ -5,7 +5,10 @@ mod io_utils;
 mod services;
 
 use commands::{
-    audience_goals::{get_audience_goals, save_audience_goals},
+    audience_goals::{
+        clear_post_audience_intent, get_audience_goals, get_post_audience_intent,
+        save_audience_goals, save_post_audience_intent,
+    },
     candidates::{extract_resume_candidates, list_story_candidates, set_story_candidate_status},
     capture::{
         classify_capture_source, create_capture_source, get_capture_source, list_captures,
@@ -82,6 +85,9 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             get_audience_goals,
             save_audience_goals,
+            get_post_audience_intent,
+            save_post_audience_intent,
+            clear_post_audience_intent,
             create_vault,
             create_vault_in_parent,
             create_default_vault,

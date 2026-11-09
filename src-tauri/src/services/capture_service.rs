@@ -672,6 +672,7 @@ mod tests {
         assert_eq!(attribution.0.as_deref(), Some("https://example.com/insight"));
         assert_eq!(attribution.1.as_deref(), Some("Example Publisher"));
         assert_eq!(attribution.2, "I disagree with the conclusion.");
+        drop(connection);
         std::fs::remove_dir_all(path).unwrap();
     }
 
