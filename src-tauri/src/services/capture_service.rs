@@ -86,7 +86,16 @@ pub struct CaptureClassificationResult {
     pub created: bool,
 }
 
+// Retain the stable three-argument API for the existing capture workflows and tests.
 pub fn create_capture_source(
+    vault_path: &Path,
+    text: &str,
+    source_type: SourceType,
+) -> ServiceResult<CaptureSourceView> {
+    create_capture_source_with_metadata(vault_path, text, source_type, None, None, None)
+}
+
+pub fn create_capture_source_with_metadata(
     vault_path: &Path,
     text: &str,
     source_type: SourceType,
@@ -493,7 +502,7 @@ mod tests {
     fn capture_persists_before_classification_and_reopen() {
         let path = vault();
         let raw = "  A memory I do not want to lose.\nSecond line.  ";
-        let captured = create_capture_source(&path, raw, SourceType::Other, None, None, None).unwrap();
+        let captured = create_capture_source_with_metadata(&path, raw, SourceType::Other, None, None, None).unwrap();
         assert_eq!(captured.text, raw);
         assert!(captured.classifications.is_empty());
         canonical_store::initialize_and_migrate(&path).unwrap();
@@ -521,7 +530,7 @@ mod tests {
     #[test]
     fn story_seed_classification_is_idempotent_and_role_free() {
         let path = vault();
-        let captured = create_capture_source(
+        let captured = create_capture_source_with_metadata(
             &path,
             "I led a difficult launch and changed the release process.",
             SourceType::Other,
@@ -568,7 +577,7 @@ mod tests {
     #[test]
     fn target_inspiration_and_writing_sample_boundaries_hold() {
         let path = vault();
-        let job = create_capture_source(
+        let job = create_capture_source_with_metadata(
             &path,
             "Senior Product Manager - improve clinical workflows",
             SourceType::JobDescription,
@@ -579,7 +588,7 @@ mod tests {
         classify_capture_source(&path, &job.source_id, CaptureRole::TargetContext).unwrap();
         assert!(list_unclassified_captures(&path, 10).unwrap().is_empty());
 
-        let external = create_capture_source(
+        let external = create_capture_source_with_metadata(
             &path,
             "An external article with an interesting counterpoint.",
             SourceType::Other,
@@ -588,7 +597,7 @@ mod tests {
         .unwrap();
         classify_capture_source(&path, &external.source_id, CaptureRole::Inspiration).unwrap();
 
-        let writing = create_capture_source(
+        let writing = create_capture_source_with_metadata(
             &path,
             "A user-authored paragraph saved for possible future voice review.",
             SourceType::WritingSample,
@@ -621,7 +630,7 @@ mod tests {
     #[test]
     fn link_only_capture_retains_attribution_without_web_fetch() {
         let path = vault();
-        let capture = create_capture_source(&path, "", SourceType::Other,
+        let capture = create_capture_source_with_metadata(&path, "", SourceType::Other,
             Some("https://example.com/example".into()), Some("Example Author".into()),
             Some("My counterpoint".into())).unwrap();
         assert_eq!(capture.text, "https://example.com/example");

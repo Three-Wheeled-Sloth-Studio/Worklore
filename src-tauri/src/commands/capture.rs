@@ -18,7 +18,7 @@ pub fn create_capture_source(
     source_author: Option<String>,
     user_note: Option<String>,
 ) -> CommandResult<CaptureSourceView> {
-    capture_service::create_capture_source(
+    capture_service::create_capture_source_with_metadata(
         &PathBuf::from(vault_path),
         &text,
         source_type.unwrap_or(SourceType::Other),
