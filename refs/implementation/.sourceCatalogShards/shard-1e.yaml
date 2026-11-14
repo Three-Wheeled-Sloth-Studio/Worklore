@@ -1,0 +1,222 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: 1e
+  files:
+  - path: src/components/TargetContextPanel.tsx
+    analysis_version: 1
+    language: typescript
+    content_hash: 484ca94414f95b47be55356c4ec7723ad518f7c8
+    dependencies:
+    - ../domain/types
+    - ../lib/workloreApi
+    - react
+    provides:
+    - refreshAll
+    - applyRecord
+    - handleSave
+    - handleExtract
+    - handleAddRelationship
+    - handleRemoveRelationship
+    - linesFrom
+    - listFrom
+    - kindLabel
+    symbols:
+    - name: refreshAll
+      kind: function
+      line_start: 68
+      line_end: 87
+      signature: refreshAll()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Promise.all
+      - applyRecord
+      - errorMessage
+      - getTargetContext
+      - listTargetContextLinkTargets
+      - setBusy
+      - setError
+      - setRelatedId
+      - setTargets
+      parser: typescript-pattern
+      dependency_targets:
+      - &id001
+        path: src/components/InspirationPanel.tsx
+        symbol: applyRecord
+      - &id002
+        path: src/components/TargetContextPanel.tsx
+        symbol: applyRecord
+      - &id003
+        path: src/domain/types.ts
+        symbol: errorMessage
+      - path: src/lib/workloreApi.ts
+        symbol: getTargetContext
+      - path: src/lib/workloreApi.ts
+        symbol: listTargetContextLinkTargets
+    - name: applyRecord
+      kind: function
+      line_start: 88
+      line_end: 104
+      signature: 'applyRecord(loaded: TargetContextRecord)'
+      inputs:
+      - 'loaded: TargetContextRecord'
+      output: unspecified
+      dependencies:
+      - linesFrom
+      - setConcepts
+      - setLanguage
+      - setLifecycle
+      - setLocation
+      - setNotes
+      - setOrganizationName
+      - setRecord
+      - setResponsibilities
+      - setRoleTitle
+      - setSkills
+      - setSourceUrl
+      - setSummary
+      - setTensions
+      - setTitle
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/components/InspirationPanel.tsx
+        symbol: linesFrom
+      - path: src/components/TargetContextPanel.tsx
+        symbol: linesFrom
+    - name: handleSave
+      kind: function
+      line_start: 105
+      line_end: 137
+      signature: handleSave()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - applyRecord
+      - errorMessage
+      - listFrom
+      - setBusy
+      - setError
+      - setNotice
+      - title.trim
+      - updateTargetContext
+      parser: typescript-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - path: src/components/InspirationPanel.tsx
+        symbol: listFrom
+      - path: src/components/TargetContextPanel.tsx
+        symbol: listFrom
+      - path: src/lib/workloreApi.ts
+        symbol: updateTargetContext
+    - name: handleExtract
+      kind: function
+      line_start: 138
+      line_end: 159
+      signature: handleExtract()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - applyRecord
+      - errorMessage
+      - extractTargetContextSignals
+      - setBusy
+      - setError
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+      - *id003
+      - path: src/lib/workloreApi.ts
+        symbol: extractTargetContextSignals
+    - name: handleAddRelationship
+      kind: function
+      line_start: 160
+      line_end: 182
+      signature: handleAddRelationship()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - addTargetContextRelationship
+      - errorMessage
+      - refreshAll
+      - setBusy
+      - setError
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - path: src/lib/workloreApi.ts
+        symbol: addTargetContextRelationship
+      - *id003
+      - &id004
+        path: src/components/InspirationPanel.tsx
+        symbol: refreshAll
+      - &id005
+        path: src/components/TargetContextPanel.tsx
+        symbol: refreshAll
+    - name: handleRemoveRelationship
+      kind: function
+      line_start: 183
+      line_end: 200
+      signature: 'handleRemoveRelationship(kind: TargetContextRelationKind, relatedTargetId: string)'
+      inputs:
+      - 'kind: TargetContextRelationKind'
+      - 'relatedTargetId: string'
+      output: unspecified
+      dependencies:
+      - errorMessage
+      - refreshAll
+      - removeTargetContextRelationship
+      - setBusy
+      - setError
+      - setNotice
+      parser: typescript-pattern
+      dependency_targets:
+      - *id003
+      - *id004
+      - *id005
+      - path: src/lib/workloreApi.ts
+        symbol: removeTargetContextRelationship
+    - name: linesFrom
+      kind: function
+      line_start: 367
+      line_end: 370
+      signature: 'linesFrom(values: string[]) -> string'
+      inputs:
+      - 'values: string[]'
+      output: string
+      dependencies:
+      - values.join
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: listFrom
+      kind: function
+      line_start: 371
+      line_end: 377
+      signature: 'listFrom(value: string) -> string[]'
+      inputs:
+      - 'value: string'
+      output: string[]
+      dependencies:
+      - filter
+      - line.trim
+      - map
+      - split
+      parser: typescript-pattern
+      dependency_targets: []
+    - name: kindLabel
+      kind: function
+      line_start: 378
+      line_end: 381
+      signature: 'kindLabel(kind: TargetContextRelationKind) -> string'
+      inputs:
+      - 'kind: TargetContextRelationKind'
+      output: string
+      dependencies:
+      - RELATION_KINDS.find
+      parser: typescript-pattern
+      dependency_targets: []

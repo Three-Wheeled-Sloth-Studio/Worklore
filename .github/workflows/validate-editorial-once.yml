@@ -1,0 +1,99 @@
+name: Validate editorial dev checkpoint
+
+on:
+  push:
+    branches: [dev]
+    paths: [.github/workflows/validate-editorial-once.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  editorial-validation:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - name: Prepare external paths
+        shell: pwsh
+        run: |
+          $externalRoot = Join-Path $env:RUNNER_TEMP "WorkLore"
+          $buildRoot = Join-Path $externalRoot "build\validate"
+          "WORKLORE_EXTERNAL_ROOT=$externalRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "WORKLORE_BUILD_ROOT=$buildRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "WORKLORE_FRONTEND_DIST=$(Join-Path $buildRoot 'frontend')" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "CARGO_TARGET_DIR=$(Join-Path $buildRoot 'cargo-target')" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          New-Item -ItemType Directory -Force -Path $buildRoot | Out-Null
+          ./scripts/assert-repo-clean.ps1
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          npm install
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m pip install pyyaml
+          exit $LASTEXITCODE
+      - name: Project references
+        id: refs
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          python scripts/check-case-collisions.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python refs/tools/generate_source_catalog.py --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python refs/tools/validate_refs.py --mode initialized
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python refs/tools/generate_agent_context.py --check
+          exit $LASTEXITCODE
+      - name: Rust formatting
+        id: fmt
+        continue-on-error: true
+        shell: pwsh
+        run: cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
+      - name: Frontend tests
+        id: frontend_tests
+        continue-on-error: true
+        shell: pwsh
+        run: npm run test
+      - name: Frontend build
+        id: frontend_build
+        continue-on-error: true
+        shell: pwsh
+        run: npm run build:frontend
+      - name: Rust tests
+        id: rust_tests
+        continue-on-error: true
+        shell: pwsh
+        run: cargo test --manifest-path src-tauri/Cargo.toml
+      - name: Rust clippy
+        id: clippy
+        continue-on-error: true
+        shell: pwsh
+        run: cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings -A clippy::manual-pattern-char-comparison
+      - name: Source-only checkout
+        id: clean
+        continue-on-error: true
+        shell: pwsh
+        run: ./scripts/assert-repo-clean.ps1
+      - name: Validation summary
+        if: always()
+        shell: pwsh
+        run: |
+          $outcomes = @(
+            '${{ steps.refs.outcome }}',
+            '${{ steps.fmt.outcome }}',
+            '${{ steps.frontend_tests.outcome }}',
+            '${{ steps.frontend_build.outcome }}',
+            '${{ steps.rust_tests.outcome }}',
+            '${{ steps.clippy.outcome }}',
+            '${{ steps.clean.outcome }}'
+          )
+          $outcomes | ForEach-Object { Write-Host "Validation group: $_" }
+          if ($outcomes -contains 'failure' -or $outcomes -contains 'cancelled' -or $outcomes -contains 'skipped') { exit 1 }

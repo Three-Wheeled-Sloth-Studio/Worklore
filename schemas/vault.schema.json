@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://worklore.local/schemas/vault.schema.json",
+  "title": "WorkLore Vault",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "vaultId",
+    "name",
+    "createdAt",
+    "updatedAt",
+    "privacy",
+    "features"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "vaultId": {
+      "type": "string",
+      "pattern": "^vault_[A-Za-z0-9_-]+$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "default": ""
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cloudIdentifierMode",
+        "blockCloudWhenHighRiskReviewPending",
+        "retainProviderBodies"
+      ],
+      "properties": {
+        "cloudIdentifierMode": {
+          "type": "string",
+          "enum": [
+            "redact",
+            "include"
+          ],
+          "default": "redact"
+        },
+        "blockCloudWhenHighRiskReviewPending": {
+          "type": "boolean",
+          "default": true
+        },
+        "retainProviderBodies": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "features": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entityRegistry",
+        "ollama",
+        "gemini",
+        "manualWorkspace"
+      ],
+      "properties": {
+        "entityRegistry": {
+          "type": "boolean",
+          "default": true
+        },
+        "ollama": {
+          "type": "boolean",
+          "default": true
+        },
+        "gemini": {
+          "type": "boolean",
+          "default": true
+        },
+        "manualWorkspace": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": {
+        "type": [
+          "string",
+          "number",
+          "boolean",
+          "null"
+        ]
+      },
+      "default": {}
+    }
+  }
+}

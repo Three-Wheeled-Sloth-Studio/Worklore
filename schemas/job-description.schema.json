@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://worklore.local/schemas/job-description.schema.json",
+  "title": "WorkLore Job Description",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "jobId",
+    "sourceId",
+    "title",
+    "requirements",
+    "createdAt",
+    "updatedAt",
+    "revision"
+  ],
+  "$defs": {
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirementId",
+        "category",
+        "importance",
+        "text",
+        "sourceLocator",
+        "storyMatches"
+      ],
+      "properties": {
+        "requirementId": {
+          "type": "string",
+          "pattern": "^requirement_[A-Za-z0-9_-]+$"
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "required_capability",
+            "preferred_capability",
+            "domain_expectation",
+            "leadership_expectation",
+            "tool_or_platform",
+            "business_problem",
+            "education_or_certification",
+            "other"
+          ]
+        },
+        "importance": {
+          "type": "string",
+          "enum": [
+            "required",
+            "strong_preference",
+            "preference",
+            "inferred"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceLocator": {
+          "type": "string",
+          "minLength": 1
+        },
+        "storyMatches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "storyId",
+              "matchScore",
+              "matchType",
+              "rationale"
+            ],
+            "properties": {
+              "storyId": {
+                "type": "string",
+                "pattern": "^story_[A-Za-z0-9_-]+$"
+              },
+              "matchScore": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "matchType": {
+                "type": "string",
+                "enum": [
+                  "direct",
+                  "adjacent",
+                  "transferable",
+                  "weak"
+                ]
+              },
+              "rationale": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "candidateId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  },
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "jobId": {
+      "type": "string",
+      "pattern": "^job_[A-Za-z0-9_-]+$"
+    },
+    "sourceId": {
+      "type": "string",
+      "pattern": "^source_[A-Za-z0-9_-]+$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "organizationEntityId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "location": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "employmentType": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/requirement"
+      }
+    },
+    "notes": {
+      "type": "string",
+      "default": ""
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}

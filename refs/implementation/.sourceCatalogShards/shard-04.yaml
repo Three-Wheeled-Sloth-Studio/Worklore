@@ -1,0 +1,179 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: '04'
+  files:
+  - path: src-tauri/src/services/post_catalog_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 0cb98689ae0dcac53e5616fea8a3259f20b9f520
+    dependencies:
+    - "crate::{\n        domain::posts::{\n            ApprovePostRevisionRequest, CreatePostRequest, PostRevisionAuthorship,\n\
+      \            PostRevisionOrigin,\n        },\n        services::{post_lineage_service, vault_service},\n    }"
+    - "crate::{\n    domain::posts::{PostRecordView, PostStatus},\n    error::{ServiceResult, WorkLoreError},\n    services::canonical_store,\n\
+      }"
+    - rusqlite::Connection
+    - std::fs
+    - std::{path::Path, time::Duration}
+    - super::*
+    - uuid::Uuid
+    provides:
+    - list_posts
+    - post_from_raw
+    - open_connection
+    - vault
+    - user_post
+    - list_posts_reopens_current_status_and_revision_identity
+    symbols:
+    - name: list_posts
+      kind: function
+      line_start: 10
+      line_end: 39
+      signature: 'list_posts(vault_path: &Path) -> ServiceResult<Vec<PostRecordView>>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Vec<PostRecordView>>
+      dependencies:
+      - Ok
+      - collect
+      - connection.prepare
+      - initialize
+      - open_connection
+      - post_from_raw
+      - raw.0.clone
+      - rows.map
+      - statement.query_map
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: initialize
+      - path: src-tauri/src/services/post_catalog_service.rs
+        symbol: post_from_raw
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: post_from_raw
+    - name: post_from_raw
+      kind: function
+      line_start: 52
+      line_end: 68
+      signature: 'post_from_raw(raw: PostRaw, post_id: &str) -> ServiceResult<PostRecordView>'
+      inputs:
+      - 'raw: PostRaw'
+      - 'post_id: &str'
+      output: ServiceResult<PostRecordView>
+      dependencies:
+      - InvalidVault
+      - Ok
+      - map_err
+      - parse
+      - raw.3.ok_or_else
+      parser: rust-pattern
+      dependency_targets: []
+    - name: open_connection
+      kind: function
+      line_start: 69
+      line_end: 75
+      signature: 'open_connection(vault_path: &Path) -> ServiceResult<Connection>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Connection>
+      dependencies:
+      - Ok
+      - connection.busy_timeout
+      - connection.pragma_update
+      - database_path
+      - from_secs
+      - open
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/canonical_store.rs
+        symbol: database_path
+    - name: vault
+      kind: function
+      line_start: 89
+      line_end: 94
+      signature: vault() -> std::path::PathBuf
+      inputs: []
+      output: std::path::PathBuf
+      dependencies:
+      - create_vault
+      - expect
+      - join
+      - now_v7
+      - temp_dir
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/commands/vault.rs
+        symbol: create_vault
+      - path: src-tauri/src/services/vault_service.rs
+        symbol: create_vault
+    - name: user_post
+      kind: function
+      line_start: 95
+      line_end: 106
+      signature: 'user_post(title: &str, text: &str) -> CreatePostRequest'
+      inputs:
+      - 'title: &str'
+      - 'text: &str'
+      output: CreatePostRequest
+      dependencies:
+      - text.to_string
+      - title.to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: list_posts_reopens_current_status_and_revision_identity
+      kind: function
+      line_start: 109
+      line_end: 150
+      signature: list_posts_reopens_current_status_and_revision_identity()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - approve_revision
+      - create_post
+      - expect
+      - final_post.post.current_revision_id.clone
+      - final_post.post.post_id.clone
+      - find
+      - initialize
+      - iter
+      - list_posts
+      - posts.len
+      - remove_dir_all
+      - unwrap
+      - user_post
+      - vault
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: approve_revision
+      - path: src-tauri/src/commands/posts.rs
+        symbol: create_post
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: create_post
+      - *id001
+      - path: src-tauri/src/commands/posts.rs
+        symbol: list_posts
+      - path: src-tauri/src/services/post_catalog_service.rs
+        symbol: list_posts
+      - path: src-tauri/src/services/post_catalog_service.rs
+        symbol: user_post
+      - path: src-tauri/src/services/post_lineage_service.rs
+        symbol: user_post
+      - path: src-tauri/src/services/publication_feedback_service.rs
+        symbol: user_post
+  - path: src/help/quickStartContent.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: edcf5a72d1fa398d3306e79e6c94dd05204d3bf1
+    dependencies: []
+    provides: []
+    symbols: []
+  - path: src/vite-env.d.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: 11f02fe2a0061d6e6e1f271b21da95423b448b32
+    dependencies: []
+    provides: []
+    symbols: []

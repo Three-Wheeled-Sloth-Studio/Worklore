@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://worklore.local/schemas/role.schema.json",
+  "title": "WorkLore Role",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "roleId",
+    "title",
+    "organizationEntityId",
+    "startDate",
+    "endDate",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "roleId": {
+      "type": "string",
+      "pattern": "^role_[A-Za-z0-9_-]+$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 180
+    },
+    "organizationEntityId": {
+      "type": "string",
+      "pattern": "^entity_[A-Za-z0-9_-]+$"
+    },
+    "clientEntityIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^entity_[A-Za-z0-9_-]+$"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "startDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9]{4}(-[0-9]{2})?(-[0-9]{2})?$"
+    },
+    "endDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9]{4}(-[0-9]{2})?(-[0-9]{2})?$"
+    },
+    "isCurrent": {
+      "type": "boolean",
+      "default": false
+    },
+    "summary": {
+      "type": "string",
+      "default": ""
+    },
+    "sourceIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^source_[A-Za-z0-9_-]+$"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "projectEntityIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^entity_[A-Za-z0-9_-]+$"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "storyIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^story_[A-Za-z0-9_-]+$"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1
+    }
+  }
+}

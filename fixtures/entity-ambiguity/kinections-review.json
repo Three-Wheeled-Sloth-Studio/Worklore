@@ -1,0 +1,20 @@
+{
+  "existingEntity": {
+    "entityId": "entity_fixture_project_1",
+    "entityType": "project",
+    "canonicalName": "LLM tool to pre-screen investor complaints",
+    "publicToken": "[PROJECT_1]",
+    "aliases": []
+  },
+  "incomingOccurrence": {
+    "matchedText": "Kinections",
+    "contextExcerpt": "Led development of Kinections, an LLM-assisted tool used to pre-screen investor complaints before analyst review."
+  },
+  "expectedReviewQuestion": "Is Kinections the same project as LLM tool to pre-screen investor complaints?",
+  "allowedResolutions": [
+    "same_entity",
+    "related_entity",
+    "new_entity",
+    "ignore_term"
+  ]
+}

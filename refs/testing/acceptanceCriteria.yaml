@@ -1,0 +1,158 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+updated: 2026-07-25
+acceptance_criteria:
+  - id: ac-vault-001
+    area: vault
+    status: implemented_pending_validation
+    summary: A user can create a vault in its own named folder beneath a selected parent folder.
+    criteria:
+      - the selected parent folder is not converted directly into a vault.
+      - a filesystem-safe folder name is derived from the user-facing vault name.
+      - an existing sibling folder is never overwritten; a unique suffix is used instead.
+      - vault.json is created with schema version 1 and a stable vault id.
+      - canonical source, story, interview, privacy, export, and rebuildable cache folders are created.
+      - the default cloud identifier mode is redact.
+      - a matching empty Private Entity Registry is created.
+  - id: ac-vault-002
+    area: vault
+    status: implemented_pending_validation
+    summary: A user can reopen a valid vault without losing state.
+    criteria:
+      - WorkLore validates vault.json and the entity registry.
+      - source, story, and pending privacy-review counts are returned.
+      - missing canonical directories are recreated without replacing user records.
+      - stale active-operation records are preserved as interrupted metrics.
+  - id: ac-vault-003
+    area: vault
+    status: implemented_pending_validation
+    summary: A local one-user installation resumes the last valid vault automatically.
+    criteria:
+      - the most recently created or manually opened vault path is stored in local application preferences outside the repository and vault.
+      - the last valid vault opens automatically on the next launch.
+      - a missing or invalid remembered vault falls back to the vault chooser without blocking startup.
+      - opening a different vault replaces the remembered launch default.
+      - choosing Change vault does not delete or modify the current vault.
+  - id: ac-source-001
+    area: source_import
+    status: implemented_pending_validation
+    summary: Imported source files are copied into the vault.
+    criteria:
+      - the original source file is not modified.
+      - SHA-256 is stored in source metadata.
+      - a second import of identical bytes reuses the existing source record.
+      - metadata stores a vault-relative path to the copied file.
+  - id: ac-source-002
+    area: extraction
+    status: implemented_pending_validation
+    summary: WorkLore reports text extraction state honestly.
+    criteria:
+      - TXT and Markdown are extracted locally as UTF-8.
+      - invalid UTF-8 is reported as failed.
+      - text-bearing PDF and DOCX files are extracted locally.
+      - unreadable or image-only documents are not marked as understood.
+  - id: ac-resume-001
+    area: resume_candidates
+    status: implemented_pending_validation
+    summary: Resume story candidates come only from explicit employment-history sections.
+    criteria:
+      - extraction starts only after a recognized work-history or employment-history heading.
+      - headline job titles above a career summary are ignored.
+      - bullets in summaries, profiles, skills, education, certifications, projects, awards, affiliations, and references are ignored.
+      - extraction stops when a recognized non-employment section begins.
+      - a resume without a recognized employment section produces no candidates and explains why.
+  - id: ac-privacy-001
+    area: privacy
+    status: implemented_pending_validation
+    summary: Every readable imported source completes an entity scan.
+    criteria:
+      - readable TXT, Markdown, PDF, and DOCX sources run the deterministic entity scan.
+      - detected entities receive stable vault-level tokens.
+      - provisional entities create review items except for low-friction URL detections.
+      - unsupported documents remain visibly unavailable for privacy scanning.
+  - id: ac-privacy-002
+    area: privacy
+    status: implemented_pending_validation
+    summary: Ambiguous matches require user resolution.
+    criteria:
+      - a review item can show multiple candidate entities and confidence reasons.
+      - the user can resolve same entity, related entity, new entity, or ignored term.
+      - a newly detected project name can be compared with an existing project description.
+  - id: ac-ui-001
+    area: desktop_shell
+    status: implemented_pending_validation
+    summary: The desktop shell makes the next action clear.
+    criteria:
+      - the landing surface offers create vault and open vault without scrolling.
+      - the workspace shows sources, stories, candidates, and privacy-review counts.
+      - import and privacy preference controls are near the state they affect.
+      - blocking file operations use a modal operation layer.
+  - id: ac-observability-001
+    area: observability
+    status: implemented_pending_validation
+    summary: Long local operations expose useful timing without storing private content.
+    criteria:
+      - source import records top-level and phase durations.
+      - active records show the current phase and elapsed time.
+      - completed metrics record outcomes and non-content workload sizes.
+      - metrics exclude source text, interview answers, private names, prompts, responses, and secrets.
+      - the workspace shows active operations, slow phases, and recent outcomes.
+  - id: ac-build-001
+    area: build_distribution
+    status: implemented_pending_validation
+    summary: Development, validation, QA, and release output remain outside the repository.
+    criteria:
+      - frontend output and Cargo targets use an external build root.
+      - QA is copied to a distinct external installation folder before launch.
+      - QA uses a distinct product name and application identifier.
+      - local scripts and CI fail when known build or install folders exist inside the repository.
+      - build and install manifests record external paths and the source commit.
+  - id: ac-provider-001
+    area: providers
+    status: designed
+    summary: Provider work uses bounded structured contracts.
+    criteria:
+      - provider output is validated locally against an operation schema.
+      - invalid structured output cannot update canonical records.
+      - request bodies are not retained by default.
+      - API keys are never written to the vault.
+  - id: ac-provider-002
+    area: manual_workspace
+    status: implemented_pending_validation
+    summary: Completed interviews can be exported to a privacy-safe manual AI workspace.
+    criteria:
+      - export runs the local privacy preflight before writing the package.
+      - private aliases are replaced with their durable vault tokens when redaction is active.
+      - replacement does not alter longer unrelated words that merely contain the alias.
+      - the package includes task instructions, selected context, structured input, privacy summary, and response schema.
+      - workspace export records operation phases and duration without retaining prompt bodies in metrics.
+  - id: ac-role-001
+    area: roles
+    status: implemented_pending_validation
+    summary: A canonical story is linked to the employment role associated with its work-history bullet.
+    criteria:
+      - role inference uses the candidate's work-history heading rather than a headline title elsewhere in the resume.
+      - common organization-title-date and title-at-organization headings are supported.
+      - an existing employer entity is reused when its canonical name or confirmed alias matches.
+      - a newly inferred employer receives a durable token and privacy review.
+      - duplicate role records are not created for the same organization, title, and date range.
+  - id: ac-story-001
+    area: story_import
+    status: implemented_pending_validation
+    summary: A synthesis response is validated before it can become a canonical story.
+    criteria:
+      - the response must match the strict structured response contract.
+      - unknown fields, empty titles, empty claims, and empty metrics are rejected.
+      - unsupported or unlinked claims are labeled and excluded by default rather than silently promoted.
+      - source fragments and interview answers become durable evidence records.
+      - the candidate and interview are linked to the resulting story.
+  - id: ac-story-002
+    area: story_storage
+    status: implemented_pending_validation
+    summary: Canonical stories remain portable, human-readable, and recoverable.
+    criteria:
+      - each story is written as paired Markdown and JSON records with the same story id and revision.
+      - paired writes use temporary files and backups so a partial failure can be rolled back.
+      - story content is scanned through the durable private-entity pipeline after import.
+      - re-importing a response for the same interview revises the existing story instead of creating a duplicate.
+      - the workspace supports review, validation, finalization, and archival status changes.

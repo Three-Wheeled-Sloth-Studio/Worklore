@@ -1,0 +1,130 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: '11'
+  files:
+  - path: src-tauri/src/domain/posts.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 18a939f9cc1895610a43214b58ff91f5b9d0e01b
+    dependencies:
+    - serde::{Deserialize, Serialize}
+    provides:
+    - parse
+    - as_str
+    - as_str
+    - parse
+    - relationship_type
+    - target_type
+    - parse_relationship
+    symbols:
+    - name: parse
+      kind: function
+      line_start: 11
+      line_end: 17
+      signature: 'parse(value: &str) -> Result<Self, String>'
+      inputs:
+      - 'value: &str'
+      output: Result<Self, String>
+      dependencies:
+      - Err
+      - Ok
+      parser: rust-pattern
+      dependency_targets: []
+    - name: as_str
+      kind: function
+      line_start: 28
+      line_end: 33
+      signature: as_str(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: as_str
+      kind: function
+      line_start: 45
+      line_end: 51
+      signature: as_str(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: parse
+      kind: function
+      line_start: 52
+      line_end: 60
+      signature: 'parse(value: &str) -> Result<Self, String>'
+      inputs:
+      - 'value: &str'
+      output: Result<Self, String>
+      dependencies:
+      - Err
+      - Ok
+      parser: rust-pattern
+      dependency_targets: []
+    - name: relationship_type
+      kind: function
+      line_start: 78
+      line_end: 90
+      signature: relationship_type(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: target_type
+      kind: function
+      line_start: 91
+      line_end: 104
+      signature: target_type(self) -> &'static str
+      inputs:
+      - self
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: parse_relationship
+      kind: function
+      line_start: 105
+      line_end: 119
+      signature: 'parse_relationship(value: &str) -> Option<Self>'
+      inputs:
+      - 'value: &str'
+      output: Option<Self>
+      dependencies:
+      - Some
+      parser: rust-pattern
+      dependency_targets: []
+  - path: src/components/QuickStartGuide.tsx
+    analysis_version: 1
+    language: typescript
+    content_hash: c4b1315a3a5aa26a490f2dc99c6cb60af3445df9
+    dependencies:
+    - ../help/quickStartContent
+    - react
+    provides:
+    - CloseIcon
+    symbols:
+    - name: CloseIcon
+      kind: function
+      line_start: 79
+      line_end: 86
+      signature: CloseIcon()
+      inputs: []
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+  - path: src/navigation.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: 173f7f77d4b52600638c194b148ac575c3c0d07c
+    dependencies: []
+    provides: []
+    symbols: []

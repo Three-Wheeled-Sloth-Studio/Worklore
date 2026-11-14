@@ -1,0 +1,291 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://worklore.local/schemas/private-entity.schema.json",
+  "title": "WorkLore Private Entity",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "entityId",
+    "entityType",
+    "canonicalName",
+    "publicToken",
+    "sensitivity",
+    "status",
+    "aliases",
+    "relationships",
+    "occurrences",
+    "createdAt",
+    "updatedAt",
+    "revision"
+  ],
+  "$defs": {
+    "alias": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "normalizedValue",
+        "status",
+        "source"
+      ],
+      "properties": {
+        "value": {
+          "type": "string",
+          "minLength": 1
+        },
+        "normalizedValue": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "confirmed",
+            "inferred",
+            "rejected"
+          ]
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "user",
+            "scan",
+            "import",
+            "merge"
+          ]
+        }
+      }
+    },
+    "relationship": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relationshipId",
+        "relationshipType",
+        "targetEntityId",
+        "status"
+      ],
+      "properties": {
+        "relationshipId": {
+          "type": "string",
+          "pattern": "^relationship_[A-Za-z0-9_-]+$"
+        },
+        "relationshipType": {
+          "type": "string",
+          "enum": [
+            "parent_of",
+            "child_of",
+            "owned_by",
+            "client_of",
+            "used_by",
+            "repository_for",
+            "related_to",
+            "replaced_by",
+            "user_defined"
+          ]
+        },
+        "targetEntityId": {
+          "type": "string",
+          "pattern": "^entity_[A-Za-z0-9_-]+$"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "confirmed",
+            "inferred",
+            "rejected"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "default": ""
+        }
+      }
+    },
+    "occurrence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "occurrenceId",
+        "recordType",
+        "recordId",
+        "locator",
+        "matchedText",
+        "extractionConfidence",
+        "typeConfidence",
+        "identityMatchConfidence",
+        "firstSeenAt",
+        "lastSeenAt"
+      ],
+      "properties": {
+        "occurrenceId": {
+          "type": "string",
+          "pattern": "^occurrence_[A-Za-z0-9_-]+$"
+        },
+        "recordType": {
+          "type": "string",
+          "enum": [
+            "source",
+            "story",
+            "interview",
+            "candidate",
+            "voice_profile",
+            "job",
+            "git_snapshot",
+            "other"
+          ]
+        },
+        "recordId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1
+        },
+        "matchedText": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extractionConfidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "typeConfidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "identityMatchConfidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "firstSeenAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastSeenAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "entityId": {
+      "type": "string",
+      "pattern": "^entity_[A-Za-z0-9_-]+$"
+    },
+    "entityType": {
+      "type": "string",
+      "enum": [
+        "employer",
+        "client",
+        "project",
+        "product",
+        "system",
+        "repository",
+        "person",
+        "location",
+        "email",
+        "phone",
+        "url",
+        "account",
+        "identifier",
+        "organization",
+        "user_defined"
+      ]
+    },
+    "canonicalName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "publicToken": {
+      "type": "string",
+      "pattern": "^\\[[A-Z_]+_[0-9]+\\]$"
+    },
+    "publicDescription": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 500
+    },
+    "sensitivity": {
+      "type": "string",
+      "enum": [
+        "public",
+        "private",
+        "ask_before_cloud",
+        "never_send_to_cloud"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "confirmed",
+        "provisional",
+        "merged",
+        "split",
+        "archived"
+      ]
+    },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/alias"
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/relationship"
+      }
+    },
+    "occurrences": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/occurrence"
+      }
+    },
+    "redirectToEntityId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "retiredTokens": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^\\[[A-Z_]+_[0-9]+\\]$"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "notes": {
+      "type": "string",
+      "default": ""
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}

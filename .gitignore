@@ -2,6 +2,10 @@
 node_modules/
 dist/
 build/
+artifacts/
+release/
+qa-install/
+validation-logs/
 coverage/
 *.log
 npm-debug.log*
@@ -12,6 +16,11 @@ pnpm-debug.log*
 # Rust and Tauri build output
 target/
 src-tauri/target/
+src-tauri/gen/schemas/
+
+# Python tooling output
+__pycache__/
+*.py[cod]
 
 # Environment and credentials
 .env
@@ -37,6 +46,9 @@ CareerVaults/
 *.db-shm
 provider-logs/
 extraction-cache/
+
+# Derived local agent context
+.agent-context.md
 
 # Local application state
 .cache/

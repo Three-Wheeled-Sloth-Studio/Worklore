@@ -1,0 +1,584 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: '19'
+  files:
+  - path: src-tauri/src/services/manual_workspace_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 87f0b906450b52c9af6c59abe8dc52f64aecd275
+    dependencies:
+    - chrono::Utc
+    - "crate::{\n    domain::{\n        candidates::StoryCandidate,\n        interviews::{InterviewSession, InterviewStatus,\
+      \ TurnActor},\n        providers::{CreateManualWorkspaceRequest, ManualWorkspaceResult, ManualWorkspaceTarget},\n  \
+      \  },\n    error::{ServiceResult, WorkLoreError},\n    io_utils::{read_json, write_json_atomic},\n    services::{performance_service::OperationSession,\
+      \ redaction_service::redact_for_external_use},\n}"
+    - serde_json::{json, Map, Value}
+    - std::{fs, path::Path}
+    - uuid::Uuid
+    provides:
+    - create_manual_workspace
+    - build_context
+    - workspace_readme
+    - task_instructions
+    - story_response_schema
+    - read_interview
+    - read_candidate
+    - ensure_vault
+    - short_id
+    - target_slug
+    - target_label
+    symbols:
+    - name: create_manual_workspace
+      kind: function
+      line_start: 17
+      line_end: 131
+      signature: 'create_manual_workspace(vault_path: &Path, request: CreateManualWorkspaceRequest) -> ServiceResult<ManualWorkspaceResult>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'request: CreateManualWorkspaceRequest'
+      output: ServiceResult<ManualWorkspaceResult>
+      dependencies:
+      - Err
+      - ManualWorkspace
+      - Ok
+      - String
+      - build_context
+      - create_dir_all
+      - ensure_vault
+      - first
+      - format
+      - metadata.insert
+      - new
+      - now
+      - now_v7
+      - ok_or
+      - operation.finish
+      - operation.set_phase
+      - output_root.join
+      - privacy_mode.clone
+      - read_candidate
+      - read_interview
+      - redact_for_external_use
+      - redacted.preflight.mode.clone
+      - redacted.preflight.warning_review_item_ids.len
+      - request.interview_id.clone
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/manual_workspace_service.rs
+        symbol: build_context
+      - path: src-tauri/src/services/performance_service.rs
+        symbol: finish
+      - path: src-tauri/src/services/performance_service.rs
+        symbol: set_phase
+      - path: src-tauri/src/services/interview_service.rs
+        symbol: read_candidate
+      - path: src-tauri/src/services/manual_workspace_service.rs
+        symbol: read_candidate
+      - path: src-tauri/src/services/story_service.rs
+        symbol: read_candidate
+      - path: src-tauri/src/services/manual_workspace_service.rs
+        symbol: read_interview
+      - path: src-tauri/src/services/story_service.rs
+        symbol: read_interview
+      - path: src-tauri/src/services/redaction_service.rs
+        symbol: redact_for_external_use
+    - name: build_context
+      kind: function
+      line_start: 132
+      line_end: 179
+      signature: 'build_context(candidate: &StoryCandidate, interview: &InterviewSession) -> String'
+      inputs:
+      - 'candidate: &StoryCandidate'
+      - 'interview: &InterviewSession'
+      output: String
+      dependencies:
+      - Some
+      - candidate.context.metrics.is_empty
+      - candidate.context.metrics.join
+      - candidate.context.tools.is_empty
+      - candidate.context.tools.join
+      - fields.replace
+      - filter
+      - iter
+      - map
+      - new
+      - output.push
+      - output.push_str
+      - to_ascii_lowercase
+      - to_string
+      - turn.target_fields.is_empty
+      - turn.target_fields.join
+      - unwrap_or_else
+      parser: rust-pattern
+      dependency_targets: []
+    - name: workspace_readme
+      kind: function
+      line_start: 180
+      line_end: 186
+      signature: 'workspace_readme(target: ManualWorkspaceTarget) -> String'
+      inputs:
+      - 'target: ManualWorkspaceTarget'
+      output: String
+      dependencies:
+      - target_label
+      parser: rust-pattern
+      dependency_targets:
+      - &id001
+        path: src-tauri/src/services/manual_workspace_service.rs
+        symbol: target_label
+    - name: task_instructions
+      kind: function
+      line_start: 187
+      line_end: 193
+      signature: 'task_instructions(target: ManualWorkspaceTarget) -> String'
+      inputs:
+      - 'target: ManualWorkspaceTarget'
+      output: String
+      dependencies:
+      - target_label
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+    - name: story_response_schema
+      kind: function
+      line_start: 194
+      line_end: 265
+      signature: story_response_schema() -> serde_json::Value
+      inputs: []
+      output: serde_json::Value
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: read_interview
+      kind: function
+      line_start: 266
+      line_end: 275
+      signature: 'read_interview(vault_path: &Path, interview_id: &str) -> ServiceResult<InterviewSession>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'interview_id: &str'
+      output: ServiceResult<InterviewSession>
+      dependencies:
+      - Err
+      - join
+      - path.is_file
+      - read_json
+      parser: rust-pattern
+      dependency_targets:
+      - &id002
+        path: src-tauri/src/io_utils.rs
+        symbol: read_json
+    - name: read_candidate
+      kind: function
+      line_start: 276
+      line_end: 285
+      signature: 'read_candidate(vault_path: &Path, candidate_id: &str) -> ServiceResult<StoryCandidate>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'candidate_id: &str'
+      output: ServiceResult<StoryCandidate>
+      dependencies:
+      - Err
+      - join
+      - path.is_file
+      - read_json
+      parser: rust-pattern
+      dependency_targets:
+      - *id002
+    - name: ensure_vault
+      kind: function
+      line_start: 286
+      line_end: 292
+      signature: 'ensure_vault(vault_path: &Path) -> ServiceResult<()>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<()>
+      dependencies:
+      - Err
+      - Ok
+      - is_file
+      - vault_path.join
+      parser: rust-pattern
+      dependency_targets: []
+    - name: short_id
+      kind: function
+      line_start: 293
+      line_end: 301
+      signature: 'short_id(value: &str) -> &str'
+      inputs:
+      - 'value: &str'
+      output: '&str'
+      dependencies:
+      - get
+      - next
+      - rsplit
+      - unwrap_or
+      parser: rust-pattern
+      dependency_targets: []
+    - name: target_slug
+      kind: function
+      line_start: 302
+      line_end: 310
+      signature: 'target_slug(target: ManualWorkspaceTarget) -> &''static str'
+      inputs:
+      - 'target: ManualWorkspaceTarget'
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+    - name: target_label
+      kind: function
+      line_start: 311
+      line_end: 319
+      signature: 'target_label(target: ManualWorkspaceTarget) -> &''static str'
+      inputs:
+      - 'target: ManualWorkspaceTarget'
+      output: '&''static str'
+      dependencies: []
+      parser: rust-pattern
+      dependency_targets: []
+  - path: src-tauri/src/services/vault_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 33be0a9c301b79fe862fdb417b9b888317c32bd6
+    dependencies:
+    - chrono::Utc
+    - "crate::{\n    domain::models::{\n        CloudIdentifierMode, VaultDocument, VaultFeatures, VaultPrivacy, VaultSummary,\n\
+      \    },\n    error::{ServiceResult, WorkLoreError},\n    io_utils::{read_json, sanitize_file_name, write_json_atomic},\n\
+      \    services::{\n        canonical_store,\n        entity_scan::{count_pending_review_items, initialize_registry, save_registry},\n\
+      \        performance_service, privacy_scan_migration,\n    },\n}"
+    - "std::{\n    fs,\n    path::{Path, PathBuf},\n}"
+    - super::*
+    - uuid::Uuid
+    provides:
+    - create_vault_in_parent
+    - create_vault
+    - open_vault
+    - update_cloud_identifier_mode
+    - summarize
+    - count_json_files
+    - vault_folder_name
+    - unique_vault_directory
+    - vault_directories_do_not_use_parent_traversal
+    - vault_creation_uses_a_named_child_folder
+    - existing_named_folder_gets_a_unique_sibling
+    symbols:
+    - name: create_vault_in_parent
+      kind: function
+      line_start: 53
+      line_end: 66
+      signature: 'create_vault_in_parent(parent_path: &Path, name: &str) -> ServiceResult<VaultSummary>'
+      inputs:
+      - 'parent_path: &Path'
+      - 'name: &str'
+      output: ServiceResult<VaultSummary>
+      dependencies:
+      - Err
+      - InvalidVault
+      - create_dir_all
+      - create_vault
+      - name.trim
+      - to_string
+      - trimmed_name.is_empty
+      - unique_vault_directory
+      - vault_folder_name
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/commands/vault.rs
+        symbol: create_vault
+      - path: src-tauri/src/services/vault_service.rs
+        symbol: create_vault
+      - path: src-tauri/src/services/vault_service.rs
+        symbol: unique_vault_directory
+      - path: src-tauri/src/services/vault_service.rs
+        symbol: vault_folder_name
+    - name: create_vault
+      kind: function
+      line_start: 67
+      line_end: 113
+      signature: 'create_vault(path: &Path, name: &str) -> ServiceResult<VaultSummary>'
+      inputs:
+      - 'path: &Path'
+      - 'name: &str'
+      output: ServiceResult<VaultSummary>
+      dependencies:
+      - Err
+      - InvalidVault
+      - create_dir_all
+      - default
+      - exists
+      - initialize_and_migrate
+      - initialize_registry
+      - name.trim
+      - new
+      - now
+      - now.clone
+      - now_v7
+      - path.join
+      - save_registry
+      - summarize
+      - to_rfc3339
+      - to_string
+      - trimmed_name.is_empty
+      - trimmed_name.to_string
+      - write_json_atomic
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/app_preferences_service.rs
+        symbol: default
+      - &id003
+        path: src-tauri/src/services/canonical_store.rs
+        symbol: initialize_and_migrate
+      - path: src-tauri/src/services/entity_scan.rs
+        symbol: initialize_registry
+      - path: src-tauri/src/services/entity_scan.rs
+        symbol: save_registry
+      - &id004
+        path: src-tauri/src/services/interview_service.rs
+        symbol: summarize
+      - &id005
+        path: src-tauri/src/services/seed_development_service.rs
+        symbol: summarize
+      - &id006
+        path: src-tauri/src/services/vault_service.rs
+        symbol: summarize
+      - &id007
+        path: src-tauri/src/io_utils.rs
+        symbol: write_json_atomic
+    - name: open_vault
+      kind: function
+      line_start: 114
+      line_end: 143
+      signature: 'open_vault(path: &Path) -> ServiceResult<VaultSummary>'
+      inputs:
+      - 'path: &Path'
+      output: ServiceResult<VaultSummary>
+      dependencies:
+      - Err
+      - InvalidVault
+      - create_dir_all
+      - initialize_and_migrate
+      - is_file
+      - migrate_legacy_review_noise
+      - path.join
+      - read_json
+      - recover_interrupted
+      - summarize
+      - to_string
+      - vault_file.is_file
+      parser: rust-pattern
+      dependency_targets:
+      - *id003
+      - path: src-tauri/src/services/privacy_scan_migration.rs
+        symbol: migrate_legacy_review_noise
+      - *id002
+      - path: src-tauri/src/services/performance_service.rs
+        symbol: recover_interrupted
+      - *id004
+      - *id005
+      - *id006
+    - name: update_cloud_identifier_mode
+      kind: function
+      line_start: 144
+      line_end: 154
+      signature: 'update_cloud_identifier_mode(path: &Path, mode: CloudIdentifierMode) -> ServiceResult<VaultSummary>'
+      inputs:
+      - 'path: &Path'
+      - 'mode: CloudIdentifierMode'
+      output: ServiceResult<VaultSummary>
+      dependencies:
+      - now
+      - path.join
+      - read_json
+      - summarize
+      - to_rfc3339
+      - write_json_atomic
+      parser: rust-pattern
+      dependency_targets:
+      - *id002
+      - *id004
+      - *id005
+      - *id006
+      - *id007
+    - name: summarize
+      kind: function
+      line_start: 155
+      line_end: 169
+      signature: 'summarize(path: &Path, vault: VaultDocument) -> ServiceResult<VaultSummary>'
+      inputs:
+      - 'path: &Path'
+      - 'vault: VaultDocument'
+      output: ServiceResult<VaultSummary>
+      dependencies:
+      - Ok
+      - count_json_files
+      - count_pending_review_items
+      - path.join
+      - path.to_string_lossy
+      - to_string
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/vault_service.rs
+        symbol: count_json_files
+      - path: src-tauri/src/services/entity_scan.rs
+        symbol: count_pending_review_items
+    - name: count_json_files
+      kind: function
+      line_start: 170
+      line_end: 186
+      signature: 'count_json_files(directory: &Path) -> ServiceResult<usize>'
+      inputs:
+      - 'directory: &Path'
+      output: ServiceResult<usize>
+      dependencies:
+      - Ok
+      - Some
+      - and_then
+      - directory.exists
+      - entry.file_type
+      - entry.path
+      - extension
+      - is_file
+      - read_dir
+      - value.to_str
+      parser: rust-pattern
+      dependency_targets: []
+    - name: vault_folder_name
+      kind: function
+      line_start: 187
+      line_end: 222
+      signature: 'vault_folder_name(name: &str) -> String'
+      inputs:
+      - 'name: &str'
+      output: String
+      dependencies:
+      - sanitize_file_name
+      - sanitized.to_ascii_uppercase
+      - to_string
+      - upper.as_str
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/io_utils.rs
+        symbol: sanitize_file_name
+    - name: unique_vault_directory
+      kind: function
+      line_start: 223
+      line_end: 238
+      signature: 'unique_vault_directory(parent_path: &Path, folder_name: &str) -> PathBuf'
+      inputs:
+      - 'parent_path: &Path'
+      - 'folder_name: &str'
+      output: PathBuf
+      dependencies:
+      - candidate.exists
+      - direct.exists
+      - now_v7
+      - parent_path.join
+      parser: rust-pattern
+      dependency_targets: []
+    - name: vault_directories_do_not_use_parent_traversal
+      kind: function
+      line_start: 245
+      line_end: 249
+      signature: vault_directories_do_not_use_parent_traversal()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - all
+      - directory.contains
+      - iter
+      parser: rust-pattern
+      dependency_targets: []
+    - name: vault_creation_uses_a_named_child_folder
+      kind: function
+      line_start: 252
+      line_end: 265
+      signature: vault_creation_uses_a_named_child_folder()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - create_vault_in_parent
+      - expect
+      - expected.join
+      - expected.to_string_lossy
+      - is_file
+      - join
+      - now_v7
+      - parent.join
+      - remove_dir_all
+      - temp_dir
+      parser: rust-pattern
+      dependency_targets:
+      - &id008
+        path: src-tauri/src/commands/vault.rs
+        symbol: create_vault_in_parent
+      - &id009
+        path: src-tauri/src/services/vault_service.rs
+        symbol: create_vault_in_parent
+    - name: existing_named_folder_gets_a_unique_sibling
+      kind: function
+      line_start: 268
+      line_end: 281
+      signature: existing_named_folder_gets_a_unique_sibling()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - create_dir_all
+      - create_vault_in_parent
+      - expect
+      - expected.join
+      - expected.to_string_lossy
+      - is_file
+      - join
+      - now_v7
+      - parent.join
+      - remove_dir_all
+      - temp_dir
+      parser: rust-pattern
+      dependency_targets:
+      - *id008
+      - *id009
+  - path: src/components/FutureWorkspace.tsx
+    analysis_version: 1
+    language: typescript
+    content_hash: 9f889d9f8d024828aef6ed4ca3532110f6271085
+    dependencies: []
+    provides:
+    - FutureWorkspace
+    symbols:
+    - name: FutureWorkspace
+      kind: function
+      line_start: 1
+      line_end: 1
+      signature: 'FutureWorkspace({ view }: { view: <literal omitted>)'
+      inputs:
+      - '{ view }: { view: <literal omitted>'
+      output: unspecified
+      dependencies: []
+      parser: typescript-pattern
+      dependency_targets: []
+  - path: src/voiceWorkspaceQueue.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: 6bbbb917c2b7e78bb569f3c4f88128c32f6c06f5
+    dependencies:
+    - ./domain/types
+    provides:
+    - groupVoiceWorkspaceItems
+    symbols:
+    - name: groupVoiceWorkspaceItems
+      kind: function
+      line_start: 9
+      line_end: 24
+      signature: 'groupVoiceWorkspaceItems(candidates: VoiceSourceCandidate[], evidence: VoiceEvidenceRecord[]) -> VoiceWorkspaceQueue'
+      inputs:
+      - 'candidates: VoiceSourceCandidate[]'
+      - 'evidence: VoiceEvidenceRecord[]'
+      output: VoiceWorkspaceQueue
+      dependencies:
+      - candidates.filter
+      - evidence.filter
+      parser: typescript-pattern
+      dependency_targets: []

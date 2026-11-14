@@ -1,0 +1,520 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  bucket: 0d
+  files:
+  - path: src-tauri/src/error.rs
+    analysis_version: 1
+    language: rust
+    content_hash: d30b9c316f34e2e98ec6fbcf03c9f2e2d4ba45e4
+    dependencies:
+    - serde::Serialize
+    - thiserror::Error
+    provides:
+    - background_task
+    - from
+    symbols:
+    - name: background_task
+      kind: function
+      line_start: 91
+      line_end: 97
+      signature: 'background_task(error: impl ToString) -> Self'
+      inputs:
+      - 'error: impl ToString'
+      output: Self
+      dependencies:
+      - Some
+      - error.to_string
+      - to_string
+      parser: rust-pattern
+      dependency_targets: []
+    - name: from
+      kind: function
+      line_start: 101
+      line_end: 142
+      signature: 'from(value: WorkLoreError) -> Self'
+      inputs:
+      - 'value: WorkLoreError'
+      output: Self
+      dependencies:
+      - DocumentExtraction
+      - InvalidInterviewAction
+      - InvalidReviewResolution
+      - InvalidStoryResponse
+      - InvalidVault
+      - Io
+      - Json
+      - ManualWorkspace
+      - ProviderPreflightBlocked
+      - RoleInferenceFailed
+      - Some
+      - SourceNotReady
+      - Sqlite
+      - code.to_string
+      - message.clone
+      - to_string
+      - value.to_string
+      parser: rust-pattern
+      dependency_targets: []
+  - path: src-tauri/src/services/role_service.rs
+    analysis_version: 1
+    language: rust
+    content_hash: 5058d9ae51090890277121906e1c7a00a4b6f02d
+    dependencies:
+    - chrono::Utc
+    - crate::services::entity_scan::initialize_registry
+    - "crate::{\n    domain::{\n        candidates::StoryCandidate,\n        models::{\n            EntityAlias, EntityOccurrence,\
+      \ EntityReviewItem, EntitySensitivity, EntityStatus,\n            EntityType, PrivateEntity, PrivateEntityRegistry,\
+      \ ReviewCandidateMatch, ReviewScores,\n        },\n        roles::{ParsedRoleHeading, RoleRecord, RoleSummary},\n  \
+      \  },\n    error::{ServiceResult, WorkLoreError},\n    io_utils::{read_json, write_json_atomic},\n    services::entity_scan::{load_registry,\
+      \ save_registry},\n}"
+    - regex::Regex
+    - std::{fs, path::Path}
+    - super::*
+    - uuid::Uuid
+    provides:
+    - ensure_role_for_candidate
+    - read_role
+    - save_role
+    - list_role_summaries
+    - parse_role_heading
+    - split_heading
+    - split_title_at_organization
+    - parse_dates
+    - looks_like_date_segment
+    - entity_name_exists
+    - ensure_employer_entity
+    - read_roles
+    - role_path
+    - normalize
+    - parses_common_employment_heading
+    - parses_title_at_organization_without_absorbing_date_text
+    - rejects_headings_without_organization_and_title
+    symbols:
+    - name: ensure_role_for_candidate
+      kind: function
+      line_start: 20
+      line_end: 85
+      signature: 'ensure_role_for_candidate(vault_path: &Path, candidate: &StoryCandidate) -> ServiceResult<RoleRecord>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'candidate: &StoryCandidate'
+      output: ServiceResult<RoleRecord>
+      dependencies:
+      - Ok
+      - RoleInferenceFailed
+      - Some
+      - as_deref
+      - candidate.context.entity_ids.clone
+      - collect
+      - ensure_employer_entity
+      - find
+      - into_iter
+      - iter
+      - load_registry
+      - map
+      - new
+      - normalize
+      - now
+      - now.clone
+      - now_v7
+      - ok_or_else
+      - parse_role_heading
+      - path.is_file
+      - read_json
+      - read_roles
+      - reference.source_id.clone
+      - role_path
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/role_service.rs
+        symbol: ensure_employer_entity
+      - &id003
+        path: src-tauri/src/services/entity_scan.rs
+        symbol: load_registry
+      - &id005
+        path: src-tauri/src/services/contextual_entity_scan.rs
+        symbol: normalize
+      - &id006
+        path: src-tauri/src/services/entity_scan.rs
+        symbol: normalize
+      - &id007
+        path: src-tauri/src/services/role_service.rs
+        symbol: normalize
+      - &id008
+        path: src-tauri/src/services/story_service.rs
+        symbol: normalize
+      - &id009
+        path: src-tauri/src/services/role_service.rs
+        symbol: parse_role_heading
+      - &id001
+        path: src-tauri/src/io_utils.rs
+        symbol: read_json
+      - &id004
+        path: src-tauri/src/services/role_service.rs
+        symbol: read_roles
+      - &id002
+        path: src-tauri/src/services/role_service.rs
+        symbol: role_path
+    - name: read_role
+      kind: function
+      line_start: 86
+      line_end: 93
+      signature: 'read_role(vault_path: &Path, role_id: &str) -> ServiceResult<RoleRecord>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'role_id: &str'
+      output: ServiceResult<RoleRecord>
+      dependencies:
+      - Err
+      - path.is_file
+      - read_json
+      - role_path
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+      - *id002
+    - name: save_role
+      kind: function
+      line_start: 94
+      line_end: 97
+      signature: 'save_role(vault_path: &Path, role: &RoleRecord) -> ServiceResult<()>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'role: &RoleRecord'
+      output: ServiceResult<()>
+      dependencies:
+      - role_path
+      - write_json_atomic
+      parser: rust-pattern
+      dependency_targets:
+      - *id002
+      - path: src-tauri/src/io_utils.rs
+        symbol: write_json_atomic
+    - name: list_role_summaries
+      kind: function
+      line_start: 98
+      line_end: 121
+      signature: 'list_role_summaries(vault_path: &Path) -> ServiceResult<Vec<RoleSummary>>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Vec<RoleSummary>>
+      dependencies:
+      - Ok
+      - Reverse
+      - entity.canonical_name.clone
+      - find
+      - into_iter
+      - iter
+      - load_registry
+      - map
+      - read_roles
+      - role.start_date.clone
+      - role.story_ids.len
+      - summaries.sort_by_key
+      - to_string
+      - unwrap_or_else
+      parser: rust-pattern
+      dependency_targets:
+      - *id003
+      - *id004
+    - name: parse_role_heading
+      kind: function
+      line_start: 122
+      line_end: 173
+      signature: 'parse_role_heading(heading: &str, registry: &PrivateEntityRegistry) -> ServiceResult<ParsedRoleHeading>'
+      inputs:
+      - 'heading: &str'
+      - 'registry: &PrivateEntityRegistry'
+      output: ServiceResult<ParsedRoleHeading>
+      dependencies:
+      - Err
+      - Ok
+      - RoleInferenceFailed
+      - Some
+      - entity_name_exists
+      - filter
+      - find
+      - heading.trim
+      - into_iter
+      - is_empty
+      - iter
+      - let
+      - looks_like_date_segment
+      - map
+      - ok_or_else
+      - organization.to_string
+      - organization_name.trim
+      - parse_dates
+      - position
+      - segment.trim
+      - segments.first
+      - segments.len
+      - segments.remove
+      - split_heading
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/services/role_service.rs
+        symbol: entity_name_exists
+      - path: src-tauri/src/services/role_service.rs
+        symbol: looks_like_date_segment
+      - path: src-tauri/src/services/role_service.rs
+        symbol: parse_dates
+      - path: src-tauri/src/services/role_service.rs
+        symbol: split_heading
+    - name: split_heading
+      kind: function
+      line_start: 174
+      line_end: 188
+      signature: 'split_heading(heading: &str) -> Vec<String>'
+      inputs:
+      - 'heading: &str'
+      output: Vec<String>
+      dependencies:
+      - filter
+      - heading.to_string
+      - map
+      - split
+      - value.is_empty
+      - values.len
+      parser: rust-pattern
+      dependency_targets: []
+    - name: split_title_at_organization
+      kind: function
+      line_start: 189
+      line_end: 196
+      signature: 'split_title_at_organization(heading: &str) -> Option<(&str, &str)>'
+      inputs:
+      - 'heading: &str'
+      output: Option<(&str, &str)>
+      dependencies:
+      - heading.get
+      - heading.to_ascii_lowercase
+      - lower.find
+      - organization.is_empty
+      - then_some
+      - title.is_empty
+      - trim
+      parser: rust-pattern
+      dependency_targets: []
+    - name: parse_dates
+      kind: function
+      line_start: 197
+      line_end: 213
+      signature: 'parse_dates(value: &str) -> (Option<String>, Option<String>, bool)'
+      inputs:
+      - 'value: &str'
+      output: (Option<String>, Option<String>, bool)
+      dependencies:
+      - b
+      - cloned
+      - expect
+      - find_iter
+      - lower.contains
+      - map
+      - matched.as_str
+      - new
+      - to_string
+      - value.to_ascii_lowercase
+      - years.first
+      - years.get
+      parser: rust-pattern
+      dependency_targets: []
+    - name: looks_like_date_segment
+      kind: function
+      line_start: 214
+      line_end: 222
+      signature: 'looks_like_date_segment(value: &str) -> bool'
+      inputs:
+      - 'value: &str'
+      output: bool
+      dependencies:
+      - b
+      - expect
+      - is_match
+      - lower.contains
+      - new
+      - value.to_ascii_lowercase
+      parser: rust-pattern
+      dependency_targets: []
+    - name: entity_name_exists
+      kind: function
+      line_start: 223
+      line_end: 233
+      signature: 'entity_name_exists(registry: &PrivateEntityRegistry, value: &str) -> bool'
+      inputs:
+      - 'registry: &PrivateEntityRegistry'
+      - 'value: &str'
+      output: bool
+      dependencies:
+      - any
+      - entity.aliases.iter
+      - normalize
+      - registry.entities.iter
+      parser: rust-pattern
+      dependency_targets:
+      - *id005
+      - *id006
+      - *id007
+      - *id008
+    - name: ensure_employer_entity
+      kind: function
+      line_start: 234
+      line_end: 333
+      signature: 'ensure_employer_entity(vault_path: &Path, registry: &mut PrivateEntityRegistry, candidate: &StoryCandidate,
+        heading: &str, organization_name: &str) -> ServiceResult<String>'
+      inputs:
+      - 'vault_path: &Path'
+      - 'registry: &mut PrivateEntityRegistry'
+      - 'candidate: &StoryCandidate'
+      - 'heading: &str'
+      - 'organization_name: &str'
+      output: ServiceResult<String>
+      dependencies:
+      - Employer.token_family
+      - Ok
+      - Some
+      - any
+      - candidate.candidate_id.clone
+      - entity.aliases.iter
+      - entity.entity_id.clone
+      - entity_id.clone
+      - family.clone
+      - find
+      - heading.to_string
+      - join
+      - new
+      - normalize
+      - normalized.clone
+      - now
+      - now.clone
+      - now_v7
+      - or_insert
+      - organization_name.to_string
+      - registry.entities.iter
+      - registry.entities.push
+      - registry.token_counters.entry
+      - to_rfc3339
+      parser: rust-pattern
+      dependency_targets:
+      - path: src-tauri/src/domain/models.rs
+        symbol: token_family
+      - *id005
+      - *id006
+      - *id007
+      - *id008
+    - name: read_roles
+      kind: function
+      line_start: 334
+      line_end: 350
+      signature: 'read_roles(vault_path: &Path) -> ServiceResult<Vec<RoleRecord>>'
+      inputs:
+      - 'vault_path: &Path'
+      output: ServiceResult<Vec<RoleRecord>>
+      dependencies:
+      - Ok
+      - Some
+      - and_then
+      - directory.exists
+      - entry.file_type
+      - entry.path
+      - extension
+      - is_file
+      - new
+      - read_dir
+      - read_json
+      - roles.push
+      - value.to_str
+      - vault_path.join
+      parser: rust-pattern
+      dependency_targets:
+      - *id001
+    - name: role_path
+      kind: function
+      line_start: 351
+      line_end: 354
+      signature: 'role_path(vault_path: &Path, role_id: &str) -> std::path::PathBuf'
+      inputs:
+      - 'vault_path: &Path'
+      - 'role_id: &str'
+      output: std::path::PathBuf
+      dependencies:
+      - join
+      - vault_path.join
+      parser: rust-pattern
+      dependency_targets: []
+    - name: normalize
+      kind: function
+      line_start: 355
+      line_end: 362
+      signature: 'normalize(value: &str) -> String'
+      inputs:
+      - 'value: &str'
+      output: String
+      dependencies:
+      - character.is_ascii_alphanumeric
+      - chars
+      - collect
+      - filter
+      - flat_map
+      parser: rust-pattern
+      dependency_targets: []
+    - name: parses_common_employment_heading
+      kind: function
+      line_start: 370
+      line_end: 378
+      signature: parses_common_employment_heading()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - Some
+      - expect
+      - initialize_registry
+      - parse_role_heading
+      - parsed.start_date.as_deref
+      parser: rust-pattern
+      dependency_targets:
+      - &id010
+        path: src-tauri/src/services/entity_scan.rs
+        symbol: initialize_registry
+      - *id009
+    - name: parses_title_at_organization_without_absorbing_date_text
+      kind: function
+      line_start: 381
+      line_end: 388
+      signature: parses_title_at_organization_without_absorbing_date_text()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - expect
+      - initialize_registry
+      - parse_role_heading
+      parser: rust-pattern
+      dependency_targets:
+      - *id010
+      - *id009
+    - name: rejects_headings_without_organization_and_title
+      kind: function
+      line_start: 391
+      line_end: 394
+      signature: rejects_headings_without_organization_and_title()
+      inputs: []
+      output: unspecified
+      dependencies:
+      - initialize_registry
+      - is_err
+      - parse_role_heading
+      parser: rust-pattern
+      dependency_targets:
+      - *id010
+      - *id009
+  - path: src/navigation.test.ts
+    analysis_version: 1
+    language: typescript
+    content_hash: d44c963e198c94f0f6ed5bef980c90b834f84123
+    dependencies:
+    - ./navigation
+    - vitest
+    provides: []
+    symbols: []

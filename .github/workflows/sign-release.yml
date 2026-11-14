@@ -1,0 +1,210 @@
+name: Sign and publish WorkLore release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: sign-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  sign-and-publish:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    env:
+      SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
+      SIGNPATH_ORGANIZATION_ID: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+      SIGNPATH_PROJECT_SLUG: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+      SIGNPATH_SIGNING_POLICY_SLUG: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+      SIGNPATH_ARTIFACT_CONFIGURATION_SLUG: ${{ vars.SIGNPATH_ARTIFACT_CONFIGURATION_SLUG }}
+
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify release source and version
+        id: version
+        shell: pwsh
+        run: |
+          if ($env:GITHUB_REF_NAME -notmatch '^v(?<version>\d+\.\d+\.\d+)$') {
+            throw "Release tag must use vMAJOR.MINOR.PATCH. Received: $env:GITHUB_REF_NAME"
+          }
+
+          $version = $Matches.version
+          git fetch origin main
+          git merge-base --is-ancestor $env:GITHUB_SHA origin/main
+          if ($LASTEXITCODE -ne 0) {
+            throw "Release tags must point to a commit contained in origin/main."
+          }
+
+          $packageVersion = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          $tauriVersion = (Get-Content src-tauri/tauri.conf.json -Raw | ConvertFrom-Json).version
+          $cargoVersion = Select-String -Path src-tauri/Cargo.toml -Pattern '^version\s*=\s*"([^"]+)"' |
+            Select-Object -First 1 |
+            ForEach-Object { $_.Matches[0].Groups[1].Value }
+
+          foreach ($entry in @{
+            package = $packageVersion
+            tauri = $tauriVersion
+            cargo = $cargoVersion
+          }.GetEnumerator()) {
+            if ($entry.Value -ne $version) {
+              throw "$($entry.Key) version '$($entry.Value)' does not match release tag '$version'."
+            }
+          }
+
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Verify SignPath configuration
+        shell: pwsh
+        run: |
+          $required = @(
+            "SIGNPATH_API_TOKEN",
+            "SIGNPATH_ORGANIZATION_ID",
+            "SIGNPATH_PROJECT_SLUG",
+            "SIGNPATH_SIGNING_POLICY_SLUG",
+            "SIGNPATH_ARTIFACT_CONFIGURATION_SLUG"
+          )
+          $missing = $required | Where-Object { [string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($_)) }
+          if ($missing) {
+            throw "SignPath approval and repository configuration are incomplete. Missing: $($missing -join ', ')"
+          }
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Initialize external release folders
+        shell: pwsh
+        run: |
+          $externalRoot = Join-Path $env:RUNNER_TEMP "WorkLore"
+          $signingInput = Join-Path $env:RUNNER_TEMP "signing-input"
+          $signingOutput = Join-Path $env:RUNNER_TEMP "signing-output"
+
+          "WORKLORE_EXTERNAL_ROOT=$externalRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "WORKLORE_SIGNING_INPUT=$signingInput" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "WORKLORE_SIGNING_OUTPUT=$signingOutput" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+          New-Item -ItemType Directory -Force -Path $externalRoot, $signingInput, $signingOutput | Out-Null
+
+      - name: Install validation dependency
+        shell: pwsh
+        run: python -m pip install pyyaml
+
+      - name: Build and validate production executable
+        shell: pwsh
+        run: ./scripts/build.ps1 -Channel release -Clean
+
+      - name: Stage and inspect unsigned executable
+        shell: pwsh
+        run: |
+          $source = Join-Path $env:WORKLORE_EXTERNAL_ROOT "build\release\cargo-target\release\worklore.exe"
+          $destination = Join-Path $env:WORKLORE_SIGNING_INPUT "WorkLore.exe"
+          if (-not (Test-Path -LiteralPath $source)) {
+            throw "Release build did not produce $source"
+          }
+
+          Copy-Item -LiteralPath $source -Destination $destination
+          $signature = Get-AuthenticodeSignature -LiteralPath $destination
+          if ($signature.Status -ne "NotSigned") {
+            throw "Signing input must be unsigned. Actual status: $($signature.Status)"
+          }
+
+          $versionInfo = (Get-Item -LiteralPath $destination).VersionInfo
+          if ($versionInfo.ProductName -ne "WorkLore") {
+            throw "Unexpected ProductName: $($versionInfo.ProductName)"
+          }
+          if ($versionInfo.CompanyName -ne "Three-Wheeled Sloth Studio") {
+            throw "Unexpected CompanyName: $($versionInfo.CompanyName)"
+          }
+          if ($versionInfo.ProductVersion -ne "${{ steps.version.outputs.version }}") {
+            throw "Unexpected ProductVersion: $($versionInfo.ProductVersion)"
+          }
+
+      - name: Upload unsigned artifact for trusted-build verification
+        id: upload-unsigned
+        uses: actions/upload-artifact@v7
+        with:
+          name: WorkLore-${{ steps.version.outputs.version }}-unsigned
+          path: ${{ env.WORKLORE_SIGNING_INPUT }}/WorkLore.exe
+          archive: false
+          retention-days: 1
+
+      - name: Submit SignPath signing request
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: ${{ vars.SIGNPATH_ARTIFACT_CONFIGURATION_SLUG }}
+          github-artifact-id: ${{ steps.upload-unsigned.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: ${{ env.WORKLORE_SIGNING_OUTPUT }}
+          skip-decompress: true
+          parameters: |
+            version: ${{ toJSON(steps.version.outputs.version) }}
+
+      - name: Verify signed executable and write checksum
+        shell: pwsh
+        run: |
+          $signed = Join-Path $env:WORKLORE_SIGNING_OUTPUT "WorkLore.exe"
+          if (-not (Test-Path -LiteralPath $signed)) {
+            throw "SignPath did not return WorkLore.exe."
+          }
+
+          $signature = Get-AuthenticodeSignature -LiteralPath $signed
+          if ($signature.Status -ne "Valid") {
+            throw "Signed executable failed Authenticode verification: $($signature.Status)"
+          }
+          if ($signature.SignerCertificate.Subject -notmatch "SignPath Foundation") {
+            throw "Unexpected signer: $($signature.SignerCertificate.Subject)"
+          }
+          if ($null -eq $signature.TimeStamperCertificate) {
+            throw "Signed executable does not contain a trusted timestamp."
+          }
+
+          $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $signed).Hash.ToLowerInvariant()
+          "$hash  WorkLore.exe" | Set-Content -Encoding ascii (Join-Path $env:WORKLORE_SIGNING_OUTPUT "WorkLore.exe.sha256")
+
+      - name: Upload verified signed release artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: WorkLore-${{ steps.version.outputs.version }}-signed
+          path: |
+            ${{ env.WORKLORE_SIGNING_OUTPUT }}/WorkLore.exe
+            ${{ env.WORKLORE_SIGNING_OUTPUT }}/WorkLore.exe.sha256
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $signed = Join-Path $env:WORKLORE_SIGNING_OUTPUT "WorkLore.exe"
+          $checksum = Join-Path $env:WORKLORE_SIGNING_OUTPUT "WorkLore.exe.sha256"
+          gh release create $env:GITHUB_REF_NAME $signed $checksum `
+            --verify-tag `
+            --title "WorkLore $env:GITHUB_REF_NAME" `
+            --notes "Free code signing provided by SignPath.io, certificate by SignPath Foundation. See the code signing policy: https://github.com/Three-Wheeled-Sloth-Studio/Worklore/blob/$env:GITHUB_REF_NAME/CODE_SIGNING_POLICY.md" `
+            --generate-notes

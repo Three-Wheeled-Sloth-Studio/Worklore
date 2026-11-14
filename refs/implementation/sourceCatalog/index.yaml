@@ -1,0 +1,119 @@
+version: 1
+schema: refs/schemas/schemaRegistry.yaml
+source_catalog:
+  format_version: 1
+  generated_by: refs/tools/generate_source_catalog.py
+  derived: true
+  tracked_source_files: 130
+  symbols: 1318
+  languages:
+    python: 1
+    rust: 80
+    typescript: 49
+  parsers:
+    python-ast: 3
+    rust-pattern: 1007
+    typescript-pattern: 308
+  shards:
+  - path: refs/implementation/.sourceCatalogShards/shard-00.yaml
+    files: 2
+    symbols: 33
+  - path: refs/implementation/.sourceCatalogShards/shard-01.yaml
+    files: 9
+    symbols: 92
+  - path: refs/implementation/.sourceCatalogShards/shard-02.yaml
+    files: 1
+    symbols: 12
+  - path: refs/implementation/.sourceCatalogShards/shard-03.yaml
+    files: 7
+    symbols: 86
+  - path: refs/implementation/.sourceCatalogShards/shard-04.yaml
+    files: 3
+    symbols: 6
+  - path: refs/implementation/.sourceCatalogShards/shard-05.yaml
+    files: 2
+    symbols: 41
+  - path: refs/implementation/.sourceCatalogShards/shard-06.yaml
+    files: 5
+    symbols: 56
+  - path: refs/implementation/.sourceCatalogShards/shard-07.yaml
+    files: 5
+    symbols: 27
+  - path: refs/implementation/.sourceCatalogShards/shard-08.yaml
+    files: 2
+    symbols: 18
+  - path: refs/implementation/.sourceCatalogShards/shard-09.yaml
+    files: 4
+    symbols: 76
+  - path: refs/implementation/.sourceCatalogShards/shard-0a.yaml
+    files: 8
+    symbols: 39
+  - path: refs/implementation/.sourceCatalogShards/shard-0b.yaml
+    files: 8
+    symbols: 80
+  - path: refs/implementation/.sourceCatalogShards/shard-0c.yaml
+    files: 7
+    symbols: 28
+  - path: refs/implementation/.sourceCatalogShards/shard-0d.yaml
+    files: 3
+    symbols: 19
+  - path: refs/implementation/.sourceCatalogShards/shard-0e.yaml
+    files: 2
+    symbols: 40
+  - path: refs/implementation/.sourceCatalogShards/shard-0f.yaml
+    files: 3
+    symbols: 78
+  - path: refs/implementation/.sourceCatalogShards/shard-10.yaml
+    files: 4
+    symbols: 109
+  - path: refs/implementation/.sourceCatalogShards/shard-11.yaml
+    files: 3
+    symbols: 8
+  - path: refs/implementation/.sourceCatalogShards/shard-12.yaml
+    files: 3
+    symbols: 21
+  - path: refs/implementation/.sourceCatalogShards/shard-13.yaml
+    files: 8
+    symbols: 73
+  - path: refs/implementation/.sourceCatalogShards/shard-14.yaml
+    files: 4
+    symbols: 16
+  - path: refs/implementation/.sourceCatalogShards/shard-15.yaml
+    files: 5
+    symbols: 86
+  - path: refs/implementation/.sourceCatalogShards/shard-16.yaml
+    files: 1
+    symbols: 6
+  - path: refs/implementation/.sourceCatalogShards/shard-17.yaml
+    files: 3
+    symbols: 30
+  - path: refs/implementation/.sourceCatalogShards/shard-18.yaml
+    files: 4
+    symbols: 54
+  - path: refs/implementation/.sourceCatalogShards/shard-19.yaml
+    files: 4
+    symbols: 24
+  - path: refs/implementation/.sourceCatalogShards/shard-1a.yaml
+    files: 3
+    symbols: 22
+  - path: refs/implementation/.sourceCatalogShards/shard-1b.yaml
+    files: 3
+    symbols: 15
+  - path: refs/implementation/.sourceCatalogShards/shard-1c.yaml
+    files: 4
+    symbols: 8
+  - path: refs/implementation/.sourceCatalogShards/shard-1d.yaml
+    files: 5
+    symbols: 35
+  - path: refs/implementation/.sourceCatalogShards/shard-1e.yaml
+    files: 1
+    symbols: 9
+  - path: refs/implementation/.sourceCatalogShards/shard-1f.yaml
+    files: 4
+    symbols: 71
+  query_command: python refs/tools/generate_source_catalog.py --query "<task or symbol>"
+  notes:
+  - Generated from source; never hand-edit this catalog or its shards.
+  - Use catalog query results and symbol line ranges before opening whole source files.
+  - Inputs, outputs, imports, and call dependencies are static-analysis hints; runtime/dynamic behavior still requires source
+    or tests when relevant.
